@@ -65,6 +65,14 @@ class User {
   static async setRealNameVerified(id) {
     await pool.execute('UPDATE users SET is_real_name_verified = 1, updated_at = NOW() WHERE id = ?', [id]);
   }
+
+  static async updateDoublePointsFlag(id, flag) {
+    await pool.execute('UPDATE users SET has_double_points = ?, updated_at = NOW() WHERE id = ?', [flag ? 1 : 0, id]);
+  }
+
+  static async updateShieldFlag(id, flag) {
+    await pool.execute('UPDATE users SET has_shield = ?, updated_at = NOW() WHERE id = ?', [flag ? 1 : 0, id]);
+  }
 }
 
 module.exports = User;

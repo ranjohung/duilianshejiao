@@ -14,9 +14,12 @@ class CheckInService {
     return ApiResponse.fromJson(res.data, (d) => CheckInModel.fromJson(d));
   }
 
-  /// 获取签到状态
-  Future<ApiResponse<Map<String, dynamic>>> getCheckInStatus() async {
+  /// 获取签到状态（返回结构化 CheckInStatus）
+  Future<ApiResponse<CheckInStatus>> getCheckInStatus() async {
     final res = await _client.get(ApiRoutes.checkInStatus);
-    return ApiResponse.fromJson(res.data, (d) => d as Map<String, dynamic>);
+    return ApiResponse.fromJson(
+      res.data,
+      (d) => CheckInStatus.fromJson(d as Map<String, dynamic>),
+    );
   }
 }

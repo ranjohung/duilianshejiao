@@ -63,17 +63,49 @@ class UserModel {
     }
   }
 
+  // ============ 学员等级体系 ============
+
+  /// 学员等级标签
+  static const Map<String, String> studentLevelLabels = {
+    'bronze': '青铜',
+    'silver': '白银',
+    'gold': '黄金',
+    'platinum': '铂金',
+    'diamond': '钻石',
+    'master': '大师',
+  };
+
+  /// 学员等级所需最低积分
+  static const Map<String, int> studentLevelMinPoints = {
+    'bronze': 0,
+    'silver': 100,
+    'gold': 300,
+    'platinum': 600,
+    'diamond': 1000,
+    'master': 2000,
+  };
+
   /// 学员等级显示名
-  String get studentLevelDisplayName {
-    const map = {
-      'bronze': '青铜学员',
-      'silver': '白银学员',
-      'gold': '黄金学员',
-      'platinum': '铂金学员',
-      'diamond': '钻石学员',
-      'master': '大师学员',
-    };
-    return map[studentLevel] ?? '青铜学员';
+  String get studentLevelLabel => studentLevelLabels[studentLevel] ?? '青铜';
+
+  /// 学员等级显示名（含"学员"后缀）
+  String get studentLevelDisplayName => '${studentLevelLabel}学员';
+
+  /// 下一等级所需积分
+  int get nextLevelPoints {
+    final levels = ['bronze', 'silver', 'gold', 'platinum', 'diamond', 'master'];
+    final idx = levels.indexOf(studentLevel ?? 'bronze');
+    if (idx >= levels.length - 1) return 2000;
+    return studentLevelMinPoints[levels[idx + 1]] ?? 2000;
+  }
+
+  /// 当前等级进度 0.0-1.0
+  double get levelProgress {
+    final current = trainingPoints;
+    final next = nextLevelPoints;
+    final currentLevelMin = studentLevelMinPoints[studentLevel ?? 'bronze'] ?? 0;
+    if (next <= currentLevelMin) return 1.0;
+    return (current - currentLevelMin) / (next - currentLevelMin);
   }
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>

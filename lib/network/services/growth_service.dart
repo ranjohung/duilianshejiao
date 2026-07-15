@@ -10,13 +10,34 @@ import '../../models/learning_card_model.dart';
 class GrowthService {
   final _client = ApiClient.instance;
 
+  /// 获取成长档案（五维度分数+积分+等级+里程碑）
+  Future<ApiResponse<Map<String, dynamic>>> getProfile() async {
+    final res = await _client.get(ApiRoutes.growthProfile);
+    return ApiResponse.fromJson(res.data, (d) => d as Map<String, dynamic>);
+  }
+
   /// 获取能力雷达图
   Future<ApiResponse<GrowthModel>> getRadar() async {
     final res = await _client.get(ApiRoutes.growthRadar);
     return ApiResponse.fromJson(res.data, (d) => GrowthModel.fromJson(d));
   }
 
-  /// 获取进步曲线（7天/30天）
+  /// 获取周进步数据（五维度本周vs上周对比）
+  Future<ApiResponse<Map<String, dynamic>>> getWeeklyProgress() async {
+    final res = await _client.get(ApiRoutes.growthWeeklyProgress);
+    return ApiResponse.fromJson(res.data, (d) => d as Map<String, dynamic>);
+  }
+
+  /// 获取进步曲线（近30天每日平均分）
+  Future<ApiResponse<Map<String, dynamic>>> getProgressCurve({int days = 30}) async {
+    final res = await _client.get(
+      ApiRoutes.growthProgressCurve,
+      queryParameters: {'days': days},
+    );
+    return ApiResponse.fromJson(res.data, (d) => d as Map<String, dynamic>);
+  }
+
+  /// 获取进步曲线（7天/30天）— 兼容旧接口
   Future<ApiResponse<List<double>>> getProgress({int days = 7}) async {
     final res = await _client.get(
       ApiRoutes.growthProgress,

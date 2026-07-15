@@ -17,8 +17,17 @@ class MembershipService {
     );
   }
 
+  /// 获取当前会员状态
+  Future<ApiResponse<Map<String, dynamic>>> getStatus() async {
+    final res = await _client.get(ApiRoutes.membershipStatus);
+    return ApiResponse.fromJson(
+      res.data,
+      (d) => d as Map<String, dynamic>,
+    );
+  }
+
   /// 购买会员
-  Future<ApiResponse<MembershipModel>> purchase({
+  Future<ApiResponse<Map<String, dynamic>>> purchase({
     required String level,
     required String paymentMethod,
   }) async {
@@ -26,6 +35,15 @@ class MembershipService {
       ApiRoutes.membershipPurchase,
       data: {'level': level, 'paymentMethod': paymentMethod},
     );
-    return ApiResponse.fromJson(res.data, (d) => MembershipModel.fromJson(d));
+    return ApiResponse.fromJson(res.data, (d) => d as Map<String, dynamic>);
+  }
+
+  /// 获取会员权益对比表
+  Future<ApiResponse<Map<String, dynamic>>> getComparison() async {
+    final res = await _client.get(ApiRoutes.membershipComparison);
+    return ApiResponse.fromJson(
+      res.data,
+      (d) => d as Map<String, dynamic>,
+    );
   }
 }

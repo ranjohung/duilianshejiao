@@ -17,6 +17,11 @@ class ItemService {
     );
   }
 
+  /// 获取用户道具背包（别名，与 getItems 一致）
+  Future<ApiResponse<List<ItemModel>>> getInventory() async {
+    return getItems();
+  }
+
   /// 使用道具
   Future<ApiResponse> useItem({
     required String itemType,

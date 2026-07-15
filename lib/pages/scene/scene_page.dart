@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../config/app_config.dart';
+import '../../constants/scene_constants.dart';
 import '../../models/scene_model.dart';
 import '../../network/services/scene_service.dart';
 import '../../widgets/common_widgets.dart';
@@ -19,7 +20,7 @@ class _ScenePageState extends State<ScenePage> {
   List<SceneModel> _scenes = [];
   bool _isLoading = true;
   String? _error;
-  int _selectedStage = 0;
+  String _selectedStage = ''; // 空字符串=全部，否则为阶段名
 
   @override
   void initState() {
@@ -33,9 +34,13 @@ class _ScenePageState extends State<ScenePage> {
       _error = null;
     });
     try {
-      final result = await _sceneService.getSceneList(
-        stage: _selectedStage > 0 ? _selectedStage : null,
-      );
+      // 将阶段名转为 stage 数字
+      int? stageNum;
+      if (_selectedStage.isNotEmpty) {
+        final idx = SceneStages.all.indexOf(_selectedStage);
+        if (idx >= 0) stageNum = idx + 1;
+      }
+      final result = await _sceneService.getSceneList(stage: stageNum);
       if (result.isSuccess && result.data != null) {
         setState(() {
           _scenes = result.data!;
@@ -80,29 +85,25 @@ class _ScenePageState extends State<ScenePage> {
     );
   }
 
+  /// 顶部6大阶段横向滚动Chips
   Widget _buildStageFilter() {
-    final stages = [
-      {'label': '全部', 'value': 0},
-      {'label': '破冰期', 'value': 1},
-      {'label': '接触期', 'value': 2},
-      {'label': '熟悉期', 'value': 3},
-      {'label': '深化期', 'value': 4},
-      {'label': '升华期', 'value': 5},
-    ];
+    final stages = ['全部', ...SceneStages.all];
     return Container(
       height: 48,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: ListView(
         scrollDirection: Axis.horizontal,
-        children: stages.map((s) {
-          final selected = _selectedStage == s['value'];
+        children: stages.map((label) {
+          final isAll = label == '全部';
+          final selected =
+              isAll ? _selectedStage.isEmpty : _selectedStage == label;
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
             child: ChoiceChip(
-              label: Text(s['label'] as String),
+              label: Text(label),
               selected: selected,
               onSelected: (_) {
-                setState(() => _selectedStage = s['value'] as int);
+                setState(() => _selectedStage = isAll ? '' : label);
                 _loadScenes();
               },
               selectedColor: AppConfig.primaryColor.withOpacity(0.2),
@@ -113,113 +114,227 @@ class _ScenePageState extends State<ScenePage> {
     );
   }
 
-  /// 本地兜底场景数据
-  Widget _buildLocalScenes() {
-    final localScenes = [
-      _LocalScene(
+  /// 本地兜底场景数据（6个MVP场景）
+  List<_LocalScene> get _localScenes => [
+        _LocalScene(
           name: '初次见面',
           desc: '学会在陌生场合自然打招呼',
-          stage: '破冰期',
+          stage: SceneStages.breakingIce,
           difficulty: 1,
-          icon: Icons.waving_hand),
-      _LocalScene(
+          icon: Icons.waving_hand,
+          estimatedDuration: 5,
+          completionRate: 0.8,
+          isLocked: false,
+          unlockHint: '',
+        ),
+        _LocalScene(
           name: '兴趣破冰',
           desc: '找到共同话题，打开话匣子',
-          stage: '破冰期',
+          stage: SceneStages.breakingIce,
           difficulty: 1,
-          icon: Icons.favorite_border),
-      _LocalScene(
+          icon: Icons.favorite_border,
+          estimatedDuration: 8,
+          completionRate: 0.5,
+          isLocked: false,
+          unlockHint: '',
+        ),
+        _LocalScene(
           name: '同事闲聊',
           desc: '在茶水间自然地聊天',
-          stage: '接触期',
+          stage: SceneStages.contact,
           difficulty: 2,
-          icon: Icons.coffee),
-      _LocalScene(
-          name: '朋友聚会',
-          desc: '在多人场合中自如交流',
-          stage: '接触期',
-          difficulty: 2,
-          icon: Icons.groups),
-      _LocalScene(
+          icon: Icons.coffee,
+          estimatedDuration: 10,
+          completionRate: 0.0,
+          isLocked: false,
+          unlockHint: '',
+        ),
+        _LocalScene(
           name: '深度倾诉',
           desc: '与好友分享内心感受',
-          stage: '熟悉期',
-          difficulty: 3,
-          icon: Icons.chat),
-      _LocalScene(
+          stage: SceneStages.familiar,
+          difficulty: 2,
+          icon: Icons.chat,
+          estimatedDuration: 15,
+          completionRate: 0.0,
+          isLocked: true,
+          unlockHint: '积分≥50',
+        ),
+        _LocalScene(
           name: '团队演讲',
           desc: '在众人面前自信表达',
-          stage: '深化期',
-          difficulty: 4,
-          icon: Icons.mic),
-    ];
-    return GridView.count(
-      crossAxisCount: 2,
+          stage: SceneStages.workplace,
+          difficulty: 3,
+          icon: Icons.mic,
+          estimatedDuration: 20,
+          completionRate: 0.0,
+          isLocked: true,
+          unlockHint: '积分≥100',
+        ),
+        _LocalScene(
+          name: '冲突化解',
+          desc: '化解激烈冲突，达成共识',
+          stage: SceneStages.advanced,
+          difficulty: 3,
+          icon: Icons.handshake,
+          estimatedDuration: 25,
+          completionRate: 0.0,
+          isLocked: true,
+          unlockHint: '积分≥300',
+        ),
+      ];
+
+  /// 本地兜底场景列表（按选中阶段过滤）
+  Widget _buildLocalScenes() {
+    final filtered = _selectedStage.isEmpty
+        ? _localScenes
+        : _localScenes.where((s) => s.stage == _selectedStage).toList();
+    if (filtered.isEmpty) {
+      return Center(
+        child: Text('该阶段暂无场景', style: TextStyle(color: Colors.grey[500])),
+      );
+    }
+    return ListView.builder(
       padding: const EdgeInsets.all(16),
-      mainAxisSpacing: 12,
-      crossAxisSpacing: 12,
-      childAspectRatio: 0.85,
-      children: localScenes.map((s) => _buildLocalSceneCard(s)).toList(),
+      itemCount: filtered.length,
+      itemBuilder: (context, index) => _buildLocalSceneCard(filtered[index]),
     );
   }
 
   Widget _buildLocalSceneCard(_LocalScene scene) {
-    return GestureDetector(
-      onTap: () => _onLocalSceneTap(scene),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 8)
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: AppConfig.primaryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(scene.icon, color: AppConfig.primaryColor),
-              ),
-              const SizedBox(height: 10),
-              Text(scene.name,
-                  style: const TextStyle(
-                      fontSize: 15, fontWeight: FontWeight.w600),
-                  textAlign: TextAlign.center),
-              const SizedBox(height: 4),
-              Text(scene.desc,
-                  style: TextStyle(fontSize: 11, color: Colors.grey[600]),
-                  textAlign: TextAlign.center,
-                  maxLines: 2),
-              const SizedBox(height: 6),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                    decoration: BoxDecoration(
-                      color: AppConfig.primaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(scene.stage,
-                        style: TextStyle(
-                            fontSize: 9, color: AppConfig.primaryColor)),
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 第一行：图标+名称+阶段标签
+            Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: scene.isLocked
+                        ? Colors.grey[200]
+                        : AppConfig.primaryColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  const SizedBox(width: 6),
-                  Text('⭐' * scene.difficulty,
-                      style: const TextStyle(fontSize: 9)),
-                ],
+                  child: Icon(
+                    scene.isLocked ? Icons.lock_outline : scene.icon,
+                    color:
+                        scene.isLocked ? Colors.grey : AppConfig.primaryColor,
+                    size: 22,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        scene.name,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: scene.isLocked ? Colors.grey : Colors.black,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 1),
+                            decoration: BoxDecoration(
+                              color: AppConfig.primaryColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(scene.stage,
+                                style: TextStyle(
+                                    fontSize: 9,
+                                    color: AppConfig.primaryColor)),
+                          ),
+                          const SizedBox(width: 8),
+                          Text('⭐' * scene.difficulty,
+                              style: const TextStyle(fontSize: 10)),
+                          const SizedBox(width: 8),
+                          Text('约${scene.estimatedDuration}分钟',
+                              style: TextStyle(
+                                  fontSize: 10, color: Colors.grey[500])),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            // 描述
+            Text(scene.desc,
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis),
+            const SizedBox(height: 8),
+            // 完成度进度条
+            Row(
+              children: [
+                Text('完成度',
+                    style: TextStyle(fontSize: 11, color: Colors.grey[500])),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: LinearProgressIndicator(
+                      value: scene.completionRate,
+                      backgroundColor: Colors.grey[200],
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        scene.completionRate >= 1.0
+                            ? AppConfig.successColor
+                            : AppConfig.primaryColor,
+                      ),
+                      minHeight: 6,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Text('${(scene.completionRate * 100).toInt()}%',
+                    style: TextStyle(fontSize: 11, color: Colors.grey[500])),
+              ],
+            ),
+            const SizedBox(height: 10),
+            // 开始训练按钮
+            SizedBox(
+              width: double.infinity,
+              height: 36,
+              child: ElevatedButton(
+                onPressed:
+                    scene.isLocked ? null : () => _onLocalSceneTap(scene),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: scene.isLocked
+                      ? Colors.grey[300]
+                      : AppConfig.primaryColor,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
+                  elevation: 0,
+                ),
+                child: scene.isLocked
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.lock, size: 14),
+                          const SizedBox(width: 4),
+                          Text('解锁条件：${scene.unlockHint}',
+                              style: const TextStyle(fontSize: 12)),
+                        ],
+                      )
+                    : const Text('开始训练', style: TextStyle(fontSize: 13)),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -234,72 +349,140 @@ class _ScenePageState extends State<ScenePage> {
   }
 
   Widget _buildSceneCard(SceneModel scene) {
+    final locked = scene.isLocked;
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(12),
-        leading: Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: scene.isUnlocked
-                ? AppConfig.primaryColor.withOpacity(0.1)
-                : Colors.grey[200],
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(
-            scene.isUnlocked ? Icons.theater_comedy : Icons.lock_outline,
-            color: scene.isUnlocked ? AppConfig.primaryColor : Colors.grey,
-          ),
-        ),
-        title: Text(
-          scene.name,
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: scene.isUnlocked ? Colors.black : Colors.grey,
-          ),
-        ),
-        subtitle: Column(
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 4),
+            // 第一行：图标+名称+阶段标签
+            Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: locked
+                        ? Colors.grey[200]
+                        : AppConfig.primaryColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    locked ? Icons.lock_outline : Icons.theater_comedy,
+                    color: locked ? Colors.grey : AppConfig.primaryColor,
+                    size: 22,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        scene.name,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: locked ? Colors.grey : Colors.black,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 1),
+                            decoration: BoxDecoration(
+                              color: AppConfig.primaryColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(scene.stageDisplayName,
+                                style: TextStyle(
+                                    fontSize: 9,
+                                    color: AppConfig.primaryColor)),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(scene.difficultyText,
+                              style: const TextStyle(fontSize: 10)),
+                          const SizedBox(width: 8),
+                          Text('约${scene.estimatedDuration}分钟',
+                              style: TextStyle(
+                                  fontSize: 10, color: Colors.grey[500])),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            // 描述
             Text(
               scene.description ?? scene.teachingPoint,
               style: TextStyle(fontSize: 12, color: Colors.grey[600]),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 8),
+            // 完成度进度条
             Row(
               children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                  decoration: BoxDecoration(
-                    color: AppConfig.primaryColor.withOpacity(0.1),
+                Text('完成度',
+                    style: TextStyle(fontSize: 11, color: Colors.grey[500])),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: ClipRRect(
                     borderRadius: BorderRadius.circular(4),
+                    child: LinearProgressIndicator(
+                      value: scene.completionRate,
+                      backgroundColor: Colors.grey[200],
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        scene.completionRate >= 1.0
+                            ? AppConfig.successColor
+                            : AppConfig.primaryColor,
+                      ),
+                      minHeight: 6,
+                    ),
                   ),
-                  child: Text(scene.stageDisplayName,
-                      style: TextStyle(
-                          fontSize: 10, color: AppConfig.primaryColor)),
                 ),
-                const SizedBox(width: 8),
-                Text(scene.difficultyText,
-                    style: const TextStyle(fontSize: 10)),
-                const SizedBox(width: 8),
-                Text('${scene.rounds}轮 · ${scene.estimatedDuration}分钟',
-                    style: TextStyle(fontSize: 10, color: Colors.grey[500])),
+                const SizedBox(width: 6),
+                Text('${(scene.completionRate * 100).toInt()}%',
+                    style: TextStyle(fontSize: 11, color: Colors.grey[500])),
               ],
+            ),
+            const SizedBox(height: 10),
+            // 开始训练按钮
+            SizedBox(
+              width: double.infinity,
+              height: 36,
+              child: ElevatedButton(
+                onPressed: locked ? null : () => _onSceneTap(scene),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      locked ? Colors.grey[300] : AppConfig.primaryColor,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
+                  elevation: 0,
+                ),
+                child: locked
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.lock, size: 14),
+                          const SizedBox(width: 4),
+                          Text('解锁条件：${scene.unlockDescription}',
+                              style: const TextStyle(fontSize: 12)),
+                        ],
+                      )
+                    : const Text('开始训练', style: TextStyle(fontSize: 13)),
+              ),
             ),
           ],
         ),
-        trailing: Icon(
-          scene.isUnlocked ? Icons.arrow_forward_ios : Icons.lock,
-          size: 16,
-          color: scene.isUnlocked ? AppConfig.primaryColor : Colors.grey,
-        ),
-        onTap: scene.isUnlocked ? () => _onSceneTap(scene) : null,
       ),
     );
   }
@@ -316,7 +499,6 @@ class _ScenePageState extends State<ScenePage> {
   }
 
   void _onLocalSceneTap(_LocalScene scene) {
-    // 选择场景后跳转到教练选择
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => const SceneSelectPage(
@@ -334,6 +516,10 @@ class _LocalScene {
   final String stage;
   final int difficulty;
   final IconData icon;
+  final int estimatedDuration;
+  final double completionRate;
+  final bool isLocked;
+  final String unlockHint;
 
   const _LocalScene({
     required this.name,
@@ -341,5 +527,9 @@ class _LocalScene {
     required this.stage,
     required this.difficulty,
     required this.icon,
+    required this.estimatedDuration,
+    required this.completionRate,
+    required this.isLocked,
+    required this.unlockHint,
   });
 }

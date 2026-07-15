@@ -17,4 +17,7 @@ router.get('/talents', auth, socialController.listTalents);
 // GET /api/social/challenges
 router.get('/challenges', auth, socialController.listChallenges);
 
+// GET /api/social/leaderboard
+router.get('/leaderboard', auth, socialController.getLeaderboard);
+
 module.exports = router;

@@ -38,8 +38,11 @@ class ApiRoutes {
 
   // ============ 成长模块 ============
   static const String growthRadar = '$_prefix/growth/radar';
+  static const String growthProfile = '$_prefix/growth/profile';
   static const String growthProgress = '$_prefix/growth/progress';
   static const String growthWeeklyReport = '$_prefix/growth/weekly-report';
+  static const String growthWeeklyProgress = '$_prefix/growth/weekly-progress';
+  static const String growthProgressCurve = '$_prefix/growth/progress-curve';
   static const String growthMilestones = '$_prefix/growth/milestones';
 
   // ============ 签到模块 ============
@@ -62,7 +65,9 @@ class ApiRoutes {
 
   // ============ 会员模块 ============
   static const String membershipPlans = '$_prefix/membership/plans';
-  static const String membershipPurchase = '$_prefix/membership/purchase';
+  static const String membershipPurchase = '$_prefix/membership/subscribe';
+  static const String membershipStatus = '$_prefix/membership/status';
+  static const String membershipComparison = '$_prefix/membership/comparison';
 
   // ============ 情绪日记 ============
   static const String emotionDiaries = '$_prefix/emotion-diaries';

@@ -527,6 +527,103 @@ body {
 .tab-item.active i { color:var(--gold); }
 .tab-item.active span { color:var(--gold); font-weight:600; }
 
+/* ========== 进步曲线 ========== */
+.progress-chart {
+  margin:16px 20px; padding:18px; background:var(--card);
+  border-radius:var(--radius); box-shadow:var(--shadow);
+}
+.progress-chart h3 { font-size:15px; font-weight:600; color:var(--text); margin-bottom:14px; }
+.chart-container { position:relative; height:140px; display:flex; align-items:flex-end; gap:6px; padding-bottom:24px; }
+.chart-bar-group { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
+.chart-bar { width:100%; border-radius:4px 4px 0 0; background:linear-gradient(180deg, var(--gold), #FFD700); transition:height 0.6s ease; min-height:4px; }
+.chart-bar:hover { opacity:0.85; }
+.chart-label { font-size:10px; color:var(--text-light); }
+.chart-line-svg { position:absolute; top:0; left:0; width:100%; height:calc(100% - 24px); pointer-events:none; }
+.chart-legend { display:flex; align-items:center; gap:16px; margin-top:10px; font-size:11px; color:var(--text-light); }
+.chart-legend i { margin-right:4px; }
+
+/* ========== 弹窗通用 ========== */
+.modal-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000;
+  display:none; align-items:center; justify-content:center; padding:20px;
+  animation: modalFadeIn 0.25s ease;
+}
+.modal-overlay.show { display:flex; }
+@keyframes modalFadeIn { from{opacity:0} to{opacity:1} }
+.modal-box {
+  width:100%; max-width:400px; max-height:85vh; background:var(--card);
+  border-radius:var(--radius); overflow-y:auto; position:relative;
+  animation: modalSlideUp 0.3s ease;
+}
+@keyframes modalSlideUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+.modal-header {
+  padding:18px 20px; display:flex; align-items:center; justify-content:space-between;
+  border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--card); z-index:1;
+}
+.modal-header h3 { font-size:17px; font-weight:700; color:var(--primary); }
+.modal-close { width:30px; height:30px; border:none; background:#F0F4FF; border-radius:50%; cursor:pointer; font-size:14px; color:var(--text-light); display:flex; align-items:center; justify-content:center; }
+.modal-body { padding:20px; }
+
+/* 签到成功弹窗 */
+.sign-success-modal .modal-body { text-align:center; padding:30px 20px; }
+.sign-success-icon { font-size:56px; margin-bottom:12px; animation: signBounce 0.6s ease; }
+@keyframes signBounce { 0%{transform:scale(0)} 50%{transform:scale(1.2)} 100%{transform:scale(1)} }
+.sign-success-title { font-size:20px; font-weight:700; color:var(--primary); margin-bottom:8px; }
+.sign-success-info { font-size:15px; color:var(--text); margin-bottom:4px; }
+.sign-success-points { font-size:18px; font-weight:700; color:var(--gold); margin:12px 0; }
+.sign-success-btn {
+  margin-top:16px; padding:12px 40px; border:none; border-radius:24px;
+  background:var(--primary); color:#fff; font-size:15px; font-weight:600; cursor:pointer;
+}
+
+/* 会员权益表格 */
+.member-table { width:100%; border-collapse:collapse; font-size:11px; }
+.member-table th, .member-table td { padding:8px 4px; text-align:center; border:1px solid var(--border); }
+.member-table th { background:var(--primary); color:#fff; font-weight:600; font-size:11px; }
+.member-table th:first-child { background:#1a4a7a; }
+.member-table td:first-child { font-weight:600; color:var(--primary); background:#F8FAFC; text-align:left; padding-left:8px; }
+.member-table .highlight-col { background:#FFF9EC; }
+.member-table .price-row td { font-weight:700; color:var(--gold); background:#FFF9EC; }
+.member-table .price-row td:first-child { color:var(--primary); background:#F0F4FF; }
+
+/* 晚安计划弹窗 */
+.night-plan-section { margin-bottom:18px; }
+.night-plan-section label { display:block; font-size:14px; font-weight:600; color:var(--text); margin-bottom:10px; }
+.coach-select { display:flex; gap:10px; flex-wrap:wrap; }
+.coach-select-item {
+  flex:1; min-width:100px; padding:12px 8px; border:2px solid var(--border); border-radius:var(--radius-sm);
+  text-align:center; cursor:pointer; transition:all 0.2s;
+}
+.coach-select-item.active { border-color:var(--primary); background:#F0F4FF; }
+.coach-select-item .cs-avatar { width:40px; height:40px; border-radius:50%; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+.coach-select-item .cs-name { font-size:12px; color:var(--text); font-weight:500; }
+.time-picker-row { display:flex; gap:12px; }
+.time-picker-row select {
+  flex:1; padding:12px; border:1.5px solid var(--border); border-radius:var(--radius-sm);
+  font-size:15px; color:var(--text); background:var(--card); outline:none;
+}
+.time-picker-row select:focus { border-color:var(--primary); }
+.switch-row {
+  display:flex; align-items:center; justify-content:space-between; padding:14px 0;
+  border-top:1px solid var(--border);
+}
+.switch-row .switch-label { font-size:14px; color:var(--text); }
+.switch-row .switch-label small { display:block; font-size:12px; color:var(--text-light); font-weight:400; }
+.toggle-switch {
+  width:48px; height:26px; background:var(--border); border-radius:13px;
+  position:relative; cursor:pointer; transition:background 0.3s;
+}
+.toggle-switch.on { background:var(--success); }
+.toggle-switch::after {
+  content:''; position:absolute; top:3px; left:3px; width:20px; height:20px;
+  background:#fff; border-radius:50%; transition:transform 0.3s; box-shadow:0 1px 4px rgba(0,0,0,0.15);
+}
+.toggle-switch.on::after { transform:translateX(22px); }
+.night-plan-save {
+  width:100%; padding:14px; border:none; border-radius:var(--radius-sm);
+  background:var(--primary); color:#fff; font-size:15px; font-weight:600; cursor:pointer; margin-top:10px;
+}
+
 /* 动画类 */
 .fade-in { animation: fadeIn 0.3s ease; }
 @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
@@ -824,6 +921,23 @@ body {
         <div class="stat-label">本周进步</div>
       </div>
     </div>
+    <div class="progress-chart fade-in">
+      <h3><i class="fas fa-chart-area" style="color:var(--gold);margin-right:6px;"></i>进步曲线</h3>
+      <div class="chart-container" id="progress-chart-container">
+        <svg class="chart-line-svg" id="chart-line-svg" viewBox="0 0 300 116" preserveAspectRatio="none"></svg>
+        <div class="chart-bar-group"><div class="chart-bar" style="height:30%"></div><div class="chart-label">周一</div></div>
+        <div class="chart-bar-group"><div class="chart-bar" style="height:45%"></div><div class="chart-label">周二</div></div>
+        <div class="chart-bar-group"><div class="chart-bar" style="height:40%"></div><div class="chart-label">周三</div></div>
+        <div class="chart-bar-group"><div class="chart-bar" style="height:60%"></div><div class="chart-label">周四</div></div>
+        <div class="chart-bar-group"><div class="chart-bar" style="height:55%"></div><div class="chart-label">周五</div></div>
+        <div class="chart-bar-group"><div class="chart-bar" style="height:75%"></div><div class="chart-label">周六</div></div>
+        <div class="chart-bar-group"><div class="chart-bar" style="height:85%"></div><div class="chart-label">周日</div></div>
+      </div>
+      <div class="chart-legend">
+        <span><i class="fas fa-square" style="color:var(--gold);"></i> 训练得分</span>
+        <span><i class="fas fa-arrow-up" style="color:var(--success);"></i> 本周上升23%</span>
+      </div>
+    </div>
     <div class="section-title">里程碑</div>
     <div class="milestone-list">
       <div class="milestone-item">
@@ -924,6 +1038,111 @@ body {
       <i class="fas fa-user"></i><span>我的</span>
     </div>
   </div>
+
+  <!-- ========== 签到成功弹窗 ========== -->
+  <div class="modal-overlay" id="modal-sign-success">
+    <div class="modal-box sign-success-modal">
+      <div class="modal-body">
+        <div class="sign-success-icon">🎉</div>
+        <div class="sign-success-title">签到成功！</div>
+        <div class="sign-success-info" id="sign-success-days">连续签到 8 天</div>
+        <div class="sign-success-points" id="sign-success-points"><i class="fas fa-coins"></i> +5 积分</div>
+        <button class="sign-success-btn" onclick="closeModal('modal-sign-success')">知道了</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 会员权益弹窗 ========== -->
+  <div class="modal-overlay" id="modal-member">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3><i class="fas fa-crown" style="color:var(--gold);margin-right:6px;"></i>会员中心</h3>
+        <button class="modal-close" onclick="closeModal('modal-member')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <table class="member-table">
+          <thead>
+            <tr>
+              <th>权益</th><th>体验</th><th>免费</th><th>日卡</th><th>周卡</th><th>月卡</th><th>年卡</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>LLM引擎</td><td>DeepSeek(1次)</td><td>Ollama</td><td>DeepSeek</td><td>DeepSeek</td><td>DeepSeek</td><td>DeepSeek高优</td>
+            </tr>
+            <tr>
+              <td>每周训练</td><td>1次</td><td>15次</td><td>20次</td><td>无限</td><td>无限</td><td>无限</td>
+            </tr>
+            <tr>
+              <td>教练渲染</td><td>2D</td><td>2D</td><td>2D</td><td>2.5D</td><td>3D</td><td>3D+真人</td>
+            </tr>
+            <tr>
+              <td>语音训练</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td>
+            </tr>
+            <tr>
+              <td>场景解锁</td><td>2个</td><td>6个</td><td>10个</td><td>全部</td><td>全部</td><td>全部</td>
+            </tr>
+            <tr>
+              <td>训练报告</td><td>基础</td><td>基础</td><td>详细</td><td>详细</td><td>深度</td><td>深度+AI</td>
+            </tr>
+            <tr>
+              <td>教练对话</td><td>3轮/天</td><td>10轮/天</td><td>20轮/天</td><td>50轮/天</td><td>无限</td><td>无限</td>
+            </tr>
+            <tr class="price-row">
+              <td>价格</td><td>免费</td><td>免费</td><td>¥3.9/日</td><td>¥18/周</td><td>¥58/月</td><td>¥398/年</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 晚安计划弹窗 ========== -->
+  <div class="modal-overlay" id="modal-night-plan">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3><i class="fas fa-moon" style="color:#8B5CF6;margin-right:6px;"></i>晚安计划</h3>
+        <button class="modal-close" onclick="closeModal('modal-night-plan')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="night-plan-section">
+          <label>选择教练</label>
+          <div class="coach-select" id="coach-select">
+            <div class="coach-select-item active" onclick="selectNightCoach(this)">
+              <div class="cs-avatar" style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;"><i class="fas fa-user-tie"></i></div>
+              <div class="cs-name">沈清欢</div>
+            </div>
+            <div class="coach-select-item" onclick="selectNightCoach(this)">
+              <div class="cs-avatar" style="background:linear-gradient(135deg,#f093fb,#f5576c);color:#fff;"><i class="fas fa-female"></i></div>
+              <div class="cs-name">林知夏</div>
+            </div>
+            <div class="coach-select-item" onclick="selectNightCoach(this)">
+              <div class="cs-avatar" style="background:linear-gradient(135deg,#4facfe,#00f2fe);color:#fff;"><i class="fas fa-user-graduate"></i></div>
+              <div class="cs-name">陈默然</div>
+            </div>
+          </div>
+        </div>
+        <div class="night-plan-section">
+          <label>提醒时间</label>
+          <div class="time-picker-row">
+            <select id="night-hour">
+              <option value="21">21</option><option value="22" selected>22</option><option value="23">23</option>
+            </select>
+            <span style="font-size:20px;color:var(--text-light);">:</span>
+            <select id="night-minute">
+              <option value="00" selected>00</option><option value="15">15</option><option value="30">30</option><option value="45">45</option>
+            </select>
+          </div>
+        </div>
+        <div class="switch-row">
+          <div class="switch-label">开启晚安计划<small>每日定时收到教练的温馨提醒</small></div>
+          <div class="toggle-switch on" id="night-toggle" onclick="toggleNightSwitch()"></div>
+        </div>
+        <button class="night-plan-save" onclick="saveNightPlan()">保存设置</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -932,6 +1151,7 @@ const viewMap = ['view-home','view-coach','view-scene','view-growth','view-profi
 let currentTab = 0;
 let signedIn = false;
 let chatRound = 0;
+let consecutiveDays = 7;
 
 // ===== 对话数据 =====
 const chatData = [
@@ -1032,11 +1252,17 @@ function switchTab(idx) {
 function doSignIn() {
   if (signedIn) return;
   signedIn = true;
+  consecutiveDays++;
   const btn = document.getElementById('sign-in-btn');
   btn.classList.add('signed');
   document.getElementById('sign-text').textContent = '已签到';
   document.getElementById('sign-sub').textContent = '今日已签到 ✓';
   btn.querySelector('.sign-icon').className = 'fas fa-check-circle sign-icon';
+  // 显示签到成功弹窗
+  document.getElementById('sign-success-days').textContent = '连续签到 ' + consecutiveDays + ' 天';
+  const points = consecutiveDays >= 7 ? 10 : 5;
+  document.getElementById('sign-success-points').innerHTML = '<i class="fas fa-coins"></i> +' + points + ' 积分';
+  showModal('modal-sign-success');
 }
 
 // ===== 场景Tab =====
@@ -1248,6 +1474,57 @@ function drawResultRadar() {
 
 function drawGrowthRadar() {
   drawRadar('growth-radar-canvas', [85, 80, 75, 70, 65], ['沟通力','表达力','共情力','情绪控制','应变力'], 240);
+}
+
+// ===== 弹窗控制 =====
+function showModal(id) {
+  document.getElementById(id).classList.add('show');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+// 点击弹窗遮罩关闭
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('show');
+  });
+});
+
+// ===== 会员中心点击 =====
+document.querySelector('.menu-item').addEventListener('click', function() {
+  showModal('modal-member');
+});
+
+// ===== 晚安计划点击 =====
+document.querySelectorAll('.menu-item')[1].addEventListener('click', function() {
+  showModal('modal-night-plan');
+});
+
+// ===== 晚安计划功能 =====
+function selectNightCoach(el) {
+  document.querySelectorAll('#coach-select .coach-select-item').forEach(item => item.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function toggleNightSwitch() {
+  const toggle = document.getElementById('night-toggle');
+  toggle.classList.toggle('on');
+}
+
+function saveNightPlan() {
+  const coach = document.querySelector('#coach-select .coach-select-item.active .cs-name').textContent;
+  const hour = document.getElementById('night-hour').value;
+  const minute = document.getElementById('night-minute').value;
+  const isOn = document.getElementById('night-toggle').classList.contains('on');
+  closeModal('modal-night-plan');
+  // 简易提示
+  const toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;top:60px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:12px 24px;border-radius:24px;font-size:14px;z-index:2000;box-shadow:0 4px 16px rgba(0,0,0,0.2);animation:modalFadeIn 0.3s ease;';
+  toast.textContent = (isOn ? '✅ 晚安计划已开启' : '⏸ 晚安计划已关闭') + ' - ' + coach + ' ' + hour + ':' + minute;
+  document.body.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.3s'; }, 2000);
+  setTimeout(() => toast.remove(), 2400);
 }
 
 // ===== 初始化 =====

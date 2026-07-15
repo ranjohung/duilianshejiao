@@ -6,21 +6,30 @@ const SQL_STATEMENTS = [
   `CREATE TABLE IF NOT EXISTS users (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     phone VARCHAR(20) NOT NULL UNIQUE,
-    password_hash VARCHAR(255),
+    password VARCHAR(255),
     nickname VARCHAR(50) NOT NULL,
     avatar VARCHAR(500),
     bio VARCHAR(200),
+    gender ENUM('male','female','other') DEFAULT 'other',
+    age TINYINT UNSIGNED,
     real_name VARCHAR(50),
     id_card VARCHAR(18),
-    is_real_verified TINYINT(1) DEFAULT 0,
+    is_real_name_verified TINYINT(1) DEFAULT 0,
     member_level ENUM('experience','free','daily','weekly','monthly','yearly') DEFAULT 'free',
     experience_used TINYINT(1) DEFAULT 0,
     coins INT UNSIGNED DEFAULT 0,
+    training_points INT UNSIGNED DEFAULT 0,
+    total_points INT UNSIGNED DEFAULT 0,
+    student_level VARCHAR(20) DEFAULT 'bronze',
+    weekly_trainings_used INT UNSIGNED DEFAULT 0,
     streak_days INT UNSIGNED DEFAULT 0,
+    has_double_points TINYINT(1) DEFAULT 0,
+    has_shield TINYINT(1) DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_phone (phone),
-    INDEX idx_member_level (member_level)
+    INDEX idx_member_level (member_level),
+    INDEX idx_student_level (student_level)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`,
 
   // 教练表
@@ -109,6 +118,7 @@ const SQL_STATEMENTS = [
     user_id BIGINT UNSIGNED NOT NULL,
     check_date DATE NOT NULL,
     streak_days INT UNSIGNED DEFAULT 1,
+    points_earned INT UNSIGNED DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY uk_user_date (user_id, check_date),
     INDEX idx_user_id (user_id),
@@ -154,12 +164,14 @@ const SQL_STATEMENTS = [
   `CREATE TABLE IF NOT EXISTS items (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
+    item_type VARCHAR(50) NOT NULL,
     description VARCHAR(500),
     icon VARCHAR(500),
     category VARCHAR(50),
     price_coins INT UNSIGNED DEFAULT 0,
     is_active TINYINT(1) DEFAULT 1,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_item_type (item_type)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`,
 
   // 用户道具关联表
@@ -169,6 +181,7 @@ const SQL_STATEMENTS = [
     item_id BIGINT UNSIGNED NOT NULL,
     quantity INT UNSIGNED DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY uk_user_item (user_id, item_id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE
@@ -233,6 +246,34 @@ const SQL_STATEMENTS = [
     is_active TINYINT(1) DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`,
+
+  // 里程碑表
+  `CREATE TABLE IF NOT EXISTS milestones (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(500),
+    icon VARCHAR(500),
+    category VARCHAR(50),
+    condition_type VARCHAR(50) NOT NULL,
+    condition_value INT NOT NULL,
+    reward_points INT UNSIGNED DEFAULT 0,
+    reward_item_type VARCHAR(50),
+    reward_item_quantity INT UNSIGNED DEFAULT 0,
+    sort_order INT DEFAULT 0,
+    is_active TINYINT(1) DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`,
+
+  // 用户里程碑关联表
+  `CREATE TABLE IF NOT EXISTS user_milestones (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NOT NULL,
+    milestone_id BIGINT UNSIGNED NOT NULL,
+    unlocked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_user_milestone (user_id, milestone_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (milestone_id) REFERENCES milestones(id) ON DELETE CASCADE
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`,
 ];
 
 async function initDatabase() {
@@ -252,6 +293,40 @@ async function initDatabase() {
   console.log('创建数据表...');
   for (const sql of SQL_STATEMENTS) {
     await connection.execute(sql);
+  }
+
+  // 初始化道具数据
+  const [itemRows] = await connection.execute('SELECT COUNT(*) as cnt FROM items');
+  if (itemRows[0].cnt === 0) {
+    console.log('初始化道具数据...');
+    await connection.execute(`
+      INSERT INTO items (name, item_type, description, icon, category, price_coins) VALUES
+      ('时空穿梭券', 'time_shuttle', '重新选择对话分支，回到上一个决策点', '🕐', 'utility', 50),
+      ('提示卡', 'hint_card', '获取教练对当前场景的额外提示', '💡', 'utility', 30),
+      ('护盾', 'shield', '保护一次训练评分不受扣分影响', '🛡️', 'protection', 40),
+      ('双倍积分卡', 'double_points', '下次训练获得双倍积分', '✨', 'boost', 60)
+    `);
+  }
+
+  // 初始化里程碑数据
+  const [milestoneRows] = await connection.execute('SELECT COUNT(*) as cnt FROM milestones');
+  if (milestoneRows[0].cnt === 0) {
+    console.log('初始化里程碑数据...');
+    await connection.execute(`
+      INSERT INTO milestones (name, description, icon, category, condition_type, condition_value, reward_points, reward_item_type, reward_item_quantity, sort_order) VALUES
+      ('初出茅庐', '完成第一次训练', '🌱', 'training', 'total_sessions', 1, 10, NULL, 0, 1),
+      ('勤学苦练', '累计完成5次训练', '📚', 'training', 'total_sessions', 5, 30, 'hint_card', 1, 2),
+      ('小有所成', '累计完成20次训练', '🎯', 'training', 'total_sessions', 20, 80, 'time_shuttle', 1, 3),
+      ('社交新手', '社交自信度达到60', '🤝', 'dimension', 'social_confidence', 60, 20, NULL, 0, 4),
+      ('表达达人', '表达能力达到60', '🎤', 'dimension', 'expression_ability', 60, 20, NULL, 0, 5),
+      ('情商高手', '情绪智力达到60', '🧠', 'dimension', 'emotional_intelligence', 60, 20, NULL, 0, 6),
+      ('共情之星', '共情能力达到60', '❤️', 'dimension', 'empathy_score', 60, 20, NULL, 0, 7),
+      ('青铜之路', '总积分达到100', '🥉', 'points', 'total_points', 100, 15, NULL, 0, 8),
+      ('白银之辉', '总积分达到300', '🥈', 'points', 'total_points', 300, 30, 'shield', 1, 9),
+      ('黄金之光', '总积分达到600', '🥇', 'points', 'total_points', 600, 60, 'double_points', 1, 10),
+      ('连续签到3天', '连续签到3天', '🔥', 'checkin', 'streak_days', 3, 10, 'time_shuttle', 1, 11),
+      ('连续签到7天', '连续签到7天', '🌟', 'checkin', 'streak_days', 7, 30, 'double_points', 1, 12)
+    `);
   }
 
   console.log('数据库初始化完成！');

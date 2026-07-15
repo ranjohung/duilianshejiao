@@ -25,12 +25,39 @@ class SceneService {
     );
   }
 
+  /// 按阶段获取场景列表
+  Future<ApiResponse<List<SceneModel>>> getScenesByStage({
+    required int stage,
+  }) async {
+    final res = await _client.get(
+      ApiRoutes.sceneList,
+      queryParameters: {'stage': stage},
+    );
+    return ApiResponse.fromJsonList(
+      res.data,
+      (d) => d.map((e) => SceneModel.fromJson(e)).toList(),
+    );
+  }
+
   /// 获取场景详情
   Future<ApiResponse<SceneModel>> getSceneDetail({
     required String sceneId,
   }) async {
     final res = await _client.get('${ApiRoutes.sceneDetail}/$sceneId');
     return ApiResponse.fromJson(res.data, (d) => SceneModel.fromJson(d));
+  }
+
+  /// 检查场景是否解锁
+  Future<ApiResponse<Map<String, dynamic>>> checkUnlock({
+    required String sceneId,
+  }) async {
+    final res = await _client.get(
+      '${ApiRoutes.sceneDetail}/$sceneId/unlock-check',
+    );
+    return ApiResponse.fromJson(
+      res.data,
+      (d) => d as Map<String, dynamic>,
+    );
   }
 
   /// 开始训练
