@@ -1,0 +1,63 @@
+name: duilian_social
+description: 对练社交 - AI对练与社交平台
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # HTTP客户端
+  dio: ^5.4.0
+
+  # 状态管理
+  provider: ^6.1.0
+
+  # 本地存储
+  shared_preferences: ^2.2.0
+
+  # JSON序列化
+  json_annotation: ^4.8.0
+
+  # 国际化
+  intl: ^0.19.0
+
+  # Spine动画（如pub.dev上不存在flutter_spine包，请替换为spine_flutter或使用其他方案）
+  # flutter_spine: ^0.3.0
+
+  # 声网RTC（实时音视频）
+  agora_rtc_engine: ^6.3.0
+
+  # 图片缓存
+  cached_network_image: ^3.3.0
+
+  # 屏幕适配
+  flutter_screenutil: ^5.9.0
+
+  # 图表（雷达图等）
+  fl_chart: ^0.68.0
+
+  cupertino_icons: ^1.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # JSON序列化代码生成
+  build_runner: ^2.4.0
+  json_serializable: ^6.7.0
+
+  flutter_lints: ^3.0.1
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/spine/
+    - assets/fonts/
