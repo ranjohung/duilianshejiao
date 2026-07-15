@@ -448,5 +448,531 @@ module.exports = [
         scoring: { communication: 15, expression: 15, empathy: 5, emotion_control: 10, adaptability: 15 }
       }
     ]
+  },
+  // ========== Phase 4: 高难期 ==========
+  {
+    id: 'scene_salary_approved',
+    name: '加薪谈判-认可型老板',
+    stage: '高难期',
+    difficulty: 'hard',
+    description: '面对已经认可你的能力、但以预算为由推脱的老板，如何突破他的借口争取加薪',
+    total_rounds: 5,
+    unlock_condition: { min_points: 300, min_level: 'gold' },
+    teaching_points: ['准备加薪理由', '开场表达', '应对预算借口', '提出替代方案', '达成共识'],
+    npc_name: '认可型老板',
+    npc_avatar: '/assets/npc/boss_approved.png',
+    opening: '你在公司表现优异，老板也多次肯定你的能力。今天你决定正式提出加薪，推开老板办公室的门...',
+    rounds: [
+      {
+        round: 1,
+        situation: '你走进老板办公室，老板正在看文件。你需要开启加薪话题。',
+        coach_hint: '先表达对公司和团队认可，再自然引入加薪诉求，不要一上来就谈钱',
+        options: [
+          '领导您好，我在公司两年了，非常感谢您的认可。今天想跟您聊聊我的薪资调整。',
+          '领导，我觉得我工资太低了，必须给我加薪。',
+          '领导，那个...嗯...我就是来看看您忙不忙...'
+        ],
+        ideal_response_type: 'appreciation_lead',
+        scoring: { communication: 15, expression: 15, empathy: 10, emotion_control: 15, adaptability: 5 }
+      },
+      {
+        round: 2,
+        situation: '老板说："小X啊，你的能力我是认可的。但你也知道，今年预算确实紧张..."',
+        coach_hint: '先认同对方的难处，再用数据支撑你的价值，不被"认可"冲昏头脑而忽略实质诉求',
+        options: [
+          '理解您的考虑。不过我这半年独立完成了3个核心项目，为部门带来了30%的业绩增长，我想这个贡献值得对应的薪资回报。',
+          '您都说认可我了，那就应该给我加薪啊！',
+          '那算了，我理解公司困难。（放弃）'
+        ],
+        ideal_response_type: 'data_supported',
+        scoring: { communication: 15, expression: 15, empathy: 10, emotion_control: 10, adaptability: 10 }
+      },
+      {
+        round: 3,
+        situation: '老板说："你说的我都知道，但预算真的卡得很死，我也没办法。"',
+        coach_hint: '不要被"没办法"堵死，把问题从"能不能"转向"怎么才能"，提出替代方案',
+        options: [
+          '如果一次性调薪有困难，我们能不能分阶段调整？比如先调一部分，下季度再补齐？或者通过项目奖金的方式体现？',
+          '那您说什么时候能加？总得给个时间吧！',
+          '好吧，那等预算宽松了再说吧。'
+        ],
+        ideal_response_type: 'alternative_proposal',
+        scoring: { communication: 15, expression: 10, empathy: 15, emotion_control: 15, adaptability: 15 }
+      },
+      {
+        round: 4,
+        situation: '老板说："分阶段调可以考虑，但幅度不能太大。你期望多少？"',
+        coach_hint: '给出高于预期的数字作为锚点，同时表达灵活空间，不要先亮底牌',
+        options: [
+          '基于市场行情和我的贡献，我期望调整到X。当然我也理解公司的节奏，如果这个数字有压力，我们可以商量具体方案。',
+          '起码加30%！少了我肯定不干。',
+          '您觉得多少合适？我听您的。'
+        ],
+        ideal_response_type: 'anchored_negotiation',
+        scoring: { communication: 15, expression: 15, empathy: 5, emotion_control: 15, adaptability: 10 }
+      },
+      {
+        round: 5,
+        situation: '老板说："我回去跟HR商量一下，下周给你回复。"你需要锁定承诺。',
+        coach_hint: '友好但坚定地确认时间节点和预期，避免"回去商量"变成无限期拖延',
+        options: [
+          '好的，感谢领导支持。那我们约下周三下午确认结果可以吗？如果还有需要我补充的材料，随时告诉我。',
+          '行，等您消息。（没有跟进）',
+          '下周？能不能这周就定？我不想等太久。'
+        ],
+        ideal_response_type: 'commitment_lock',
+        scoring: { communication: 10, expression: 15, empathy: 10, emotion_control: 15, adaptability: 10 }
+      }
+    ]
+  },
+  {
+    id: 'scene_salary_skeptical',
+    name: '加薪谈判-质疑型老板',
+    stage: '高难期',
+    difficulty: 'hard',
+    description: '面对你的加薪要求，老板质疑你的贡献和价值',
+    total_rounds: 5,
+    unlock_condition: { min_points: 300, min_level: 'gold' },
+    teaching_points: ['陈述加薪请求', '应对质疑', '展示数据', '处理打压', '最终结果'],
+    npc_name: '质疑型老板',
+    npc_avatar: '/assets/npc/boss_skeptical.png',
+    opening: '你向老板提出加薪，对方面无表情地靠在椅背上，用审视的目光看着你...',
+    rounds: [
+      {
+        round: 1,
+        situation: '你提出加薪后，老板冷冷地说："你觉得你值更多？凭什么？"',
+        coach_hint: '不要被对方的语气激怒，冷静地用事实回应，把"凭什么"变成展示价值的机会',
+        options: [
+          '我理解您想看到依据。过去一年我主导了X项目，客户满意度提升了20%，团队效率也提高了15%。这些都是可量化的成果。',
+          '我工作很努力啊，经常加班，凭什么是应该的！',
+          '呃...我觉得我做得还行吧...'
+        ],
+        ideal_response_type: 'fact_based_response',
+        scoring: { communication: 15, expression: 15, empathy: 5, emotion_control: 20, adaptability: 5 }
+      },
+      {
+        round: 2,
+        situation: '老板皱眉说："那是团队的功劳，不能全算你头上。"',
+        coach_hint: '承认团队贡献的同时，清晰地界定你个人的独特价值和不可替代性',
+        options: [
+          '确实是团队共同努力的结果。但其中核心方案是我提出的，关键节点也是我推动解决的。团队其他同事也有贡献，但我的角色是无可替代的。',
+          '你说得对，是我们团队一起做的...',
+          '没有我那个项目根本做不成！'
+        ],
+        ideal_response_type: 'differentiated_value',
+        scoring: { communication: 15, expression: 15, empathy: 10, emotion_control: 15, adaptability: 5 }
+      },
+      {
+        round: 3,
+        situation: '老板翻了翻你的绩效表："你上季度KPI只完成了85%，这怎么说？"',
+        coach_hint: '直面短板不回避，解释背景原因，同时展示你在其他维度的超预期表现',
+        options: [
+          '上季度KPI确实未达满分，主要因为临时接手了Y项目的救火任务，影响了原定指标。但如果看整体产出，Y项目挽回的损失远超KPI缺口。我可以展示详细对比数据。',
+          '那个KPI设定本来就不合理！',
+          '嗯...是，我确实没完成...'
+        ],
+        ideal_response_type: 'context_with_data',
+        scoring: { communication: 15, expression: 15, empathy: 5, emotion_control: 15, adaptability: 10 }
+      },
+      {
+        round: 4,
+        situation: '老板语气缓和了一点，但说："就算你说的都对，现在不是谈这个的时候。"',
+        coach_hint: '识别对方态度松动，不要因"不是时候"而放弃，转化为明确时间承诺',
+        options: [
+          '我理解时机的重要性。那您觉得什么时候比较合适讨论这个？能否给我一个大致的时间节点，我好提前准备材料？',
+          '什么时候都不是好时候！到底行不行给个痛快话！',
+          '好吧，那等您觉得合适的时候再说。'
+        ],
+        ideal_response_type: 'timeline_request',
+        scoring: { communication: 15, expression: 10, empathy: 10, emotion_control: 20, adaptability: 5 }
+      },
+      {
+        round: 5,
+        situation: '老板说："先做好你手头的事吧，其他的以后再说。"你需要做最后争取。',
+        coach_hint: '不卑不亢地重申诉求，用专业态度留下印象，为后续跟进埋下伏笔',
+        options: [
+          '我会继续全力以赴做好工作。同时我也希望我的贡献能得到合理的回报，这是我的职业底线。我会在月底再次跟您沟通此事，谢谢您的时间。',
+          '您就是不想给我加薪！（情绪失控）',
+          '好的好的，我一定好好工作！（完全退让）'
+        ],
+        ideal_response_type: 'firm_closing',
+        scoring: { communication: 10, expression: 15, empathy: 5, emotion_control: 20, adaptability: 10 }
+      }
+    ]
+  },
+  {
+    id: 'scene_salary_promises',
+    name: '加薪谈判-画饼型老板',
+    stage: '高难期',
+    difficulty: 'hard',
+    description: '老板用未来承诺和画饼来回避当前加薪',
+    total_rounds: 5,
+    unlock_condition: { min_points: 300, min_level: 'gold' },
+    teaching_points: ['提出加薪', '识别画饼', '坚持立场', '要求具体承诺', '设定时间线'],
+    npc_name: '画饼型老板',
+    npc_avatar: '/assets/npc/boss_promises.png',
+    opening: '你向老板提出加薪，老板热情地说："好好好，你放心，我心里有数！"',
+    rounds: [
+      {
+        round: 1,
+        situation: '你提出加薪，老板笑着说："你放心，公司不会亏待你的，我一直在关注你。"',
+        coach_hint: '识别模糊承诺，不要被热情态度蒙蔽，礼貌地把模糊承诺变成具体讨论',
+        options: [
+          '谢谢领导的认可，我很感激。不过我想具体聊聊薪资调整的方案，这样我也能更有方向地努力。',
+          '谢谢领导！那我就放心了！（满足于模糊承诺）',
+          '您说的关注具体是什么意思？'
+        ],
+        ideal_response_type: 'specific_discussion',
+        scoring: { communication: 15, expression: 15, empathy: 5, emotion_control: 15, adaptability: 10 }
+      },
+      {
+        round: 2,
+        situation: '老板说："等下半年公司上市了，肯定给你大幅调整！你好好干，到时候一起分蛋糕。"',
+        coach_hint: '识别"画饼"模式——用未来不确定的大好处换取你当下放弃小诉求，用追问拆解模糊承诺',
+        options: [
+          '公司上市确实是好事。不过我更关心的是目前的薪资是否和我的贡献匹配。上市前这段时间，能否先做一个合理的过渡调整？',
+          '上市了真的会加薪吗？太好了！（轻信画饼）',
+          '又是画饼，我听太多了。（直接对抗）'
+        ],
+        ideal_response_type: 'recognize_vague_promise',
+        scoring: { communication: 15, expression: 10, empathy: 10, emotion_control: 15, adaptability: 10 }
+      },
+      {
+        round: 3,
+        situation: '老板说："你看小张，也是先做事后回报的嘛。年轻人不要太计较眼前。"',
+        coach_hint: '不要被比较绑架，温和但坚定地表示"做事"和"合理回报"不矛盾',
+        options: [
+          '做事我一直在做，而且成果您也看到了。合理回报和计较眼前是两回事，我希望的是对我的付出给予当下的认可，这样我更有动力继续贡献。',
+          '小张是小张，我是我！（情绪化比较）',
+          '您说得对，我不应该计较...（自我否定）'
+        ],
+        ideal_response_type: 'decouple_effort_reward',
+        scoring: { communication: 15, expression: 15, empathy: 5, emotion_control: 20, adaptability: 5 }
+      },
+      {
+        round: 4,
+        situation: '老板说："行行行，我答应你，年底一定给你调。"但之前类似的承诺从未兑现。',
+        coach_hint: '对重复承诺保持警惕，要求具体、书面化的承诺，而非口头"一定"',
+        options: [
+          '感谢您的承诺。为了让双方都有清晰的预期，能否把调整时间、幅度和考核标准确认一下？邮件确认也可以，这样我也能安心投入工作。',
+          '您说的年底是具体什么时候？（开始追问但不够具体）',
+          '好的，谢谢领导！（再次轻信）'
+        ],
+        ideal_response_type: 'request_specific_commitment',
+        scoring: { communication: 15, expression: 15, empathy: 5, emotion_control: 15, adaptability: 10 }
+      },
+      {
+        round: 5,
+        situation: '老板有些不耐烦了："你是不是不信任我？我说了给你调就一定会调。"',
+        coach_hint: '把"不信任"的帽子甩回去，用专业框架重新定义对话——这不是信任问题，是流程问题',
+        options: [
+          '这不是信任的问题，是职业规范。任何薪资调整走正式流程对双方都是保障。我们就定一个明确的时间节点，到时候无论结果如何，至少沟通是透明的。',
+          '我就是不信任你！（激化矛盾）',
+          '对不起，是我多想了...（退缩）'
+        ],
+        ideal_response_type: 'reframe_professional',
+        scoring: { communication: 10, expression: 15, empathy: 10, emotion_control: 20, adaptability: 5 }
+      }
+    ]
+  },
+  {
+    id: 'scene_complaint_property',
+    name: '投诉物业',
+    stage: '高难期',
+    difficulty: 'hard',
+    description: '小区物业长期不作为，需要有效投诉',
+    total_rounds: 5,
+    unlock_condition: { min_points: 200, min_level: 'gold' },
+    teaching_points: ['整理问题', '选择投诉渠道', '表达诉求', '应对推诿', '升级处理'],
+    npc_name: '物业经理',
+    npc_avatar: '/assets/npc/property_manager.png',
+    opening: '你小区的电梯已坏了两周、公共区域卫生差、安保形同虚设。多次口头反映无果，今天你决定正式投诉...',
+    rounds: [
+      {
+        round: 1,
+        situation: '你来到物业办公室，需要系统地反映问题。',
+        coach_hint: '先整理好问题清单，按轻重缓急排列，用事实和时间线说话，避免情绪化宣泄',
+        options: [
+          '我整理了三个主要问题：第一，A栋电梯已坏14天未修；第二，公共区域近一个月未正常清洁；第三，门禁系统失灵导致外来人员随意进出。这些都有记录和照片为证。',
+          '你们物业怎么回事！什么都不干！我要投诉你们！',
+          '那个...电梯好像坏了挺久了...卫生也不太好...'
+        ],
+        ideal_response_type: 'structured_complaint',
+        scoring: { communication: 20, expression: 15, empathy: 5, emotion_control: 10, adaptability: 5 }
+      },
+      {
+        round: 2,
+        situation: '物业经理说："这些问题我们会处理的，你先回去等消息吧。"',
+        coach_hint: '不要接受模糊回应，要求明确的处理时限和责任人',
+        options: [
+          '我理解处理需要时间，但之前多次反映都没有下文。这次我希望确定：每个问题的处理时限、具体负责人、以及给我书面回复的日期。比如电梯问题，本周五之前能修好吗？',
+          '好吧，那等你们消息...（再次被敷衍）',
+          '你们就是拖延！我不走，今天必须给我解决！（情绪化）'
+        ],
+        ideal_response_type: 'demand_timeline',
+        scoring: { communication: 15, expression: 15, empathy: 5, emotion_control: 15, adaptability: 10 }
+      },
+      {
+        round: 3,
+        situation: '物业经理说："电梯问题要等厂家来修，厂家排不上我们也没办法。"',
+        coach_hint: '识别推诿话术，要求对方给出备选方案和临时措施，不接受"没办法"作为终点',
+        options: [
+          '厂家排期我理解，但两周了还没有确切时间说不过去。我的诉求是：一，今天内联系厂家确定维修日期并书面告知业主；二，在此期间安排临时保障措施，比如楼层巡查和安全提示。',
+          '那你们就一直等？业主的安全谁负责？',
+          '好吧，等厂家吧...（被动接受）'
+        ],
+        ideal_response_type: 'counter_excuse',
+        scoring: { communication: 15, expression: 10, empathy: 10, emotion_control: 15, adaptability: 10 }
+      },
+      {
+        round: 4,
+        situation: '物业经理开始推脱："这些事不归我管，你得找工程部。"',
+        coach_hint: '不接受踢皮球，在当前对话中锁定责任人，要求对方内部协调而非让你转投',
+        options: [
+          '您作为物业经理，协调各部门解决问题是您的职责。我不需要去找工程部，我需要您作为对接人统筹处理这三个问题。如果今天不能给出解决方案，我将向住建局和业委会正式投诉。',
+          '好吧，那我去找工程部。（被踢皮球）',
+          '你就是推卸责任！（指责无实质推进）'
+        ],
+        ideal_response_type: 'pin_responsibility',
+        scoring: { communication: 15, expression: 10, empathy: 5, emotion_control: 20, adaptability: 10 }
+      },
+      {
+        round: 5,
+        situation: '物业经理说："你投诉也没用，别把事情搞大了。"',
+        coach_hint: '不被威胁吓退，清晰表明升级路径和对方不处理的后果，合理运用投诉渠道',
+        options: [
+          '我不希望事情升级，但如果物业不能在合理时间内解决问题，我会依法行使业主权利：一，向12345市民热线投诉；二，向住建局物业科反映；三，在业主大会提议更换物业。希望我们能合作解决问题。',
+          '你威胁我？我就要搞大！（对抗升级）',
+          '算了算了，不投诉了...（退缩）'
+        ],
+        ideal_response_type: 'legitimate_escalation',
+        scoring: { communication: 15, expression: 15, empathy: 5, emotion_control: 15, adaptability: 10 }
+      }
+    ]
+  },
+  {
+    id: 'scene_negotiate_4s',
+    name: '4S店砍价',
+    stage: '高难期',
+    difficulty: 'hard',
+    description: '在4S店购车时与销售砍价',
+    total_rounds: 5,
+    unlock_condition: { min_points: 200, min_level: 'gold' },
+    teaching_points: ['了解底价', '初始报价', '应对话术', '利用竞争', '最终成交'],
+    npc_name: '4S店销售',
+    npc_avatar: '/assets/npc/sales_4s.png',
+    opening: '你看中了一款车，指导价15万。走进4S店，销售热情地迎上来...',
+    rounds: [
+      {
+        round: 1,
+        situation: '销售说："这款车现在优惠力度很大，给您报个价？"你需要获取信息。',
+        coach_hint: '先听对方报价，不要先亮底牌，同时了解当前市场行情和优惠政策',
+        options: [
+          '好，您先说说现在的优惠方案，裸车价多少？有什么附加条件吗？我之前也了解了其他店的报价。',
+          '14万行不行？我直接定了！',
+          '嗯...你看着报吧...'
+        ],
+        ideal_response_type: 'information_gathering',
+        scoring: { communication: 15, expression: 10, empathy: 5, emotion_control: 15, adaptability: 15 }
+      },
+      {
+        round: 2,
+        situation: '销售报价："裸车14万2，送脚垫和贴膜，这已经是最低价了。"',
+        coach_hint: '不相信"最低价"，用自己的心理价位建立锚点，同时要求明细报价',
+        options: [
+          '14万2还是偏高了，我的预期在13万5左右。另外能否给我一份明细报价？包括裸车、购置税、保险、上牌费，我需要看总价。',
+          '能不能再便宜点？',
+          '行吧，14万2就14万2...（轻易接受）'
+        ],
+        ideal_response_type: 'anchor_and_detail',
+        scoring: { communication: 15, expression: 15, empathy: 5, emotion_control: 10, adaptability: 15 }
+      },
+      {
+        round: 3,
+        situation: '销售说："这个价格我们真的做不下来，亏本的。要不您看看低配版？"',
+        coach_hint: '识别销售压价话术——"亏本"和"看低配"都是让你降低预期的策略，坚持车型但调整谈判策略',
+        options: [
+          '我就是要这款配置，低配不考虑。价格方面我们慢慢谈，您先去请示一下经理，看看还能不能有空间。我这边今天就能定，前提是价格到位。',
+          '低配也行吧，便宜就好...（被引导降档）',
+          '不卖拉倒，我去别家！（掀桌走人）'
+        ],
+        ideal_response_type: 'hold_ground_leverage',
+        scoring: { communication: 15, expression: 10, empathy: 5, emotion_control: 20, adaptability: 10 }
+      },
+      {
+        round: 4,
+        situation: '销售请示回来："经理说最低13万8，但是要贷款3年才行。"',
+        coach_hint: '分析附加条件的真实成本，贷款利息可能抵消降价，用竞品或竞店施压',
+        options: [
+          '我倾向全款购车，贷款的话利息算下来并不划算。另外我了解到隔壁XX店同配置给到了13万6，还送保养。如果你们能13万6全款，我今天就能签约。',
+          '13万8也行，贷款就贷款吧...（未算清成本）',
+          '必须全款！13万5以下！一分不能多！（僵化立场）'
+        ],
+        ideal_response_type: 'competition_leverage',
+        scoring: { communication: 15, expression: 15, empathy: 5, emotion_control: 15, adaptability: 10 }
+      },
+      {
+        round: 5,
+        situation: '销售说："13万7，全款，送3次保养和脚垫贴膜，这真的是底线了。"',
+        coach_hint: '评估最后报价是否合理，决定接受还是做最后一搏，不要因为疲惫而妥协',
+        options: [
+          '13万7可以考虑，但保养再加两次，一共5次，我现在就付定金。如果不行，我再回去考虑一下，明天给您回复。',
+          '不行！必须13万6！（错过合理成交）',
+          '好的好的，13万7成交！什么都不要了！（过度退让）'
+        ],
+        ideal_response_type: 'final_negotiation',
+        scoring: { communication: 10, expression: 15, empathy: 5, emotion_control: 15, adaptability: 15 }
+      }
+    ]
+  },
+  {
+    id: 'scene_negotiate_street',
+    name: '路边摊砍价',
+    stage: '高难期',
+    difficulty: 'hard',
+    description: '在路边摊/菜市场砍价',
+    total_rounds: 5,
+    unlock_condition: { min_points: 150, min_level: 'silver' },
+    teaching_points: ['了解行情', '开局砍价', '应对加价', '巧妙施压', '成交收尾'],
+    npc_name: '摊主阿姨',
+    npc_avatar: '/assets/npc/vendor_aunt.png',
+    opening: '你在菜市场看到一个摊位卖水果，标价8块一斤。你想买几斤，但觉得价格偏贵...',
+    rounds: [
+      {
+        round: 1,
+        situation: '摊主阿姨招呼你："来看看，新鲜的水果！"你需要先了解行情。',
+        coach_hint: '先观察品质和数量，用闲聊了解价格空间，不要上来就砍',
+        options: [
+          '阿姨，这水果看着不错，怎么卖？8块一斤？旁边那家好像6块，您这是什么品种？',
+          '8块？5块行不行？',
+          '嗯...挺贵的...（犹豫不决）'
+        ],
+        ideal_response_type: 'casual_inquiry',
+        scoring: { communication: 15, expression: 10, empathy: 10, emotion_control: 10, adaptability: 15 }
+      },
+      {
+        round: 2,
+        situation: '阿姨说："我这是正宗的，跟那些不一样的！你要多少？"',
+        coach_hint: '用购买量做筹码，表明你要多买来换取优惠',
+        options: [
+          '我想要3斤，您给个实惠价呗。要是价格合适我以后常来，也可以介绍邻居来买。',
+          '就买1斤，便宜点吧。',
+          '好吧，8块就8块...（直接接受）'
+        ],
+        ideal_response_type: 'volume_leverage',
+        scoring: { communication: 15, expression: 15, empathy: 5, emotion_control: 10, adaptability: 15 }
+      },
+      {
+        round: 3,
+        situation: '阿姨说："3斤的话，7块5一斤吧，已经很便宜了！"',
+        coach_hint: '不要对第一次让步满意，用合理的理由继续压价',
+        options: [
+          '阿姨，7块5还是贵了，6块5一斤怎么样？3斤就是19块5，我微信直接转您，也省得您找零。',
+          '7块5可以！（满足于小让步）',
+          '必须5块！少一分不买！（砍价过度）'
+        ],
+        ideal_response_type: 'reasonable_counter',
+        scoring: { communication: 15, expression: 15, empathy: 5, emotion_control: 15, adaptability: 10 }
+      },
+      {
+        round: 4,
+        situation: '阿姨有些不乐意："6块5我亏本的！这样吧，7块，不能再少了。"',
+        coach_hint: '用"走人"策略温和施压，同时给对方台阶，不把路堵死',
+        options: [
+          '那这样，我再去前面转转比较一下，如果还是您家最实惠我再回来。要不就7块，再送我几个小的？',
+          '行吧行吧，7块就7块...（轻易妥协）',
+         '6块5！不卖我走了！（僵持不放）'
+        ],
+        ideal_response_type: 'walkaway_leverage',
+        scoring: { communication: 15, expression: 10, empathy: 10, emotion_control: 15, adaptability: 10 }
+      },
+      {
+        round: 5,
+        situation: '阿姨犹豫了一下说："那行吧，7块一斤再送你两个。你是个会说话的。"',
+        coach_hint: '成交时确认细节，保持友好关系，为下次交易留好印象',
+        options: [
+          '谢谢阿姨！以后买水果就认准您家了。您帮我挑几个好的呗，下次我带朋友来。',
+          '才送两个？再多点！（得寸进尺）',
+          '嗯，谢谢...（草草收场）'
+        ],
+        ideal_response_type: 'friendly_close',
+        scoring: { communication: 10, expression: 15, empathy: 15, emotion_control: 10, adaptability: 10 }
+      }
+    ]
+  },
+  {
+    id: 'scene_complaint_customer_service',
+    name: '投诉客服',
+    stage: '高难期',
+    difficulty: 'hard',
+    description: '商品出了问题，需要有效投诉客服',
+    total_rounds: 5,
+    unlock_condition: { min_points: 200, min_level: 'gold' },
+    teaching_points: ['描述问题', '表达不满', '要求解决方案', '应对拖延', '升级投诉'],
+    npc_name: '客服专员',
+    npc_avatar: '/assets/npc/customer_service.png',
+    opening: '你网购的商品到手发现质量有问题，联系客服处理。等了20分钟终于接通了...',
+    rounds: [
+      {
+        round: 1,
+        situation: '客服说："您好，请问有什么可以帮您？"你需要描述问题。',
+        coach_hint: '简明扼要地说明问题，包含订单号、问题描述、你的诉求，不要长篇大论',
+        options: [
+          '我5号下单的订单（订单号XXXX），收到的商品有明显质量问题：外壳破裂、功能无法使用。我的诉求是退货退款，请尽快处理。',
+          '你们卖的东西是假的！垃圾！骗人的！',
+          '嗯...就是我买的东西有点问题...不太好用...'
+        ],
+        ideal_response_type: 'clear_problem_statement',
+        scoring: { communication: 20, expression: 15, empathy: 5, emotion_control: 10, adaptability: 5 }
+      },
+      {
+        round: 2,
+        situation: '客服说："非常抱歉给您带来不便，我帮您记录一下。请问有照片吗？"',
+        coach_hint: '提前准备好证据，配合对方流程但设定时限，不要无休止地等',
+        options: [
+          '照片和视频我都拍了，现在可以发给您。不过我想确认一下：资料提交后多长时间能给出处理结果？我不希望一直等。',
+          '照片？我回头再拍吧。（未准备证据）',
+          '我都发了！你们就是不处理！我太生气了！（只有情绪没有实质）'
+        ],
+        ideal_response_type: 'evidence_with_deadline',
+        scoring: { communication: 15, expression: 15, empathy: 5, emotion_control: 15, adaptability: 10 }
+      },
+      {
+        round: 3,
+        situation: '客服说："我帮您申请退货，但需要7-15个工作日审核。"',
+        coach_hint: '不接受过长的处理周期，引用消费者权益法规压缩时限',
+        options: [
+          '7-15个工作日太长了。根据消费者权益保护法，7天无理由退货应在收到商品后7天内处理。我要求在3个工作日内给出明确处理结果，否则我将向平台投诉并申请介入。',
+          '好吧，那就等15天吧...（被动接受）',
+          '15天？你们想拖到什么时候！骗子！（纯情绪发泄）'
+        ],
+        ideal_response_type: 'legal_leverage',
+        scoring: { communication: 15, expression: 10, empathy: 5, emotion_control: 20, adaptability: 10 }
+      },
+      {
+        round: 4,
+        situation: '客服说："我帮您加急了，但还是需要5个工作日。这是流程，没办法跳过的。"',
+        coach_hint: '识别"流程"借口，要求升级到有决定权的人，同时保留后续升级渠道',
+        options: [
+          '我理解您个人权限有限。能否帮我转接主管或投诉处理专员？如果5个工作日后仍未解决，我会同时向12315和平台发起正式投诉，届时处理成本会更高。',
+          '好吧，5天就5天...（继续被动）',
+          '你们就是不想处理！我要曝光你们！（空泛威胁）'
+        ],
+        ideal_response_type: 'escalate_authority',
+        scoring: { communication: 15, expression: 15, empathy: 5, emotion_control: 15, adaptability: 10 }
+      },
+      {
+        round: 5,
+        situation: '主管接入了："您好，我是客服主管，了解了您的情况。我们加急处理，48小时内给您退款。"',
+        coach_hint: '确认承诺并要求书面确认，确保不会被再次拖延',
+        options: [
+          '好的，感谢您的处理。我需要一个书面确认——短信或邮件通知退款进度和到账时间，这样双方都有记录。如果48小时内没有收到退款，我会再次跟进。',
+          '好的，谢谢！（没有确认）',
+         '48小时？现在就退！（过度施压）'
+        ],
+        ideal_response_type: 'confirm_with_record',
+        scoring: { communication: 15, expression: 10, empathy: 10, emotion_control: 15, adaptability: 10 }
+      }
+    ]
   }
 ];

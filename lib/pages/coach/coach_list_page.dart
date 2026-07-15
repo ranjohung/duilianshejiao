@@ -4,6 +4,7 @@ import '../../models/coach_model.dart';
 import '../../network/services/coach_service.dart';
 import '../../widgets/common_widgets.dart';
 import 'coach_detail_page.dart';
+import 'custom_coach_page.dart';
 
 /// 教练选择页面
 /// 展示4个预设教练卡片（2×2网格布局），点击进入教练详情
@@ -129,9 +130,12 @@ class _CoachListPageState extends State<CoachListPage> {
             mainAxisSpacing: 12,
             crossAxisSpacing: 12,
             childAspectRatio: 0.72,
-            children: usePreset
-                ? _presetCoaches.asMap().entries.map((e) => _buildPresetCard(e.value, e.key)).toList()
-                : _coaches.asMap().entries.map((e) => _buildCoachCard(e.value, e.key)).toList(),
+            children: [
+              ...usePreset
+                  ? _presetCoaches.asMap().entries.map((e) => _buildPresetCard(e.value, e.key)).toList()
+                  : _coaches.asMap().entries.map((e) => _buildCoachCard(e.value, e.key)).toList(),
+              _buildCreateCustomCoachCard(),
+            ],
           ),
         ],
       ),
@@ -277,6 +281,72 @@ class _CoachListPageState extends State<CoachListPage> {
         ),
       ),
     );
+  }
+
+  /// 创建自定义教练卡片
+  Widget _buildCreateCustomCoachCard() {
+    return GestureDetector(
+      onTap: _onCreateCustomCoach,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: AppConfig.accentColor.withOpacity(0.4),
+            width: 1.5,
+            style: BorderStyle.solid,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: AppConfig.accentColor.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.add_circle_outline,
+                  size: 32,
+                  color: AppConfig.accentColor,
+                ),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                '创建自定义教练',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '消耗100积分',
+                style: TextStyle(fontSize: 12, color: AppConfig.accentColor),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                '定制专属性格\n打造你的理想教练',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 12, color: Colors.grey[500], height: 1.3),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _onCreateCustomCoach() async {
+    final result = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(builder: (_) => const CustomCoachPage()),
+    );
+    if (result == true) {
+      _loadCoaches(); // 创建成功后刷新教练列表
+    }
   }
 
   void _onPresetCoachTap(PresetCoachData data, int index) {

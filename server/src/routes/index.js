@@ -11,5 +11,7 @@ router.use('/goodnight', require('./goodnight.routes'));
 router.use('/social', require('./social.routes'));
 router.use('/items', require('./item.routes'));
 router.use('/membership', require('./membership.routes'));
+router.use('/talents', require('./talent.routes'));
+router.use('/real-challenges', require('./challenge.routes'));
 
 module.exports = router;

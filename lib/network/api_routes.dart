@@ -58,6 +58,9 @@ class ApiRoutes {
   static const String socialComment = '$_prefix/social/posts'; // + /:id/comment
   static const String socialInvite = '$_prefix/social/invite';
   static const String socialLeaderboard = '$_prefix/social/leaderboard';
+  static const String socialShareAchievement =
+      '$_prefix/social/share/achievement';
+  static const String socialTeamTraining = '$_prefix/social/team-training';
 
   // ============ 道具模块 ============
   static const String itemList = '$_prefix/items';

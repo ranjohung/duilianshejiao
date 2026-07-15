@@ -1,4 +1,5 @@
 const Coach = require('../models/Coach');
+const User = require('../models/User');
 const { successResponse, errorResponse } = require('../utils/response');
 
 // 预设教练配置
@@ -102,5 +103,99 @@ exports.chat = async (req, res) => {
     successResponse(res, null, '请使用 training 接口进行对话');
   } catch (err) {
     errorResponse(res, 500, err.message);
+  }
+};
+
+/**
+ * 创建自定义教练（消耗100积分）
+ */
+exports.createCustomCoach = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { name, personalityType, teachingStyle, personalityConfig, catchphrase } = req.body;
+
+    if (!name || !personalityType || !teachingStyle) {
+      return errorResponse(res, 400, '缺少必要参数：name, personalityType, teachingStyle');
+    }
+
+    // 检查积分是否足够
+    const user = await User.findById(userId);
+    if (!user || user.total_points < 100) {
+      return errorResponse(res, 400, '需要100积分才能创建自定义教练');
+    }
+
+    // 扣除积分
+    const success = await User.consumeTrainingPoints(userId, 100);
+    if (!success) {
+      return errorResponse(res, 400, '积分不足');
+    }
+
+    // 创建教练
+    const coachId = await Coach.createCustom({
+      userId,
+      name,
+      personalityType,
+      teachingStyle,
+      personalityConfig: JSON.stringify(personalityConfig || {}),
+      catchphrase: catchphrase || '',
+    });
+
+    successResponse(res, { coachId, pointsConsumed: 100 }, '自定义教练创建成功');
+  } catch (err) {
+    errorResponse(res, 500, '创建失败');
+  }
+};
+
+/**
+ * 更新自定义教练
+ */
+exports.updateCustomCoach = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
+    const { name, personalityType, teachingStyle, personalityConfig, catchphrase } = req.body;
+
+    // 确认教练属于当前用户
+    const coach = await Coach.findById(id);
+    if (!coach) return errorResponse(res, 404, '教练不存在');
+    if (coach.user_id !== userId) return errorResponse(res, 403, '无权修改此教练');
+
+    const updates = {};
+    if (name) updates.name = name;
+    if (personalityType) updates.personality_type = personalityType;
+    if (teachingStyle) updates.teaching_style = teachingStyle;
+    if (personalityConfig) updates.personality_config = JSON.stringify(personalityConfig);
+    if (catchphrase !== undefined) updates.catchphrase = catchphrase;
+
+    if (Object.keys(updates).length === 0) {
+      return errorResponse(res, 400, '未提供需要更新的字段');
+    }
+
+    await Coach.updateCustom(id, updates);
+    const updated = await Coach.getFullProfile(id);
+
+    successResponse(res, updated, '教练更新成功');
+  } catch (err) {
+    errorResponse(res, 500, '更新失败');
+  }
+};
+
+/**
+ * 获取用户的自定义教练列表
+ */
+exports.getCustomCoaches = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const coaches = await Coach.findByUser(userId);
+    // 解析JSON字段
+    const parsed = coaches.map(c => {
+      if (c.personality_config) {
+        try { c.personality_config = JSON.parse(c.personality_config); } catch {}
+      }
+      return c;
+    });
+    successResponse(res, parsed, '获取自定义教练列表成功');
+  } catch (err) {
+    errorResponse(res, 500, '获取失败');
   }
 };

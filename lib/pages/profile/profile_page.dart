@@ -4,6 +4,7 @@ import '../../models/item_model.dart';
 import '../../network/services/item_service.dart';
 import '../membership/membership_page.dart';
 import '../goodnight/goodnight_plan_page.dart';
+import '../social/invite_page.dart';
 
 /// Tab5 我的页
 /// 展示：个人资料、会员信息、训练统计、道具背包、菜单列表
@@ -331,6 +332,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget _buildMenuList() {
     final menus = [
       _MenuItem(Icons.card_membership, '会员中心', AppConfig.accentColor),
+      _MenuItem(Icons.person_add, '邀请好友', AppConfig.primaryColor),
       _MenuItem(Icons.nightlight_round, '晚安计划', const Color(0xFF5B3FA0)),
       _MenuItem(Icons.verified_user, '实名认证', AppConfig.successColor),
       _MenuItem(Icons.lock_outline, '隐私设置', Colors.grey[600]!),
@@ -378,6 +380,9 @@ class _ProfilePageState extends State<ProfilePage> {
         break;
       case '晚安计划':
         Navigator.push(context, MaterialPageRoute(builder: (_) => const GoodnightPlanPage()));
+        break;
+      case '邀请好友':
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const InvitePage()));
         break;
       default:
         ScaffoldMessenger.of(context).showSnackBar(

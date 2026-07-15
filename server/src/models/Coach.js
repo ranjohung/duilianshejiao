@@ -29,6 +29,39 @@ class Coach {
     }
     return coach;
   }
+
+  // 创建自定义教练
+  static async createCustom({ userId, name, personalityType, teachingStyle, personalityConfig, catchphrase }) {
+    const [result] = await pool.execute(
+      `INSERT INTO coaches (user_id, name, personality_type, teaching_style, personality_config, catchphrase, type, is_active, is_preset, sort_order, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, 'custom', 1, 0, 99, NOW(), NOW())`,
+      [userId, name, personalityType, teachingStyle, personalityConfig, catchphrase]
+    );
+    return result.insertId;
+  }
+
+  // 获取用户的自定义教练列表
+  static async findByUser(userId) {
+    const [rows] = await pool.execute(
+      'SELECT * FROM coaches WHERE user_id = ? AND type = ? ORDER BY created_at DESC',
+      [userId, 'custom']
+    );
+    return rows;
+  }
+
+  // 更新自定义教练
+  static async updateCustom(id, updates) {
+    const fields = [];
+    const values = [];
+    for (const [key, value] of Object.entries(updates)) {
+      fields.push(`${key} = ?`);
+      values.push(value);
+    }
+    if (fields.length === 0) return;
+    fields.push('updated_at = NOW()');
+    values.push(id);
+    await pool.execute(`UPDATE coaches SET ${fields.join(', ')} WHERE id = ?`, values);
+  }
 }
 
 module.exports = Coach;
