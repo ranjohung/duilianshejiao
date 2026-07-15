@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>对练社交 - AI社交训练平台</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+  --primary: #1E3A5F;
+  --gold: #F5A623;
+  --gold-light: #FFD700;
+  --white: #FFFFFF;
+  --bg: #F5F7FA;
+  --card: #FFFFFF;
+  --text: #2C3E50;
+  --text-light: #8E9AAF;
+  --border: #E8ECF1;
+  --success: #27AE60;
+  --danger: #E74C3C;
+  --shadow: 0 2px 12px rgba(30,58,95,0.08);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  background: #E8ECF1;
+  display:flex; justify-content:center; align-items:center; min-height:100vh;
+}
+.app {
+  width: 100%; max-width: 430px; height: 100vh; max-height: 932px;
+  background: var(--bg); position: relative; overflow: hidden;
+  box-shadow: 0 0 40px rgba(0,0,0,0.12);
+}
+.view { display:none; width:100%; height:100%; overflow-y:auto; padding-bottom:70px; }
+.view.active { display:block; }
+.view::-webkit-scrollbar { width:0; }
+
+/* ========== 登录页 ========== */
+.login-view {
+  background: linear-gradient(160deg, #1E3A5F 0%, #2A5298 50%, #1E3A5F 100%);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding: 40px 30px; padding-bottom:70px;
+}
+.login-logo {
+  width:80px; height:80px; border-radius:20px;
+  background: linear-gradient(135deg, var(--gold), #FFD700);
+  display:flex; align-items:center; justify-content:center;
+  font-size:36px; color:var(--primary); margin-bottom:16px;
+  box-shadow: 0 8px 24px rgba(245,166,35,0.3);
+}
+.login-title { color:#fff; font-size:28px; font-weight:700; margin-bottom:6px; }
+.login-subtitle { color:rgba(255,255,255,0.7); font-size:14px; margin-bottom:40px; }
+.login-form { width:100%; max-width:340px; }
+.login-input-group {
+  display:flex; align-items:center; background:rgba(255,255,255,0.12);
+  border-radius:12px; margin-bottom:14px; padding:0 16px;
+  border:1px solid rgba(255,255,255,0.15); transition: all 0.3s;
+}
+.login-input-group:focus-within { border-color:var(--gold); background:rgba(255,255,255,0.18); }
+.login-input-group i { color:rgba(255,255,255,0.5); font-size:16px; }
+.login-input {
+  flex:1; border:none; background:none; color:#fff; padding:14px 12px;
+  font-size:15px; outline:none;
+}
+.login-input::placeholder { color:rgba(255,255,255,0.4); }
+.sms-btn {
+  color:var(--gold); font-size:13px; white-space:nowrap; cursor:pointer;
+  border:none; background:none; font-weight:600;
+}
+.sms-btn.disabled { color:rgba(255,255,255,0.3); pointer-events:none; }
+.login-btn {
+  width:100%; padding:15px; border:none; border-radius:12px;
+  background: linear-gradient(135deg, var(--gold), #FFD700);
+  color:var(--primary); font-size:16px; font-weight:700; cursor:pointer;
+  margin-top:8px; box-shadow:0 4px 16px rgba(245,166,35,0.35);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.login-btn:active { transform:scale(0.97); }
+.login-agreement {
+  display:flex; align-items:center; margin-top:20px; gap:8px;
+}
+.login-agreement input[type="checkbox"] {
+  width:16px; height:16px; accent-color:var(--gold);
+}
+.login-agreement label { color:rgba(255,255,255,0.6); font-size:12px; }
+.login-agreement a { color:var(--gold); text-decoration:none; }
+
+/* ========== 通用头部 ========== */
+.page-header {
+  background: linear-gradient(135deg, var(--primary), #2A5298);
+  padding: 20px 20px 24px; color:#fff;
+}
+.page-header h2 { font-size:20px; font-weight:700; }
+.page-header p { font-size:13px; color:rgba(255,255,255,0.7); margin-top:4px; }
+
+/* ========== 首页 ========== */
+.home-greeting { padding:24px 20px 0; }
+.home-greeting h2 { font-size:22px; color:var(--primary); }
+.coach-online-card {
+  margin:16px 20px; padding:16px 20px; background:var(--card);
+  border-radius:var(--radius); box-shadow:var(--shadow);
+  display:flex; align-items:center; gap:14px;
+}
+.breath-dot {
+  width:10px; height:10px; border-radius:50%; background:var(--success);
+  animation: breathe 2s ease-in-out infinite;
+}
+@keyframes breathe {
+  0%,100% { box-shadow:0 0 0 0 rgba(39,174,96,0.5); }
+  50% { box-shadow:0 0 0 8px rgba(39,174,96,0); }
+}
+.coach-online-card .coach-info { flex:1; }
+.coach-online-card .coach-name { font-size:16px; font-weight:600; color:var(--text); }
+.coach-online-card .coach-status { font-size:12px; color:var(--success); }
+.coach-online-card .coach-action {
+  padding:8px 16px; background:var(--primary); color:#fff; border:none;
+  border-radius:20px; font-size:13px; cursor:pointer;
+}
+
+.sign-in-section { margin:0 20px; }
+.sign-in-btn {
+  width:100%; padding:16px; border:2px dashed var(--gold); border-radius:var(--radius);
+  background:linear-gradient(135deg, #FFF9EC, #FFF3D6); cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  transition: all 0.3s;
+}
+.sign-in-btn.signed {
+  border-style:solid; border-color:var(--success);
+  background:linear-gradient(135deg, #ECFDF5, #D1FAE5);
+}
+.sign-in-btn .sign-icon { font-size:24px; color:var(--gold); }
+.sign-in-btn.signed .sign-icon { color:var(--success); }
+.sign-in-btn .sign-text { font-size:16px; font-weight:600; color:var(--primary); }
+.sign-in-btn .sign-sub { font-size:12px; color:var(--text-light); }
+
+.recommend-card {
+  margin:16px 20px; padding:18px; background: linear-gradient(135deg, var(--primary), #2A5298);
+  border-radius:var(--radius); color:#fff; box-shadow: 0 4px 16px rgba(30,58,95,0.2);
+}
+.recommend-card .tag {
+  display:inline-block; padding:3px 10px; background:rgba(255,255,255,0.2);
+  border-radius:12px; font-size:11px; margin-bottom:10px;
+}
+.recommend-card h3 { font-size:17px; margin-bottom:6px; }
+.recommend-card p { font-size:13px; color:rgba(255,255,255,0.8); }
+.recommend-card .start-btn {
+  margin-top:12px; padding:9px 20px; background:var(--gold); color:var(--primary);
+  border:none; border-radius:20px; font-size:13px; font-weight:600; cursor:pointer;
+}
+
+.section-title {
+  padding:20px 20px 10px; font-size:16px; font-weight:600; color:var(--text);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.section-title .more { font-size:13px; color:var(--text-light); font-weight:400; }
+
+.record-item {
+  margin:0 20px 10px; padding:14px 16px; background:var(--card);
+  border-radius:var(--radius-sm); box-shadow:var(--shadow);
+  display:flex; align-items:center; gap:12px;
+}
+.record-item .record-icon {
+  width:40px; height:40px; border-radius:10px; display:flex;
+  align-items:center; justify-content:center; font-size:18px;
+}
+.record-item .record-info { flex:1; }
+.record-item .record-title { font-size:14px; font-weight:500; color:var(--text); }
+.record-item .record-time { font-size:12px; color:var(--text-light); }
+.record-item .record-score { font-size:16px; font-weight:700; color:var(--gold); }
+
+.progress-section {
+  margin:16px 20px; padding:18px; background:var(--card);
+  border-radius:var(--radius); box-shadow:var(--shadow);
+  display:flex; align-items:center; gap:20px;
+}
+.ring-progress {
+  position:relative; width:80px; height:80px; flex-shrink:0;
+}
+.ring-progress svg { transform:rotate(-90deg); }
+.ring-progress .ring-text {
+  position:absolute; inset:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+}
+.ring-progress .ring-num { font-size:18px; font-weight:700; color:var(--primary); }
+.ring-progress .ring-label { font-size:10px; color:var(--text-light); }
+.progress-detail { flex:1; }
+.progress-detail h4 { font-size:14px; font-weight:600; color:var(--text); margin-bottom:6px; }
+.progress-detail p { font-size:12px; color:var(--text-light); }
+
+/* ========== 教练页 ========== */
+.coach-header {
+  background: linear-gradient(160deg, var(--primary), #1a4a7a);
+  padding:20px 20px 0; color:#fff;
+}
+.coach-points {
+  display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;
+}
+.coach-points .pts-info { font-size:14px; }
+.coach-points .pts-info strong { font-size:20px; color:var(--gold); }
+.coach-points .pts-info span { color:rgba(255,255,255,0.7); font-size:12px; }
+.rank-bar { height:6px; background:rgba(255,255,255,0.2); border-radius:3px; margin-bottom:6px; }
+.rank-bar .fill { height:100%; background:var(--gold); border-radius:3px; transition:width 0.6s; }
+.rank-label { font-size:12px; color:rgba(255,255,255,0.7); text-align:right; }
+
+.coach-avatar-area {
+  display:flex; flex-direction:column; align-items:center;
+  padding:30px 20px 20px; background:var(--card);
+  margin:0 20px; border-radius:0 0 var(--radius) var(--radius);
+  box-shadow:var(--shadow);
+}
+.coach-portrait {
+  width:120px; height:120px; border-radius:50%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  display:flex; align-items:center; justify-content:center;
+  font-size:48px; color:#fff; margin-bottom:12px;
+  animation: coachFloat 3s ease-in-out infinite;
+  position:relative; overflow:hidden;
+}
+.coach-portrait::after {
+  content:''; position:absolute; top:15%; left:25%;
+  width:12px; height:12px; background:#fff; border-radius:50%;
+  animation: blink 4s ease-in-out infinite;
+}
+@keyframes coachFloat {
+  0%,100% { transform:translateY(0); }
+  50% { transform:translateY(-8px); }
+}
+@keyframes blink {
+  0%,42%,46%,100% { opacity:1; }
+  44% { opacity:0; }
+}
+.coach-portrait-name { font-size:22px; font-weight:700; color:var(--primary); margin-bottom:4px; }
+.coach-portrait-tag {
+  display:inline-block; padding:4px 14px; background:#F0F4FF;
+  border-radius:12px; font-size:12px; color:var(--primary); margin-bottom:20px;
+}
+
+.coach-actions { display:flex; gap:12px; width:100%; margin-bottom:20px; }
+.coach-action-btn {
+  flex:1; padding:14px 8px; border:none; border-radius:var(--radius-sm);
+  font-size:14px; font-weight:600; cursor:pointer; transition:transform 0.2s;
+}
+.coach-action-btn:active { transform:scale(0.96); }
+.coach-action-btn.primary { background:var(--primary); color:#fff; }
+.coach-action-btn.secondary { background:#F0F4FF; color:var(--primary); }
+
+.coach-moment {
+  margin:16px 20px; padding:16px; background:var(--card);
+  border-radius:var(--radius-sm); box-shadow:var(--shadow);
+}
+.coach-moment .moment-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.coach-moment .moment-avatar {
+  width:36px; height:36px; border-radius:50%;
+  background:linear-gradient(135deg, #667eea, #764ba2);
+  display:flex; align-items:center; justify-content:center;
+  color:#fff; font-size:14px;
+}
+.coach-moment .moment-name { font-size:14px; font-weight:600; color:var(--text); }
+.coach-moment .moment-time { font-size:11px; color:var(--text-light); }
+.coach-moment .moment-content { font-size:14px; color:var(--text); line-height:1.6; }
+
+.task-list { margin:0 20px 20px; }
+.task-item {
+  display:flex; align-items:center; gap:12px; padding:12px 16px;
+  background:var(--card); border-radius:var(--radius-sm); margin-bottom:8px;
+  box-shadow:var(--shadow);
+}
+.task-item .task-check {
+  width:22px; height:22px; border-radius:50%; border:2px solid var(--border);
+  display:flex; align-items:center; justify-content:center; font-size:11px;
+  flex-shrink:0;
+}
+.task-item .task-check.done {
+  background:var(--success); border-color:var(--success); color:#fff;
+}
+.task-item .task-text { flex:1; font-size:14px; color:var(--text); }
+.task-item .task-text.done-text { text-decoration:line-through; color:var(--text-light); }
+.task-item .task-reward { font-size:12px; color:var(--gold); font-weight:600; }
+
+/* ========== 场景页 ========== */
+.stage-tabs {
+  display:flex; overflow-x:auto; padding:16px 20px; gap:10px;
+  -webkit-overflow-scrolling:touch;
+}
+.stage-tabs::-webkit-scrollbar { display:none; }
+.stage-tab {
+  flex-shrink:0; padding:8px 18px; border-radius:20px; font-size:13px;
+  background:var(--card); color:var(--text-light); border:none; cursor:pointer;
+  box-shadow:var(--shadow); transition:all 0.3s; font-weight:500;
+}
+.stage-tab.active {
+  background:var(--primary); color:#fff; box-shadow:0 4px 12px rgba(30,58,95,0.25);
+}
+
+.scene-card {
+  margin:0 20px 12px; padding:16px; background:var(--card);
+  border-radius:var(--radius); box-shadow:var(--shadow);
+}
+.scene-card .scene-top { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.scene-card .scene-icon { font-size:24px; }
+.scene-card .scene-name { font-size:15px; font-weight:600; color:var(--text); }
+.scene-card .scene-diff {
+  display:inline-block; margin-left:auto; padding:2px 8px;
+  border-radius:8px; font-size:11px; font-weight:500;
+}
+.scene-diff.easy { background:#E8F8EF; color:#27AE60; }
+.scene-diff.medium { background:#FFF8E1; color:#F5A623; }
+.scene-diff.hard { background:#FDE8E8; color:#E74C3C; }
+.scene-diff.vhard { background:#F3E8FF; color:#8B5CF6; }
+.scene-card .scene-meta { font-size:12px; color:var(--text-light); margin-bottom:10px; }
+.scene-progress-bar {
+  height:6px; background:var(--border); border-radius:3px; margin-bottom:12px;
+}
+.scene-progress-bar .fill { height:100%; border-radius:3px; background:var(--gold); transition:width 0.5s; }
+.scene-start-btn {
+  width:100%; padding:10px; border:none; border-radius:var(--radius-sm);
+  background:var(--primary); color:#fff; font-size:14px; font-weight:600;
+  cursor:pointer; transition:transform 0.2s;
+}
+.scene-start-btn:active { transform:scale(0.97); }
+.scene-start-btn.locked {
+  background:var(--border); color:var(--text-light); cursor:default;
+}
+.scene-lock-info { font-size:12px; color:var(--text-light); text-align:center; margin-top:4px; }
+
+/* ========== 对话训练页 ========== */
+.chat-view { display:flex; flex-direction:column; padding-bottom:0; }
+.chat-header {
+  background:var(--primary); color:#fff; padding:14px 20px;
+  display:flex; align-items:center; gap:12px; flex-shrink:0;
+}
+.chat-back { font-size:18px; cursor:pointer; }
+.chat-header-info { flex:1; }
+.chat-header-info h3 { font-size:15px; font-weight:600; }
+.chat-header-info p { font-size:11px; color:rgba(255,255,255,0.7); }
+.chat-progress-bar { height:4px; background:rgba(255,255,255,0.2); border-radius:2px; margin-top:8px; }
+.chat-progress-bar .fill { height:100%; background:var(--gold); border-radius:2px; transition:width 0.4s; }
+
+.chat-messages {
+  flex:1; overflow-y:auto; padding:16px 20px; background:#F0F4F8;
+}
+.chat-messages::-webkit-scrollbar { width:0; }
+.msg { margin-bottom:16px; display:flex; gap:10px; }
+.msg.coach { justify-content:flex-start; }
+.msg.user { justify-content:flex-end; }
+.msg-avatar {
+  width:32px; height:32px; border-radius:50%; flex-shrink:0;
+  background:linear-gradient(135deg, #667eea, #764ba2);
+  display:flex; align-items:center; justify-content:center;
+  color:#fff; font-size:12px;
+}
+.msg.user .msg-avatar { display:none; }
+.msg-bubble {
+  max-width:75%; padding:12px 16px; border-radius:16px; font-size:14px;
+  line-height:1.6; word-break:break-word;
+}
+.msg.coach .msg-bubble {
+  background:var(--card); color:var(--text);
+  border-bottom-left-radius:4px;
+  box-shadow:var(--shadow);
+}
+.msg.user .msg-bubble {
+  background:var(--primary); color:#fff;
+  border-bottom-right-radius:4px;
+}
+
+.chat-options {
+  padding:12px 20px 24px; background:var(--card); flex-shrink:0;
+  border-top:1px solid var(--border);
+}
+.chat-options .options-label { font-size:12px; color:var(--text-light); margin-bottom:8px; }
+.option-btn {
+  width:100%; padding:12px 16px; border:1.5px solid var(--border); border-radius:var(--radius-sm);
+  background:var(--card); color:var(--text); font-size:14px; text-align:left;
+  cursor:pointer; margin-bottom:8px; transition:all 0.2s; line-height:1.5;
+}
+.option-btn:hover { border-color:var(--primary); background:#F0F4FF; }
+.option-btn:active { transform:scale(0.98); }
+.option-btn .opt-letter {
+  display:inline-block; width:22px; height:22px; border-radius:50%;
+  background:var(--primary); color:#fff; text-align:center; line-height:22px;
+  font-size:12px; font-weight:600; margin-right:8px;
+}
+
+/* ========== 训练结果页 ========== */
+.result-view {
+  display:flex; flex-direction:column; align-items:center;
+  padding:30px 20px 40px; background:linear-gradient(180deg, #F0F4FF, var(--bg));
+}
+.result-score-ring {
+  position:relative; width:140px; height:140px; margin-bottom:8px;
+}
+.result-score-ring svg { transform:rotate(-90deg); }
+.result-score-ring .score-center {
+  position:absolute; inset:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+}
+.result-score-ring .score-num { font-size:36px; font-weight:800; color:var(--primary); }
+.result-score-ring .score-label { font-size:12px; color:var(--text-light); }
+.result-stars { margin-bottom:20px; font-size:28px; }
+.result-stars .fa-star { color:var(--border); margin:0 2px; }
+.result-stars .fa-star.active { color:var(--gold); }
+
+.radar-chart {
+  width:220px; height:220px; position:relative; margin:0 auto 20px;
+}
+.radar-bg { width:100%; height:100%; }
+.radar-label {
+  position:absolute; font-size:11px; color:var(--text-light); white-space:nowrap;
+  transform:translate(-50%,-50%);
+}
+
+.result-comment {
+  margin:0 20px 20px; padding:18px; background:var(--card);
+  border-radius:var(--radius); box-shadow:var(--shadow); width:calc(100% - 40px);
+}
+.result-comment .comment-header { font-size:14px; font-weight:600; color:var(--primary); margin-bottom:8px; }
+.result-comment .comment-text { font-size:14px; color:var(--text); line-height:1.7; }
+
+.result-points {
+  display:inline-block; padding:8px 20px; background:linear-gradient(135deg, #FFF9EC, #FFF3D6);
+  border-radius:20px; font-size:14px; font-weight:600; color:var(--gold); margin-bottom:24px;
+}
+.result-btns { display:flex; gap:12px; width:100%; max-width:340px; }
+.result-btn {
+  flex:1; padding:14px; border:none; border-radius:var(--radius-sm);
+  font-size:15px; font-weight:600; cursor:pointer; transition:transform 0.2s;
+}
+.result-btn:active { transform:scale(0.96); }
+.result-btn.primary { background:var(--primary); color:#fff; }
+.result-btn.secondary { background:var(--card); color:var(--primary); border:1.5px solid var(--primary); }
+
+/* ========== 成长页 ========== */
+.growth-radar {
+  margin:20px; padding:20px; background:var(--card);
+  border-radius:var(--radius); box-shadow:var(--shadow);
+}
+.growth-radar h3 { font-size:15px; font-weight:600; margin-bottom:16px; color:var(--text); }
+.radar-container { position:relative; width:240px; height:240px; margin:0 auto; }
+.radar-container canvas { width:100%; height:100%; }
+
+.growth-stats {
+  display:flex; gap:12px; margin:0 20px;
+}
+.growth-stat-card {
+  flex:1; padding:16px; background:var(--card);
+  border-radius:var(--radius-sm); box-shadow:var(--shadow); text-align:center;
+}
+.growth-stat-card .stat-val { font-size:22px; font-weight:700; color:var(--primary); }
+.growth-stat-card .stat-val.gold { color:var(--gold); }
+.growth-stat-card .stat-label { font-size:12px; color:var(--text-light); margin-top:4px; }
+
+.milestone-list { margin:16px 20px; }
+.milestone-item {
+  display:flex; align-items:center; gap:12px; padding:14px 16px;
+  background:var(--card); border-radius:var(--radius-sm); margin-bottom:8px;
+  box-shadow:var(--shadow);
+}
+.milestone-item .ms-icon { font-size:20px; }
+.milestone-item .ms-text { flex:1; font-size:14px; color:var(--text); }
+.milestone-item .ms-text.locked { color:var(--text-light); }
+.milestone-item .ms-req { font-size:11px; color:var(--text-light); }
+
+.emotion-diary-btn {
+  display:flex; align-items:center; gap:12px; margin:0 20px 20px; padding:16px;
+  background:linear-gradient(135deg, #FFF9EC, #FFF3D6);
+  border-radius:var(--radius); cursor:pointer;
+}
+.emotion-diary-btn .diary-icon { font-size:24px; }
+.emotion-diary-btn .diary-text { flex:1; }
+.emotion-diary-btn .diary-text h4 { font-size:15px; font-weight:600; color:var(--text); }
+.emotion-diary-btn .diary-text p { font-size:12px; color:var(--text-light); }
+.emotion-diary-btn .diary-arrow { color:var(--text-light); }
+
+/* ========== 我的页 ========== */
+.profile-header {
+  background:linear-gradient(135deg, var(--primary), #2A5298);
+  padding:30px 20px 24px; color:#fff; text-align:center;
+}
+.profile-avatar {
+  width:64px; height:64px; border-radius:50%;
+  background:linear-gradient(135deg, var(--gold), #FFD700);
+  display:flex; align-items:center; justify-content:center;
+  font-size:28px; margin:0 auto 10px; color:var(--primary);
+}
+.profile-name { font-size:18px; font-weight:600; margin-bottom:4px; }
+.profile-rank { font-size:12px; color:var(--gold); }
+
+.profile-stats {
+  display:flex; margin:-12px 20px 0; padding:16px; background:var(--card);
+  border-radius:var(--radius); box-shadow:var(--shadow); position:relative; z-index:1;
+}
+.profile-stat { flex:1; text-align:center; }
+.profile-stat .ps-val { font-size:18px; font-weight:700; color:var(--primary); }
+.profile-stat .ps-label { font-size:11px; color:var(--text-light); margin-top:2px; }
+
+.menu-list { margin:16px 20px; }
+.menu-item {
+  display:flex; align-items:center; gap:14px; padding:16px;
+  background:var(--card); border-radius:var(--radius-sm); margin-bottom:8px;
+  box-shadow:var(--shadow); cursor:pointer;
+}
+.menu-item .menu-icon {
+  width:36px; height:36px; border-radius:10px; display:flex;
+  align-items:center; justify-content:center; font-size:16px;
+}
+.menu-item .menu-text { flex:1; font-size:14px; color:var(--text); }
+.menu-item .menu-badge { font-size:12px; color:var(--text-light); }
+.menu-item .menu-arrow { color:var(--text-light); font-size:12px; }
+
+/* ========== 底部Tab栏 ========== */
+.tab-bar {
+  position:absolute; bottom:0; left:0; right:0; height:64px;
+  background:var(--card); display:flex; align-items:center;
+  box-shadow:0 -2px 10px rgba(0,0,0,0.06); z-index:100;
+  border-top:1px solid var(--border);
+}
+.tab-item {
+  flex:1; display:flex; flex-direction:column; align-items:center;
+  justify-content:center; gap:3px; cursor:pointer; padding:6px 0;
+  -webkit-tap-highlight-color:transparent;
+}
+.tab-item i { font-size:20px; color:var(--text-light); transition:color 0.2s; }
+.tab-item span { font-size:10px; color:var(--text-light); transition:color 0.2s; }
+.tab-item.active i { color:var(--gold); }
+.tab-item.active span { color:var(--gold); font-weight:600; }
+
+/* 动画类 */
+.fade-in { animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <!-- ========== 登录页 ========== -->
+  <div class="view login-view active" id="view-login">
+    <div class="login-logo"><i class="fas fa-comments"></i></div>
+    <div class="login-title">对练社交</div>
+    <div class="login-subtitle">AI驱动的社交训练平台</div>
+    <div class="login-form">
+      <div class="login-input-group">
+        <i class="fas fa-mobile-alt"></i>
+        <input class="login-input" id="phone-input" type="tel" placeholder="请输入手机号" maxlength="11">
+      </div>
+      <div class="login-input-group">
+        <i class="fas fa-shield-alt"></i>
+        <input class="login-input" id="sms-input" type="text" placeholder="验证码" maxlength="6">
+        <button class="sms-btn" id="sms-btn" onclick="sendSms()">发送验证码</button>
+      </div>
+      <button class="login-btn" onclick="doLogin()">登 录</button>
+      <div class="login-agreement">
+        <input type="checkbox" id="agree-check" checked>
+        <label for="agree-check">我已阅读并同意 <a href="#">《用户协议》</a>和<a href="#">《隐私政策》</a></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 首页 ========== -->
+  <div class="view" id="view-home">
+    <div class="home-greeting">
+      <h2>下午好，钻石学员 ✨</h2>
+    </div>
+    <div class="coach-online-card fade-in">
+      <div class="breath-dot"></div>
+      <div class="coach-info">
+        <div class="coach-name">沈清欢</div>
+        <div class="coach-status">在线 ●</div>
+      </div>
+      <button class="coach-action" onclick="switchTab(1)">对话</button>
+    </div>
+    <div class="sign-in-section">
+      <div class="sign-in-btn" id="sign-in-btn" onclick="doSignIn()">
+        <i class="fas fa-calendar-check sign-icon"></i>
+        <div>
+          <div class="sign-text" id="sign-text">签到</div>
+          <div class="sign-sub" id="sign-sub">已连续签到7天</div>
+        </div>
+      </div>
+    </div>
+    <div class="recommend-card fade-in">
+      <div class="tag">🎯 今日推荐</div>
+      <h3>咖啡厅破冰</h3>
+      <p>推荐理由：你的破冰能力有提升空间</p>
+      <button class="start-btn" onclick="startTraining()">开始训练</button>
+    </div>
+    <div class="section-title">最近训练 <span class="more">查看全部 ›</span></div>
+    <div class="record-item">
+      <div class="record-icon" style="background:#FFF3D6;color:#F5A623;">☕</div>
+      <div class="record-info">
+        <div class="record-title">咖啡厅破冰</div>
+        <div class="record-time">今天 14:30</div>
+      </div>
+      <div class="record-score">85分</div>
+    </div>
+    <div class="record-item">
+      <div class="record-icon" style="background:#E8F8EF;color:#27AE60;">👥</div>
+      <div class="record-info">
+        <div class="record-title">兴趣社群</div>
+        <div class="record-time">昨天 20:15</div>
+      </div>
+      <div class="record-score">72分</div>
+    </div>
+    <div class="section-title">本周训练进度</div>
+    <div class="progress-section">
+      <div class="ring-progress">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="34" fill="none" stroke="#E8ECF1" stroke-width="6"/>
+          <circle cx="40" cy="40" r="34" fill="none" stroke="#F5A623" stroke-width="6"
+            stroke-dasharray="213.6" stroke-dashoffset="42.7" stroke-linecap="round"/>
+        </svg>
+        <div class="ring-text">
+          <div class="ring-num">12</div>
+          <div class="ring-label">/15次</div>
+        </div>
+      </div>
+      <div class="progress-detail">
+        <h4>还差3次达成目标</h4>
+        <p>本周已训练12次，继续保持💪</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 教练页 ========== -->
+  <div class="view" id="view-coach">
+    <div class="coach-header">
+      <div class="coach-points">
+        <div class="pts-info">训练积分 <strong>285</strong><span> /300</span></div>
+        <div class="pts-info" style="text-align:right;">→ 铂金</div>
+      </div>
+      <div class="rank-bar"><div class="fill" style="width:95%"></div></div>
+      <div class="rank-label">还差15分升级</div>
+    </div>
+    <div class="coach-avatar-area" style="margin-top:0; border-radius:0 0 var(--radius) var(--radius);">
+      <div class="coach-portrait"><i class="fas fa-user-tie"></i></div>
+      <div class="coach-portrait-name">沈清欢</div>
+      <div class="coach-portrait-tag">ENFP · 温和引导型</div>
+      <div class="coach-actions">
+        <button class="coach-action-btn primary" onclick="startTraining()"><i class="fas fa-comment-dots"></i> 开始对话训练</button>
+        <button class="coach-action-btn secondary" onclick="switchTab(2)"><i class="fas fa-theater-masks"></i> 场景挑战</button>
+      </div>
+    </div>
+    <div class="section-title">教练朋友圈</div>
+    <div class="coach-moment">
+      <div class="moment-header">
+        <div class="moment-avatar">沈</div>
+        <div>
+          <div class="moment-name">沈清欢</div>
+          <div class="moment-time">2小时前</div>
+        </div>
+      </div>
+      <div class="moment-content">今天看到学员在咖啡厅破冰拿了3星，太棒了！🎉 每次看到学员的进步都特别开心～</div>
+    </div>
+    <div class="section-title">今日任务</div>
+    <div class="task-list">
+      <div class="task-item">
+        <div class="task-check done"><i class="fas fa-check"></i></div>
+        <div class="task-text done-text">完成1次破冰训练</div>
+        <div class="task-reward">+10分</div>
+      </div>
+      <div class="task-item">
+        <div class="task-check"></div>
+        <div class="task-text">完成1次场景挑战</div>
+        <div class="task-reward">+15分</div>
+      </div>
+      <div class="task-item">
+        <div class="task-check"></div>
+        <div class="task-text">连续签到7天</div>
+        <div class="task-reward">+20分</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 场景页 ========== -->
+  <div class="view" id="view-scene">
+    <div class="page-header">
+      <h2><i class="fas fa-theater-masks"></i> 社交场景</h2>
+      <p>选择场景，开始你的社交训练之旅</p>
+    </div>
+    <div class="stage-tabs" id="stage-tabs">
+      <button class="stage-tab active" data-stage="0">破冰期</button>
+      <button class="stage-tab" data-stage="1">接触期</button>
+      <button class="stage-tab" data-stage="2">熟悉期</button>
+      <button class="stage-tab" data-stage="3">亲密期</button>
+      <button class="stage-tab" data-stage="4">职场期</button>
+      <button class="stage-tab" data-stage="5">高难期</button>
+    </div>
+    <div id="scene-list">
+      <div class="scene-card fade-in">
+        <div class="scene-top">
+          <span class="scene-icon">☕</span>
+          <span class="scene-name">咖啡厅破冰</span>
+          <span class="scene-diff easy">⭐ 简单</span>
+        </div>
+        <div class="scene-meta">10分钟 · 已完成75%</div>
+        <div class="scene-progress-bar"><div class="fill" style="width:75%"></div></div>
+        <button class="scene-start-btn" onclick="startTraining()">开始训练</button>
+      </div>
+      <div class="scene-card fade-in">
+        <div class="scene-top">
+          <span class="scene-icon">👥</span>
+          <span class="scene-name">兴趣社群</span>
+          <span class="scene-diff medium">⭐⭐ 中等</span>
+        </div>
+        <div class="scene-meta">12分钟 · 未开始</div>
+        <div class="scene-progress-bar"><div class="fill" style="width:0%"></div></div>
+        <button class="scene-start-btn" onclick="startTraining()">开始训练</button>
+      </div>
+      <div class="scene-card fade-in">
+        <div class="scene-top">
+          <span class="scene-icon">🏢</span>
+          <span class="scene-name">模拟面试</span>
+          <span class="scene-diff hard">⭐⭐⭐ 困难</span>
+        </div>
+        <div class="scene-meta">15分钟</div>
+        <button class="scene-start-btn locked" style="margin-top:8px;">🔒 需50积分</button>
+      </div>
+      <div class="scene-card fade-in">
+        <div class="scene-top">
+          <span class="scene-icon">📊</span>
+          <span class="scene-name">向上汇报</span>
+          <span class="scene-diff vhard">⭐⭐⭐⭐ 较难</span>
+        </div>
+        <div class="scene-meta">15分钟</div>
+        <button class="scene-start-btn locked" style="margin-top:8px;">🔒 需100积分</button>
+      </div>
+      <div class="scene-card fade-in">
+        <div class="scene-top">
+          <span class="scene-icon">💬</span>
+          <span class="scene-name">被误解(NVC)</span>
+          <span class="scene-diff hard">⭐⭐⭐ 困难</span>
+        </div>
+        <div class="scene-meta">12分钟</div>
+        <button class="scene-start-btn locked" style="margin-top:8px;">🔒 需100积分</button>
+      </div>
+      <div class="scene-card fade-in">
+        <div class="scene-top">
+          <span class="scene-icon">🤗</span>
+          <span class="scene-name">安慰TA</span>
+          <span class="scene-diff medium">⭐⭐ 中等</span>
+        </div>
+        <div class="scene-meta">10分钟</div>
+        <button class="scene-start-btn locked" style="margin-top:8px;">🔒 需50积分</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 对话训练页 ========== -->
+  <div class="view chat-view" id="view-chat">
+    <div class="chat-header">
+      <i class="fas fa-arrow-left chat-back" onclick="exitChat()"></i>
+      <div class="chat-header-info">
+        <h3>咖啡厅破冰</h3>
+        <p id="chat-round">第1轮 / 5轮</p>
+        <div class="chat-progress-bar"><div class="fill" id="chat-progress-fill" style="width:20%"></div></div>
+      </div>
+    </div>
+    <div class="chat-messages" id="chat-messages"></div>
+    <div class="chat-options" id="chat-options"></div>
+  </div>
+
+  <!-- ========== 训练结果页 ========== -->
+  <div class="view result-view" id="view-result">
+    <h2 style="color:var(--primary);margin-bottom:20px;font-size:20px;">训练报告</h2>
+    <div class="result-score-ring">
+      <svg width="140" height="140" viewBox="0 0 140 140">
+        <circle cx="70" cy="70" r="60" fill="none" stroke="#E8ECF1" stroke-width="8"/>
+        <circle cx="70" cy="70" r="60" fill="none" stroke="#F5A623" stroke-width="8"
+          stroke-dasharray="376.99" id="result-ring-fill" stroke-dashoffset="376.99" stroke-linecap="round"/>
+      </svg>
+      <div class="score-center">
+        <div class="score-num" id="result-score-num">0</div>
+        <div class="score-label">分</div>
+      </div>
+    </div>
+    <div class="result-stars">
+      <i class="fas fa-star active"></i>
+      <i class="fas fa-star active"></i>
+      <i class="fas fa-star active"></i>
+      <i class="fas fa-star"></i>
+      <i class="fas fa-star"></i>
+    </div>
+    <div class="section-title" style="padding:10px 0;">五维能力分析</div>
+    <div style="margin-bottom:20px;">
+      <canvas id="radar-canvas" width="260" height="260" style="display:block;margin:0 auto;"></canvas>
+    </div>
+    <div class="result-comment">
+      <div class="comment-header"><i class="fas fa-comment-dots"></i> 教练点评</div>
+      <div class="comment-text">整体表现不错！你的沟通力表现最好，继续保持。应变力方面可以多加练习，下次试试更灵活应对不同情况。</div>
+    </div>
+    <div class="result-points"><i class="fas fa-plus-circle"></i> 获得 +15 训练积分</div>
+    <div class="result-btns">
+      <button class="result-btn secondary" onclick="startTraining()">再来一次</button>
+      <button class="result-btn primary" onclick="switchTab(0)">返回首页</button>
+    </div>
+  </div>
+
+  <!-- ========== 成长页 ========== -->
+  <div class="view" id="view-growth">
+    <div class="page-header">
+      <h2><i class="fas fa-chart-line"></i> 我的成长</h2>
+      <p>记录你的每一次进步</p>
+    </div>
+    <div class="growth-radar">
+      <h3>五维能力雷达</h3>
+      <div class="radar-container">
+        <canvas id="growth-radar-canvas" width="240" height="240"></canvas>
+      </div>
+    </div>
+    <div class="growth-stats">
+      <div class="growth-stat-card">
+        <div class="stat-val gold">285</div>
+        <div class="stat-label">训练积分</div>
+      </div>
+      <div class="growth-stat-card">
+        <div class="stat-val">铂金</div>
+        <div class="stat-label">学员等级</div>
+      </div>
+      <div class="growth-stat-card">
+        <div class="stat-val gold">+45</div>
+        <div class="stat-label">本周进步</div>
+      </div>
+    </div>
+    <div class="section-title">里程碑</div>
+    <div class="milestone-list">
+      <div class="milestone-item">
+        <div class="ms-icon">✅</div>
+        <div class="ms-text">首次训练</div>
+      </div>
+      <div class="milestone-item">
+        <div class="ms-icon">✅</div>
+        <div class="ms-text">破冰达人</div>
+      </div>
+      <div class="milestone-item">
+        <div class="ms-icon">✅</div>
+        <div class="ms-text">三星学员</div>
+      </div>
+      <div class="milestone-item">
+        <div class="ms-icon">🔒</div>
+        <div class="ms-text locked">社交达人</div>
+        <div class="ms-req">需500分</div>
+      </div>
+    </div>
+    <div class="emotion-diary-btn">
+      <div class="diary-icon">📝</div>
+      <div class="diary-text">
+        <h4>情绪日记</h4>
+        <p>记录今天的社交感受</p>
+      </div>
+      <i class="fas fa-chevron-right diary-arrow"></i>
+    </div>
+  </div>
+
+  <!-- ========== 我的页 ========== -->
+  <div class="view" id="view-profile">
+    <div class="profile-header">
+      <div class="profile-avatar"><i class="fas fa-user"></i></div>
+      <div class="profile-name">钻石学员</div>
+      <div class="profile-rank"><i class="fas fa-gem"></i> 铂金会员</div>
+    </div>
+    <div class="profile-stats">
+      <div class="profile-stat">
+        <div class="ps-val">28</div>
+        <div class="ps-label">训练次数</div>
+      </div>
+      <div class="profile-stat">
+        <div class="ps-val">6</div>
+        <div class="ps-label">场景完成</div>
+      </div>
+      <div class="profile-stat">
+        <div class="ps-val">7</div>
+        <div class="ps-label">连续签到</div>
+      </div>
+    </div>
+    <div class="menu-list">
+      <div class="menu-item">
+        <div class="menu-icon" style="background:#FFF3D6;color:#F5A623;"><i class="fas fa-crown"></i></div>
+        <div class="menu-text">会员中心</div>
+        <div class="menu-badge">年卡用户</div>
+        <i class="fas fa-chevron-right menu-arrow"></i>
+      </div>
+      <div class="menu-item">
+        <div class="menu-icon" style="background:#E8F0FE;color:#4285F4;"><i class="fas fa-moon"></i></div>
+        <div class="menu-text">晚安计划设置</div>
+        <i class="fas fa-chevron-right menu-arrow"></i>
+      </div>
+      <div class="menu-item">
+        <div class="menu-icon" style="background:#E8F8EF;color:#27AE60;"><i class="fas fa-shield-alt"></i></div>
+        <div class="menu-text">实名认证</div>
+        <div class="menu-badge" style="color:#27AE60;">已认证</div>
+        <i class="fas fa-chevron-right menu-arrow"></i>
+      </div>
+      <div class="menu-item">
+        <div class="menu-icon" style="background:#F3E8FF;color:#8B5CF6;"><i class="fas fa-lock"></i></div>
+        <div class="menu-text">隐私设置</div>
+        <i class="fas fa-chevron-right menu-arrow"></i>
+      </div>
+      <div class="menu-item">
+        <div class="menu-icon" style="background:#FDE8E8;color:#E74C3C;"><i class="fas fa-info-circle"></i></div>
+        <div class="menu-text">关于我们</div>
+        <i class="fas fa-chevron-right menu-arrow"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 底部Tab栏 ========== -->
+  <div class="tab-bar" id="tab-bar">
+    <div class="tab-item active" data-tab="0" onclick="switchTab(0)">
+      <i class="fas fa-home"></i><span>首页</span>
+    </div>
+    <div class="tab-item" data-tab="1" onclick="switchTab(1)">
+      <i class="fas fa-chalkboard-teacher"></i><span>教练</span>
+    </div>
+    <div class="tab-item" data-tab="2" onclick="switchTab(2)">
+      <i class="fas fa-theater-masks"></i><span>场景</span>
+    </div>
+    <div class="tab-item" data-tab="3" onclick="switchTab(3)">
+      <i class="fas fa-chart-line"></i><span>成长</span>
+    </div>
+    <div class="tab-item" data-tab="4" onclick="switchTab(4)">
+      <i class="fas fa-user"></i><span>我的</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== 全局状态 =====
+const viewMap = ['view-home','view-coach','view-scene','view-growth','view-profile'];
+let currentTab = 0;
+let signedIn = false;
+let chatRound = 0;
+
+// ===== 对话数据 =====
+const chatData = [
+  {
+    coach: '你走进一家咖啡厅，发现只有吧台旁边还有一个空位。旁边坐着一个人正在看书。你会怎么做？',
+    options: [
+      { letter:'A', text:'你好，这本书我也看过，很不错！', score:20 },
+      { letter:'B', text:'（沉默等待对方先开口）', score:5 },
+      { letter:'C', text:'这里的咖啡真不错，你常来吗？', score:15 }
+    ],
+    feedback: '很好的开场！用共同兴趣打开话题是破冰的高效方式。对方似乎愿意聊天，试试深入了解...'
+  },
+  {
+    coach: null,
+    options: [
+      { letter:'A', text:'你平时喜欢看什么类型的书？', score:20 },
+      { letter:'B', text:'嗯...（不知说什么好）', score:5 },
+      { letter:'C', text:'我是第一次来这里，你有什么推荐吗？', score:15 }
+    ],
+    feedback: '开放式问题能让对话自然延续！对方很乐意分享，继续深入...'
+  },
+  {
+    coach: null,
+    options: [
+      { letter:'A', text:'原来如此！那你是怎么开始对这个感兴趣的？', score:20 },
+      { letter:'B', text:'哦，挺好的。（没有追问）', score:5 },
+      { letter:'C', text:'我也很喜欢这个！你最近有什么新发现吗？', score:15 }
+    ],
+    feedback: '追问「怎么开始」能让对方分享更多故事，建立了更深层的连接！'
+  },
+  {
+    coach: null,
+    options: [
+      { letter:'A', text:'说起来我也有类似的经历...', score:20 },
+      { letter:'B', text:'（一直点头但不太说话）', score:5 },
+      { letter:'C', text:'对了，你在这一带住很久了吗？', score:12 }
+    ],
+    feedback: '分享自己的经历能拉近关系，让对方觉得更有亲近感！'
+  },
+  {
+    coach: null,
+    options: [
+      { letter:'A', text:'今天聊得很开心！希望下次还能遇到你。', score:15 },
+      { letter:'B', text:'（默默看对方离开）', score:5 },
+      { letter:'C', text:'加个微信吧，有空可以一起喝咖啡！', score:20 }
+    ],
+    feedback: null
+  }
+];
+
+let totalScore = 0;
+
+// ===== 登录逻辑 =====
+function sendSms() {
+  const btn = document.getElementById('sms-btn');
+  if (btn.classList.contains('disabled')) return;
+  let sec = 60;
+  btn.classList.add('disabled');
+  btn.textContent = sec + 's';
+  const timer = setInterval(() => {
+    sec--;
+    btn.textContent = sec + 's';
+    if (sec <= 0) {
+      clearInterval(timer);
+      btn.classList.remove('disabled');
+      btn.textContent = '发送验证码';
+    }
+  }, 1000);
+}
+
+function doLogin() {
+  const agree = document.getElementById('agree-check').checked;
+  if (!agree) { alert('请先同意用户协议'); return; }
+  showView('view-home');
+  document.getElementById('tab-bar').style.display = 'flex';
+}
+
+// ===== 视图切换 =====
+function showView(viewId) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const target = document.getElementById(viewId);
+  target.classList.add('active');
+  target.scrollTop = 0;
+}
+
+function switchTab(idx) {
+  currentTab = idx;
+  const viewIds = ['view-home','view-coach','view-scene','view-growth','view-profile'];
+  showView(viewIds[idx]);
+  document.querySelectorAll('.tab-item').forEach((t,i) => {
+    t.classList.toggle('active', i === idx);
+  });
+  document.getElementById('tab-bar').style.display = 'flex';
+  if (idx === 3) drawGrowthRadar();
+}
+
+// ===== 签到 =====
+function doSignIn() {
+  if (signedIn) return;
+  signedIn = true;
+  const btn = document.getElementById('sign-in-btn');
+  btn.classList.add('signed');
+  document.getElementById('sign-text').textContent = '已签到';
+  document.getElementById('sign-sub').textContent = '今日已签到 ✓';
+  btn.querySelector('.sign-icon').className = 'fas fa-check-circle sign-icon';
+}
+
+// ===== 场景Tab =====
+document.getElementById('stage-tabs').addEventListener('click', function(e) {
+  if (e.target.classList.contains('stage-tab')) {
+    document.querySelectorAll('.stage-tab').forEach(t => t.classList.remove('active'));
+    e.target.classList.add('active');
+  }
+});
+
+// ===== 对话训练 =====
+function startTraining() {
+  chatRound = 0;
+  totalScore = 0;
+  showView('view-chat');
+  document.getElementById('tab-bar').style.display = 'none';
+  document.getElementById('chat-messages').innerHTML = '';
+  document.getElementById('chat-options').innerHTML = '';
+  updateChatRound();
+  setTimeout(() => {
+    addCoachMessage(chatData[0].coach);
+    setTimeout(() => showOptions(chatData[0].options), 600);
+  }, 400);
+}
+
+function updateChatRound() {
+  document.getElementById('chat-round').textContent = '第' + (chatRound + 1) + '轮 / 5轮';
+  document.getElementById('chat-progress-fill').style.width = ((chatRound + 1) * 20) + '%';
+}
+
+function addCoachMessage(text) {
+  const container = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg coach fade-in';
+  div.innerHTML = '<div class="msg-avatar">沈</div><div class="msg-bubble">' + text + '</div>';
+  container.appendChild(div);
+  scrollChat();
+}
+
+function addUserMessage(text) {
+  const container = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg user fade-in';
+  div.innerHTML = '<div class="msg-bubble">' + text + '</div><div class="msg-avatar" style="background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;">我</div>';
+  container.appendChild(div);
+  scrollChat();
+}
+
+function showOptions(options) {
+  const container = document.getElementById('chat-options');
+  let html = '<div class="options-label">请选择你的回应：</div>';
+  options.forEach((opt, i) => {
+    html += '<button class="option-btn" onclick="selectOption(' + i + ')"><span class="opt-letter">' + opt.letter + '</span>' + opt.text + '</button>';
+  });
+  container.innerHTML = html;
+}
+
+function selectOption(idx) {
+  const round = chatData[chatRound];
+  const chosen = round.options[idx];
+  totalScore += chosen.score;
+
+  // 隐藏选项
+  document.getElementById('chat-options').innerHTML = '';
+
+  // 显示用户消息
+  addUserMessage(chosen.letter + '. ' + chosen.text);
+
+  chatRound++;
+
+  if (chatRound >= 5) {
+    // 训练结束
+    setTimeout(() => {
+      addCoachMessage('训练结束！让我来为你总结一下本次表现～');
+      setTimeout(() => showResult(), 1200);
+    }, 800);
+  } else {
+    // 显示教练反馈 + 下一轮
+    setTimeout(() => {
+      addCoachMessage(round.feedback);
+      setTimeout(() => {
+        updateChatRound();
+        setTimeout(() => showOptions(round.options), 400);
+      }, 600);
+    }, 800);
+  }
+}
+
+function scrollChat() {
+  const el = document.getElementById('chat-messages');
+  setTimeout(() => { el.scrollTop = el.scrollHeight; }, 50);
+}
+
+function exitChat() {
+  switchTab(currentTab);
+}
+
+// ===== 训练结果 =====
+function showResult() {
+  showView('view-result');
+  document.getElementById('tab-bar').style.display = 'none';
+
+  // 分数动画
+  const score = Math.min(100, Math.max(40, totalScore));
+  const ring = document.getElementById('result-ring-fill');
+  const circumference = 2 * Math.PI * 60;
+  const offset = circumference * (1 - score / 100);
+  setTimeout(() => { ring.style.transition = 'stroke-dashoffset 1.2s ease'; ring.style.strokeDashoffset = offset; }, 100);
+
+  // 数字递增
+  let cur = 0;
+  const numEl = document.getElementById('result-score-num');
+  const step = Math.ceil(score / 40);
+  const timer = setInterval(() => {
+    cur += step;
+    if (cur >= score) { cur = score; clearInterval(timer); }
+    numEl.textContent = cur;
+  }, 25);
+
+  // 雷达图
+  drawResultRadar();
+}
+
+// ===== 雷达图绘制 =====
+function drawRadar(canvasId, values, labels, size) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  const cx = w / 2, cy = h / 2;
+  const maxR = Math.min(w, h) / 2 - 30;
+  const n = values.length;
+  const angleStep = (2 * Math.PI) / n;
+  const startAngle = -Math.PI / 2;
+
+  ctx.clearRect(0, 0, w, h);
+
+  // 绘制背景网格
+  for (let level = 1; level <= 5; level++) {
+    const r = maxR * level / 5;
+    ctx.beginPath();
+    for (let i = 0; i < n; i++) {
+      const a = startAngle + i * angleStep;
+      const x = cx + r * Math.cos(a);
+      const y = cy + r * Math.sin(a);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = '#E8ECF1';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // 绘制轴线
+  for (let i = 0; i < n; i++) {
+    const a = startAngle + i * angleStep;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + maxR * Math.cos(a), cy + maxR * Math.sin(a));
+    ctx.strokeStyle = '#E8ECF1';
+    ctx.stroke();
+  }
+
+  // 绘制数据区域
+  ctx.beginPath();
+  for (let i = 0; i < n; i++) {
+    const a = startAngle + i * angleStep;
+    const r = maxR * values[i] / 100;
+    const x = cx + r * Math.cos(a);
+    const y = cy + r * Math.sin(a);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(245,166,35,0.2)';
+  ctx.fill();
+  ctx.strokeStyle = '#F5A623';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // 绘制数据点
+  for (let i = 0; i < n; i++) {
+    const a = startAngle + i * angleStep;
+    const r = maxR * values[i] / 100;
+    const x = cx + r * Math.cos(a);
+    const y = cy + r * Math.sin(a);
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, 2 * Math.PI);
+    ctx.fillStyle = '#F5A623';
+    ctx.fill();
+  }
+
+  // 绘制标签
+  ctx.fillStyle = '#2C3E50';
+  ctx.font = '12px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  for (let i = 0; i < n; i++) {
+    const a = startAngle + i * angleStep;
+    const lr = maxR + 22;
+    const x = cx + lr * Math.cos(a);
+    const y = cy + lr * Math.sin(a);
+    ctx.fillText(labels[i] + ' ' + values[i], x, y);
+  }
+}
+
+function drawResultRadar() {
+  drawRadar('radar-canvas', [85, 80, 75, 70, 65], ['沟通力','表达力','共情力','情绪控制','应变力'], 260);
+}
+
+function drawGrowthRadar() {
+  drawRadar('growth-radar-canvas', [85, 80, 75, 70, 65], ['沟通力','表达力','共情力','情绪控制','应变力'], 240);
+}
+
+// ===== 初始化 =====
+document.getElementById('tab-bar').style.display = 'none';
+</script>
+</body>
+</html>
