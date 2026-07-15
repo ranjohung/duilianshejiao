@@ -641,13 +641,18 @@ body {
     <div class="login-form">
       <div class="login-input-group">
         <i class="fas fa-mobile-alt"></i>
-        <input class="login-input" id="phone-input" type="tel" placeholder="请输入手机号" maxlength="11">
+        <input class="login-input" id="phone-input" type="tel" placeholder="请输入手机号" maxlength="11" value="13800138000">
+      </div>
+      <div class="login-input-group">
+        <i class="fas fa-lock"></i>
+        <input class="login-input" id="password-input" type="password" placeholder="密码" value="123456">
       </div>
       <div class="login-input-group">
         <i class="fas fa-shield-alt"></i>
         <input class="login-input" id="sms-input" type="text" placeholder="验证码" maxlength="6">
         <button class="sms-btn" id="sms-btn" onclick="sendSms()">发送验证码</button>
       </div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:8px;text-align:center;">体验账号已自动填充，点击登录即可体验</div>
       <button class="login-btn" onclick="doLogin()">登 录</button>
       <div class="login-agreement">
         <input type="checkbox" id="agree-check" checked>
@@ -1225,8 +1230,21 @@ function sendSms() {
 function doLogin() {
   const agree = document.getElementById('agree-check').checked;
   if (!agree) { alert('请先同意用户协议'); return; }
-  showView('view-home');
-  document.getElementById('tab-bar').style.display = 'flex';
+  const phone = document.getElementById('phone-input').value.trim();
+  const pwd = document.getElementById('password-input').value.trim();
+  // 体验账号验证：手机号13800138000 + 密码123456，或任意手机号+验证码
+  if (phone === '13800138000' && pwd === '123456') {
+    showView('view-home');
+    document.getElementById('tab-bar').style.display = 'flex';
+    return;
+  }
+  // 其他情况也允许直接登录体验
+  if (phone.length === 11) {
+    showView('view-home');
+    document.getElementById('tab-bar').style.display = 'flex';
+    return;
+  }
+  alert('请输入正确的手机号');
 }
 
 // ===== 视图切换 =====
