@@ -343,7 +343,40 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
   <!-- ===== 训练页 ===== -->
   <div class="page" id="page-training">
     <div class="page-content">
-      <h1 class="text-xl font-bold text-gray-800 mb-6">社交场景训练</h1>
+      <h1 class="text-xl font-bold text-gray-800 mb-4">社交场景训练</h1>
+
+      <!-- 自定义场景入口（PRD §2.1） -->
+      <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-4 text-white mb-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="font-semibold text-lg">🎨 自定义场景</h3>
+            <p class="text-xs opacity-80 mt-1">创建专属你的训练场景</p>
+          </div>
+          <button onclick="showCustomSceneModal()" class="px-4 py-2 bg-white/20 rounded-lg text-sm font-medium hover:bg-white/30 transition-colors">
+            + 创建场景
+          </button>
+        </div>
+        <div class="mt-3 flex items-center gap-4 text-xs opacity-80">
+          <span>免费用户：可创建1个</span>
+          <span>会员用户：无限创建</span>
+        </div>
+      </div>
+
+      <!-- 我的自定义场景（PRD §2.1） -->
+      <div id="my-custom-scenes" class="mb-6" style="display:none">
+        <h3 class="text-sm font-semibold text-gray-800 mb-3">我的自定义场景</h3>
+        <div class="grid grid-cols-1 gap-3" id="custom-scene-list"></div>
+      </div>
+
+      <!-- 场景模板市场（PRD §2.4） -->
+      <div class="bg-gray-50 rounded-2xl p-4 mb-6">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-semibold text-gray-800">📦 场景模板市场</h3>
+          <span class="text-xs text-gray-400">精选优质场景</span>
+        </div>
+        <div class="grid grid-cols-2 gap-3" id="template-scene-list"></div>
+      </div>
+
       <div id="scene-list"></div>
     </div>
   </div>
@@ -489,6 +522,24 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
         <div class="grid grid-cols-7 gap-1" id="calendar-grid"></div>
       </div>
 
+      <!-- 我的形象（PRD §3.1） -->
+      <div class="bg-gradient-to-br from-pink-50 to-rose-50 rounded-2xl p-4 shadow-sm mb-4 border border-pink-100">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-semibold text-gray-800">👤 我的形象</h3>
+          <button onclick="showAvatarModal()" class="text-xs text-pink-600 font-medium">更换形象</button>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="w-20 h-20 bg-white rounded-xl flex items-center justify-center text-3xl shadow-sm" id="profile-avatar-preview">👤</div>
+          <div class="flex-1">
+            <div class="text-sm font-medium text-gray-800" id="profile-avatar-name">默认形象</div>
+            <div class="text-xs text-gray-400 mt-0.5" id="profile-avatar-time">未创建</div>
+          </div>
+          <button onclick="showAvatarModal()" class="px-3 py-1.5 bg-pink-500 text-white text-xs font-medium rounded-lg hover:bg-pink-600 transition-colors">
+            去搭配
+          </button>
+        </div>
+      </div>
+
       <div class="space-y-3">
         <button onclick="showModal('editprofile')" class="w-full bg-white rounded-xl p-4 shadow-sm flex items-center justify-between hover:bg-gray-50 transition-all">
           <div class="flex items-center gap-3">
@@ -575,6 +626,72 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
   </div>
 
   <!-- ===== 训练弹窗 ===== -->
+  <!-- 场景准备页（包含"打扮一下"功能，PRD §1.1） -->
+  <div class="modal-overlay" id="modal-prepare" style="display:none">
+    <div class="modal-content h-[85vh]">
+      <div class="flex items-center justify-between p-4 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-800">🎯 训练准备</h3>
+        <button onclick="closeModal('prepare')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+      </div>
+      <div class="flex-1 overflow-auto p-4">
+        <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-4 text-white mb-4">
+          <div class="text-sm opacity-80 mb-1">即将开始</div>
+          <div class="text-xl font-bold" id="prepare-title">训练场景</div>
+        </div>
+
+        <div class="bg-white rounded-xl p-4 shadow-sm mb-4">
+          <h4 class="text-sm font-semibold text-gray-800 mb-3">场景信息</h4>
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between">
+              <span class="text-gray-500">场景类型</span>
+              <span class="text-gray-800" id="prepare-type">生活社交</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">你的角色</span>
+              <span class="text-gray-800" id="prepare-your-role">求职者</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">对方角色</span>
+              <span class="text-gray-800" id="prepare-other-role">面试官</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">训练目标</span>
+              <span class="text-gray-800" id="prepare-target">通过面试</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">难度等级</span>
+              <span class="text-gray-800" id="prepare-difficulty">⭐⭐⭐</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 打扮一下（PRD §1.1） -->
+        <div class="bg-gradient-to-br from-pink-50 to-rose-50 rounded-xl p-4 border border-pink-100">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-xl">💄</span>
+            <h4 class="text-sm font-semibold text-gray-800">打扮一下</h4>
+          </div>
+          <p class="text-sm text-gray-600 mb-3" id="image-tip-text">形象是社交的加分项，不是必选项；能力是社交的硬通货。</p>
+          <div class="flex gap-3">
+            <button onclick="goToBeautyClub()" class="flex-1 py-3 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-medium hover:opacity-90 transition-opacity text-sm">
+              去悦己颜值社搭配一下
+            </button>
+            <button onclick="skipDressAndStart()" class="flex-1 py-3 bg-white border border-gray-200 text-gray-600 rounded-xl font-medium hover:bg-gray-50 transition-colors text-sm">
+              直接开始训练
+            </button>
+          </div>
+          <div class="mt-3 flex items-center gap-2">
+            <span class="text-xs text-gray-400">形象适配度：</span>
+            <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div class="h-full bg-pink-500 rounded-full transition-all" id="image-fit-bar" style="width:0%"></div>
+            </div>
+            <span class="text-xs text-gray-500" id="image-fit-percent">0%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="modal-training" style="display:none">
     <div class="modal-content h-[70vh]">
       <div class="flex items-center justify-between p-4 border-b border-gray-100">
@@ -583,6 +700,13 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
           <p class="text-xs text-gray-400" id="training-subtitle"></p>
         </div>
         <div class="flex items-center gap-2">
+          <!-- 形象适配度指示器（PRD §1.6） -->
+          <div class="flex flex-col items-end" id="image-indicator" style="display:none">
+            <div class="text-xs flex items-center gap-1 bg-pink-50 text-pink-600 px-2 py-1 rounded-full">
+              💄 <span id="image-indicator-percent">0%</span>
+            </div>
+            <div class="text-[10px] text-gray-400 mt-1" id="image-indicator-scene">场景类型</div>
+          </div>
           <!-- 时空穿梭券（参考"与你"实现，PRD §13.1） -->
           <button onclick="useTimeRewind()" id="rewind-btn" class="px-2 py-1 bg-purple-100 text-purple-600 text-xs rounded-full flex items-center gap-1 hover:bg-purple-200 disabled:opacity-50 disabled:cursor-not-allowed" style="display:none" disabled>
             ⏳ <span id="rewind-count">0</span>张
@@ -601,6 +725,285 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
         </div>
       </div>
       <div class="flex-1 overflow-auto p-4 space-y-3" id="training-messages"></div>
+    </div>
+  </div>
+
+  <!-- 悦己颜值社联动弹窗（模拟，PRD §1.2） -->
+  <div class="modal-overlay" id="modal-beauty-club" style="display:none">
+    <div class="modal-content h-[85vh]">
+      <div class="flex items-center justify-between p-4 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-800">💄 悦己颜值社</h3>
+        <button onclick="closeModal('beauty-club')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+      </div>
+      <div class="flex-1 overflow-auto p-4">
+        <div class="bg-gradient-to-br from-pink-500 via-rose-500 to-orange-500 rounded-2xl p-4 text-white mb-4 text-center">
+          <div class="text-3xl mb-2">✨</div>
+          <div class="text-lg font-bold">形象搭配服务</div>
+          <div class="text-sm opacity-80 mt-1">为你的训练场景定制专属形象</div>
+        </div>
+
+        <div class="bg-white rounded-xl p-4 shadow-sm mb-4">
+          <h4 class="text-sm font-semibold text-gray-800 mb-3">当前场景推荐</h4>
+          <div class="flex items-center gap-3">
+            <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center text-2xl">👔</div>
+            <div class="flex-1">
+              <div class="text-sm font-medium" id="beauty-scene-name">相亲模拟</div>
+              <div class="text-xs text-gray-500">推荐风格：休闲得体</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-3 mb-4">
+          <div class="bg-white rounded-xl p-3 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm font-medium">穿搭方案</span>
+              <span class="text-xs text-green-600">AI推荐</span>
+            </div>
+            <div class="text-xs text-gray-600" id="beauty-outfit">选择适合相亲的休闲装，颜色搭配和谐</div>
+          </div>
+          <div class="bg-white rounded-xl p-3 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm font-medium">妆容建议</span>
+              <span class="text-xs text-green-600">AI推荐</span>
+            </div>
+            <div class="text-xs text-gray-600" id="beauty-makeup">淡妆为主，突出自然好气色</div>
+          </div>
+          <div class="bg-white rounded-xl p-3 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm font-medium">发型建议</span>
+              <span class="text-xs text-green-600">AI推荐</span>
+            </div>
+            <div class="text-xs text-gray-600" id="beauty-hair">清爽整洁，展现自信气质</div>
+          </div>
+        </div>
+
+        <div class="bg-gray-50 rounded-xl p-4 mb-4">
+          <h4 class="text-sm font-semibold text-gray-800 mb-2">形象预览</h4>
+          <div class="w-full h-32 bg-gradient-to-br from-pink-100 to-rose-100 rounded-xl flex items-center justify-center">
+            <div class="text-center">
+              <div class="text-4xl mb-1">👤</div>
+              <div class="text-xs text-gray-500">AI形象生成中...</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-3">
+          <button onclick="confirmBeautyMatch()" class="flex-1 py-3 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-medium hover:opacity-90 transition-opacity">
+            确认方案并返回
+          </button>
+          <button onclick="closeModal('beauty-club')" class="flex-1 py-3 bg-white border border-gray-200 text-gray-600 rounded-xl font-medium hover:bg-gray-50 transition-colors">
+            暂不搭配
+          </button>
+        </div>
+
+        <div class="mt-4 text-xs text-gray-400 text-center">
+          <p>悦己颜值社App尚未安装</p>
+          <p>当前为模拟体验，实际使用时将唤起App</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 自定义场景创建弹窗（PRD §2.2） -->
+  <div class="modal-overlay" id="modal-custom-scene" style="display:none">
+    <div class="modal-content h-[90vh]">
+      <div class="flex items-center justify-between p-4 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-800">🎨 创建自定义场景</h3>
+        <button onclick="closeModal('custom-scene')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+      </div>
+      <div class="flex-1 overflow-auto p-4">
+        <!-- Step 1 -->
+        <div id="custom-step-1">
+          <h4 class="text-sm font-semibold text-gray-800 mb-4">Step 1：场景基本信息</h4>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1.5">场景名称</label>
+              <input id="custom-name" type="text" placeholder="例如：客户拜访" class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1.5">场景类型</label>
+              <select id="custom-type" class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm">
+                <option value="工作沟通">工作沟通</option>
+                <option value="生活社交">生活社交</option>
+                <option value="销售谈判">销售谈判</option>
+                <option value="学习场景">学习场景</option>
+                <option value="其他">其他</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1.5">你的角色</label>
+              <input id="custom-your-role" type="text" placeholder="例如：销售员" class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1.5">对方角色</label>
+              <input id="custom-other-role" type="text" placeholder="例如：客户" class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1.5">场景难度</label>
+              <div class="flex items-center gap-2">
+                <input type="range" id="custom-difficulty" min="1" max="5" value="3" class="flex-1">
+                <span class="text-sm font-medium" id="custom-difficulty-label">⭐⭐⭐</span>
+              </div>
+            </div>
+          </div>
+          <button onclick="nextCustomStep(2)" class="w-full mt-6 py-3 bg-indigo-500 text-white rounded-xl font-medium hover:bg-indigo-600 transition-colors">下一步</button>
+        </div>
+
+        <!-- Step 2 -->
+        <div id="custom-step-2" style="display:none">
+          <h4 class="text-sm font-semibold text-gray-800 mb-4">Step 2：场景细节</h4>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1.5">背景故事</label>
+              <textarea id="custom-background" rows="4" placeholder="描述场景发生的背景..." class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm resize-none"></textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1.5">训练目标</label>
+              <textarea id="custom-target" rows="3" placeholder="你希望通过这个场景学习什么？" class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm resize-none"></textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1.5">对方性格</label>
+              <select id="custom-personality" class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm">
+                <option value="犹豫不决">犹豫不决</option>
+                <option value="强势挑剔">强势挑剔</option>
+                <option value="热情冲动">热情冲动</option>
+                <option value="理性分析">理性分析</option>
+                <option value="沉默寡言">沉默寡言</option>
+                <option value="其他">其他</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1.5">对方可能的反对意见（可选）</label>
+              <textarea id="custom-objections" rows="2" placeholder="对方可能会提出什么反对意见？" class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm resize-none"></textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1.5">关键对话节点（可选）</label>
+              <textarea id="custom-key-nodes" rows="2" placeholder="对话中需要重点关注的节点..." class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm resize-none"></textarea>
+            </div>
+          </div>
+          <div class="flex gap-3 mt-6">
+            <button onclick="nextCustomStep(1)" class="flex-1 py-3 bg-white border border-gray-200 text-gray-600 rounded-xl font-medium hover:bg-gray-50 transition-colors">上一步</button>
+            <button onclick="nextCustomStep(3)" class="flex-1 py-3 bg-indigo-500 text-white rounded-xl font-medium hover:bg-indigo-600 transition-colors">下一步</button>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div id="custom-step-3" style="display:none">
+          <h4 class="text-sm font-semibold text-gray-800 mb-4">Step 3：确认并生成</h4>
+          <div class="bg-gray-50 rounded-xl p-4 mb-4">
+            <div class="space-y-2 text-sm">
+              <div class="flex justify-between"><span class="text-gray-500">场景名称</span><span class="text-gray-800 font-medium" id="preview-name">-</span></div>
+              <div class="flex justify-between"><span class="text-gray-500">场景类型</span><span class="text-gray-800 font-medium" id="preview-type">-</span></div>
+              <div class="flex justify-between"><span class="text-gray-500">你的角色</span><span class="text-gray-800 font-medium" id="preview-your-role">-</span></div>
+              <div class="flex justify-between"><span class="text-gray-500">对方角色</span><span class="text-gray-800 font-medium" id="preview-other-role">-</span></div>
+              <div class="flex justify-between"><span class="text-gray-500">难度等级</span><span class="text-gray-800 font-medium" id="preview-difficulty">-</span></div>
+              <div class="flex justify-between"><span class="text-gray-500">训练目标</span><span class="text-gray-800 font-medium" id="preview-target">-</span></div>
+            </div>
+          </div>
+          <div class="bg-indigo-50 rounded-xl p-4 mb-4">
+            <div class="text-xs text-indigo-600">
+              <p>✨ AI将根据你提供的信息生成完整的场景配置</p>
+              <p>预计训练时长：约10-15分钟</p>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <button onclick="nextCustomStep(2)" class="flex-1 py-3 bg-white border border-gray-200 text-gray-600 rounded-xl font-medium hover:bg-gray-50 transition-colors">上一步</button>
+            <button onclick="generateCustomScene()" class="flex-1 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl font-medium hover:opacity-90 transition-opacity">生成场景</button>
+          </div>
+        </div>
+
+        <!-- Step 4: Generating -->
+        <div id="custom-step-4" style="display:none">
+          <div class="text-center py-12">
+            <div class="text-6xl mb-4">🤖</div>
+            <h4 class="text-lg font-semibold text-gray-800 mb-2">AI正在生成场景...</h4>
+            <p class="text-sm text-gray-500">请稍候，预计需要5-10秒</p>
+            <div class="mt-6 w-32 h-2 bg-gray-200 rounded-full overflow-hidden mx-auto">
+              <div class="h-full bg-indigo-500 rounded-full animate-pulse" style="width:60%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 我的形象弹窗（PRD §3.2） -->
+  <div class="modal-overlay" id="modal-avatar" style="display:none">
+    <div class="modal-content h-[85vh]">
+      <div class="flex items-center justify-between p-4 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-800">👤 我的形象</h3>
+        <button onclick="closeModal('avatar')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+      </div>
+      <div class="flex-1 overflow-auto p-4">
+        <!-- 形象预览区 -->
+        <div class="bg-gradient-to-br from-pink-100 to-rose-100 rounded-2xl p-6 mb-4">
+          <div class="w-full h-40 flex items-center justify-center">
+            <div class="text-center">
+              <div class="text-6xl mb-2" id="avatar-preview">👤</div>
+              <div class="text-sm text-gray-600" id="avatar-preview-name">默认形象</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 上传照片（PRD §3.2） -->
+        <div class="bg-white rounded-xl p-4 shadow-sm mb-4">
+          <h4 class="text-sm font-semibold text-gray-800 mb-3">上传照片生成形象</h4>
+          <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-pink-400 transition-colors cursor-pointer" onclick="uploadAvatar()">
+            <div class="text-4xl mb-2">📷</div>
+            <div class="text-sm text-gray-600">点击上传正面全身照</div>
+            <div class="text-xs text-gray-400 mt-1">支持JPG/PNG格式，建议尺寸1024×1024</div>
+          </div>
+          <p class="text-xs text-gray-400 text-center mt-2">照片加密存储，原始照片1小时后自动删除</p>
+        </div>
+
+        <!-- 预设形象（PRD §3.4） -->
+        <div class="bg-white rounded-xl p-4 shadow-sm">
+          <h4 class="text-sm font-semibold text-gray-800 mb-3">预设形象</h4>
+          <div class="grid grid-cols-5 gap-2">
+            <div onclick="selectPresetAvatar('👨')" class="aspect-square bg-gray-100 rounded-xl flex items-center justify-center text-2xl hover:bg-pink-100 hover:border-pink-300 border-2 border-transparent transition-all cursor-pointer">👨</div>
+            <div onclick="selectPresetAvatar('👩')" class="aspect-square bg-gray-100 rounded-xl flex items-center justify-center text-2xl hover:bg-pink-100 hover:border-pink-300 border-2 border-transparent transition-all cursor-pointer">👩</div>
+            <div onclick="selectPresetAvatar('🧑')" class="aspect-square bg-gray-100 rounded-xl flex items-center justify-center text-2xl hover:bg-pink-100 hover:border-pink-300 border-2 border-transparent transition-all cursor-pointer">🧑</div>
+            <div onclick="selectPresetAvatar('👨‍💼')" class="aspect-square bg-gray-100 rounded-xl flex items-center justify-center text-2xl hover:bg-pink-100 hover:border-pink-300 border-2 border-transparent transition-all cursor-pointer">👨‍💼</div>
+            <div onclick="selectPresetAvatar('👩‍💼')" class="aspect-square bg-gray-100 rounded-xl flex items-center justify-center text-2xl hover:bg-pink-100 hover:border-pink-300 border-2 border-transparent transition-all cursor-pointer">👩‍💼</div>
+            <div onclick="selectPresetAvatar('👨‍🎨')" class="aspect-square bg-gray-100 rounded-xl flex items-center justify-center text-2xl hover:bg-pink-100 hover:border-pink-300 border-2 border-transparent transition-all cursor-pointer">👨‍🎨</div>
+            <div onclick="selectPresetAvatar('👩‍🎨')" class="aspect-square bg-gray-100 rounded-xl flex items-center justify-center text-2xl hover:bg-pink-100 hover:border-pink-300 border-2 border-transparent transition-all cursor-pointer">👩‍🎨</div>
+            <div onclick="selectPresetAvatar('👨‍👩‍👧')" class="aspect-square bg-gray-100 rounded-xl flex items-center justify-center text-2xl hover:bg-pink-100 hover:border-pink-300 border-2 border-transparent transition-all cursor-pointer">👨‍👩‍👧</div>
+            <div onclick="selectPresetAvatar('🧑‍🤝‍🧑')" class="aspect-square bg-gray-100 rounded-xl flex items-center justify-center text-2xl hover:bg-pink-100 hover:border-pink-300 border-2 border-transparent transition-all cursor-pointer">🧑‍🤝‍🧑</div>
+            <div onclick="selectPresetAvatar('🧑‍🚀')" class="aspect-square bg-gray-100 rounded-xl flex items-center justify-center text-2xl hover:bg-pink-100 hover:border-pink-300 border-2 border-transparent transition-all cursor-pointer">🧑‍🚀</div>
+          </div>
+        </div>
+
+        <!-- 微调选项（PRD §3.2） -->
+        <div class="bg-white rounded-xl p-4 shadow-sm mt-4">
+          <h4 class="text-sm font-semibold text-gray-800 mb-3">形象微调</h4>
+          <div class="space-y-3">
+            <div>
+              <label class="block text-xs text-gray-500 mb-1.5">发型</label>
+              <div class="flex gap-2">
+                <button onclick="adjustAvatar('hair',1)" class="flex-1 py-1.5 text-xs bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">短发</button>
+                <button onclick="adjustAvatar('hair',2)" class="flex-1 py-1.5 text-xs bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">中长发</button>
+                <button onclick="adjustAvatar('hair',3)" class="flex-1 py-1.5 text-xs bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">长发</button>
+                <button onclick="adjustAvatar('hair',4)" class="flex-1 py-1.5 text-xs bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">卷发</button>
+                <button onclick="adjustAvatar('hair',5)" class="flex-1 py-1.5 text-xs bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">直发</button>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1.5">发色</label>
+              <div class="flex gap-2">
+                <button onclick="adjustAvatar('color',1)" class="flex-1 py-1.5 text-xs bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">黑色</button>
+                <button onclick="adjustAvatar('color',2)" class="flex-1 py-1.5 text-xs bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">棕色</button>
+                <button onclick="adjustAvatar('color',3)" class="flex-1 py-1.5 text-xs bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">金色</button>
+                <button onclick="adjustAvatar('color',4)" class="flex-1 py-1.5 text-xs bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">红色</button>
+                <button onclick="adjustAvatar('color',5)" class="flex-1 py-1.5 text-xs bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">灰色</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button onclick="saveAvatar()" class="w-full mt-4 py-3 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl font-medium hover:opacity-90 transition-opacity">
+          保存形象
+        </button>
+      </div>
     </div>
   </div>
 
@@ -916,21 +1319,31 @@ let userData = {
 
 // 训练数据
 let trainingScenes = [
-  { id:1, icon:'☕', name:'咖啡厅破冰', desc:'与陌生人初次见面', stage:1, difficulty:1, duration:'8min', unlocked:true, completed:false, rounds:[
-    { ai:'这家店的拿铁很出名，你平时喜欢喝什么？', options:[
-      { text:'我更喜欢美式', quality:'safe', points:3 },
-      { text:'你推荐的这个听起来不错，我试试', quality:'good', points:8 },
-      { text:'我不喝咖啡', quality:'cold', points:-2 }
+  { id:1, icon:'💑', name:'相亲模拟', desc:'朋友介绍的第一次见面', stage:1, difficulty:2, duration:'12min', unlocked:true, completed:false, rounds:[
+    { ai:'你好，我是XXX介绍的小雨', options:[
+      { text:'你好！终于见到了，路上堵吗？', quality:'good', points:10 },
+      { text:'你好你好', quality:'safe', points:3 },
+      { text:'哦，你就是小雨啊', quality:'cold', points:-3 }
     ]},
-    { ai:'周末一般怎么过？', options:[
-      { text:'宅家休息', quality:'safe', points:3 },
-      { text:'最近在学做咖啡，还挺有意思的', quality:'good', points:8 },
-      { text:'没什么', quality:'cold', points:-2 }
+    { ai:'我听XXX说你是个工程师，平时工作忙吗？', options:[
+      { text:'是有点忙，但工作再忙也要有自己的生活。你平时下班喜欢做什么？', quality:'good', points:10 },
+      { text:'还好吧', quality:'safe', points:3 },
+      { text:'天天加班，累死了', quality:'cold', points:-5 }
     ]},
-    { ai:'我最近在看一本书，特别有意思...', options:[
-      { text:'什么书？', quality:'good', points:8 },
-      { text:'是吗', quality:'safe', points:2 },
-      { text:'哦', quality:'cold', points:-3 }
+    { ai:'（沉默了几秒……）', options:[
+      { text:'这家咖啡厅的提拉米苏很有名，要不要试试？', quality:'good', points:8 },
+      { text:'（低头看手机）', quality:'cold', points:-5 },
+      { text:'嗯…那个…', quality:'safe', points:2 }
+    ]},
+    { ai:'你平时喜欢看电影吗？', options:[
+      { text:'喜欢啊！最近看了一部很不错的，你平时喜欢什么类型的电影？', quality:'good', points:10 },
+      { text:'还行', quality:'safe', points:3 },
+      { text:'不爱看', quality:'cold', points:-3 }
+    ]},
+    { ai:'时间过得真快，今天聊得很开心', options:[
+      { text:'我也是！下次可以去那家新开的书店看看', quality:'good', points:10 },
+      { text:'嗯，再见', quality:'safe', points:3 },
+      { text:'（起身就走）', quality:'cold', points:-5 }
     ]}
   ]},
   { id:2, icon:'🎤', name:'兴趣社群自我介绍', desc:'在兴趣社群中做自我介绍', stage:1, difficulty:2, duration:'10min', unlocked:false, completed:false, rounds:[
@@ -960,18 +1373,43 @@ let trainingScenes = [
       { text:'没有缺点', quality:'cold', points:-3 },
       { text:'我有时候会追求完美，正在学习平衡质量与效率', quality:'good', points:8 },
       { text:'我比较内向', quality:'safe', points:3 }
+    ]},
+    { ai:'你做过最有成就感的项目是什么？', options:[
+      { text:'一个电商项目', quality:'safe', points:3 },
+      { text:'我主导了一个用户增长项目，3个月内DAU增长50%', quality:'good', points:10 },
+      { text:'忘了', quality:'cold', points:-3 }
+    ]},
+    { ai:'你还有什么想问我的？', options:[
+      { text:'没有了', quality:'cold', points:-3 },
+      { text:'团队目前的主要挑战是什么？', quality:'good', points:8 },
+      { text:'薪资多少？', quality:'safe', points:2 }
     ]}
   ]},
-  { id:4, icon:'📊', name:'向上汇报被质疑', desc:'向领导汇报时被质疑', stage:2, difficulty:4, duration:'12min', unlocked:false, completed:false, rounds:[
-    { ai:'这个方案的数据支撑不够充分，你怎么解释？', options:[
-      { text:'数据就是这样的', quality:'cold', points:-5 },
-      { text:'您说得对，我会在本周内补充更多样本数据', quality:'good', points:10 },
-      { text:'我觉得数据已经够了', quality:'safe', points:2 }
+  { id:4, icon:'💰', name:'加薪谈判', desc:'向老板提出加薪请求', stage:2, difficulty:4, duration:'15min', unlocked:false, completed:false, rounds:[
+    { ai:'请坐，你说有重要的事要和我谈？', options:[
+      { text:'老板，我想涨工资', quality:'cold', points:-3 },
+      { text:'老板，感谢公司的培养，我想和您聊聊我的职业发展', quality:'good', points:8 },
+      { text:'老板，我觉得工资太低了', quality:'safe', points:2 }
     ]},
-    { ai:'这个预算是不是偏高了？', options:[
-      { text:'不多啊', quality:'cold', points:-3 },
-      { text:'这个预算包含了XX和XX两部分，如果您觉得高，可以调整XX部分', quality:'good', points:8 },
-      { text:'这是市场行情', quality:'safe', points:3 }
+    { ai:'说说你的理由', options:[
+      { text:'我都来两年了，工资一直没涨', quality:'cold', points:-3 },
+      { text:'过去一年我负责的项目带来了200万营收，还培养了3名新人', quality:'good', points:10 },
+      { text:'我觉得自己能力提升了', quality:'safe', points:3 }
+    ]},
+    { ai:'公司今年业绩不太好，加薪可能比较困难', options:[
+      { text:'那没办法了', quality:'cold', points:-5 },
+      { text:'我理解公司的困难，能否考虑绩效奖金或期权激励？', quality:'good', points:10 },
+      { text:'可是别的公司给我开了更高的工资', quality:'safe', points:3 }
+    ]},
+    { ai:'你觉得你值多少钱？', options:[
+      { text:'至少涨50%', quality:'cold', points:-5 },
+      { text:'根据市场行情和我的贡献，希望能有20%-30%的涨幅', quality:'good', points:10 },
+      { text:'您看着办吧', quality:'safe', points:2 }
+    ]},
+    { ai:'好，我考虑一下，下周给你答复', options:[
+      { text:'行', quality:'safe', points:3 },
+      { text:'感谢您的考虑！我会继续努力工作的', quality:'good', points:8 },
+      { text:'希望尽快', quality:'cold', points:-2 }
     ]}
   ]},
   { id:5, icon:'💔', name:'被朋友误解(NVC)', desc:'用非暴力沟通化解误会', stage:3, difficulty:3, duration:'10min', unlocked:false, completed:false, rounds:[
@@ -1038,6 +1476,9 @@ let useDoublePoints = false;  // 是否使用双倍积分卡
 let useShieldCard = false;    // 是否使用情绪护盾
 let useHintCard = false;      // 是否使用提示卡
 let currentRewindRound = -1;  // 穿梭回退的目标轮次
+let currentImageFit = 0;      // 当前形象适配度
+let currentPersonality = '友好型';      // 当前NPC性格（PRD §5.1）
+let currentPersonalityLabel = '😊 友好型'; // NPC性格标签
 
 // 学习卡片
 let learningCards = [
@@ -1403,7 +1844,23 @@ function generateCoachMoments() {
 }
 
 // ===== 训练页 =====
+// 自定义场景数据
+let customScenes = [];
+
+// 场景模板数据（PRD §2.4）
+const templateScenes = [
+  { id:101, icon:'🎓', name:'家长会', desc:'与老师沟通孩子情况', type:'生活社交', difficulty:3, creator:'社区用户', usage:1258, rating:4.8 },
+  { id:102, icon:'🏠', name:'租房谈判', desc:'与房东谈租金', type:'销售谈判', difficulty:4, creator:'社区用户', usage:892, rating:4.5 },
+  { id:103, icon:'👥', name:'团队冲突调解', desc:'调解团队成员矛盾', type:'工作沟通', difficulty:4, creator:'社区用户', usage:654, rating:4.7 },
+  { id:104, icon:'🎁', name:'拒绝借钱', desc:'委婉拒绝朋友借钱', type:'生活社交', difficulty:3, creator:'社区用户', usage:2341, rating:4.6 },
+  { id:105, icon:'📞', name:'客户投诉处理', desc:'处理客户投诉', type:'工作沟通', difficulty:4, creator:'社区用户', usage:1567, rating:4.9 },
+  { id:106, icon:'💼', name:'跨部门协作', desc:'与其他部门沟通协作', type:'工作沟通', difficulty:3, creator:'社区用户', usage:987, rating:4.4 }
+];
+
 function renderScenes() {
+  renderCustomScenes();
+  renderTemplateScenes();
+
   const stages = [
     { id:1, name:'破冰期', desc:'基础社交场景' },
     { id:2, name:'接触期', desc:'进阶社交场景' },
@@ -1446,6 +1903,166 @@ function renderScenes() {
   }).join('');
 }
 
+// 渲染自定义场景列表（PRD §2.1）
+function renderCustomScenes() {
+  if (customScenes.length === 0) {
+    $('my-custom-scenes').style.display = 'none';
+    return;
+  }
+  $('my-custom-scenes').style.display = 'block';
+  $('custom-scene-list').innerHTML = customScenes.map(s => `
+    <div class="bg-white rounded-xl p-4 shadow-sm">
+      <div class="flex items-start gap-3">
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl bg-purple-100">${s.icon}</div>
+        <div class="flex-1">
+          <h3 class="font-semibold text-gray-800">${s.name}</h3>
+          <p class="text-sm text-gray-500 mt-0.5">${s.desc}</p>
+          <div class="flex items-center gap-3 mt-2">
+            <span class="flex items-center gap-1 text-xs text-gray-400">⭐ ${s.difficulty}</span>
+            <span class="text-xs text-gray-400">${s.duration}</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex gap-3 mt-3">
+        <button onclick="startTraining(${s.id})" class="flex-1 py-2 text-sm font-medium bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors">开始训练</button>
+        <button onclick="deleteCustomScene(${s.id})" class="px-3 py-2 text-sm font-medium bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors">删除</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// 渲染场景模板市场（PRD §2.4）
+function renderTemplateScenes() {
+  $('template-scene-list').innerHTML = templateScenes.map(s => `
+    <div class="bg-white rounded-xl p-3 shadow-sm">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-xl">${s.icon}</span>
+        <span class="text-xs text-gray-400">⭐${s.difficulty}</span>
+      </div>
+      <h4 class="font-medium text-gray-800 text-sm">${s.name}</h4>
+      <p class="text-xs text-gray-500 mt-0.5 line-clamp-2">${s.desc}</p>
+      <div class="flex items-center justify-between mt-2">
+        <span class="text-xs text-gray-400">${s.creator}</span>
+        <span class="text-xs text-orange-500">${s.rating}分</span>
+      </div>
+      <button onclick="useTemplateScene(${s.id})" class="w-full mt-2 py-1.5 text-xs font-medium bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-colors">
+        开始训练
+      </button>
+    </div>
+  `).join('');
+}
+
+// 自定义场景相关函数（PRD §2.2）
+function showCustomSceneModal() {
+  $('custom-step-1').style.display = 'block';
+  $('custom-step-2').style.display = 'none';
+  $('custom-step-3').style.display = 'none';
+  $('custom-step-4').style.display = 'none';
+  $('custom-name').value = '';
+  $('custom-your-role').value = '';
+  $('custom-other-role').value = '';
+  $('custom-background').value = '';
+  $('custom-target').value = '';
+  $('custom-objections').value = '';
+  $('custom-key-nodes').value = '';
+  showModal('custom-scene');
+}
+
+function nextCustomStep(step) {
+  for (let i = 1; i <= 4; i++) {
+    $(`custom-step-${i}`).style.display = 'none';
+  }
+  if (step === 3) {
+    $('preview-name').textContent = $('custom-name').value || '-';
+    $('preview-type').textContent = $('custom-type').value;
+    $('preview-your-role').textContent = $('custom-your-role').value || '-';
+    $('preview-other-role').textContent = $('custom-other-role').value || '-';
+    $('preview-difficulty').textContent = '⭐'.repeat($('custom-difficulty').value);
+    $('preview-target').textContent = $('custom-target').value || '-';
+  }
+  $(`custom-step-${step}`).style.display = 'block';
+}
+
+function generateCustomScene() {
+  $('custom-step-3').style.display = 'none';
+  $('custom-step-4').style.display = 'block';
+
+  setTimeout(() => {
+    const name = $('custom-name').value || '自定义场景';
+    const newScene = {
+      id: Date.now(),
+      icon: ['🎯', '💬', '💼', '👥'][Math.floor(Math.random() * 4)],
+      name: name,
+      desc: $('custom-background').value.substring(0, 20) + '...',
+      stage: 1,
+      difficulty: parseInt($('custom-difficulty').value),
+      duration: '12min',
+      unlocked: true,
+      completed: false,
+      rounds: generateMockRounds(name, $('custom-personality').value)
+    };
+    customScenes.push(newScene);
+    closeModal('custom-scene');
+    renderScenes();
+  }, 2000);
+}
+
+function generateMockRounds(sceneName, personality) {
+  const personalities = {
+    '犹豫不决': ['嗯...这个嘛...', '我需要再考虑一下', '让我想想...'],
+    '强势挑剔': ['这不行！', '你确定这样做吗？', '我觉得不够好'],
+    '热情冲动': ['太棒了！', '我很感兴趣！', '我们马上开始吧！'],
+    '理性分析': ['让我分析一下', '数据表明...', '从逻辑上看...'],
+    '沉默寡言': ['（沉默）', '...', '嗯']
+  };
+  const lines = personalities[personality] || ['好的', '我明白了', '继续'];
+
+  return [
+    { ai: lines[0] + ' ' + sceneName + '这个场景你怎么看？', options:[
+      { text:'我觉得很有挑战性', quality:'good', points:8 },
+      { text:'还可以吧', quality:'safe', points:3 },
+      { text:'没什么想法', quality:'cold', points:-2 }
+    ]},
+    { ai: lines[1] + ' 你有什么具体方案吗？', options:[
+      { text:'有的，我准备了几个方案供你参考', quality:'good', points:10 },
+      { text:'还在想', quality:'safe', points:2 },
+      { text:'不知道', quality:'cold', points:-3 }
+    ]},
+    { ai: lines[2] + ' 如果遇到困难怎么办？', options:[
+      { text:'我会提前做好预案，确保万无一失', quality:'good', points:10 },
+      { text:'到时候再说吧', quality:'safe', points:3 },
+      { text:'没办法', quality:'cold', points:-3 }
+    ]}
+  ];
+}
+
+function deleteCustomScene(id) {
+  if (!confirm('确定要删除这个自定义场景吗？')) return;
+  customScenes = customScenes.filter(s => s.id !== id);
+  renderScenes();
+}
+
+function useTemplateScene(id) {
+  const template = templateScenes.find(t => t.id === id);
+  if (!template) return;
+
+  const newScene = {
+    id: Date.now(),
+    icon: template.icon,
+    name: template.name,
+    desc: template.desc,
+    stage: 1,
+    difficulty: template.difficulty,
+    duration: '12min',
+    unlocked: true,
+    completed: false,
+    rounds: generateMockRounds(template.name, '理性分析')
+  };
+  customScenes.push(newScene);
+  renderScenes();
+  startTraining(newScene.id);
+}
+
 function getRecommendedScene() {
   const unlocked = trainingScenes.filter(s => s.unlocked && !s.completed);
   if (unlocked.length > 0) return unlocked[0];
@@ -1453,7 +2070,10 @@ function getRecommendedScene() {
 }
 
 function startTraining(sceneId) {
-  const scene = trainingScenes.find(s => s.id === (typeof sceneId==='number' ? sceneId : sceneId.id));
+  let scene = trainingScenes.find(s => s.id === (typeof sceneId==='number' ? sceneId : sceneId.id));
+  if (!scene) {
+    scene = customScenes.find(s => s.id === (typeof sceneId==='number' ? sceneId : sceneId.id));
+  }
   if (!scene || !scene.unlocked) return;
 
   currentTraining = scene;
@@ -1469,17 +2089,114 @@ function startTraining(sceneId) {
   useShieldCard = false;
   useHintCard = false;
   currentRewindRound = -1;
+  currentImageFit = 0;
 
-  $('training-title').textContent = scene.icon + ' ' + scene.name;
-  $('training-subtitle').textContent = '阶段' + scene.stage + ' · ' + scene.duration;
+  // 防记忆变体系统（PRD §5.1）
+  currentPersonality = ['友好型', '内向型', '挑剔型', '理性型'][Math.floor(Math.random() * 4)];
+  const personalityLabels = { '友好型':'😊', '内向型':'😌', '挑剔型':'😒', '理性型':'🤔' };
+  currentPersonalityLabel = personalityLabels[currentPersonality] + ' ' + currentPersonality;
+
+  const sceneTypeMap = { '相亲模拟': '生活社交', '模拟面试': '工作沟通', '加薪谈判': '工作沟通', '兴趣社群自我介绍': '生活社交', '被朋友误解(NVC)': '生活社交', '安慰失落的TA': '生活社交' };
+  const yourRoleMap = { '相亲模拟': '相亲者', '模拟面试': '求职者', '加薪谈判': '员工', '兴趣社群自我介绍': '新人', '被朋友误解(NVC)': '被误解者', '安慰失落的TA': '安慰者' };
+  const otherRoleMap = { '相亲模拟': '相亲对象', '模拟面试': '面试官', '加薪谈判': '老板', '兴趣社群自我介绍': '社群成员', '被朋友误解(NVC)': '朋友', '安慰失落的TA': '失落的朋友' };
+  const targetMap = { '相亲模拟': '给对方留下好印象', '模拟面试': '通过面试', '加薪谈判': '成功加薪', '兴趣社群自我介绍': '融入社群', '被朋友误解(NVC)': '化解误会', '安慰失落的TA': '安慰朋友' };
+  const tipMap = {
+    '相亲模拟': '在相亲中，对方的第一印象很大程度上来源于你的外表',
+    '模拟面试': '面试官会在7秒内形成第一印象',
+    '加薪谈判': '专业形象有助于提升谈判信心',
+    '兴趣社群自我介绍': '得体的形象能让你更快融入集体',
+    '被朋友误解(NVC)': '真诚的态度比外表更重要',
+    '安慰失落的TA': '温暖的形象能传递安全感'
+  };
+
+  $('prepare-title').textContent = scene.icon + ' ' + scene.name;
+  $('prepare-type').textContent = sceneTypeMap[scene.name] || '其他';
+  $('prepare-your-role').textContent = yourRoleMap[scene.name] || '参与者';
+  $('prepare-other-role').textContent = otherRoleMap[scene.name] || '对方';
+  $('prepare-target').textContent = targetMap[scene.name] || '完成训练';
+  $('prepare-difficulty').textContent = '⭐'.repeat(scene.difficulty);
+  $('image-tip-text').textContent = tipMap[scene.name] || '形象是社交的加分项，不是必选项；能力是社交的硬通货。';
+
+  $('image-fit-bar').style.width = '0%';
+  $('image-fit-percent').textContent = '0%';
+
+  $('modal-prepare').style.display = 'flex';
+}
+
+// 去悦己颜值社（模拟，PRD §1.2）
+function goToBeautyClub() {
+  $('beauty-scene-name').textContent = currentTraining.icon + ' ' + currentTraining.name;
+
+  const outfitMap = {
+    '相亲模拟': '选择适合相亲的休闲装，颜色搭配和谐，展现自信气质',
+    '模拟面试': '职业装为主，颜色稳重，展现专业形象',
+    '加薪谈判': '商务休闲风格，既专业又不失亲和力',
+    '兴趣社群自我介绍': '轻松休闲，展现个人风格',
+    '被朋友误解(NVC)': '舒适自然，让对方感到放松',
+    '安慰失落的TA': '温暖柔和的色调，传递安全感'
+  };
+  const makeupMap = {
+    '相亲模拟': '淡妆为主，突出自然好气色',
+    '模拟面试': '干练妆容，突出专业感',
+    '加薪谈判': '精致得体，展现自信',
+    '兴趣社群自我介绍': '自然清新，展现个性',
+    '被朋友误解(NVC)': '素净自然，传递真诚',
+    '安慰失落的TA': '温柔妆容，传递温暖'
+  };
+  const hairMap = {
+    '相亲模拟': '清爽整洁，展现自信气质',
+    '模拟面试': '利落大方，展现专业',
+    '加薪谈判': '精心打理，展现自信',
+    '兴趣社群自我介绍': '随性自然，展现个性',
+    '被朋友误解(NVC)': '柔和自然，传递真诚',
+    '安慰失落的TA': '温暖亲和的发型'
+  };
+
+  $('beauty-outfit').textContent = outfitMap[currentTraining.name] || '选择适合的穿搭';
+  $('beauty-makeup').textContent = makeupMap[currentTraining.name] || '适合场景的妆容';
+  $('beauty-hair').textContent = hairMap[currentTraining.name] || '适合场景的发型';
+
+  showModal('beauty-club');
+}
+
+// 确认形象方案（模拟，PRD §1.3）
+function confirmBeautyMatch() {
+  currentImageFit = Math.floor(Math.random() * 30) + 70;
+  closeModal('beauty-club');
+
+  $('image-fit-bar').style.width = currentImageFit + '%';
+  $('image-fit-percent').textContent = currentImageFit + '%';
+
+  setTimeout(() => {
+    startTrainingSession();
+  }, 300);
+}
+
+// 跳过打扮直接开始训练（PRD §1.1）
+function skipDressAndStart() {
+  closeModal('prepare');
+  startTrainingSession();
+}
+
+// 开始训练会话
+function startTrainingSession() {
+  $('training-title').textContent = currentTraining.icon + ' ' + currentTraining.name;
+  $('training-subtitle').textContent = '阶段' + currentTraining.stage + ' · ' + currentTraining.duration + ' · ' + currentPersonalityLabel;
   $('training-messages').innerHTML = '';
   $('modal-training').style.display = 'flex';
 
-  // 显示道具按钮（参考"与你"实现，PRD §9 + §13.1）
+  if (currentImageFit > 0) {
+    $('image-indicator').style.display = 'flex';
+    $('image-indicator-percent').textContent = currentImageFit + '%';
+    $('image-indicator-scene').textContent = currentTraining.type || '社交场景';
+  } else {
+    $('image-indicator').style.display = 'none';
+  }
+
   updatePropButtons();
 
   setTimeout(() => {
-    addTrainingMessage(scene.desc, false);
+    addTrainingMessage(currentTraining.desc, false);
     setTimeout(() => showRound(), 800);
   }, 500);
 }
@@ -1508,12 +2225,21 @@ function showRound() {
   const round = currentTraining.rounds[trainingRoundIdx];
   if (!round) { finishTraining(); return; }
 
-  addTrainingMessage(round.ai, false);
+  // NPC性格变体影响对话语气（PRD §5.1）
+  const personalityEffects = {
+    '友好型': { prefix:'', suffix:'~', emoji:'😊' },
+    '内向型': { prefix:'嗯...', suffix:'...', emoji:'😌' },
+    '挑剔型': { prefix:'哼，', suffix:'！', emoji:'😒' },
+    '理性型': { prefix:'从客观角度看，', suffix:'.', emoji:'🤔' }
+  };
+  const effect = personalityEffects[currentPersonality];
+  let aiMsg = effect.prefix + round.ai + effect.suffix;
+
+  addTrainingMessage(aiMsg, false);
   showTrainingOptions = true;
   showTrainingReport = false;
   useHintCard = false;
 
-  // 更新穿梭按钮 - 选择后出现
   $('rewind-btn').style.display = 'none';
   updatePropButtons();
 
@@ -1522,18 +2248,50 @@ function showRound() {
     const optsDiv = document.createElement('div');
     optsDiv.id = 'training-options';
     optsDiv.className = 'space-y-2 animate-in';
-    // 如果使用了提示卡，标记最佳选项（参考"与你"PRD §9.2提示卡）
-    const hintIdx = useHintCard ? round.options.findIndex(o => o.quality === 'good') : -1;
-    optsDiv.innerHTML = round.options.map((opt, idx) => {
+
+    // 选项随机化（PRD §5.1）- 随机打乱选项顺序
+    const shuffledOpts = [...round.options].sort(() => Math.random() - 0.5);
+    const originalIndices = shuffledOpts.map(o => round.options.indexOf(o));
+
+    // 如果使用了提示卡，标记最佳选项
+    const hintIdx = useHintCard ? shuffledOpts.findIndex(o => o.quality === 'good') : -1;
+
+    optsDiv.innerHTML = shuffledOpts.map((opt, idx) => {
+      const originalIdx = originalIndices[idx];
       const colors = ['bg-green-50 border-green-200 text-green-700', 'bg-gray-50 border-gray-200 text-gray-700', 'bg-red-50 border-red-200 text-red-700'];
       const hintMark = hintIdx === idx ? '🌟' : '';
-      return `<button onclick="selectOption(${idx})" class="w-full p-3 rounded-xl text-sm hover:bg-indigo-100 transition-colors text-left border ${colors[idx]}">
+      return `<button onclick="selectOption(${originalIdx})" class="w-full p-3 rounded-xl text-sm hover:bg-indigo-100 transition-colors text-left border ${colors[originalIdx]}">
         <span class="text-xs mr-2">${['A','B','C'][idx]}</span>${hintMark}${opt.text}
       </button>`;
     }).join('');
     msgs.appendChild(optsDiv);
     msgs.scrollTop = msgs.scrollHeight;
+
+    // 随机触发突发事件（PRD §5.1）
+    if (trainingRoundIdx > 0 && Math.random() < 0.3) {
+      triggerRandomEvent();
+    }
   }, 500);
+}
+
+// 触发随机事件（PRD §5.1）
+function triggerRandomEvent() {
+  const events = [
+    { msg:'📱 对方的手机突然响了...', type:'distraction' },
+    { msg:'😶 对方突然沉默了几秒...', type:'silence' },
+    { msg:'⚠️ 对方似乎对你的回答不太满意', type:'disapproval' },
+    { msg:'💡 对方眼神一亮，对你的话题感兴趣了', type:'interest' }
+  ];
+  const event = events[Math.floor(Math.random() * events.length)];
+
+  setTimeout(() => {
+    addTrainingMessage(event.msg, false, true);
+    if (event.type === 'interest') {
+      addTrainingMessage('✨ 这个话题让对方对你产生了兴趣！', false, true);
+    } else if (event.type === 'disapproval') {
+      addTrainingMessage('💭 需要调整沟通方式...', false, true);
+    }
+  }, 800);
 }
 
 function selectOption(idx) {
@@ -1659,6 +2417,41 @@ function finishTraining() {
             <span class="text-gray-400 truncate">${c.option.text}</span>
           </div>`).join('')}
       </div>
+
+      <!-- 形象影响分析（PRD §1.5） -->
+      <div class="bg-gradient-to-br from-pink-50 to-rose-50 rounded-xl p-4 animate-in border border-pink-100">
+        <h5 class="text-sm font-semibold text-gray-800 mb-3">💄 形象影响分析</h5>
+        <div class="space-y-3">
+          <div class="flex justify-between text-xs">
+            <span class="text-gray-500">形象准备状态</span>
+            <span class="font-medium ${currentImageFit > 0 ? 'text-green-600' : 'text-gray-400'}">${currentImageFit > 0 ? '✓ 已搭配' : '○ 未打扮'}</span>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs mb-1">
+              <span class="text-gray-500">NPC初始态度</span>
+              <span class="${currentImageFit > 80 ? 'text-green-600' : currentImageFit > 60 ? 'text-gray-600' : 'text-orange-600'}">${currentImageFit > 80 ? '友好' : currentImageFit > 60 ? '中立' : '冷淡'}</span>
+            </div>
+            <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div class="h-full rounded-full transition-all" style="width:${currentImageFit > 80 ? '90' : currentImageFit > 60 ? '60' : '30'}%; background:${currentImageFit > 80 ? '#22c55e' : currentImageFit > 60 ? '#6b7280' : '#f97316'}"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs mb-1">
+              <span class="text-gray-500">能力表现</span>
+              <span class="text-indigo-600">${trainingScore}分</span>
+            </div>
+            <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div class="h-full bg-indigo-500 rounded-full transition-all" style="width:${trainingScore}%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-3 text-xs text-gray-600">
+
+          ${currentImageFit > 0 ? (trainingScore >= 80 ? '✨ 你证明了自己的能力！形象也为你加分不少。' : trainingScore >= 60 ? '👍 能力和形象都表现不错，继续保持！' : '💡 能力有待提升，形象帮你弥补了一些不足。') : (trainingScore >= 80 ? '🎯 你证明了能力是社交的硬通货！' : '💪 能力和形象都有提升空间，加油！')}
+        </div>
+        <button onclick="goToBeautyClub()" class="w-full mt-3 py-2 bg-pink-500 text-white text-xs font-medium rounded-lg hover:bg-pink-600 transition-colors">去悦己颜值社搭配下次</button>
+      </div>
+
       <button onclick="closeModal('training')" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all animate-in">返回训练列表</button>
     `;
     msgs.scrollTop = msgs.scrollHeight;
@@ -1837,6 +2630,49 @@ function renderProfile() {
   $('profile-streak').textContent = userData.streak;
   $('profile-scenes').textContent = trainingScenes.filter(s => s.completed).length;
   renderCalendar();
+
+  $('profile-avatar-preview').textContent = userData.avatar || '👤';
+  $('profile-avatar-name').textContent = userData.avatar ? '自定义形象' : '默认形象';
+  $('profile-avatar-time').textContent = userData.avatar ? '已创建' : '未创建';
+}
+
+// 我的形象相关函数（PRD §3.2）
+let currentAvatar = '👤';
+let avatarHair = 1;
+let avatarColor = 1;
+
+function showAvatarModal() {
+  currentAvatar = userData.avatar || '👤';
+  $('avatar-preview').textContent = currentAvatar;
+  $('avatar-preview-name').textContent = currentAvatar !== '👤' ? '当前形象' : '默认形象';
+  showModal('avatar');
+}
+
+function uploadAvatar() {
+  alert('📷 选择照片功能需要在App中使用，当前为Web演示版本');
+}
+
+function selectPresetAvatar(emoji) {
+  currentAvatar = emoji;
+  $('avatar-preview').textContent = emoji;
+  $('avatar-preview-name').textContent = '预设形象';
+}
+
+function adjustAvatar(type, value) {
+  if (type === 'hair') avatarHair = value;
+  if (type === 'color') avatarColor = value;
+
+  const hairNames = ['短发', '中长发', '长发', '卷发', '直发'];
+  const colorNames = ['黑色', '棕色', '金色', '红色', '灰色'];
+  $('avatar-preview-name').textContent = `${hairNames[avatarHair-1]} · ${colorNames[avatarColor-1]}`;
+}
+
+function saveAvatar() {
+  userData.avatar = currentAvatar;
+  saveData();
+  renderProfile();
+  closeModal('avatar');
+  alert('✅ 形象已保存！');
 }
 
 // ===== 编辑资料 =====
