@@ -3,1557 +3,2479 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>对练社交 - AI社交训练平台</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<title>对练社交 - AI驱动的社交训练平台</title>
+<script src="https://cdn.tailwindcss.com"></script>
 <style>
-:root {
-  --primary: #1E3A5F;
-  --gold: #F5A623;
-  --gold-light: #FFD700;
-  --white: #FFFFFF;
-  --bg: #F5F7FA;
-  --card: #FFFFFF;
-  --text: #2C3E50;
-  --text-light: #8E9AAF;
-  --border: #E8ECF1;
-  --success: #27AE60;
-  --danger: #E74C3C;
-  --shadow: 0 2px 12px rgba(30,58,95,0.08);
-  --radius: 16px;
-  --radius-sm: 10px;
-}
-* { margin:0; padding:0; box-sizing:border-box; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-  background: #E8ECF1;
-  display:flex; justify-content:center; align-items:center; min-height:100vh;
-}
-.app {
-  width: 100%; max-width: 430px; height: 100vh; max-height: 932px;
-  background: var(--bg); position: relative; overflow: hidden;
-  box-shadow: 0 0 40px rgba(0,0,0,0.12);
-}
-.view { display:none; width:100%; height:100%; overflow-y:auto; padding-bottom:70px; }
-.view.active { display:block; }
-.view::-webkit-scrollbar { width:0; }
-
-/* ========== 登录页 ========== */
-.login-view {
-  background: linear-gradient(160deg, #1E3A5F 0%, #2A5298 50%, #1E3A5F 100%);
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  padding: 40px 30px; padding-bottom:70px;
-}
-.login-logo {
-  width:80px; height:80px; border-radius:20px;
-  background: linear-gradient(135deg, var(--gold), #FFD700);
-  display:flex; align-items:center; justify-content:center;
-  font-size:36px; color:var(--primary); margin-bottom:16px;
-  box-shadow: 0 8px 24px rgba(245,166,35,0.3);
-}
-.login-title { color:#fff; font-size:28px; font-weight:700; margin-bottom:6px; }
-.login-subtitle { color:rgba(255,255,255,0.7); font-size:14px; margin-bottom:40px; }
-.login-form { width:100%; max-width:340px; }
-.login-input-group {
-  display:flex; align-items:center; background:rgba(255,255,255,0.12);
-  border-radius:12px; margin-bottom:14px; padding:0 16px;
-  border:1px solid rgba(255,255,255,0.15); transition: all 0.3s;
-}
-.login-input-group:focus-within { border-color:var(--gold); background:rgba(255,255,255,0.18); }
-.login-input-group i { color:rgba(255,255,255,0.5); font-size:16px; }
-.login-input {
-  flex:1; border:none; background:none; color:#fff; padding:14px 12px;
-  font-size:15px; outline:none;
-}
-.login-input::placeholder { color:rgba(255,255,255,0.4); }
-.sms-btn {
-  color:var(--gold); font-size:13px; white-space:nowrap; cursor:pointer;
-  border:none; background:none; font-weight:600;
-}
-.sms-btn.disabled { color:rgba(255,255,255,0.3); pointer-events:none; }
-.login-btn {
-  width:100%; padding:15px; border:none; border-radius:12px;
-  background: linear-gradient(135deg, var(--gold), #FFD700);
-  color:var(--primary); font-size:16px; font-weight:700; cursor:pointer;
-  margin-top:8px; box-shadow:0 4px 16px rgba(245,166,35,0.35);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.login-btn:active { transform:scale(0.97); }
-.login-agreement {
-  display:flex; align-items:center; margin-top:20px; gap:8px;
-}
-.login-agreement input[type="checkbox"] {
-  width:16px; height:16px; accent-color:var(--gold);
-}
-.login-agreement label { color:rgba(255,255,255,0.6); font-size:12px; }
-.login-agreement a { color:var(--gold); text-decoration:none; }
-
-/* ========== 通用头部 ========== */
-.page-header {
-  background: linear-gradient(135deg, var(--primary), #2A5298);
-  padding: 20px 20px 24px; color:#fff;
-}
-.page-header h2 { font-size:20px; font-weight:700; }
-.page-header p { font-size:13px; color:rgba(255,255,255,0.7); margin-top:4px; }
-
-/* ========== 首页 ========== */
-.home-greeting { padding:24px 20px 0; }
-.home-greeting h2 { font-size:22px; color:var(--primary); }
-.coach-online-card {
-  margin:16px 20px; padding:16px 20px; background:var(--card);
-  border-radius:var(--radius); box-shadow:var(--shadow);
-  display:flex; align-items:center; gap:14px;
-}
-.breath-dot {
-  width:10px; height:10px; border-radius:50%; background:var(--success);
-  animation: breathe 2s ease-in-out infinite;
-}
-@keyframes breathe {
-  0%,100% { box-shadow:0 0 0 0 rgba(39,174,96,0.5); }
-  50% { box-shadow:0 0 0 8px rgba(39,174,96,0); }
-}
-.coach-online-card .coach-info { flex:1; }
-.coach-online-card .coach-name { font-size:16px; font-weight:600; color:var(--text); }
-.coach-online-card .coach-status { font-size:12px; color:var(--success); }
-.coach-online-card .coach-action {
-  padding:8px 16px; background:var(--primary); color:#fff; border:none;
-  border-radius:20px; font-size:13px; cursor:pointer;
-}
-
-.sign-in-section { margin:0 20px; }
-.sign-in-btn {
-  width:100%; padding:16px; border:2px dashed var(--gold); border-radius:var(--radius);
-  background:linear-gradient(135deg, #FFF9EC, #FFF3D6); cursor:pointer;
-  display:flex; align-items:center; justify-content:center; gap:10px;
-  transition: all 0.3s;
-}
-.sign-in-btn.signed {
-  border-style:solid; border-color:var(--success);
-  background:linear-gradient(135deg, #ECFDF5, #D1FAE5);
-}
-.sign-in-btn .sign-icon { font-size:24px; color:var(--gold); }
-.sign-in-btn.signed .sign-icon { color:var(--success); }
-.sign-in-btn .sign-text { font-size:16px; font-weight:600; color:var(--primary); }
-.sign-in-btn .sign-sub { font-size:12px; color:var(--text-light); }
-
-.recommend-card {
-  margin:16px 20px; padding:18px; background: linear-gradient(135deg, var(--primary), #2A5298);
-  border-radius:var(--radius); color:#fff; box-shadow: 0 4px 16px rgba(30,58,95,0.2);
-}
-.recommend-card .tag {
-  display:inline-block; padding:3px 10px; background:rgba(255,255,255,0.2);
-  border-radius:12px; font-size:11px; margin-bottom:10px;
-}
-.recommend-card h3 { font-size:17px; margin-bottom:6px; }
-.recommend-card p { font-size:13px; color:rgba(255,255,255,0.8); }
-.recommend-card .start-btn {
-  margin-top:12px; padding:9px 20px; background:var(--gold); color:var(--primary);
-  border:none; border-radius:20px; font-size:13px; font-weight:600; cursor:pointer;
-}
-
-.section-title {
-  padding:20px 20px 10px; font-size:16px; font-weight:600; color:var(--text);
-  display:flex; align-items:center; justify-content:space-between;
-}
-.section-title .more { font-size:13px; color:var(--text-light); font-weight:400; }
-
-.record-item {
-  margin:0 20px 10px; padding:14px 16px; background:var(--card);
-  border-radius:var(--radius-sm); box-shadow:var(--shadow);
-  display:flex; align-items:center; gap:12px;
-}
-.record-item .record-icon {
-  width:40px; height:40px; border-radius:10px; display:flex;
-  align-items:center; justify-content:center; font-size:18px;
-}
-.record-item .record-info { flex:1; }
-.record-item .record-title { font-size:14px; font-weight:500; color:var(--text); }
-.record-item .record-time { font-size:12px; color:var(--text-light); }
-.record-item .record-score { font-size:16px; font-weight:700; color:var(--gold); }
-
-.progress-section {
-  margin:16px 20px; padding:18px; background:var(--card);
-  border-radius:var(--radius); box-shadow:var(--shadow);
-  display:flex; align-items:center; gap:20px;
-}
-.ring-progress {
-  position:relative; width:80px; height:80px; flex-shrink:0;
-}
-.ring-progress svg { transform:rotate(-90deg); }
-.ring-progress .ring-text {
-  position:absolute; inset:0; display:flex; flex-direction:column;
-  align-items:center; justify-content:center;
-}
-.ring-progress .ring-num { font-size:18px; font-weight:700; color:var(--primary); }
-.ring-progress .ring-label { font-size:10px; color:var(--text-light); }
-.progress-detail { flex:1; }
-.progress-detail h4 { font-size:14px; font-weight:600; color:var(--text); margin-bottom:6px; }
-.progress-detail p { font-size:12px; color:var(--text-light); }
-
-/* ========== 教练页 ========== */
-.coach-header {
-  background: linear-gradient(160deg, var(--primary), #1a4a7a);
-  padding:20px 20px 0; color:#fff;
-}
-.coach-points {
-  display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;
-}
-.coach-points .pts-info { font-size:14px; }
-.coach-points .pts-info strong { font-size:20px; color:var(--gold); }
-.coach-points .pts-info span { color:rgba(255,255,255,0.7); font-size:12px; }
-.rank-bar { height:6px; background:rgba(255,255,255,0.2); border-radius:3px; margin-bottom:6px; }
-.rank-bar .fill { height:100%; background:var(--gold); border-radius:3px; transition:width 0.6s; }
-.rank-label { font-size:12px; color:rgba(255,255,255,0.7); text-align:right; }
-
-.coach-avatar-area {
-  display:flex; flex-direction:column; align-items:center;
-  padding:30px 20px 20px; background:var(--card);
-  margin:0 20px; border-radius:0 0 var(--radius) var(--radius);
-  box-shadow:var(--shadow);
-}
-.coach-portrait {
-  width:120px; height:120px; border-radius:50%;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  display:flex; align-items:center; justify-content:center;
-  font-size:48px; color:#fff; margin-bottom:12px;
-  animation: coachFloat 3s ease-in-out infinite;
-  position:relative; overflow:hidden;
-}
-.coach-portrait::after {
-  content:''; position:absolute; top:15%; left:25%;
-  width:12px; height:12px; background:#fff; border-radius:50%;
-  animation: blink 4s ease-in-out infinite;
-}
-@keyframes coachFloat {
-  0%,100% { transform:translateY(0); }
-  50% { transform:translateY(-8px); }
-}
-@keyframes blink {
-  0%,42%,46%,100% { opacity:1; }
-  44% { opacity:0; }
-}
-.coach-portrait-name { font-size:22px; font-weight:700; color:var(--primary); margin-bottom:4px; }
-.coach-portrait-tag {
-  display:inline-block; padding:4px 14px; background:#F0F4FF;
-  border-radius:12px; font-size:12px; color:var(--primary); margin-bottom:20px;
-}
-
-.coach-actions { display:flex; gap:12px; width:100%; margin-bottom:20px; }
-.coach-action-btn {
-  flex:1; padding:14px 8px; border:none; border-radius:var(--radius-sm);
-  font-size:14px; font-weight:600; cursor:pointer; transition:transform 0.2s;
-}
-.coach-action-btn:active { transform:scale(0.96); }
-.coach-action-btn.primary { background:var(--primary); color:#fff; }
-.coach-action-btn.secondary { background:#F0F4FF; color:var(--primary); }
-
-.coach-moment {
-  margin:16px 20px; padding:16px; background:var(--card);
-  border-radius:var(--radius-sm); box-shadow:var(--shadow);
-}
-.coach-moment .moment-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
-.coach-moment .moment-avatar {
-  width:36px; height:36px; border-radius:50%;
-  background:linear-gradient(135deg, #667eea, #764ba2);
-  display:flex; align-items:center; justify-content:center;
-  color:#fff; font-size:14px;
-}
-.coach-moment .moment-name { font-size:14px; font-weight:600; color:var(--text); }
-.coach-moment .moment-time { font-size:11px; color:var(--text-light); }
-.coach-moment .moment-content { font-size:14px; color:var(--text); line-height:1.6; }
-
-.task-list { margin:0 20px 20px; }
-.task-item {
-  display:flex; align-items:center; gap:12px; padding:12px 16px;
-  background:var(--card); border-radius:var(--radius-sm); margin-bottom:8px;
-  box-shadow:var(--shadow);
-}
-.task-item .task-check {
-  width:22px; height:22px; border-radius:50%; border:2px solid var(--border);
-  display:flex; align-items:center; justify-content:center; font-size:11px;
-  flex-shrink:0;
-}
-.task-item .task-check.done {
-  background:var(--success); border-color:var(--success); color:#fff;
-}
-.task-item .task-text { flex:1; font-size:14px; color:var(--text); }
-.task-item .task-text.done-text { text-decoration:line-through; color:var(--text-light); }
-.task-item .task-reward { font-size:12px; color:var(--gold); font-weight:600; }
-
-/* ========== 场景页 ========== */
-.stage-tabs {
-  display:flex; overflow-x:auto; padding:16px 20px; gap:10px;
-  -webkit-overflow-scrolling:touch;
-}
-.stage-tabs::-webkit-scrollbar { display:none; }
-.stage-tab {
-  flex-shrink:0; padding:8px 18px; border-radius:20px; font-size:13px;
-  background:var(--card); color:var(--text-light); border:none; cursor:pointer;
-  box-shadow:var(--shadow); transition:all 0.3s; font-weight:500;
-}
-.stage-tab.active {
-  background:var(--primary); color:#fff; box-shadow:0 4px 12px rgba(30,58,95,0.25);
-}
-
-.scene-card {
-  margin:0 20px 12px; padding:16px; background:var(--card);
-  border-radius:var(--radius); box-shadow:var(--shadow);
-}
-.scene-card .scene-top { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
-.scene-card .scene-icon { font-size:24px; }
-.scene-card .scene-name { font-size:15px; font-weight:600; color:var(--text); }
-.scene-card .scene-diff {
-  display:inline-block; margin-left:auto; padding:2px 8px;
-  border-radius:8px; font-size:11px; font-weight:500;
-}
-.scene-diff.easy { background:#E8F8EF; color:#27AE60; }
-.scene-diff.medium { background:#FFF8E1; color:#F5A623; }
-.scene-diff.hard { background:#FDE8E8; color:#E74C3C; }
-.scene-diff.vhard { background:#F3E8FF; color:#8B5CF6; }
-.scene-card .scene-meta { font-size:12px; color:var(--text-light); margin-bottom:10px; }
-.scene-progress-bar {
-  height:6px; background:var(--border); border-radius:3px; margin-bottom:12px;
-}
-.scene-progress-bar .fill { height:100%; border-radius:3px; background:var(--gold); transition:width 0.5s; }
-.scene-start-btn {
-  width:100%; padding:10px; border:none; border-radius:var(--radius-sm);
-  background:var(--primary); color:#fff; font-size:14px; font-weight:600;
-  cursor:pointer; transition:transform 0.2s;
-}
-.scene-start-btn:active { transform:scale(0.97); }
-.scene-start-btn.locked {
-  background:var(--border); color:var(--text-light); cursor:default;
-}
-.scene-lock-info { font-size:12px; color:var(--text-light); text-align:center; margin-top:4px; }
-
-/* ========== 对话训练页 ========== */
-.chat-view { display:flex; flex-direction:column; padding-bottom:0; }
-.chat-header {
-  background:var(--primary); color:#fff; padding:14px 20px;
-  display:flex; align-items:center; gap:12px; flex-shrink:0;
-}
-.chat-back { font-size:18px; cursor:pointer; }
-.chat-header-info { flex:1; }
-.chat-header-info h3 { font-size:15px; font-weight:600; }
-.chat-header-info p { font-size:11px; color:rgba(255,255,255,0.7); }
-.chat-progress-bar { height:4px; background:rgba(255,255,255,0.2); border-radius:2px; margin-top:8px; }
-.chat-progress-bar .fill { height:100%; background:var(--gold); border-radius:2px; transition:width 0.4s; }
-
-.chat-messages {
-  flex:1; overflow-y:auto; padding:16px 20px; background:#F0F4F8;
-}
-.chat-messages::-webkit-scrollbar { width:0; }
-.msg { margin-bottom:16px; display:flex; gap:10px; }
-.msg.coach { justify-content:flex-start; }
-.msg.user { justify-content:flex-end; }
-.msg-avatar {
-  width:32px; height:32px; border-radius:50%; flex-shrink:0;
-  background:linear-gradient(135deg, #667eea, #764ba2);
-  display:flex; align-items:center; justify-content:center;
-  color:#fff; font-size:12px;
-}
-.msg.user .msg-avatar { display:none; }
-.msg-bubble {
-  max-width:75%; padding:12px 16px; border-radius:16px; font-size:14px;
-  line-height:1.6; word-break:break-word;
-}
-.msg.coach .msg-bubble {
-  background:var(--card); color:var(--text);
-  border-bottom-left-radius:4px;
-  box-shadow:var(--shadow);
-}
-.msg.user .msg-bubble {
-  background:var(--primary); color:#fff;
-  border-bottom-right-radius:4px;
-}
-
-.chat-options {
-  padding:12px 20px 24px; background:var(--card); flex-shrink:0;
-  border-top:1px solid var(--border);
-}
-.chat-options .options-label { font-size:12px; color:var(--text-light); margin-bottom:8px; }
-.option-btn {
-  width:100%; padding:12px 16px; border:1.5px solid var(--border); border-radius:var(--radius-sm);
-  background:var(--card); color:var(--text); font-size:14px; text-align:left;
-  cursor:pointer; margin-bottom:8px; transition:all 0.2s; line-height:1.5;
-}
-.option-btn:hover { border-color:var(--primary); background:#F0F4FF; }
-.option-btn:active { transform:scale(0.98); }
-.option-btn .opt-letter {
-  display:inline-block; width:22px; height:22px; border-radius:50%;
-  background:var(--primary); color:#fff; text-align:center; line-height:22px;
-  font-size:12px; font-weight:600; margin-right:8px;
-}
-
-/* ========== 训练结果页 ========== */
-.result-view {
-  display:flex; flex-direction:column; align-items:center;
-  padding:30px 20px 40px; background:linear-gradient(180deg, #F0F4FF, var(--bg));
-}
-.result-score-ring {
-  position:relative; width:140px; height:140px; margin-bottom:8px;
-}
-.result-score-ring svg { transform:rotate(-90deg); }
-.result-score-ring .score-center {
-  position:absolute; inset:0; display:flex; flex-direction:column;
-  align-items:center; justify-content:center;
-}
-.result-score-ring .score-num { font-size:36px; font-weight:800; color:var(--primary); }
-.result-score-ring .score-label { font-size:12px; color:var(--text-light); }
-.result-stars { margin-bottom:20px; font-size:28px; }
-.result-stars .fa-star { color:var(--border); margin:0 2px; }
-.result-stars .fa-star.active { color:var(--gold); }
-
-.radar-chart {
-  width:220px; height:220px; position:relative; margin:0 auto 20px;
-}
-.radar-bg { width:100%; height:100%; }
-.radar-label {
-  position:absolute; font-size:11px; color:var(--text-light); white-space:nowrap;
-  transform:translate(-50%,-50%);
-}
-
-.result-comment {
-  margin:0 20px 20px; padding:18px; background:var(--card);
-  border-radius:var(--radius); box-shadow:var(--shadow); width:calc(100% - 40px);
-}
-.result-comment .comment-header { font-size:14px; font-weight:600; color:var(--primary); margin-bottom:8px; }
-.result-comment .comment-text { font-size:14px; color:var(--text); line-height:1.7; }
-
-.result-points {
-  display:inline-block; padding:8px 20px; background:linear-gradient(135deg, #FFF9EC, #FFF3D6);
-  border-radius:20px; font-size:14px; font-weight:600; color:var(--gold); margin-bottom:24px;
-}
-.result-btns { display:flex; gap:12px; width:100%; max-width:340px; }
-.result-btn {
-  flex:1; padding:14px; border:none; border-radius:var(--radius-sm);
-  font-size:15px; font-weight:600; cursor:pointer; transition:transform 0.2s;
-}
-.result-btn:active { transform:scale(0.96); }
-.result-btn.primary { background:var(--primary); color:#fff; }
-.result-btn.secondary { background:var(--card); color:var(--primary); border:1.5px solid var(--primary); }
-
-/* ========== 成长页 ========== */
-.growth-radar {
-  margin:20px; padding:20px; background:var(--card);
-  border-radius:var(--radius); box-shadow:var(--shadow);
-}
-.growth-radar h3 { font-size:15px; font-weight:600; margin-bottom:16px; color:var(--text); }
-.radar-container { position:relative; width:240px; height:240px; margin:0 auto; }
-.radar-container canvas { width:100%; height:100%; }
-
-.growth-stats {
-  display:flex; gap:12px; margin:0 20px;
-}
-.growth-stat-card {
-  flex:1; padding:16px; background:var(--card);
-  border-radius:var(--radius-sm); box-shadow:var(--shadow); text-align:center;
-}
-.growth-stat-card .stat-val { font-size:22px; font-weight:700; color:var(--primary); }
-.growth-stat-card .stat-val.gold { color:var(--gold); }
-.growth-stat-card .stat-label { font-size:12px; color:var(--text-light); margin-top:4px; }
-
-.milestone-list { margin:16px 20px; }
-.milestone-item {
-  display:flex; align-items:center; gap:12px; padding:14px 16px;
-  background:var(--card); border-radius:var(--radius-sm); margin-bottom:8px;
-  box-shadow:var(--shadow);
-}
-.milestone-item .ms-icon { font-size:20px; }
-.milestone-item .ms-text { flex:1; font-size:14px; color:var(--text); }
-.milestone-item .ms-text.locked { color:var(--text-light); }
-.milestone-item .ms-req { font-size:11px; color:var(--text-light); }
-
-.emotion-diary-btn {
-  display:flex; align-items:center; gap:12px; margin:0 20px 20px; padding:16px;
-  background:linear-gradient(135deg, #FFF9EC, #FFF3D6);
-  border-radius:var(--radius); cursor:pointer;
-}
-.emotion-diary-btn .diary-icon { font-size:24px; }
-.emotion-diary-btn .diary-text { flex:1; }
-.emotion-diary-btn .diary-text h4 { font-size:15px; font-weight:600; color:var(--text); }
-.emotion-diary-btn .diary-text p { font-size:12px; color:var(--text-light); }
-.emotion-diary-btn .diary-arrow { color:var(--text-light); }
-
-/* ========== 我的页 ========== */
-.profile-header {
-  background:linear-gradient(135deg, var(--primary), #2A5298);
-  padding:30px 20px 24px; color:#fff; text-align:center;
-}
-.profile-avatar {
-  width:64px; height:64px; border-radius:50%;
-  background:linear-gradient(135deg, var(--gold), #FFD700);
-  display:flex; align-items:center; justify-content:center;
-  font-size:28px; margin:0 auto 10px; color:var(--primary);
-}
-.profile-name { font-size:18px; font-weight:600; margin-bottom:4px; }
-.profile-rank { font-size:12px; color:var(--gold); }
-
-.profile-stats {
-  display:flex; margin:-12px 20px 0; padding:16px; background:var(--card);
-  border-radius:var(--radius); box-shadow:var(--shadow); position:relative; z-index:1;
-}
-.profile-stat { flex:1; text-align:center; }
-.profile-stat .ps-val { font-size:18px; font-weight:700; color:var(--primary); }
-.profile-stat .ps-label { font-size:11px; color:var(--text-light); margin-top:2px; }
-
-.menu-list { margin:16px 20px; }
-.menu-item {
-  display:flex; align-items:center; gap:14px; padding:16px;
-  background:var(--card); border-radius:var(--radius-sm); margin-bottom:8px;
-  box-shadow:var(--shadow); cursor:pointer;
-}
-.menu-item .menu-icon {
-  width:36px; height:36px; border-radius:10px; display:flex;
-  align-items:center; justify-content:center; font-size:16px;
-}
-.menu-item .menu-text { flex:1; font-size:14px; color:var(--text); }
-.menu-item .menu-badge { font-size:12px; color:var(--text-light); }
-.menu-item .menu-arrow { color:var(--text-light); font-size:12px; }
-
-/* ========== 底部Tab栏 ========== */
-.tab-bar {
-  position:absolute; bottom:0; left:0; right:0; height:64px;
-  background:var(--card); display:flex; align-items:center;
-  box-shadow:0 -2px 10px rgba(0,0,0,0.06); z-index:100;
-  border-top:1px solid var(--border);
-}
-.tab-item {
-  flex:1; display:flex; flex-direction:column; align-items:center;
-  justify-content:center; gap:3px; cursor:pointer; padding:6px 0;
-  -webkit-tap-highlight-color:transparent;
-}
-.tab-item i { font-size:20px; color:var(--text-light); transition:color 0.2s; }
-.tab-item span { font-size:10px; color:var(--text-light); transition:color 0.2s; }
-.tab-item.active i { color:var(--gold); }
-.tab-item.active span { color:var(--gold); font-weight:600; }
-
-/* ========== 进步曲线 ========== */
-.progress-chart {
-  margin:16px 20px; padding:18px; background:var(--card);
-  border-radius:var(--radius); box-shadow:var(--shadow);
-}
-.progress-chart h3 { font-size:15px; font-weight:600; color:var(--text); margin-bottom:14px; }
-.chart-container { position:relative; height:140px; display:flex; align-items:flex-end; gap:6px; padding-bottom:24px; }
-.chart-bar-group { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
-.chart-bar { width:100%; border-radius:4px 4px 0 0; background:linear-gradient(180deg, var(--gold), #FFD700); transition:height 0.6s ease; min-height:4px; }
-.chart-bar:hover { opacity:0.85; }
-.chart-label { font-size:10px; color:var(--text-light); }
-.chart-line-svg { position:absolute; top:0; left:0; width:100%; height:calc(100% - 24px); pointer-events:none; }
-.chart-legend { display:flex; align-items:center; gap:16px; margin-top:10px; font-size:11px; color:var(--text-light); }
-.chart-legend i { margin-right:4px; }
-
-/* ========== 弹窗通用 ========== */
-.modal-overlay {
-  position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000;
-  display:none; align-items:center; justify-content:center; padding:20px;
-  animation: modalFadeIn 0.25s ease;
-}
-.modal-overlay.show { display:flex; }
-@keyframes modalFadeIn { from{opacity:0} to{opacity:1} }
-.modal-box {
-  width:100%; max-width:400px; max-height:85vh; background:var(--card);
-  border-radius:var(--radius); overflow-y:auto; position:relative;
-  animation: modalSlideUp 0.3s ease;
-}
-@keyframes modalSlideUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
-.modal-header {
-  padding:18px 20px; display:flex; align-items:center; justify-content:space-between;
-  border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--card); z-index:1;
-}
-.modal-header h3 { font-size:17px; font-weight:700; color:var(--primary); }
-.modal-close { width:30px; height:30px; border:none; background:#F0F4FF; border-radius:50%; cursor:pointer; font-size:14px; color:var(--text-light); display:flex; align-items:center; justify-content:center; }
-.modal-body { padding:20px; }
-
-/* 签到成功弹窗 */
-.sign-success-modal .modal-body { text-align:center; padding:30px 20px; }
-.sign-success-icon { font-size:56px; margin-bottom:12px; animation: signBounce 0.6s ease; }
-@keyframes signBounce { 0%{transform:scale(0)} 50%{transform:scale(1.2)} 100%{transform:scale(1)} }
-.sign-success-title { font-size:20px; font-weight:700; color:var(--primary); margin-bottom:8px; }
-.sign-success-info { font-size:15px; color:var(--text); margin-bottom:4px; }
-.sign-success-points { font-size:18px; font-weight:700; color:var(--gold); margin:12px 0; }
-.sign-success-btn {
-  margin-top:16px; padding:12px 40px; border:none; border-radius:24px;
-  background:var(--primary); color:#fff; font-size:15px; font-weight:600; cursor:pointer;
-}
-
-/* 会员权益表格 */
-.member-table { width:100%; border-collapse:collapse; font-size:11px; }
-.member-table th, .member-table td { padding:8px 4px; text-align:center; border:1px solid var(--border); }
-.member-table th { background:var(--primary); color:#fff; font-weight:600; font-size:11px; }
-.member-table th:first-child { background:#1a4a7a; }
-.member-table td:first-child { font-weight:600; color:var(--primary); background:#F8FAFC; text-align:left; padding-left:8px; }
-.member-table .highlight-col { background:#FFF9EC; }
-.member-table .price-row td { font-weight:700; color:var(--gold); background:#FFF9EC; }
-.member-table .price-row td:first-child { color:var(--primary); background:#F0F4FF; }
-
-/* 晚安计划弹窗 */
-.night-plan-section { margin-bottom:18px; }
-.night-plan-section label { display:block; font-size:14px; font-weight:600; color:var(--text); margin-bottom:10px; }
-.coach-select { display:flex; gap:10px; flex-wrap:wrap; }
-.coach-select-item {
-  flex:1; min-width:100px; padding:12px 8px; border:2px solid var(--border); border-radius:var(--radius-sm);
-  text-align:center; cursor:pointer; transition:all 0.2s;
-}
-.coach-select-item.active { border-color:var(--primary); background:#F0F4FF; }
-.coach-select-item .cs-avatar { width:40px; height:40px; border-radius:50%; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; font-size:18px; }
-.coach-select-item .cs-name { font-size:12px; color:var(--text); font-weight:500; }
-.time-picker-row { display:flex; gap:12px; }
-.time-picker-row select {
-  flex:1; padding:12px; border:1.5px solid var(--border); border-radius:var(--radius-sm);
-  font-size:15px; color:var(--text); background:var(--card); outline:none;
-}
-.time-picker-row select:focus { border-color:var(--primary); }
-.switch-row {
-  display:flex; align-items:center; justify-content:space-between; padding:14px 0;
-  border-top:1px solid var(--border);
-}
-.switch-row .switch-label { font-size:14px; color:var(--text); }
-.switch-row .switch-label small { display:block; font-size:12px; color:var(--text-light); font-weight:400; }
-.toggle-switch {
-  width:48px; height:26px; background:var(--border); border-radius:13px;
-  position:relative; cursor:pointer; transition:background 0.3s;
-}
-.toggle-switch.on { background:var(--success); }
-.toggle-switch::after {
-  content:''; position:absolute; top:3px; left:3px; width:20px; height:20px;
-  background:#fff; border-radius:50%; transition:transform 0.3s; box-shadow:0 1px 4px rgba(0,0,0,0.15);
-}
-.toggle-switch.on::after { transform:translateX(22px); }
-.night-plan-save {
-  width:100%; padding:14px; border:none; border-radius:var(--radius-sm);
-  background:var(--primary); color:#fff; font-size:15px; font-weight:600; cursor:pointer; margin-top:10px;
-}
-
-/* 动画类 */
-.fade-in { animation: fadeIn 0.3s ease; }
-@keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; background:#f5f5f5; }
+.safe-area-bottom { padding-bottom:env(safe-area-inset-bottom); }
+.scrollbar-hide::-webkit-scrollbar { display:none; }
+.scrollbar-hide { -ms-overflow-style:none; scrollbar-width:none; }
+.line-clamp-2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.app { max-width:430px; margin:0 auto; height:100vh; position:relative; overflow:hidden; background:#fff; }
+.page { display:none; height:100%; overflow-y:auto; }
+.page.active { display:block; }
+.page-content { padding:16px; padding-bottom:80px; }
+.tab-bar { display:none; position:absolute; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #f0f0f0; padding:6px 12px; padding-bottom:calc(6px + env(safe-area-inset-bottom)); z-index:100; }
+.tab-bar.show { display:flex; }
+.tab-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; padding:4px 0; cursor:pointer; border:none; background:none; transition:color .2s; }
+.tab-item .tab-icon { font-size:20px; }
+.tab-item .tab-label { font-size:10px; }
+.tab-item.active { color:#6366f1; }
+.tab-item:not(.active) { color:#9ca3af; }
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:200; padding:16px; }
+.modal-content { background:#fff; border-radius:16px; width:100%; max-width:400px; max-height:85vh; display:flex; flex-direction:column; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+.animate-in { animation:fadeIn .3s ease-out; }
 </style>
 </head>
 <body>
-
 <div class="app" id="app">
 
-  <!-- ========== 登录页 ========== -->
-  <div class="view login-view active" id="view-login">
-    <div class="login-logo"><i class="fas fa-comments"></i></div>
-    <div class="login-title">对练社交</div>
-    <div class="login-subtitle">AI驱动的社交训练平台</div>
-    <div class="login-form">
-      <div class="login-input-group">
-        <i class="fas fa-mobile-alt"></i>
-        <input class="login-input" id="phone-input" type="tel" placeholder="请输入手机号" maxlength="11" value="13800138000">
-      </div>
-      <div class="login-input-group">
-        <i class="fas fa-lock"></i>
-        <input class="login-input" id="password-input" type="password" placeholder="密码" value="123456">
-      </div>
-      <div class="login-input-group">
-        <i class="fas fa-shield-alt"></i>
-        <input class="login-input" id="sms-input" type="text" placeholder="验证码" maxlength="6" value="123456">
-        <button class="sms-btn" id="sms-btn" onclick="sendSms()">发送验证码</button>
-      </div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:8px;text-align:center;">体验账号已自动填充，点击登录即可体验</div>
-      <button class="login-btn" onclick="doLogin()">登 录</button>
-      <div class="login-agreement">
-        <input type="checkbox" id="agree-check" checked>
-        <label for="agree-check">我已阅读并同意 <a href="#">《用户协议》</a>和<a href="#">《隐私政策》</a></label>
+  <!-- ===== 登录页 ===== -->
+  <div class="page active" id="page-login">
+    <div class="flex flex-col h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+      <div class="flex-1 flex flex-col items-center justify-center px-6 py-12">
+        <div class="relative inline-flex mb-6">
+          <div class="w-24 h-24 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-xl shadow-indigo-200">
+            <span class="text-5xl">💬</span>
+          </div>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">对练社交</h1>
+        <p class="text-gray-500 text-base mb-10 text-center">AI驱动的社交训练平台</p>
+
+        <div id="login-form" class="w-full max-w-sm">
+          <div class="flex bg-gray-100 rounded-xl p-1 mb-6">
+            <button onclick="switchLoginMode('password')" id="login-tab-password" class="flex-1 py-3 rounded-lg text-sm font-medium transition-all bg-white text-indigo-600 shadow-sm">
+              <span class="mr-1.5">🔒</span>密码登录
+            </button>
+            <button onclick="switchLoginMode('sms')" id="login-tab-sms" class="flex-1 py-3 rounded-lg text-sm font-medium transition-all text-gray-500">
+              <span class="mr-1.5">💬</span>短信验证码
+            </button>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">手机号</label>
+              <input id="login-phone" type="tel" maxlength="11" placeholder="请输入手机号" value="13800138000"
+                class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all">
+            </div>
+            <div id="login-password-group">
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">密码</label>
+              <div class="relative">
+                <input id="login-password" type="password" placeholder="请输入密码" value="123456"
+                  class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all">
+                <button type="button" onclick="toggleLoginPwd()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                  <span id="login-pwd-eye">👁</span>
+                </button>
+              </div>
+            </div>
+            <div id="login-sms-group" style="display:none">
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">验证码</label>
+              <div class="flex gap-2">
+                <input id="login-sms" type="text" maxlength="6" placeholder="输入验证码"
+                  class="flex-1 px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all">
+                <button onclick="sendSms()" id="sms-btn" class="px-4 py-3 bg-indigo-50 text-indigo-600 rounded-xl text-sm font-medium hover:bg-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all whitespace-nowrap">获取验证码</button>
+              </div>
+              <p class="text-xs text-gray-400 mt-1">体验验证码：123456</p>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between mt-4">
+            <label class="flex items-center cursor-pointer">
+              <input id="remember-me" type="checkbox" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500">
+              <span class="ml-2 text-sm text-gray-500">记住我</span>
+            </label>
+            <button class="text-sm text-gray-400 hover:text-indigo-600 transition-colors">忘记密码？</button>
+          </div>
+
+          <div id="login-error" class="mt-3 px-3 py-2 bg-red-50 text-red-600 text-sm rounded-lg text-center" style="display:none"></div>
+
+          <button onclick="doLogin()" class="w-full mt-4 py-3.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all shadow-lg shadow-indigo-200 active:scale-[0.98]">
+            登 录
+          </button>
+
+          <button onclick="fillDemoAccount()" class="w-full mt-3 py-3 bg-white border border-gray-200 text-gray-600 font-medium rounded-xl hover:bg-gray-50 transition-all">
+            👤 使用演示账号登录
+          </button>
+
+          <div class="flex items-center justify-center mt-6">
+            <span class="text-gray-400 text-sm">还没有账号？</span>
+            <button onclick="showRegister=true;renderRegister()" class="ml-1 text-indigo-600 text-sm font-medium hover:text-indigo-700">立即注册</button>
+          </div>
+        </div>
+
+        <div id="register-form" class="w-full max-w-sm" style="display:none">
+          <h2 class="text-xl font-bold text-gray-800 mb-1">创建账号</h2>
+          <p class="text-gray-500 text-sm mb-6">开启你的社交成长之旅</p>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">手机号</label>
+              <input id="reg-phone" type="tel" maxlength="11" placeholder="请输入手机号"
+                class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">验证码</label>
+              <div class="flex gap-2">
+                <input id="reg-sms" type="text" maxlength="6" placeholder="输入验证码"
+                  class="flex-1 px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all">
+                <button onclick="sendRegSms()" id="reg-sms-btn" class="px-4 py-3 bg-indigo-50 text-indigo-600 rounded-xl text-sm font-medium hover:bg-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all whitespace-nowrap">获取验证码</button>
+              </div>
+              <p class="text-xs text-gray-400 mt-1">体验验证码：123456</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">昵称</label>
+              <input id="reg-nickname" type="text" maxlength="20" placeholder="给自己取个昵称"
+                class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">密码</label>
+              <div class="relative">
+                <input id="reg-password" type="password" placeholder="设置密码（至少6位）"
+                  class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all">
+                <button type="button" onclick="toggleRegPwd()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                  <span id="reg-pwd-eye">👁</span>
+                </button>
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">确认密码</label>
+              <div class="relative">
+                <input id="reg-confirm-password" type="password" placeholder="请再次输入密码"
+                  class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all">
+                <button type="button" onclick="toggleRegConfirmPwd()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                  <span id="reg-confirm-pwd-eye">👁</span>
+                </button>
+              </div>
+              <p class="text-xs mt-1" id="reg-pwd-match" style="display:none"></p>
+            </div>
+          </div>
+          <label class="flex items-start cursor-pointer mt-4">
+            <input id="agree-terms" type="checkbox" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500 mt-0.5">
+            <span class="ml-2 text-sm text-gray-500">我已阅读并同意 <span class="text-indigo-600">《服务协议》</span> 和 <span class="text-indigo-600">《隐私政策》</span></span>
+          </label>
+          <div id="register-error" class="mt-3 px-3 py-2 bg-red-50 text-red-600 text-sm rounded-lg text-center" style="display:none"></div>
+          <button onclick="doRegister()" class="w-full mt-4 py-3.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all shadow-lg shadow-indigo-200 active:scale-[0.98]">注 册</button>
+          <div class="flex items-center justify-center mt-5">
+            <span class="text-gray-400 text-sm">已有账号？</span>
+            <button onclick="showRegister=false;document.getElementById('register-form').style.display='none';document.getElementById('login-form').style.display='block'" class="ml-1 text-indigo-600 text-sm font-medium hover:text-indigo-700">立即登录</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- ========== 首页 ========== -->
-  <div class="view" id="view-home">
-    <div class="home-greeting">
-      <h2>下午好，钻石学员 ✨</h2>
-    </div>
-    <div class="coach-online-card fade-in">
-      <div class="breath-dot"></div>
-      <div class="coach-info">
-        <div class="coach-name">沈清欢</div>
-        <div class="coach-status">在线 ●</div>
-      </div>
-      <button class="coach-action" onclick="switchTab(1)">对话</button>
-    </div>
-    <div class="sign-in-section">
-      <div class="sign-in-btn" id="sign-in-btn" onclick="doSignIn()">
-        <i class="fas fa-calendar-check sign-icon"></i>
+  <!-- ===== 首页 ===== -->
+  <div class="page" id="page-home">
+    <div class="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 px-4 pt-8 pb-6 text-white">
+      <div class="flex items-center justify-between mb-6">
         <div>
-          <div class="sign-text" id="sign-text">签到</div>
-          <div class="sign-sub" id="sign-sub">已连续签到7天</div>
+          <p class="text-sm opacity-80" id="greeting-text">晚上好</p>
+          <div class="flex items-center gap-2 mt-1">
+            <span class="text-lg font-bold" id="user-level">✨ 钻石学员</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <button onclick="doCheckin()" id="checkin-btn" class="flex items-center gap-1 px-3 py-1.5 bg-white/20 rounded-full text-xs font-medium hover:bg-white/30 transition-all">
+            📅 签到
+          </button>
+          <button onclick="showModal('profile')" class="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors font-medium" id="user-avatar-btn">👤</button>
         </div>
       </div>
-    </div>
-    <div class="recommend-card fade-in">
-      <div class="tag">🎯 今日推荐</div>
-      <h3>咖啡厅破冰</h3>
-      <p>推荐理由：你的破冰能力有提升空间</p>
-      <button class="start-btn" onclick="startTraining()">开始训练</button>
-    </div>
-    <div class="section-title">最近训练 <span class="more">查看全部 ›</span></div>
-    <div class="record-item">
-      <div class="record-icon" style="background:#FFF3D6;color:#F5A623;">☕</div>
-      <div class="record-info">
-        <div class="record-title">咖啡厅破冰</div>
-        <div class="record-time">今天 14:30</div>
+
+      <div class="flex items-center gap-4 p-4 bg-white/10 rounded-2xl backdrop-blur-sm">
+        <div class="relative">
+          <div class="text-5xl" id="coach-avatar">🎯</div>
+          <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white"></div>
+        </div>
+        <div class="flex-1">
+          <div class="flex items-center gap-2">
+            <h2 class="font-semibold text-lg" id="coach-name">林教练</h2>
+            <span class="text-xs px-2 py-0.5 bg-white/20 rounded-full" id="coach-type">沟通力</span>
+            <span class="text-xs px-2 py-0.5 bg-green-400/80 rounded-full">在线</span>
+          </div>
+          <div class="flex items-center gap-2 mt-1.5">
+            <div class="flex-1 h-2 bg-white/20 rounded-full overflow-hidden">
+              <div class="h-full bg-white rounded-full transition-all" id="coach-progress" style="width:65%"></div>
+            </div>
+            <span class="text-xs font-medium" id="coach-affection">650/1000</span>
+          </div>
+        </div>
+        <button onclick="switchTab('coach')" class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-colors">💬</button>
       </div>
-      <div class="record-score">85分</div>
     </div>
-    <div class="record-item">
-      <div class="record-icon" style="background:#E8F8EF;color:#27AE60;">👥</div>
-      <div class="record-info">
-        <div class="record-title">兴趣社群</div>
-        <div class="record-time">昨天 20:15</div>
-      </div>
-      <div class="record-score">72分</div>
-    </div>
-    <div class="section-title">本周训练进度</div>
-    <div class="progress-section">
-      <div class="ring-progress">
-        <svg width="80" height="80" viewBox="0 0 80 80">
-          <circle cx="40" cy="40" r="34" fill="none" stroke="#E8ECF1" stroke-width="6"/>
-          <circle cx="40" cy="40" r="34" fill="none" stroke="#F5A623" stroke-width="6"
-            stroke-dasharray="213.6" stroke-dashoffset="42.7" stroke-linecap="round"/>
-        </svg>
-        <div class="ring-text">
-          <div class="ring-num">12</div>
-          <div class="ring-label">/15次</div>
+
+    <div class="page-content">
+      <div class="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-4 text-white shadow-lg mb-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-medium bg-white/20 px-2 py-0.5 rounded-full">📌 今日推荐训练</span>
+          <span class="text-xs" id="recommend-duration">8min</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="font-bold text-lg" id="recommend-name">☕ 咖啡厅破冰</h3>
+            <p class="text-sm opacity-80 mt-0.5" id="recommend-desc">与陌生人初次见面练习</p>
+          </div>
+          <button onclick="startTraining(getRecommendedScene())" class="px-4 py-2 bg-white text-orange-500 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">开始训练</button>
+        </div>
+        <div class="flex items-center gap-2 mt-3">
+          <span id="recommend-stars">⭐⭐⭐⭐☆</span>
         </div>
       </div>
-      <div class="progress-detail">
-        <h4>还差3次达成目标</h4>
-        <p>本周已训练12次，继续保持💪</p>
+
+      <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-semibold text-gray-800">🕐 最近训练</h3>
+          <button onclick="switchTab('training')" class="text-xs text-indigo-600">查看更多 →</button>
+        </div>
+        <div class="flex gap-3 overflow-x-auto scrollbar-hide pb-1" id="recent-trainings"></div>
+      </div>
+
+      <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
+        <h3 class="text-sm font-semibold text-gray-800 mb-3">📊 本周进度</h3>
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm text-gray-600" id="weekly-days">训练天数：3/7</span>
+          <span class="text-sm font-medium text-indigo-600" id="weekly-progress">43%</span>
+        </div>
+        <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+          <div class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all" id="weekly-bar" style="width:43%"></div>
+        </div>
+        <div class="flex items-center gap-4 mt-3">
+          <div class="flex items-center gap-1">
+            <span>💬</span><span class="text-xs text-gray-600">沟通力</span>
+            <span class="text-xs text-green-500 font-medium" id="improve-communication">+12%</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <span>🎤</span><span class="text-xs text-gray-600">表达力</span>
+            <span class="text-xs text-green-500 font-medium" id="improve-expression">+8%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-4 text-white shadow-sm mb-4" id="goodnight-card" style="display:none">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="font-bold">🌙 今晚晚安计划</h3>
+            <p class="text-sm opacity-80 mt-0.5">"今天辛苦了，睡前想听点什么？"</p>
+          </div>
+          <button onclick="showGoodnight()" class="px-4 py-2 bg-white/20 rounded-lg text-sm font-medium hover:bg-white/30 transition-colors">听TA说晚安 →</button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl p-4 shadow-sm">
+        <h3 class="text-sm font-semibold text-gray-800 mb-3">💡 今日小贴士</h3>
+        <p class="text-sm text-gray-600 leading-relaxed">倾听是沟通的基础。试着在对话中多听少说，理解对方的感受比表达自己更重要。</p>
       </div>
     </div>
   </div>
 
-  <!-- ========== 教练页 ========== -->
-  <div class="view" id="view-coach">
-    <div class="coach-header">
-      <div class="coach-points">
-        <div class="pts-info">训练积分 <strong>285</strong><span> /300</span></div>
-        <div class="pts-info" style="text-align:right;">→ 铂金</div>
-      </div>
-      <div class="rank-bar"><div class="fill" style="width:95%"></div></div>
-      <div class="rank-label">还差15分升级</div>
-    </div>
-    <div class="coach-avatar-area" style="margin-top:0; border-radius:0 0 var(--radius) var(--radius);">
-      <div class="coach-portrait"><i class="fas fa-user-tie"></i></div>
-      <div class="coach-portrait-name">沈清欢</div>
-      <div class="coach-portrait-tag">ENFP · 温和引导型</div>
-      <div class="coach-actions">
-        <button class="coach-action-btn primary" onclick="startTraining()"><i class="fas fa-comment-dots"></i> 开始对话训练</button>
-        <button class="coach-action-btn secondary" onclick="switchTab(2)"><i class="fas fa-theater-masks"></i> 场景挑战</button>
-      </div>
-    </div>
-    <div class="section-title">教练朋友圈</div>
-    <div class="coach-moment">
-      <div class="moment-header">
-        <div class="moment-avatar">沈</div>
-        <div>
-          <div class="moment-name">沈清欢</div>
-          <div class="moment-time">2小时前</div>
+  <!-- ===== 教练页 ===== -->
+  <div class="page" id="page-coach">
+    <div class="page-content">
+      <div class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 rounded-2xl p-6 mb-4 text-center relative overflow-hidden">
+        <div class="absolute inset-0 opacity-20">
+          <div class="absolute top-10 left-10 text-2xl">✨</div>
+          <div class="absolute top-20 right-16 text-xl">💫</div>
+          <div class="absolute bottom-20 left-20 text-xl">⭐</div>
+          <div class="absolute bottom-10 right-10 text-2xl">🌟</div>
+        </div>
+        <div class="text-8xl mb-3 relative cursor-pointer hover:scale-105 transition-transform" id="coach-big-avatar">🎯</div>
+        <h2 class="text-xl font-bold text-gray-800" id="coach-big-name">林教练</h2>
+        <p class="text-sm text-gray-500 mt-1" id="coach-big-desc">沟通力教练 · 善于引导对话</p>
+        <div class="flex items-center gap-2 justify-center mt-2">
+          <span class="text-xs px-2 py-0.5 bg-green-100 text-green-600 rounded-full">在线</span>
+          <span class="text-xs px-2 py-0.5 bg-indigo-100 text-indigo-600 rounded-full" id="coach-level-label">⭐ 钻石学员</span>
+        </div>
+        <div class="mt-4">
+          <div class="flex items-center justify-between text-sm mb-1">
+            <span class="text-gray-500">训练积分</span>
+            <span class="font-medium text-indigo-600" id="coach-points">650/1000</span>
+          </div>
+          <div class="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all" id="coach-points-bar" style="width:65%"></div>
+          </div>
+          <p class="text-xs text-gray-400 mt-1">当前等级：黄金学员</p>
         </div>
       </div>
-      <div class="moment-content">今天看到学员在咖啡厅破冰拿了3星，太棒了！🎉 每次看到学员的进步都特别开心～</div>
-    </div>
-    <div class="section-title">今日任务</div>
-    <div class="task-list">
-      <div class="task-item">
-        <div class="task-check done"><i class="fas fa-check"></i></div>
-        <div class="task-text done-text">完成1次破冰训练</div>
-        <div class="task-reward">+10分</div>
+
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <button onclick="switchTab('training')" class="py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all flex items-center justify-center gap-2">
+          🎯 开始训练
+        </button>
+        <button onclick="switchTab('growth')" class="py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold rounded-xl hover:from-amber-600 hover:to-orange-600 transition-all flex items-center justify-center gap-2">
+          📈 成长报告
+        </button>
       </div>
-      <div class="task-item">
-        <div class="task-check"></div>
-        <div class="task-text">完成1次场景挑战</div>
-        <div class="task-reward">+15分</div>
+
+      <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
+        <h3 class="text-sm font-semibold text-gray-800 mb-3">教练档案</h3>
+        <div class="space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="text-xl">🎯</span>
+            <div>
+              <div class="text-sm font-medium text-gray-800">教学风格</div>
+              <div class="text-xs text-gray-500">引导式 + 反馈式</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-xl">🧠</span>
+            <div>
+              <div class="text-sm font-medium text-gray-800">擅长领域</div>
+              <div class="text-xs text-gray-500">沟通力 · 表达力 · 共情力</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-xl">💡</span>
+            <div>
+              <div class="text-sm font-medium text-gray-800">训练理念</div>
+              <div class="text-xs text-gray-500">每一次练习都是成长的机会</div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="task-item">
-        <div class="task-check"></div>
-        <div class="task-text">连续签到7天</div>
-        <div class="task-reward">+20分</div>
+
+      <div class="bg-white rounded-2xl p-4 shadow-sm">
+        <h3 class="text-sm font-semibold text-gray-800 mb-3">📱 教练动态</h3>
+        <div class="space-y-3" id="coach-moments"></div>
       </div>
     </div>
   </div>
 
-  <!-- ========== 场景页 ========== -->
-  <div class="view" id="view-scene">
-    <div class="page-header">
-      <h2><i class="fas fa-theater-masks"></i> 社交场景</h2>
-      <p>选择场景，开始你的社交训练之旅</p>
+  <!-- ===== 训练页 ===== -->
+  <div class="page" id="page-training">
+    <div class="page-content">
+      <h1 class="text-xl font-bold text-gray-800 mb-6">社交场景训练</h1>
+      <div id="scene-list"></div>
     </div>
-    <div class="stage-tabs" id="stage-tabs">
-      <button class="stage-tab active" data-stage="0">破冰期</button>
-      <button class="stage-tab" data-stage="1">接触期</button>
-      <button class="stage-tab" data-stage="2">熟悉期</button>
-      <button class="stage-tab" data-stage="3">亲密期</button>
-      <button class="stage-tab" data-stage="4">职场期</button>
-      <button class="stage-tab" data-stage="5">高难期</button>
-    </div>
-    <div id="scene-list">
-      <div class="scene-card fade-in">
-        <div class="scene-top">
-          <span class="scene-icon">☕</span>
-          <span class="scene-name">咖啡厅破冰</span>
-          <span class="scene-diff easy">⭐ 简单</span>
-        </div>
-        <div class="scene-meta">10分钟 · 已完成75%</div>
-        <div class="scene-progress-bar"><div class="fill" style="width:75%"></div></div>
-        <button class="scene-start-btn" onclick="startTraining()">开始训练</button>
+  </div>
+
+  <!-- ===== 成长页 ===== -->
+  <div class="page" id="page-growth">
+    <div class="page-content">
+      <h1 class="text-xl font-bold text-gray-800 mb-6">成长报告</h1>
+
+      <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
+        <h3 class="text-sm font-semibold text-gray-800 mb-4">能力雷达</h3>
+        <div class="grid grid-cols-3 gap-3" id="ability-grid"></div>
       </div>
-      <div class="scene-card fade-in">
-        <div class="scene-top">
-          <span class="scene-icon">👥</span>
-          <span class="scene-name">兴趣社群</span>
-          <span class="scene-diff medium">⭐⭐ 中等</span>
+
+      <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-sm font-semibold text-gray-800">📈 进步曲线</h3>
+          <div class="flex bg-gray-100 rounded-lg p-1">
+            <button onclick="setProgressDays(7)" id="prog-7" class="px-3 py-1 text-xs rounded-md bg-white text-indigo-600 shadow-sm">7天</button>
+            <button onclick="setProgressDays(30)" id="prog-30" class="px-3 py-1 text-xs rounded-md text-gray-500">30天</button>
+          </div>
         </div>
-        <div class="scene-meta">12分钟 · 未开始</div>
-        <div class="scene-progress-bar"><div class="fill" style="width:0%"></div></div>
-        <button class="scene-start-btn" onclick="startTraining()">开始训练</button>
+        <div class="h-32 flex items-end gap-2" id="progress-chart"></div>
+        <div class="flex items-center justify-between mt-4 text-xs">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 bg-indigo-500 rounded-full"></span>
+            <span class="text-gray-500">综合能力</span>
+          </div>
+          <span class="text-indigo-600" id="avg-improvement">平均提升 +0%</span>
+        </div>
       </div>
-      <div class="scene-card fade-in">
-        <div class="scene-top">
-          <span class="scene-icon">🏢</span>
-          <span class="scene-name">模拟面试</span>
-          <span class="scene-diff hard">⭐⭐⭐ 困难</span>
+
+      <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-4 text-white mb-4">
+        <h3 class="text-sm font-semibold mb-3">📋 本周训练报告</h3>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <div class="text-2xl font-bold" id="weekly-report-count">0</div>
+            <div class="text-xs opacity-80">本周训练次数</div>
+          </div>
+          <div>
+            <div class="text-2xl font-bold" id="weekly-report-change">+0</div>
+            <div class="text-xs opacity-80">积分变化</div>
+          </div>
         </div>
-        <div class="scene-meta">15分钟</div>
-        <button class="scene-start-btn locked" style="margin-top:8px;">🔒 需50积分</button>
+        <div class="mt-3 pt-3 border-t border-white/20">
+          <p class="text-xs opacity-90" id="weekly-report-msg">本周还没有训练记录</p>
+        </div>
       </div>
-      <div class="scene-card fade-in">
-        <div class="scene-top">
-          <span class="scene-icon">📊</span>
-          <span class="scene-name">向上汇报</span>
-          <span class="scene-diff vhard">⭐⭐⭐⭐ 较难</span>
+
+      <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-semibold text-gray-800">📖 情绪日记</h3>
+          <span class="text-xs text-gray-400" id="diary-count">0篇</span>
         </div>
-        <div class="scene-meta">15分钟</div>
-        <button class="scene-start-btn locked" style="margin-top:8px;">🔒 需100积分</button>
+        <div id="diary-list"></div>
       </div>
-      <div class="scene-card fade-in">
-        <div class="scene-top">
-          <span class="scene-icon">💬</span>
-          <span class="scene-name">被误解(NVC)</span>
-          <span class="scene-diff hard">⭐⭐⭐ 困难</span>
+
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <div onclick="showCBT()" class="bg-white rounded-2xl p-4 shadow-sm cursor-pointer hover:shadow-md transition-all">
+          <div class="text-2xl mb-2">🧠</div>
+          <h3 class="text-sm font-semibold text-gray-800">思维记录</h3>
+          <p class="text-xs text-gray-400 mt-1">CBT认知行为练习</p>
         </div>
-        <div class="scene-meta">12分钟</div>
-        <button class="scene-start-btn locked" style="margin-top:8px;">🔒 需100积分</button>
+        <div onclick="showNVC()" class="bg-white rounded-2xl p-4 shadow-sm cursor-pointer hover:shadow-md transition-all">
+          <div class="text-2xl mb-2">💬</div>
+          <h3 class="text-sm font-semibold text-gray-800">NVC练习</h3>
+          <p class="text-xs text-gray-400 mt-1">非暴力沟通四步法</p>
+        </div>
       </div>
-      <div class="scene-card fade-in">
-        <div class="scene-top">
-          <span class="scene-icon">🤗</span>
-          <span class="scene-name">安慰TA</span>
-          <span class="scene-diff medium">⭐⭐ 中等</span>
+
+      <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-semibold text-gray-800">📚 学习卡片</h3>
+          <button onclick="showCards()" class="text-xs text-indigo-600 hover:text-indigo-700">查看全部 →</button>
         </div>
-        <div class="scene-meta">10分钟</div>
-        <button class="scene-start-btn locked" style="margin-top:8px;">🔒 需50积分</button>
+        <div class="grid grid-cols-2 gap-2" id="card-grid"></div>
+      </div>
+
+      <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
+        <h3 class="text-sm font-semibold text-gray-800 mb-3">🏆 成就徽章</h3>
+        <div class="flex flex-wrap gap-3" id="achievement-list"></div>
+      </div>
+
+      <div class="bg-white rounded-2xl p-4 shadow-sm">
+        <h3 class="text-sm font-semibold text-gray-800 mb-4">🚀 成长里程碑</h3>
+        <div class="relative" id="milestone-list"></div>
+      </div>
+
+      <!-- 教练寄语（参考"与你"伴侣寄语实现，PRD §4.4） -->
+      <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-4 shadow-sm">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-xl">💌</span>
+          <h3 class="text-sm font-semibold text-gray-800">教练寄语</h3>
+          <span class="text-xs text-gray-400" id="coach-message-type">本周总结</span>
+        </div>
+        <div class="flex items-center gap-2 mb-3">
+          <button onclick="setCoachMsgType('weekly')" id="coach-msg-weekly" class="px-3 py-1 text-xs rounded-full transition-colors bg-purple-100 text-purple-600 font-medium">本周</button>
+          <button onclick="setCoachMsgType('monthly')" id="coach-msg-monthly" class="px-3 py-1 text-xs rounded-full transition-colors bg-white text-gray-500">本月</button>
+        </div>
+        <div class="bg-white rounded-xl p-4">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-lg">🎯</div>
+            <div>
+              <p class="text-sm text-gray-700" id="coach-message-text">每一次练习都在进步，继续保持！</p>
+              <div class="flex items-center gap-2 mt-2">
+                <span class="text-xs text-gray-400" id="coach-message-date"></span>
+                <button onclick="regenerateCoachMsg()" class="text-xs text-indigo-500 hover:text-indigo-600">换一句</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- ========== 对话训练页 ========== -->
-  <div class="view chat-view" id="view-chat">
-    <div class="chat-header">
-      <i class="fas fa-arrow-left chat-back" onclick="exitChat()"></i>
-      <div class="chat-header-info">
-        <h3>咖啡厅破冰</h3>
-        <p id="chat-round">第1轮 / 5轮</p>
-        <div class="chat-progress-bar"><div class="fill" id="chat-progress-fill" style="width:20%"></div></div>
+  <!-- ===== 我的页 ===== -->
+  <div class="page" id="page-profile">
+    <div class="page-content">
+      <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-6 text-white mb-6">
+        <div class="flex items-center gap-4">
+          <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-2xl font-bold" id="profile-avatar">👤</div>
+          <div>
+            <h1 class="text-xl font-bold" id="profile-name">用户</h1>
+            <div class="flex items-center gap-2 mt-1">
+              <span class="px-2 py-0.5 bg-yellow-400 text-yellow-900 text-xs rounded-full font-medium" id="profile-member">免费版</span>
+              <span class="text-sm text-white/80" id="profile-level">钻石学员</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-6 mt-6">
+          <div><div class="text-2xl font-bold" id="profile-points">0</div><div class="text-xs text-white/80">训练积分</div></div>
+          <div><div class="text-2xl font-bold" id="profile-streak">0</div><div class="text-xs text-white/80">连续签到</div></div>
+          <div><div class="text-2xl font-bold" id="profile-scenes">0</div><div class="text-xs text-white/80">完成场景</div></div>
+        </div>
       </div>
-    </div>
-    <div class="chat-messages" id="chat-messages"></div>
-    <div class="chat-options" id="chat-options"></div>
-  </div>
 
-  <!-- ========== 训练结果页 ========== -->
-  <div class="view result-view" id="view-result">
-    <h2 style="color:var(--primary);margin-bottom:20px;font-size:20px;">训练报告</h2>
-    <div class="result-score-ring">
-      <svg width="140" height="140" viewBox="0 0 140 140">
-        <circle cx="70" cy="70" r="60" fill="none" stroke="#E8ECF1" stroke-width="8"/>
-        <circle cx="70" cy="70" r="60" fill="none" stroke="#F5A623" stroke-width="8"
-          stroke-dasharray="376.99" id="result-ring-fill" stroke-dashoffset="376.99" stroke-linecap="round"/>
-      </svg>
-      <div class="score-center">
-        <div class="score-num" id="result-score-num">0</div>
-        <div class="score-label">分</div>
+      <!-- 本月签到日历（参考"与你"实现，PRD §4.1） -->
+      <div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-semibold text-gray-800">📅 本月签到</h3>
+          <span class="text-xs text-gray-400" id="calendar-month-label"></span>
+        </div>
+        <div class="grid grid-cols-7 gap-1" id="calendar-grid"></div>
       </div>
-    </div>
-    <div class="result-stars">
-      <i class="fas fa-star active"></i>
-      <i class="fas fa-star active"></i>
-      <i class="fas fa-star active"></i>
-      <i class="fas fa-star"></i>
-      <i class="fas fa-star"></i>
-    </div>
-    <div class="section-title" style="padding:10px 0;">五维能力分析</div>
-    <div style="margin-bottom:20px;">
-      <canvas id="radar-canvas" width="260" height="260" style="display:block;margin:0 auto;"></canvas>
-    </div>
-    <div class="result-comment">
-      <div class="comment-header"><i class="fas fa-comment-dots"></i> 教练点评</div>
-      <div class="comment-text">整体表现不错！你的沟通力表现最好，继续保持。应变力方面可以多加练习，下次试试更灵活应对不同情况。</div>
-    </div>
-    <div class="result-points"><i class="fas fa-plus-circle"></i> 获得 +15 训练积分</div>
-    <div class="result-btns">
-      <button class="result-btn secondary" onclick="startTraining()">再来一次</button>
-      <button class="result-btn primary" onclick="switchTab(0)">返回首页</button>
-    </div>
-  </div>
 
-  <!-- ========== 成长页 ========== -->
-  <div class="view" id="view-growth">
-    <div class="page-header">
-      <h2><i class="fas fa-chart-line"></i> 我的成长</h2>
-      <p>记录你的每一次进步</p>
-    </div>
-    <div class="growth-radar">
-      <h3>五维能力雷达</h3>
-      <div class="radar-container">
-        <canvas id="growth-radar-canvas" width="240" height="240"></canvas>
-      </div>
-    </div>
-    <div class="growth-stats">
-      <div class="growth-stat-card">
-        <div class="stat-val gold">285</div>
-        <div class="stat-label">训练积分</div>
-      </div>
-      <div class="growth-stat-card">
-        <div class="stat-val">铂金</div>
-        <div class="stat-label">学员等级</div>
-      </div>
-      <div class="growth-stat-card">
-        <div class="stat-val gold">+45</div>
-        <div class="stat-label">本周进步</div>
-      </div>
-    </div>
-    <div class="progress-chart fade-in">
-      <h3><i class="fas fa-chart-area" style="color:var(--gold);margin-right:6px;"></i>进步曲线</h3>
-      <div class="chart-container" id="progress-chart-container">
-        <svg class="chart-line-svg" id="chart-line-svg" viewBox="0 0 300 116" preserveAspectRatio="none"></svg>
-        <div class="chart-bar-group"><div class="chart-bar" style="height:30%"></div><div class="chart-label">周一</div></div>
-        <div class="chart-bar-group"><div class="chart-bar" style="height:45%"></div><div class="chart-label">周二</div></div>
-        <div class="chart-bar-group"><div class="chart-bar" style="height:40%"></div><div class="chart-label">周三</div></div>
-        <div class="chart-bar-group"><div class="chart-bar" style="height:60%"></div><div class="chart-label">周四</div></div>
-        <div class="chart-bar-group"><div class="chart-bar" style="height:55%"></div><div class="chart-label">周五</div></div>
-        <div class="chart-bar-group"><div class="chart-bar" style="height:75%"></div><div class="chart-label">周六</div></div>
-        <div class="chart-bar-group"><div class="chart-bar" style="height:85%"></div><div class="chart-label">周日</div></div>
-      </div>
-      <div class="chart-legend">
-        <span><i class="fas fa-square" style="color:var(--gold);"></i> 训练得分</span>
-        <span><i class="fas fa-arrow-up" style="color:var(--success);"></i> 本周上升23%</span>
-      </div>
-    </div>
-    <div class="section-title">里程碑</div>
-    <div class="milestone-list">
-      <div class="milestone-item">
-        <div class="ms-icon">✅</div>
-        <div class="ms-text">首次训练</div>
-      </div>
-      <div class="milestone-item">
-        <div class="ms-icon">✅</div>
-        <div class="ms-text">破冰达人</div>
-      </div>
-      <div class="milestone-item">
-        <div class="ms-icon">✅</div>
-        <div class="ms-text">三星学员</div>
-      </div>
-      <div class="milestone-item">
-        <div class="ms-icon">🔒</div>
-        <div class="ms-text locked">社交达人</div>
-        <div class="ms-req">需500分</div>
-      </div>
-    </div>
-    <div class="emotion-diary-btn">
-      <div class="diary-icon">📝</div>
-      <div class="diary-text">
-        <h4>情绪日记</h4>
-        <p>记录今天的社交感受</p>
-      </div>
-      <i class="fas fa-chevron-right diary-arrow"></i>
-    </div>
-  </div>
+      <div class="space-y-3">
+        <button onclick="showModal('editprofile')" class="w-full bg-white rounded-xl p-4 shadow-sm flex items-center justify-between hover:bg-gray-50 transition-all">
+          <div class="flex items-center gap-3">
+            <span class="text-xl">👤</span>
+            <div><div class="text-gray-700 text-sm">编辑资料</div><div class="text-xs text-gray-400">修改头像和昵称</div></div>
+          </div>
+          <span class="text-gray-400">→</span>
+        </button>
 
-  <!-- ========== 我的页 ========== -->
-  <div class="view" id="view-profile">
-    <div class="profile-header">
-      <div class="profile-avatar"><i class="fas fa-user"></i></div>
-      <div class="profile-name">钻石学员</div>
-      <div class="profile-rank"><i class="fas fa-gem"></i> 铂金会员</div>
-    </div>
-    <div class="profile-stats">
-      <div class="profile-stat">
-        <div class="ps-val">28</div>
-        <div class="ps-label">训练次数</div>
-      </div>
-      <div class="profile-stat">
-        <div class="ps-val">6</div>
-        <div class="ps-label">场景完成</div>
-      </div>
-      <div class="profile-stat">
-        <div class="ps-val">7</div>
-        <div class="ps-label">连续签到</div>
-      </div>
-    </div>
-    <div class="menu-list">
-      <div class="menu-item">
-        <div class="menu-icon" style="background:#FFF3D6;color:#F5A623;"><i class="fas fa-crown"></i></div>
-        <div class="menu-text">会员中心</div>
-        <div class="menu-badge">年卡用户</div>
-        <i class="fas fa-chevron-right menu-arrow"></i>
-      </div>
-      <div class="menu-item">
-        <div class="menu-icon" style="background:#E8F0FE;color:#4285F4;"><i class="fas fa-moon"></i></div>
-        <div class="menu-text">晚安计划设置</div>
-        <i class="fas fa-chevron-right menu-arrow"></i>
-      </div>
-      <div class="menu-item">
-        <div class="menu-icon" style="background:#E8F8EF;color:#27AE60;"><i class="fas fa-shield-alt"></i></div>
-        <div class="menu-text">实名认证</div>
-        <div class="menu-badge" style="color:#27AE60;">已认证</div>
-        <i class="fas fa-chevron-right menu-arrow"></i>
-      </div>
-      <div class="menu-item">
-        <div class="menu-icon" style="background:#F3E8FF;color:#8B5CF6;"><i class="fas fa-lock"></i></div>
-        <div class="menu-text">隐私设置</div>
-        <i class="fas fa-chevron-right menu-arrow"></i>
-      </div>
-      <div class="menu-item">
-        <div class="menu-icon" style="background:#FDE8E8;color:#E74C3C;"><i class="fas fa-info-circle"></i></div>
-        <div class="menu-text">关于我们</div>
-        <i class="fas fa-chevron-right menu-arrow"></i>
+        <button onclick="showModal('member')" class="w-full bg-white rounded-xl p-4 shadow-sm flex items-center justify-between hover:bg-gray-50 transition-all">
+          <div class="flex items-center gap-3">
+            <span class="text-xl">💎</span>
+            <div><div class="text-gray-700 text-sm">会员中心</div><div class="text-xs text-gray-400">升级享受更多特权</div></div>
+          </div>
+          <span class="text-gray-400">→</span>
+        </button>
+
+        <!-- 道具背包（参考"与你"PRD §9 + §13.1） -->
+        <button onclick="showModal('props')" class="w-full bg-white rounded-xl p-4 shadow-sm flex items-center justify-between hover:bg-gray-50 transition-all">
+          <div class="flex items-center gap-3">
+            <span class="text-xl">🎒</span>
+            <div><div class="text-gray-700 text-sm">道具背包</div><div class="text-xs text-gray-400">查看和使用训练道具</div></div>
+          </div>
+          <span class="text-gray-400">→</span>
+        </button>
+
+        <button onclick="showModal('realname')" class="w-full bg-white rounded-xl p-4 shadow-sm flex items-center justify-between hover:bg-gray-50 transition-all">
+          <div class="flex items-center gap-3">
+            <span class="text-xl">🪪</span>
+            <div><div class="text-gray-700 text-sm">实名认证</div><div class="text-xs text-gray-400">根据法规要求完成认证</div></div>
+          </div>
+          <span class="text-gray-400">→</span>
+        </button>
+
+        <button onclick="showModal('privacy')" class="w-full bg-white rounded-xl p-4 shadow-sm flex items-center justify-between hover:bg-gray-50 transition-all">
+          <div class="flex items-center gap-3">
+            <span class="text-xl">🔒</span>
+            <span class="text-gray-700 text-sm">隐私与数据</span>
+          </div>
+          <span class="text-gray-400">→</span>
+        </button>
+
+        <button onclick="showModal('antiaddiction')" class="w-full bg-white rounded-xl p-4 shadow-sm flex items-center justify-between hover:bg-gray-50 transition-all">
+          <div class="flex items-center gap-3">
+            <span class="text-xl">⏱️</span>
+            <span class="text-gray-700 text-sm">防沉迷设置</span>
+          </div>
+          <span class="text-gray-400">→</span>
+        </button>
+
+        <button onclick="logout()" class="w-full bg-red-50 rounded-xl p-4 shadow-sm flex items-center justify-between hover:bg-red-100 transition-all">
+          <div class="flex items-center gap-3">
+            <span class="text-xl">🚪</span>
+            <span class="text-red-600 text-sm">退出登录</span>
+          </div>
+          <span class="text-gray-400">→</span>
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- ========== 底部Tab栏 ========== -->
+  <!-- ===== 底部Tab栏 ===== -->
   <div class="tab-bar" id="tab-bar">
-    <div class="tab-item active" data-tab="0" onclick="switchTab(0)">
-      <i class="fas fa-home"></i><span>首页</span>
-    </div>
-    <div class="tab-item" data-tab="1" onclick="switchTab(1)">
-      <i class="fas fa-chalkboard-teacher"></i><span>教练</span>
-    </div>
-    <div class="tab-item" data-tab="2" onclick="switchTab(2)">
-      <i class="fas fa-theater-masks"></i><span>场景</span>
-    </div>
-    <div class="tab-item" data-tab="3" onclick="switchTab(3)">
-      <i class="fas fa-chart-line"></i><span>成长</span>
-    </div>
-    <div class="tab-item" data-tab="4" onclick="switchTab(4)">
-      <i class="fas fa-user"></i><span>我的</span>
+    <button class="tab-item active" onclick="switchTab('home')">
+      <span class="tab-icon">🏠</span>
+      <span class="tab-label">首页</span>
+    </button>
+    <button class="tab-item" onclick="switchTab('coach')">
+      <span class="tab-icon">🎯</span>
+      <span class="tab-label">教练</span>
+    </button>
+    <button class="tab-item" onclick="switchTab('training')">
+      <span class="tab-icon">🎭</span>
+      <span class="tab-label">训练</span>
+    </button>
+    <button class="tab-item" onclick="switchTab('growth')">
+      <span class="tab-icon">📈</span>
+      <span class="tab-label">成长</span>
+    </button>
+    <button class="tab-item" onclick="switchTab('profile')">
+      <span class="tab-icon">👤</span>
+      <span class="tab-label">我的</span>
+    </button>
+  </div>
+
+  <!-- ===== 训练弹窗 ===== -->
+  <div class="modal-overlay" id="modal-training" style="display:none">
+    <div class="modal-content h-[70vh]">
+      <div class="flex items-center justify-between p-4 border-b border-gray-100">
+        <div>
+          <h3 class="font-semibold text-gray-800" id="training-title">训练</h3>
+          <p class="text-xs text-gray-400" id="training-subtitle"></p>
+        </div>
+        <div class="flex items-center gap-2">
+          <!-- 时空穿梭券（参考"与你"实现，PRD §13.1） -->
+          <button onclick="useTimeRewind()" id="rewind-btn" class="px-2 py-1 bg-purple-100 text-purple-600 text-xs rounded-full flex items-center gap-1 hover:bg-purple-200 disabled:opacity-50 disabled:cursor-not-allowed" style="display:none" disabled>
+            ⏳ <span id="rewind-count">0</span>张
+          </button>
+          <!-- 道具按钮（参考"与你"实现，PRD §9） -->
+          <button onclick="useHintCardNow()" id="hint-btn" class="px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded-full flex items-center gap-1 hover:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed" style="display:none" disabled>
+            💡 <span id="hint-count">0</span>
+          </button>
+          <button onclick="useShieldCardNow()" id="shield-btn" class="px-2 py-1 bg-green-100 text-green-600 text-xs rounded-full flex items-center gap-1 hover:bg-green-200 disabled:opacity-50 disabled:cursor-not-allowed" style="display:none" disabled>
+            🛡️ <span id="shield-count">0</span>
+          </button>
+          <button onclick="toggleDoublePoints()" id="double-btn" class="px-2 py-1 bg-amber-100 text-amber-600 text-xs rounded-full flex items-center gap-1 hover:bg-amber-200 disabled:opacity-50 disabled:cursor-not-allowed" style="display:none" disabled>
+            ✨ <span id="double-count">0</span>
+          </button>
+          <button onclick="closeModal('training')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+        </div>
+      </div>
+      <div class="flex-1 overflow-auto p-4 space-y-3" id="training-messages"></div>
     </div>
   </div>
 
-  <!-- ========== 签到成功弹窗 ========== -->
-  <div class="modal-overlay" id="modal-sign-success">
-    <div class="modal-box sign-success-modal">
-      <div class="modal-body">
-        <div class="sign-success-icon">🎉</div>
-        <div class="sign-success-title">签到成功！</div>
-        <div class="sign-success-info" id="sign-success-days">连续签到 8 天</div>
-        <div class="sign-success-points" id="sign-success-points"><i class="fas fa-coins"></i> +5 积分</div>
-        <button class="sign-success-btn" onclick="closeModal('modal-sign-success')">知道了</button>
+  <!-- ===== 会员弹窗 ===== -->
+  <div class="modal-overlay" id="modal-member" style="display:none">
+    <div class="modal-content h-[80vh]">
+      <div class="flex items-center justify-between p-4 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-800">💎 会员中心</h3>
+        <button onclick="closeModal('member')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+      </div>
+      <div class="flex-1 overflow-auto p-4">
+        <div class="bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl p-4 text-white mb-6 text-center">
+          <div class="text-sm opacity-80 mb-1">当前会员</div>
+          <div class="text-2xl font-bold" id="member-status">免费版</div>
+        </div>
+        <div class="space-y-4" id="member-plans"></div>
+        <div class="mt-6 bg-gray-50 rounded-xl p-4">
+          <h4 class="text-sm font-semibold text-gray-800 mb-3">会员权益对比</h4>
+          <div class="space-y-2 text-xs" id="member-benefits"></div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- ========== 会员权益弹窗 ========== -->
-  <div class="modal-overlay" id="modal-member">
-    <div class="modal-box">
-      <div class="modal-header">
-        <h3><i class="fas fa-crown" style="color:var(--gold);margin-right:6px;"></i>会员中心</h3>
-        <button class="modal-close" onclick="closeModal('modal-member')"><i class="fas fa-times"></i></button>
+  <!-- ===== 实名认证弹窗 ===== -->
+  <div class="modal-overlay" id="modal-realname" style="display:none">
+    <div class="modal-content">
+      <div class="flex items-center justify-between p-4 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-800">🪪 实名认证</h3>
+        <button onclick="closeModal('realname')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
       </div>
-      <div class="modal-body">
-        <table class="member-table">
-          <thead>
-            <tr>
-              <th>权益</th><th>体验</th><th>免费</th><th>日卡</th><th>周卡</th><th>月卡</th><th>年卡</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>LLM引擎</td><td>DeepSeek(1次)</td><td>Ollama</td><td>DeepSeek</td><td>DeepSeek</td><td>DeepSeek</td><td>DeepSeek高优</td>
-            </tr>
-            <tr>
-              <td>每周训练</td><td>1次</td><td>15次</td><td>20次</td><td>无限</td><td>无限</td><td>无限</td>
-            </tr>
-            <tr>
-              <td>教练渲染</td><td>2D</td><td>2D</td><td>2D</td><td>2.5D</td><td>3D</td><td>3D+真人</td>
-            </tr>
-            <tr>
-              <td>语音训练</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td>
-            </tr>
-            <tr>
-              <td>场景解锁</td><td>2个</td><td>6个</td><td>10个</td><td>全部</td><td>全部</td><td>全部</td>
-            </tr>
-            <tr>
-              <td>训练报告</td><td>基础</td><td>基础</td><td>详细</td><td>详细</td><td>深度</td><td>深度+AI</td>
-            </tr>
-            <tr>
-              <td>教练对话</td><td>3轮/天</td><td>10轮/天</td><td>20轮/天</td><td>50轮/天</td><td>无限</td><td>无限</td>
-            </tr>
-            <tr class="price-row">
-              <td>价格</td><td>免费</td><td>免费</td><td>¥3.9/日</td><td>¥18/周</td><td>¥58/月</td><td>¥398/年</td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="p-4" id="realname-content">
+        <div class="bg-amber-50 rounded-xl p-3 mb-4 text-sm text-amber-700">根据相关法规，使用部分功能需完成实名认证</div>
+        <div class="space-y-4">
+          <div>
+            <label class="text-sm font-medium text-gray-700 mb-1 block">姓名</label>
+            <input id="realname-name" type="text" placeholder="请输入真实姓名" maxlength="20"
+              class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300">
+          </div>
+          <div>
+            <label class="text-sm font-medium text-gray-700 mb-1 block">身份证号</label>
+            <input id="realname-id" type="text" placeholder="请输入18位身份证号" maxlength="18"
+              class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300">
+          </div>
+          <button onclick="submitRealName()" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold rounded-xl hover:from-indigo-600 hover:to-purple-600 transition-all">提交认证</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- ========== 晚安计划弹窗 ========== -->
-  <div class="modal-overlay" id="modal-night-plan">
-    <div class="modal-box">
-      <div class="modal-header">
-        <h3><i class="fas fa-moon" style="color:#8B5CF6;margin-right:6px;"></i>晚安计划</h3>
-        <button class="modal-close" onclick="closeModal('modal-night-plan')"><i class="fas fa-times"></i></button>
+  <!-- ===== CBT弹窗 ===== -->
+  <div class="modal-overlay" id="modal-cbt" style="display:none">
+    <div class="modal-content max-h-[85vh] overflow-y-auto">
+      <div class="sticky top-0 bg-white px-6 pt-5 pb-3 border-b border-gray-100 z-10">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-lg font-bold text-gray-800">🧠 思维记录</h2>
+          <button onclick="closeModal('cbt')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+        </div>
+        <div class="flex bg-gray-100 rounded-lg p-1">
+          <button onclick="cbtTab='new';renderCBT()" id="cbt-tab-new" class="flex-1 py-2 rounded-md text-xs font-medium bg-white text-indigo-600 shadow-sm">新建</button>
+          <button onclick="cbtTab='history';renderCBT()" id="cbt-tab-history" class="flex-1 py-2 rounded-md text-xs font-medium text-gray-500">历史</button>
+        </div>
       </div>
-      <div class="modal-body">
-        <div class="night-plan-section">
-          <label>选择教练</label>
-          <div class="coach-select" id="coach-select">
-            <div class="coach-select-item active" onclick="selectNightCoach(this)">
-              <div class="cs-avatar" style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;"><i class="fas fa-user-tie"></i></div>
-              <div class="cs-name">沈清欢</div>
-            </div>
-            <div class="coach-select-item" onclick="selectNightCoach(this)">
-              <div class="cs-avatar" style="background:linear-gradient(135deg,#f093fb,#f5576c);color:#fff;"><i class="fas fa-female"></i></div>
-              <div class="cs-name">林知夏</div>
-            </div>
-            <div class="coach-select-item" onclick="selectNightCoach(this)">
-              <div class="cs-avatar" style="background:linear-gradient(135deg,#4facfe,#00f2fe);color:#fff;"><i class="fas fa-user-graduate"></i></div>
-              <div class="cs-name">陈默然</div>
+      <div class="px-6 py-4" id="cbt-content"></div>
+    </div>
+  </div>
+
+  <!-- ===== NVC弹窗 ===== -->
+  <div class="modal-overlay" id="modal-nvc" style="display:none">
+    <div class="modal-content max-h-[85vh] overflow-y-auto">
+      <div class="px-6 pt-5 pb-3 border-b border-gray-100">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-lg font-bold text-gray-800">💬 NVC练习</h2>
+          <button onclick="closeModal('nvc')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+        </div>
+        <div class="flex items-center justify-between" id="nvc-steps"></div>
+      </div>
+      <div class="px-6 py-4" id="nvc-content"></div>
+    </div>
+  </div>
+
+  <!-- ===== 学习卡片弹窗 ===== -->
+  <div class="modal-overlay" id="modal-cards" style="display:none">
+    <div class="modal-content h-[80vh]">
+      <div class="flex items-center justify-between p-4 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-800">📚 学习卡片库</h3>
+        <button onclick="closeModal('cards')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+      </div>
+      <div class="flex gap-2 px-4 pt-3 pb-2 overflow-x-auto" id="card-filters"></div>
+      <div class="flex-1 overflow-auto p-4 space-y-3" id="card-list"></div>
+    </div>
+  </div>
+
+  <!-- ===== 晚安计划弹窗 ===== -->
+  <div class="modal-overlay" id="modal-goodnight" style="display:none">
+    <div class="modal-content" style="background:transparent;box-shadow:none">
+      <div class="text-center mb-8">
+        <div class="text-6xl mb-4">🌙</div>
+        <h2 class="text-2xl font-bold text-white mb-2" id="goodnight-title">晚安，用户</h2>
+        <p class="text-purple-200 text-sm">教练想对你说...</p>
+      </div>
+      <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-6">
+        <div class="text-center text-white mb-4">
+          <p class="text-lg leading-relaxed" id="goodnight-content">今天辛苦了，好好休息吧。</p>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <div class="bg-white/10 backdrop-blur-lg rounded-xl p-4 text-center">
+          <div class="text-2xl font-bold text-green-400" id="goodnight-scenes">0</div>
+          <div class="text-purple-200 text-xs mt-1">已完成场景</div>
+        </div>
+        <div class="bg-white/10 backdrop-blur-lg rounded-xl p-4 text-center">
+          <div class="text-2xl font-bold text-pink-400" id="goodnight-points">+0</div>
+          <div class="text-purple-200 text-xs mt-1">训练积分</div>
+        </div>
+      </div>
+      <div class="bg-white/10 backdrop-blur-lg rounded-xl p-4 mb-6">
+        <h3 class="text-white font-medium mb-2">✨ 明日鼓励</h3>
+        <p class="text-purple-200 text-sm" id="goodnight-encourage">明天继续加油，你会越来越棒的！</p>
+      </div>
+      <button onclick="closeModal('goodnight')" class="w-full py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-semibold rounded-xl hover:from-purple-600 hover:to-indigo-600 transition-all">晚安，做个好梦 💤</button>
+    </div>
+  </div>
+
+  <!-- ===== 编辑资料弹窗 ===== -->
+  <div class="modal-overlay" id="modal-editprofile" style="display:none">
+    <div class="modal-content max-h-[80vh]">
+      <div class="flex items-center justify-between p-4 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-800">👤 编辑资料</h3>
+        <button onclick="closeModal('editprofile')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+      </div>
+      <div class="flex-1 overflow-auto p-4">
+        <div class="text-center mb-6">
+          <div class="text-6xl mb-2" id="edit-avatar-preview">👤</div>
+          <p class="text-sm text-gray-500">当前头像</p>
+        </div>
+        <h4 class="text-sm font-semibold text-gray-700 mb-3">选择头像</h4>
+        <div class="grid grid-cols-6 gap-2 mb-6">
+          <button onclick="selectAvatar('👤')" class="text-2xl p-2 rounded-xl flex items-center justify-center transition-colors avatar-option" data-avatar="👤">👤</button>
+          <button onclick="selectAvatar('👦')" class="text-2xl p-2 rounded-xl flex items-center justify-center transition-colors avatar-option bg-gray-50 hover:bg-gray-100" data-avatar="👦">👦</button>
+          <button onclick="selectAvatar('👧')" class="text-2xl p-2 rounded-xl flex items-center justify-center transition-colors avatar-option bg-gray-50 hover:bg-gray-100" data-avatar="👧">👧</button>
+          <button onclick="selectAvatar('🧑')" class="text-2xl p-2 rounded-xl flex items-center justify-center transition-colors avatar-option bg-gray-50 hover:bg-gray-100" data-avatar="🧑">🧑</button>
+          <button onclick="selectAvatar('👨')" class="text-2xl p-2 rounded-xl flex items-center justify-center transition-colors avatar-option bg-gray-50 hover:bg-gray-100" data-avatar="👨">👨</button>
+          <button onclick="selectAvatar('👩')" class="text-2xl p-2 rounded-xl flex items-center justify-center transition-colors avatar-option bg-gray-50 hover:bg-gray-100" data-avatar="👩">👩</button>
+          <button onclick="selectAvatar('🧑‍💻')" class="text-2xl p-2 rounded-xl flex items-center justify-center transition-colors avatar-option bg-gray-50 hover:bg-gray-100" data-avatar="🧑‍💻">🧑‍💻</button>
+          <button onclick="selectAvatar('👨‍💼')" class="text-2xl p-2 rounded-xl flex items-center justify-center transition-colors avatar-option bg-gray-50 hover:bg-gray-100" data-avatar="👨‍💼">👨‍💼</button>
+          <button onclick="selectAvatar('👩‍💼')" class="text-2xl p-2 rounded-xl flex items-center justify-center transition-colors avatar-option bg-gray-50 hover:bg-gray-100" data-avatar="👩‍💼">👩‍💼</button>
+          <button onclick="selectAvatar('🧑‍🎤')" class="text-2xl p-2 rounded-xl flex items-center justify-center transition-colors avatar-option bg-gray-50 hover:bg-gray-100" data-avatar="🧑‍🎤">🧑‍🎤</button>
+          <button onclick="selectAvatar('👨‍🎨')" class="text-2xl p-2 rounded-xl flex items-center justify-center transition-colors avatar-option bg-gray-50 hover:bg-gray-100" data-avatar="👨‍🎨">👨‍🎨</button>
+          <button onclick="selectAvatar('👩‍🎨')" class="text-2xl p-2 rounded-xl flex items-center justify-center transition-colors avatar-option bg-gray-50 hover:bg-gray-100" data-avatar="👩‍🎨">👩‍🎨</button>
+        </div>
+        <h4 class="text-sm font-semibold text-gray-700 mb-2">修改昵称</h4>
+        <input id="edit-nickname" type="text" placeholder="输入新昵称" maxlength="12"
+          class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 mb-4">
+        <h4 class="text-sm font-semibold text-gray-700 mb-2">邀请码</h4>
+        <div class="flex gap-2 mb-4">
+          <input id="edit-invite-code" type="text" readonly
+            class="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-400">
+          <button onclick="copyInviteCode()" class="px-4 py-3 bg-indigo-50 text-indigo-600 rounded-xl text-sm font-medium hover:bg-indigo-100 transition-colors whitespace-nowrap">复制</button>
+        </div>
+        <button onclick="showInviteRewards()" class="w-full mb-4 py-2.5 bg-gradient-to-r from-amber-50 to-orange-50 text-amber-600 rounded-xl text-sm font-medium hover:from-amber-100 hover:to-orange-100 transition-all border border-amber-200">🎁 查看邀请奖励规则</button>
+        <button onclick="saveProfileEdit()" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold rounded-xl hover:from-indigo-600 hover:to-purple-600 transition-all">保存修改</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 隐私弹窗 ===== -->
+  <div class="modal-overlay" id="modal-privacy" style="display:none">
+    <div class="modal-content h-[80vh]">
+      <div class="flex items-center justify-between p-4 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-800">🔒 隐私与数据</h3>
+        <button onclick="closeModal('privacy')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+      </div>
+      <div class="flex-1 overflow-auto p-4 space-y-4">
+        <div class="bg-gray-50 rounded-xl p-4">
+          <h4 class="text-sm font-semibold text-gray-700 mb-1">聊天记录</h4>
+          <p class="text-xs text-gray-400 mb-3">清除后将无法恢复</p>
+          <button onclick="clearChatHistory()" class="w-full py-2.5 bg-red-50 text-red-600 font-medium rounded-lg hover:bg-red-100 transition-colors text-sm">清除聊天记录</button>
+        </div>
+        <div class="bg-gray-50 rounded-xl p-4">
+          <h4 class="text-sm font-semibold text-gray-700 mb-1">数据导出</h4>
+          <p class="text-xs text-gray-400 mb-3">导出为JSON文件</p>
+          <button onclick="exportData()" class="w-full py-2.5 bg-indigo-50 text-indigo-600 font-medium rounded-lg hover:bg-indigo-100 transition-colors text-sm">导出数据</button>
+        </div>
+        <div class="bg-gray-50 rounded-xl p-4" id="privacy-clear-all">
+          <h4 class="text-sm font-semibold text-gray-700 mb-1">清除所有数据</h4>
+          <p class="text-xs text-gray-400 mb-3">此操作不可撤销</p>
+          <div id="privacy-clear-btn">
+            <button onclick="confirmClearAllData()" class="w-full py-2.5 bg-red-50 text-red-600 font-medium rounded-lg hover:bg-red-100 transition-colors text-sm">清除所有数据</button>
+          </div>
+          <div id="privacy-clear-confirm" style="display:none">
+            <p class="text-xs text-red-500 font-medium text-center mb-2">⚠️ 确定要清除所有数据吗？此操作不可撤销！</p>
+            <div class="flex gap-2">
+              <button onclick="executeClearAll()" class="flex-1 py-2.5 bg-red-500 text-white font-medium rounded-lg hover:bg-red-600 transition-colors text-sm">确认清除</button>
+              <button onclick="cancelClearAll()" class="flex-1 py-2.5 bg-gray-200 text-gray-600 font-medium rounded-lg hover:bg-gray-300 transition-colors text-sm">取消</button>
             </div>
           </div>
         </div>
-        <div class="night-plan-section">
-          <label>提醒时间</label>
-          <div class="time-picker-row">
-            <select id="night-hour">
-              <option value="21">21</option><option value="22" selected>22</option><option value="23">23</option>
-            </select>
-            <span style="font-size:20px;color:var(--text-light);">:</span>
-            <select id="night-minute">
-              <option value="00" selected>00</option><option value="15">15</option><option value="30">30</option><option value="45">45</option>
-            </select>
-          </div>
-        </div>
-        <div class="switch-row">
-          <div class="switch-label">开启晚安计划<small>每日定时收到教练的温馨提醒</small></div>
-          <div class="toggle-switch on" id="night-toggle" onclick="toggleNightSwitch()"></div>
-        </div>
-        <button class="night-plan-save" onclick="saveNightPlan()">保存设置</button>
       </div>
     </div>
   </div>
 
+  <!-- ===== 防沉迷弹窗 ===== -->
+  <div class="modal-overlay" id="modal-antiaddiction" style="display:none">
+    <div class="modal-content">
+      <div class="flex items-center justify-between p-4 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-800">⏱️ 防沉迷设置</h3>
+        <button onclick="closeModal('antiaddiction')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+      </div>
+      <div class="p-4 space-y-5">
+        <div>
+          <h4 class="text-sm font-semibold text-gray-700 mb-2">每日使用时长限制</h4>
+          <div class="grid grid-cols-4 gap-2" id="time-limit-options"></div>
+        </div>
+        <div>
+          <h4 class="text-sm font-semibold text-gray-700 mb-2">连续使用提醒</h4>
+          <div class="grid grid-cols-3 gap-2" id="continuous-reminder-options"></div>
+        </div>
+        <div class="bg-gray-50 rounded-xl p-4">
+          <h4 class="text-sm font-semibold text-gray-700 mb-3">当前设置</h4>
+          <div class="space-y-2 text-sm">
+            <div class="flex justify-between">
+              <span class="text-gray-500">每日时长限制</span>
+              <span class="font-medium text-indigo-600" id="time-limit-status">无限制</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">连续使用提醒</span>
+              <span class="font-medium" id="continuous-reminder-status">已关闭</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 邀请奖励弹窗 ===== -->
+  <div class="modal-overlay" id="modal-invite" style="display:none">
+    <div class="modal-content">
+      <div class="flex items-center justify-between p-4 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-800">🎁 邀请奖励规则</h3>
+        <button onclick="closeModal('invite')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+      </div>
+      <div class="p-4 space-y-4">
+        <div class="bg-indigo-50 rounded-xl p-4">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-lg">🎉</span>
+            <span class="font-medium text-indigo-700">好友注册成功</span>
+          </div>
+          <p class="text-sm text-indigo-600">邀请人获得 <strong>+3张</strong> 时空穿梭券</p>
+        </div>
+        <div class="bg-purple-50 rounded-xl p-4">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-lg">🎯</span>
+            <span class="font-medium text-purple-700">好友完成首次训练</span>
+          </div>
+          <p class="text-sm text-purple-600">邀请人获得 <strong>+5张</strong> 时空穿梭券</p>
+          <p class="text-sm text-purple-600">被邀请人获得 <strong>+3张</strong> 时空穿梭券</p>
+        </div>
+        <div class="bg-amber-50 rounded-xl p-4">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-lg">💎</span>
+            <span class="font-medium text-amber-700">好友购买会员</span>
+          </div>
+          <p class="text-sm text-amber-600">邀请人获得 <strong>+10张</strong> 时空穿梭券</p>
+          <p class="text-sm text-amber-600">被邀请人获得 <strong>+1张</strong> 体验日卡</p>
+        </div>
+        <button onclick="closeModal('invite')" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-xl">我知道了</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
 // ===== 全局状态 =====
-const viewMap = ['view-home','view-coach','view-scene','view-growth','view-profile'];
-let currentTab = 0;
-let signedIn = false;
-let chatRound = 0;
-let consecutiveDays = 7;
+let currentTab = 'home';
+let loginMode = 'password';
+let showRegister = false;
+let smsCountdown = 0;
+let regSmsCountdown = 0;
+const STORAGE_PREFIX = 'dl_';
 
-// ===== 对话数据 =====
-const chatData = [
-  {
-    coach: '你走进一家咖啡厅，发现只有吧台旁边还有一个空位。旁边坐着一个人正在看书。你会怎么做？',
-    options: [
-      { letter:'A', text:'你好，这本书我也看过，很不错！', score:20 },
-      { letter:'B', text:'（沉默等待对方先开口）', score:5 },
-      { letter:'C', text:'这里的咖啡真不错，你常来吗？', score:15 }
-    ],
-    feedback: '很好的开场！用共同兴趣打开话题是破冰的高效方式。对方似乎愿意聊天，试试深入了解...'
-  },
-  {
-    coach: null,
-    options: [
-      { letter:'A', text:'你平时喜欢看什么类型的书？', score:20 },
-      { letter:'B', text:'嗯...（不知说什么好）', score:5 },
-      { letter:'C', text:'我是第一次来这里，你有什么推荐吗？', score:15 }
-    ],
-    feedback: '开放式问题能让对话自然延续！对方很乐意分享，继续深入...'
-  },
-  {
-    coach: null,
-    options: [
-      { letter:'A', text:'原来如此！那你是怎么开始对这个感兴趣的？', score:20 },
-      { letter:'B', text:'哦，挺好的。（没有追问）', score:5 },
-      { letter:'C', text:'我也很喜欢这个！你最近有什么新发现吗？', score:15 }
-    ],
-    feedback: '追问「怎么开始」能让对方分享更多故事，建立了更深层的连接！'
-  },
-  {
-    coach: null,
-    options: [
-      { letter:'A', text:'说起来我也有类似的经历...', score:20 },
-      { letter:'B', text:'（一直点头但不太说话）', score:5 },
-      { letter:'C', text:'对了，你在这一带住很久了吗？', score:12 }
-    ],
-    feedback: '分享自己的经历能拉近关系，让对方觉得更有亲近感！'
-  },
-  {
-    coach: null,
-    options: [
-      { letter:'A', text:'今天聊得很开心！希望下次还能遇到你。', score:15 },
-      { letter:'B', text:'（默默看对方离开）', score:5 },
-      { letter:'C', text:'加个微信吧，有空可以一起喝咖啡！', score:20 }
-    ],
-    feedback: null
-  }
+// CBT额外状态
+let cbtSelectedEmotions = [];
+let cbtEmotionIntensity = 5;
+let cbtEmotionAfter = 5;
+let cbtDetectedDistortions = [];
+
+const distortionPatterns = [
+  { name: '灾难化', keywords: ['肯定', '一定会', '彻底', '完了', '没救了'] },
+  { name: '过度概括', keywords: ['总是', '从来', '每次', '永远', '都'] },
+  { name: '个人化', keywords: ['都是我的错', '怪我', '我害的'] },
+  { name: '非黑即白', keywords: ['要么', '不是就是', '完全', '绝对'] },
+  { name: '情绪推理', keywords: ['我觉得自己很笨', '我感觉不行', '我觉得没用'] }
 ];
 
-let totalScore = 0;
+// NVC评价词检测
+const nvcEvaluationWords = ['态度很差', '态度不好', '很讨厌', '很差劲', '很糟糕', '很过分', '很烦人', '不负责', '不靠谱'];
 
-// ===== 登录逻辑 =====
+// 用户数据
+let userData = {
+  nickname: '用户',
+  phone: '',
+  password: '',
+  points: 0,
+  streak: 0,
+  member: 'free',
+  level: '青铜学员',
+  realNameVerified: false,
+  realNameInfo: { name: '', idCard: '' },
+  avatar: '👤',
+  inviteCode: ''
+};
+
+// 训练数据
+let trainingScenes = [
+  { id:1, icon:'☕', name:'咖啡厅破冰', desc:'与陌生人初次见面', stage:1, difficulty:1, duration:'8min', unlocked:true, completed:false, rounds:[
+    { ai:'这家店的拿铁很出名，你平时喜欢喝什么？', options:[
+      { text:'我更喜欢美式', quality:'safe', points:3 },
+      { text:'你推荐的这个听起来不错，我试试', quality:'good', points:8 },
+      { text:'我不喝咖啡', quality:'cold', points:-2 }
+    ]},
+    { ai:'周末一般怎么过？', options:[
+      { text:'宅家休息', quality:'safe', points:3 },
+      { text:'最近在学做咖啡，还挺有意思的', quality:'good', points:8 },
+      { text:'没什么', quality:'cold', points:-2 }
+    ]},
+    { ai:'我最近在看一本书，特别有意思...', options:[
+      { text:'什么书？', quality:'good', points:8 },
+      { text:'是吗', quality:'safe', points:2 },
+      { text:'哦', quality:'cold', points:-3 }
+    ]}
+  ]},
+  { id:2, icon:'🎤', name:'兴趣社群自我介绍', desc:'在兴趣社群中做自我介绍', stage:1, difficulty:2, duration:'10min', unlocked:false, completed:false, rounds:[
+    { ai:'欢迎加入！你也来说说吧~', options:[
+      { text:'大家好，请多多指教', quality:'safe', points:3 },
+      { text:'大家好！我叫小雨，喜欢摄影和旅行，很高兴认识大家', quality:'good', points:8 },
+      { text:'嗨', quality:'cold', points:-2 }
+    ]},
+    { ai:'你最喜欢的摄影题材是什么？', options:[
+      { text:'风景吧', quality:'safe', points:3 },
+      { text:'我喜欢拍人物，尤其是街头抓拍', quality:'good', points:8 },
+      { text:'随便拍拍', quality:'cold', points:-2 }
+    ]}
+  ]},
+  { id:3, icon:'💼', name:'模拟面试', desc:'模拟求职面试场景', stage:2, difficulty:3, duration:'15min', unlocked:false, completed:false, rounds:[
+    { ai:'请先做个自我介绍', options:[
+      { text:'我叫张三，毕业两年', quality:'cold', points:-2 },
+      { text:'面试官您好，我叫张三，有两年产品经理经验', quality:'good', points:10 },
+      { text:'我做过一些项目', quality:'safe', points:3 }
+    ]},
+    { ai:'为什么从上一家公司离职？', options:[
+      { text:'公司太坑了', quality:'cold', points:-5 },
+      { text:'业务方向调整，希望找到更符合职业发展的机会', quality:'good', points:8 },
+      { text:'想换个环境', quality:'safe', points:3 }
+    ]},
+    { ai:'你的缺点是什么？', options:[
+      { text:'没有缺点', quality:'cold', points:-3 },
+      { text:'我有时候会追求完美，正在学习平衡质量与效率', quality:'good', points:8 },
+      { text:'我比较内向', quality:'safe', points:3 }
+    ]}
+  ]},
+  { id:4, icon:'📊', name:'向上汇报被质疑', desc:'向领导汇报时被质疑', stage:2, difficulty:4, duration:'12min', unlocked:false, completed:false, rounds:[
+    { ai:'这个方案的数据支撑不够充分，你怎么解释？', options:[
+      { text:'数据就是这样的', quality:'cold', points:-5 },
+      { text:'您说得对，我会在本周内补充更多样本数据', quality:'good', points:10 },
+      { text:'我觉得数据已经够了', quality:'safe', points:2 }
+    ]},
+    { ai:'这个预算是不是偏高了？', options:[
+      { text:'不多啊', quality:'cold', points:-3 },
+      { text:'这个预算包含了XX和XX两部分，如果您觉得高，可以调整XX部分', quality:'good', points:8 },
+      { text:'这是市场行情', quality:'safe', points:3 }
+    ]}
+  ]},
+  { id:5, icon:'💔', name:'被朋友误解(NVC)', desc:'用非暴力沟通化解误会', stage:3, difficulty:3, duration:'10min', unlocked:false, completed:false, rounds:[
+    { ai:'你上次为什么没来聚会？大家都很失望', options:[
+      { text:'我有事啊', quality:'cold', points:-3 },
+      { text:'对不起让大家失望了，那天我身体不舒服，下次一定到', quality:'good', points:8 },
+      { text:'我忘了', quality:'safe', points:2 }
+    ]},
+    { ai:'可是你连消息都不回', options:[
+      { text:'我没看到', quality:'cold', points:-3 },
+      { text:'我理解你的感受，那天太难受了就直接睡了，对不起', quality:'good', points:10 },
+      { text:'下次不会了', quality:'safe', points:3 }
+    ]}
+  ]},
+  { id:6, icon:'🤗', name:'安慰失落的TA', desc:'安慰情绪低落的朋友', stage:3, difficulty:2, duration:'8min', unlocked:false, completed:false, rounds:[
+    { ai:'我今天被老板骂了，感觉自己什么都做不好...', options:[
+      { text:'别难过了', quality:'safe', points:3 },
+      { text:'被骂的感觉一定很委屈吧。你愿意跟我说说发生了什么吗？', quality:'good', points:10 },
+      { text:'老板也是为你好', quality:'cold', points:-2 }
+    ]},
+    { ai:'我觉得自己能力不够...', options:[
+      { text:'你别想太多', quality:'cold', points:-2 },
+      { text:'我不这么觉得。你工作很努力，每个人都会遇到挫折', quality:'good', points:8 },
+      { text:'加油', quality:'safe', points:3 }
+    ]}
+  ]}
+];
+
+// 训练状态
+let currentTraining = null;
+let trainingMessages = [];
+let trainingRoundIdx = 0;
+let trainingChoices = [];
+let trainingScore = 0;
+let trainingPointsGain = 0;
+let showTrainingOptions = false;
+let showTrainingReport = false;
+let trainingFeedback = '';
+
+// 能力数据
+let abilityStats = { communication:65, expression:55, empathy:70, emotionControl:50, adaptability:45 };
+let progressDays = 7;
+let weeklyTrainingDays = 3;
+let checkedInToday = false;
+let checkInDates = []; // 签到日期记录 ["2026-07-01", "2026-07-02", ...]
+let diaries = [];
+let collectedCards = [];
+let cardFilter = '全部';
+let cbtTab = 'new';
+let cbtRecords = [];
+let nvcRecords = [];
+let cbtStep = 1;
+let nvcStep = 1;
+let dailyTimeLimit = 0;
+let continuousReminder = 0;
+let coachMoments = [];
+
+// ===== 道具系统（参考"与你"实现，PRD §9 + §13.1） =====
+let timeRewindTickets = 3;    // 时空穿梭券
+let hintCards = 2;            // 提示卡
+let shieldCards = 1;          // 情绪护盾
+let doublePointCards = 1;     // 双倍积分卡
+let useDoublePoints = false;  // 是否使用双倍积分卡
+let useShieldCard = false;    // 是否使用情绪护盾
+let useHintCard = false;      // 是否使用提示卡
+let currentRewindRound = -1;  // 穿梭回退的目标轮次
+
+// 学习卡片
+let learningCards = [
+  { id:1, title:'破冰技巧', category:'沟通技巧', content:'初次见面时，可以从环境切入话题', tips:['观察周围环境找话题','赞美对方的选择','避免敏感话题'] },
+  { id:2, title:'积极倾听', category:'沟通技巧', content:'倾听不光是听，还要给出积极反馈', tips:['保持眼神接触','适时点头回应','用"嗯"鼓励对方'] },
+  { id:3, title:'开放式提问', category:'沟通技巧', content:'多用"如何""为什么"等开放问题', tips:['避免封闭式问题','从对方兴趣入手','层层递进'] },
+  { id:4, title:'情绪识别', category:'情感表达', content:'通过表情、语气、肢体语言判断情绪', tips:['注意微表情','倾听语气变化','观察肢体语言'] },
+  { id:5, title:'赞美技巧', category:'情感表达', content:'真诚赞美让人愉悦，要具体而非泛泛而谈', tips:['具体描述优点','赞美努力而非天赋','避免夸张'] },
+  { id:6, title:'冷场处理', category:'职场社交', content:'遇到冷场时，主动提出新话题', tips:['准备备用话题','幽默化解尴尬','大方承认冷场'] }
+];
+
+// 教练动态模板
+let momentTemplates = [
+  { type:'daily', content:'今天发现一个不错的社交技巧，下次训练分享给你', icon:'💡' },
+  { type:'encourage', content:'每一次训练都在进步，继续加油！', icon:'🌟' },
+  { type:'tip', content:'记住：倾听比说话更重要', icon:'👂' },
+  { type:'growth', content:'看到你的成长，我真的很开心', icon:'😊' },
+  { type:'challenge', content:'今天挑战了一个高难度场景，收获满满', icon:'🎯' }
+];
+
+// ===== 密码可见切换 =====
+let loginPwdVisible = false;
+let regPwdVisible = false;
+let regConfirmPwdVisible = false;
+
+function toggleLoginPwd() {
+  loginPwdVisible = !loginPwdVisible;
+  $('login-password').type = loginPwdVisible ? 'text' : 'password';
+  $('login-pwd-eye').textContent = loginPwdVisible ? '🙈' : '👁';
+}
+
+function toggleRegPwd() {
+  regPwdVisible = !regPwdVisible;
+  $('reg-password').type = regPwdVisible ? 'text' : 'password';
+  $('reg-pwd-eye').textContent = regPwdVisible ? '🙈' : '👁';
+}
+
+function toggleRegConfirmPwd() {
+  regConfirmPwdVisible = !regConfirmPwdVisible;
+  $('reg-confirm-password').type = regConfirmPwdVisible ? 'text' : 'password';
+  $('reg-confirm-pwd-eye').textContent = regConfirmPwdVisible ? '🙈' : '👁';
+}
+
+// ===== 工具函数 =====
+function $(id) { return document.getElementById(id); }
+
+function showView(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  $(id).classList.add('active');
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  const pages = { home:'page-home', coach:'page-coach', training:'page-training', growth:'page-growth', profile:'page-profile' };
+  showView(pages[tab]);
+  document.querySelectorAll('.tab-item').forEach((t,i) => {
+    t.classList.toggle('active', ['home','coach','training','growth','profile'][i] === tab);
+  });
+  if (tab === 'growth') renderGrowth();
+  if (tab === 'training') renderScenes();
+  if (tab === 'coach') renderCoach();
+  if (tab === 'home') renderHome();
+  if (tab === 'profile') renderProfile();
+}
+
+function showModal(name) {
+  const el = $('modal-' + name);
+  if (el) { el.style.display = 'flex'; renderModal(name); }
+}
+
+function closeModal(name) {
+  const el = $('modal-' + name);
+  if (el) el.style.display = 'none';
+}
+
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h<6) return '夜深了';
+  if (h<9) return '早上好';
+  if (h<12) return '上午好';
+  if (h<14) return '中午好';
+  if (h<18) return '下午好';
+  if (h<22) return '晚上好';
+  return '夜深了';
+}
+
+function getLevel(points) {
+  if (points>=800) return { name:'大师学员', color:'text-red-500' };
+  if (points>=600) return { name:'钻石学员', color:'text-blue-500' };
+  if (points>=400) return { name:'铂金学员', color:'text-purple-500' };
+  if (points>=200) return { name:'黄金学员', color:'text-yellow-500' };
+  if (points>=100) return { name:'白银学员', color:'text-gray-400' };
+  return { name:'青铜学员', color:'text-amber-600' };
+}
+
+function saveData() {
+  const key = STORAGE_PREFIX + 'user_' + userData.phone;
+  const data = { userData, trainingScenes, abilityStats, weeklyTrainingDays, checkedInToday, checkInDates, diaries, collectedCards, cbtRecords, nvcRecords, coachMoments, timeRewindTickets, hintCards, shieldCards, doublePointCards };
+  localStorage.setItem(key, JSON.stringify(data));
+}
+
+function loadData(phone) {
+  const key = STORAGE_PREFIX + 'user_' + phone;
+  const saved = localStorage.getItem(key);
+  if (saved) {
+    try {
+      const data = JSON.parse(saved);
+      if (data.userData) userData = data.userData;
+      if (data.trainingScenes) trainingScenes = data.trainingScenes;
+      if (data.abilityStats) abilityStats = data.abilityStats;
+      if (data.weeklyTrainingDays) weeklyTrainingDays = data.weeklyTrainingDays;
+      if (data.checkedInToday) checkedInToday = data.checkedInToday;
+      if (data.checkInDates) checkInDates = data.checkInDates;
+      if (data.diaries) diaries = data.diaries;
+      if (data.collectedCards) collectedCards = data.collectedCards;
+      if (data.cbtRecords) cbtRecords = data.cbtRecords;
+      if (data.nvcRecords) nvcRecords = data.nvcRecords;
+      if (data.coachMoments) coachMoments = data.coachMoments;
+      if (data.timeRewindTickets !== undefined) timeRewindTickets = data.timeRewindTickets;
+      if (data.hintCards !== undefined) hintCards = data.hintCards;
+      if (data.shieldCards !== undefined) shieldCards = data.shieldCards;
+      if (data.doublePointCards !== undefined) doublePointCards = data.doublePointCards;
+    } catch(e) {}
+  }
+  generateCoachMoments();
+}
+
+// ===== 登录 =====
+function switchLoginMode(mode) {
+  loginMode = mode;
+  $('login-tab-password').className = 'flex-1 py-3 rounded-lg text-sm font-medium transition-all ' + (mode==='password' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500');
+  $('login-tab-sms').className = 'flex-1 py-3 rounded-lg text-sm font-medium transition-all ' + (mode==='sms' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500');
+  $('login-password-group').style.display = mode==='password' ? 'block' : 'none';
+  $('login-sms-group').style.display = mode==='sms' ? 'block' : 'none';
+}
+
 function sendSms() {
-  const btn = document.getElementById('sms-btn');
-  if (btn.classList.contains('disabled')) return;
-  let sec = 60;
-  btn.classList.add('disabled');
-  btn.textContent = sec + 's';
+  const phone = $('login-phone').value.trim();
+  if (!phone || phone.length!==11) { alert('请输入正确的手机号'); return; }
+  smsCountdown = 60;
+  const btn = $('sms-btn');
+  btn.disabled = true;
   const timer = setInterval(() => {
-    sec--;
-    btn.textContent = sec + 's';
-    if (sec <= 0) {
-      clearInterval(timer);
-      btn.classList.remove('disabled');
-      btn.textContent = '发送验证码';
-    }
+    smsCountdown--;
+    btn.textContent = smsCountdown + 's';
+    if (smsCountdown<=0) { clearInterval(timer); btn.disabled = false; btn.textContent = '获取验证码'; }
   }, 1000);
 }
 
+function sendRegSms() {
+  const phone = $('reg-phone').value.trim();
+  if (!phone || phone.length!==11) { alert('请输入正确的手机号'); return; }
+  regSmsCountdown = 60;
+  const btn = $('reg-sms-btn');
+  btn.disabled = true;
+  const timer = setInterval(() => {
+    regSmsCountdown--;
+    btn.textContent = regSmsCountdown + 's';
+    if (regSmsCountdown<=0) { clearInterval(timer); btn.disabled = false; btn.textContent = '获取验证码'; }
+  }, 1000);
+}
+
+function fillDemoAccount() {
+  loginMode = 'password';
+  $('login-phone').value = '13800138000';
+  $('login-password').value = '123456';
+  switchLoginMode('password');
+  $('login-error').style.display = 'none';
+}
+
 function doLogin() {
-  const agree = document.getElementById('agree-check').checked;
-  if (!agree) { alert('请先同意用户协议'); return; }
-  const phone = document.getElementById('phone-input').value.trim();
-  const pwd = document.getElementById('password-input').value.trim();
-  const smsCode = document.getElementById('sms-input').value.trim();
-  // 体验账号：手机号13800138000 + 密码123456 + 验证码123456
-  if ((phone === '13800138000' || phone === '13900139000') && (pwd === '123456') && (smsCode === '123456')) {
-    showView('view-home');
-    document.getElementById('tab-bar').style.display = 'flex';
+  const phone = $('login-phone').value.trim();
+  const err = $('login-error');
+
+  if (!phone || phone.length!==11) {
+    err.textContent = '请输入正确的手机号';
+    err.style.display = 'block';
     return;
   }
-  // 开发调试模式：任意11位手机号 + 验证码123456 即可登录
-  if (phone.length === 11 && smsCode === '123456') {
-    showView('view-home');
-    document.getElementById('tab-bar').style.display = 'flex';
-    return;
+
+  if (loginMode === 'password') {
+    const pwd = $('login-password').value.trim();
+    if (!pwd) { err.textContent='请输入密码'; err.style.display='block'; return; }
+    const saved = localStorage.getItem(STORAGE_PREFIX + 'user_' + phone);
+    if (!saved) {
+      if (phone==='13800138000' && pwd==='123456') {
+        userData = { nickname:'演示用户', phone, password:'123456', points:650, streak:3, member:'free', level:'钻石学员', realNameVerified:false, realNameInfo:{name:'',idCard:''}, avatar:'👤', inviteCode:generateInviteCode() };
+      } else {
+        err.textContent='账号不存在，请先注册'; err.style.display='block'; return;
+      }
+    } else {
+      const d = JSON.parse(saved);
+      if (d.userData && d.userData.password !== pwd) { err.textContent='密码错误'; err.style.display='block'; return; }
+      if (d.userData) userData = d.userData;
+    }
+  } else {
+    const sms = $('login-sms').value.trim();
+    if (!sms || sms.length!==6) { err.textContent='请输入6位验证码'; err.style.display='block'; return; }
+    if (sms !== '123456') { err.textContent='验证码错误'; err.style.display='block'; return; }
+    const saved = localStorage.getItem(STORAGE_PREFIX + 'user_' + phone);
+    if (saved) { try { const d = JSON.parse(saved); if (d.userData) userData = d.userData; } catch(e) {} }
+    else { userData = { nickname:'用户', phone, password:'', points:0, streak:0, member:'free', level:'青铜学员', realNameVerified:false, realNameInfo:{name:'',idCard:''} }; }
   }
-  // 简化模式：直接登录体验
-  if (phone.length === 11) {
-    showView('view-home');
-    document.getElementById('tab-bar').style.display = 'flex';
-    return;
+
+  userData.phone = phone;
+  loadData(phone);
+  showView('page-home');
+  $('tab-bar').classList.add('show');
+  renderHome();
+}
+
+function doRegister() {
+  const phone = $('reg-phone').value.trim();
+  const nick = $('reg-nickname').value.trim();
+  const pwd = $('reg-password').value.trim();
+  const confirmPwd = $('reg-confirm-password').value.trim();
+  const agreeTerms = $('agree-terms').checked;
+  const err = $('register-error');
+
+  if (!phone || phone.length!==11) { err.textContent='请输入正确的手机号'; err.style.display='block'; return; }
+  if (!nick) { err.textContent='请输入昵称'; err.style.display='block'; return; }
+  if (!pwd || pwd.length<6) { err.textContent='密码至少6位'; err.style.display='block'; return; }
+  if (pwd !== confirmPwd) { err.textContent='两次密码输入不一致'; err.style.display='block'; return; }
+  if (!agreeTerms) { err.textContent='请阅读并同意服务协议和隐私政策'; err.style.display='block'; return; }
+
+  userData = { nickname:nick, phone, password:pwd, points:0, streak:0, member:'free', level:'青铜学员', realNameVerified:false, realNameInfo:{name:'',idCard:''} };
+  saveData();
+  showView('page-home');
+  $('tab-bar').classList.add('show');
+  renderHome();
+}
+
+// ===== 首页 =====
+function renderHome() {
+  $('greeting-text').textContent = getGreeting() + '，' + userData.nickname;
+  const level = getLevel(userData.points);
+  $('user-level').textContent = '✨ ' + level.name;
+  $('user-level').className = 'text-lg font-bold ' + level.color;
+  $('user-avatar-btn').textContent = userData.nickname.charAt(0);
+  $('checkin-btn').textContent = checkedInToday ? '✅ 已签到' : '📅 签到';
+  $('checkin-btn').disabled = checkedInToday;
+
+  $('coach-progress').style.width = Math.min(100, userData.points/10) + '%';
+  $('coach-affection').textContent = userData.points + '/1000';
+
+  // 推荐场景
+  const unlocked = trainingScenes.filter(s => s.unlocked && !s.completed);
+  const rec = unlocked.length > 0 ? unlocked[0] : trainingScenes.find(s => s.unlocked) || trainingScenes[0];
+  if (rec) {
+    $('recommend-name').textContent = rec.icon + ' ' + rec.name;
+    $('recommend-desc').textContent = rec.desc;
+    $('recommend-duration').textContent = rec.duration;
+    $('recommend-stars').innerHTML = '⭐'.repeat(rec.difficulty) + '☆'.repeat(5-rec.difficulty);
   }
-  alert('请输入正确的手机号');
+
+  // 最近训练
+  const completed = trainingScenes.filter(s => s.completed);
+  $('recent-trainings').innerHTML = completed.length > 0
+    ? completed.slice(-3).reverse().map(s => `<div class="flex-shrink-0 w-28 bg-gray-50 rounded-xl p-3"><div class="text-2xl mb-1">${s.icon}</div><div class="text-xs font-medium text-gray-800 truncate">${s.name}</div></div>`).join('')
+    : '<div class="text-sm text-gray-400 py-2">暂无训练记录</div>';
+
+  $('weekly-days').textContent = '训练天数：' + weeklyTrainingDays + '/7';
+  const pct = Math.round(weeklyTrainingDays/7*100);
+  $('weekly-progress').textContent = pct + '%';
+  $('weekly-bar').style.width = pct + '%';
+
+  $('improve-communication').textContent = '+' + Math.floor(Math.random()*15+5) + '%';
+  $('improve-expression').textContent = '+' + Math.floor(Math.random()*15+5) + '%';
+
+  // 晚安计划（21点后显示）
+  const h = new Date().getHours();
+  $('goodnight-card').style.display = h >= 21 ? 'block' : 'none';
 }
 
-// ===== 视图切换 =====
-function showView(viewId) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  const target = document.getElementById(viewId);
-  target.classList.add('active');
-  target.scrollTop = 0;
+function doCheckin() {
+  if (checkedInToday) return;
+  checkedInToday = true;
+  const today = new Date().toISOString().slice(0,10);
+  if (!checkInDates.includes(today)) checkInDates.push(today);
+  userData.streak++;
+  const bonus = userData.streak % 7 === 0 ? 30 : 10;
+  userData.points += bonus;
+  const msg = userData.streak % 7 === 0
+    ? '🎉 连续签到' + userData.streak + '天！获得30积分！'
+    : '签到成功！获得' + bonus + '积分';
+  alert(msg);
+  saveData();
+  renderHome();
+  renderCalendar();
 }
 
-function switchTab(idx) {
-  currentTab = idx;
-  const viewIds = ['view-home','view-coach','view-scene','view-growth','view-profile'];
-  showView(viewIds[idx]);
-  document.querySelectorAll('.tab-item').forEach((t,i) => {
-    t.classList.toggle('active', i === idx);
-  });
-  document.getElementById('tab-bar').style.display = 'flex';
-  if (idx === 3) drawGrowthRadar();
-}
+// ===== 签到日历（参考"与你"实现，PRD §4.1） =====
+function renderCalendar() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDay = new Date(year, month, 1).getDay(); // 0=Sun
 
-// ===== 签到 =====
-function doSignIn() {
-  if (signedIn) return;
-  signedIn = true;
-  consecutiveDays++;
-  const btn = document.getElementById('sign-in-btn');
-  btn.classList.add('signed');
-  document.getElementById('sign-text').textContent = '已签到';
-  document.getElementById('sign-sub').textContent = '今日已签到 ✓';
-  btn.querySelector('.sign-icon').className = 'fas fa-check-circle sign-icon';
-  // 显示签到成功弹窗
-  document.getElementById('sign-success-days').textContent = '连续签到 ' + consecutiveDays + ' 天';
-  const points = consecutiveDays >= 7 ? 10 : 5;
-  document.getElementById('sign-success-points').innerHTML = '<i class="fas fa-coins"></i> +' + points + ' 积分';
-  showModal('modal-sign-success');
-}
+  $('calendar-month-label').textContent = year + '年' + (month + 1) + '月';
 
-// ===== 场景Tab =====
-document.getElementById('stage-tabs').addEventListener('click', function(e) {
-  if (e.target.classList.contains('stage-tab')) {
-    document.querySelectorAll('.stage-tab').forEach(t => t.classList.remove('active'));
-    e.target.classList.add('active');
+  const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+  let html = weekdays.map(d => `<div class="text-center text-xs text-gray-400 font-medium py-1">${d}</div>`).join('');
+
+  // 空白占位
+  for (let i = 0; i < firstDay; i++) {
+    html += '<div class="aspect-square"></div>';
   }
-});
 
-// ===== 对话训练 =====
-function startTraining() {
-  chatRound = 0;
-  totalScore = 0;
-  showView('view-chat');
-  document.getElementById('tab-bar').style.display = 'none';
-  document.getElementById('chat-messages').innerHTML = '';
-  document.getElementById('chat-options').innerHTML = '';
-  updateChatRound();
+  const todayStr = now.toISOString().slice(0,10);
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const isToday = dateStr === todayStr;
+    const isChecked = checkInDates.includes(dateStr);
+    let cls = 'aspect-square flex items-center justify-center rounded-lg text-xs ';
+    if (isChecked) {
+      cls += 'bg-green-100 text-green-600 font-medium';
+    } else if (isToday) {
+      cls += 'bg-indigo-100 text-indigo-600 font-medium';
+    } else if (day < now.getDate()) {
+      cls += 'bg-gray-50 text-gray-400';
+    } else {
+      cls += 'text-gray-300';
+    }
+    html += `<div class="${cls}">${isChecked ? '✓' : day}</div>`;
+  }
+
+  $('calendar-grid').innerHTML = html;
+}
+
+// ===== 教练页 =====
+function renderCoach() {
+  const level = getLevel(userData.points);
+  $('coach-points').textContent = userData.points + '/1000';
+  $('coach-points-bar').style.width = Math.min(100, userData.points/10) + '%';
+  $('coach-level-label').textContent = '⭐ ' + level.name;
+
+  $('coach-moments').innerHTML = coachMoments.length > 0
+    ? coachMoments.slice(0,3).map(m => `
+      <div class="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
+        <span class="text-lg">${m.icon}</span>
+        <div>
+          <div class="flex items-center gap-1"><span class="text-xs font-medium text-gray-800">教练</span><span class="text-xs text-gray-400">${m.time}</span></div>
+          <p class="text-sm text-gray-600 mt-0.5">${m.content}</p>
+        </div>
+      </div>`).join('')
+    : '<div class="text-center py-4 text-gray-400 text-sm">暂无动态</div>';
+}
+
+function generateCoachMoments() {
+  if (coachMoments.length === 0) {
+    const now = new Date();
+    for (let i=2; i>=0; i--) {
+      const d = new Date(now); d.setDate(d.getDate()-i);
+      const t = momentTemplates[Math.floor(Math.random()*momentTemplates.length)];
+      coachMoments.push({
+        icon: t.icon, content: t.content,
+        time: d.toLocaleDateString('zh-CN', {month:'numeric',day:'numeric'})
+      });
+    }
+  }
+}
+
+// ===== 训练页 =====
+function renderScenes() {
+  const stages = [
+    { id:1, name:'破冰期', desc:'基础社交场景' },
+    { id:2, name:'接触期', desc:'进阶社交场景' },
+    { id:3, name:'熟悉期', desc:'深度社交场景' }
+  ];
+
+  $('scene-list').innerHTML = stages.map(stage => {
+    const scenes = trainingScenes.filter(s => s.stage === stage.id);
+    return `<div class="mb-6">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="px-2 py-0.5 bg-indigo-100 text-indigo-600 text-xs font-medium rounded">阶段${stage.id}</span>
+        <span class="text-sm text-gray-600">${stage.name}</span>
+        <span class="text-xs text-gray-400">${stage.desc}</span>
+      </div>
+      <div class="space-y-3">
+        ${scenes.map(s => `
+          <div class="bg-white rounded-xl p-4 shadow-sm">
+            <div class="flex items-start gap-3">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl ${s.unlocked ? 'bg-indigo-100' : 'bg-gray-100'}">${s.icon}</div>
+              <div class="flex-1">
+                <div class="flex items-center gap-2">
+                  <h3 class="font-semibold text-gray-800">${s.name}</h3>
+                  ${s.completed ? '<span class="px-1.5 py-0.5 bg-green-100 text-green-600 text-xs rounded-full">✓ 已完成</span>' : ''}
+                </div>
+                <p class="text-sm text-gray-500 mt-0.5">${s.desc}</p>
+                <div class="flex items-center gap-3 mt-2">
+                  <span class="flex items-center gap-1 text-xs text-gray-400">⭐ ${s.difficulty}</span>
+                  <span class="text-xs text-gray-400">${s.duration}</span>
+                  ${!s.unlocked ? '<span class="text-xs text-orange-500">🔒 需完成上一阶段</span>' : ''}
+                </div>
+              </div>
+            </div>
+            <button onclick="startTraining(${s.id})" ${s.unlocked ? '' : 'disabled'}
+              class="mt-3 w-full py-2 text-sm font-medium rounded-lg transition-all ${s.unlocked ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}">
+              ${s.completed ? '再次训练' : '开始训练'}
+            </button>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function getRecommendedScene() {
+  const unlocked = trainingScenes.filter(s => s.unlocked && !s.completed);
+  if (unlocked.length > 0) return unlocked[0];
+  return trainingScenes.find(s => s.unlocked) || trainingScenes[0];
+}
+
+function startTraining(sceneId) {
+  const scene = trainingScenes.find(s => s.id === (typeof sceneId==='number' ? sceneId : sceneId.id));
+  if (!scene || !scene.unlocked) return;
+
+  currentTraining = scene;
+  trainingMessages = [];
+  trainingRoundIdx = 0;
+  trainingChoices = [];
+  trainingScore = 0;
+  trainingPointsGain = 0;
+  showTrainingOptions = false;
+  showTrainingReport = false;
+  trainingFeedback = '';
+  useDoublePoints = false;
+  useShieldCard = false;
+  useHintCard = false;
+  currentRewindRound = -1;
+
+  $('training-title').textContent = scene.icon + ' ' + scene.name;
+  $('training-subtitle').textContent = '阶段' + scene.stage + ' · ' + scene.duration;
+  $('training-messages').innerHTML = '';
+  $('modal-training').style.display = 'flex';
+
+  // 显示道具按钮（参考"与你"实现，PRD §9 + §13.1）
+  updatePropButtons();
+
   setTimeout(() => {
-    addCoachMessage(chatData[0].coach);
-    setTimeout(() => showOptions(chatData[0].options), 600);
-  }, 400);
+    addTrainingMessage(scene.desc, false);
+    setTimeout(() => showRound(), 800);
+  }, 500);
 }
 
-function updateChatRound() {
-  document.getElementById('chat-round').textContent = '第' + (chatRound + 1) + '轮 / 5轮';
-  document.getElementById('chat-progress-fill').style.width = ((chatRound + 1) * 20) + '%';
+// 更新道具按钮状态和显示
+function updatePropButtons() {
+  $('rewind-btn').style.display = timeRewindTickets > 0 && trainingRoundIdx > 0 ? 'inline-flex' : 'none';
+  $('rewind-btn').disabled = timeRewindTickets <= 0;
+  $('rewind-count').textContent = timeRewindTickets;
+
+  $('hint-btn').style.display = hintCards > 0 && !showTrainingOptions ? 'none' : hintCards > 0 ? 'inline-flex' : 'none';
+  $('hint-btn').disabled = hintCards <= 0 || useHintCard || !showTrainingOptions;
+  $('hint-count').textContent = hintCards;
+
+  $('shield-btn').style.display = shieldCards > 0 ? 'inline-flex' : 'none';
+  $('shield-btn').disabled = shieldCards <= 0 || useShieldCard;
+  $('shield-count').textContent = shieldCards;
+
+  $('double-btn').style.display = doublePointCards > 0 ? 'inline-flex' : 'none';
+  $('double-btn').disabled = doublePointCards <= 0 || useDoublePoints;
+  $('double-count').textContent = doublePointCards;
 }
 
-function addCoachMessage(text) {
-  const container = document.getElementById('chat-messages');
-  const div = document.createElement('div');
-  div.className = 'msg coach fade-in';
-  div.innerHTML = '<div class="msg-avatar">沈</div><div class="msg-bubble">' + text + '</div>';
-  container.appendChild(div);
-  scrollChat();
-}
+function showRound() {
+  if (!currentTraining) return;
+  const round = currentTraining.rounds[trainingRoundIdx];
+  if (!round) { finishTraining(); return; }
 
-function addUserMessage(text) {
-  const container = document.getElementById('chat-messages');
-  const div = document.createElement('div');
-  div.className = 'msg user fade-in';
-  div.innerHTML = '<div class="msg-bubble">' + text + '</div><div class="msg-avatar" style="background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;">我</div>';
-  container.appendChild(div);
-  scrollChat();
-}
+  addTrainingMessage(round.ai, false);
+  showTrainingOptions = true;
+  showTrainingReport = false;
+  useHintCard = false;
 
-function showOptions(options) {
-  const container = document.getElementById('chat-options');
-  let html = '<div class="options-label">请选择你的回应：</div>';
-  options.forEach((opt, i) => {
-    html += '<button class="option-btn" onclick="selectOption(' + i + ')"><span class="opt-letter">' + opt.letter + '</span>' + opt.text + '</button>';
-  });
-  container.innerHTML = html;
+  // 更新穿梭按钮 - 选择后出现
+  $('rewind-btn').style.display = 'none';
+  updatePropButtons();
+
+  setTimeout(() => {
+    const msgs = $('training-messages');
+    const optsDiv = document.createElement('div');
+    optsDiv.id = 'training-options';
+    optsDiv.className = 'space-y-2 animate-in';
+    // 如果使用了提示卡，标记最佳选项（参考"与你"PRD §9.2提示卡）
+    const hintIdx = useHintCard ? round.options.findIndex(o => o.quality === 'good') : -1;
+    optsDiv.innerHTML = round.options.map((opt, idx) => {
+      const colors = ['bg-green-50 border-green-200 text-green-700', 'bg-gray-50 border-gray-200 text-gray-700', 'bg-red-50 border-red-200 text-red-700'];
+      const hintMark = hintIdx === idx ? '🌟' : '';
+      return `<button onclick="selectOption(${idx})" class="w-full p-3 rounded-xl text-sm hover:bg-indigo-100 transition-colors text-left border ${colors[idx]}">
+        <span class="text-xs mr-2">${['A','B','C'][idx]}</span>${hintMark}${opt.text}
+      </button>`;
+    }).join('');
+    msgs.appendChild(optsDiv);
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 500);
 }
 
 function selectOption(idx) {
-  const round = chatData[chatRound];
-  const chosen = round.options[idx];
-  totalScore += chosen.score;
+  if (!currentTraining || !showTrainingOptions) return;
+  const round = currentTraining.rounds[trainingRoundIdx];
+  const opt = round.options[idx];
+  const labels = { 'good':'✅ 高质量', 'safe':'⚪ 安全', 'cold':'❌ 冷场' };
 
-  // 隐藏选项
-  document.getElementById('chat-options').innerHTML = '';
+  showTrainingOptions = false;
+  const opts = $('training-options');
+  if (opts) opts.remove();
 
-  // 显示用户消息
-  addUserMessage(chosen.letter + '. ' + chosen.text);
+  addTrainingMessage(opt.text, true);
+  trainingChoices.push({ round: trainingRoundIdx+1, option: opt });
 
-  chatRound++;
-
-  if (chatRound >= 5) {
-    // 训练结束
-    setTimeout(() => {
-      addCoachMessage('训练结束！让我来为你总结一下本次表现～');
-      setTimeout(() => showResult(), 1200);
-    }, 800);
-  } else {
-    // 显示教练反馈 + 下一轮
-    setTimeout(() => {
-      addCoachMessage(round.feedback);
-      setTimeout(() => {
-        updateChatRound();
-        setTimeout(() => showOptions(round.options), 400);
-      }, 600);
-    }, 800);
-  }
-}
-
-function scrollChat() {
-  const el = document.getElementById('chat-messages');
-  setTimeout(() => { el.scrollTop = el.scrollHeight; }, 50);
-}
-
-function exitChat() {
-  switchTab(currentTab);
-}
-
-// ===== 训练结果 =====
-function showResult() {
-  showView('view-result');
-  document.getElementById('tab-bar').style.display = 'none';
-
-  // 分数动画
-  const score = Math.min(100, Math.max(40, totalScore));
-  const ring = document.getElementById('result-ring-fill');
-  const circumference = 2 * Math.PI * 60;
-  const offset = circumference * (1 - score / 100);
-  setTimeout(() => { ring.style.transition = 'stroke-dashoffset 1.2s ease'; ring.style.strokeDashoffset = offset; }, 100);
-
-  // 数字递增
-  let cur = 0;
-  const numEl = document.getElementById('result-score-num');
-  const step = Math.ceil(score / 40);
-  const timer = setInterval(() => {
-    cur += step;
-    if (cur >= score) { cur = score; clearInterval(timer); }
-    numEl.textContent = cur;
-  }, 25);
-
-  // 雷达图
-  drawResultRadar();
-}
-
-// ===== 雷达图绘制 =====
-function drawRadar(canvasId, values, labels, size) {
-  const canvas = document.getElementById(canvasId);
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const w = canvas.width, h = canvas.height;
-  const cx = w / 2, cy = h / 2;
-  const maxR = Math.min(w, h) / 2 - 30;
-  const n = values.length;
-  const angleStep = (2 * Math.PI) / n;
-  const startAngle = -Math.PI / 2;
-
-  ctx.clearRect(0, 0, w, h);
-
-  // 绘制背景网格
-  for (let level = 1; level <= 5; level++) {
-    const r = maxR * level / 5;
-    ctx.beginPath();
-    for (let i = 0; i < n; i++) {
-      const a = startAngle + i * angleStep;
-      const x = cx + r * Math.cos(a);
-      const y = cy + r * Math.sin(a);
-      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  setTimeout(() => {
+    addTrainingMessage(labels[opt.quality] + (opt.points > 0 ? ' +'+opt.points+'积分' : ' '+opt.points+'积分'), false, true);
+    trainingRoundIdx++;
+    // 显示穿梭按钮（参考"与你"实现，PRD §13.1）
+    $('rewind-btn').style.display = timeRewindTickets > 0 ? 'inline-flex' : 'none';
+    $('rewind-btn').disabled = timeRewindTickets <= 0;
+    updatePropButtons();
+    if (trainingRoundIdx < currentTraining.rounds.length) {
+      setTimeout(() => showRound(), 1200);
+    } else {
+      setTimeout(() => finishTraining(), 1200);
     }
-    ctx.closePath();
-    ctx.strokeStyle = '#E8ECF1';
-    ctx.lineWidth = 1;
-    ctx.stroke();
-  }
-
-  // 绘制轴线
-  for (let i = 0; i < n; i++) {
-    const a = startAngle + i * angleStep;
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.lineTo(cx + maxR * Math.cos(a), cy + maxR * Math.sin(a));
-    ctx.strokeStyle = '#E8ECF1';
-    ctx.stroke();
-  }
-
-  // 绘制数据区域
-  ctx.beginPath();
-  for (let i = 0; i < n; i++) {
-    const a = startAngle + i * angleStep;
-    const r = maxR * values[i] / 100;
-    const x = cx + r * Math.cos(a);
-    const y = cy + r * Math.sin(a);
-    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-  }
-  ctx.closePath();
-  ctx.fillStyle = 'rgba(245,166,35,0.2)';
-  ctx.fill();
-  ctx.strokeStyle = '#F5A623';
-  ctx.lineWidth = 2;
-  ctx.stroke();
-
-  // 绘制数据点
-  for (let i = 0; i < n; i++) {
-    const a = startAngle + i * angleStep;
-    const r = maxR * values[i] / 100;
-    const x = cx + r * Math.cos(a);
-    const y = cy + r * Math.sin(a);
-    ctx.beginPath();
-    ctx.arc(x, y, 4, 0, 2 * Math.PI);
-    ctx.fillStyle = '#F5A623';
-    ctx.fill();
-  }
-
-  // 绘制标签
-  ctx.fillStyle = '#2C3E50';
-  ctx.font = '12px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  for (let i = 0; i < n; i++) {
-    const a = startAngle + i * angleStep;
-    const lr = maxR + 22;
-    const x = cx + lr * Math.cos(a);
-    const y = cy + lr * Math.sin(a);
-    ctx.fillText(labels[i] + ' ' + values[i], x, y);
-  }
+  }, 800);
 }
 
-function drawResultRadar() {
-  drawRadar('radar-canvas', [85, 80, 75, 70, 65], ['沟通力','表达力','共情力','情绪控制','应变力'], 260);
+function addTrainingMessage(content, isUser, isFeedback) {
+  const msgs = $('training-messages');
+  const div = document.createElement('div');
+  div.className = 'flex ' + (isUser ? 'justify-end' : 'justify-start') + ' animate-in';
+  div.innerHTML = `<div class="max-w-[90%] px-4 py-2 rounded-xl text-sm ${isFeedback ? 'bg-amber-100 text-amber-700 text-xs px-3 py-1 rounded-lg' : isUser ? 'bg-indigo-500 text-white' : 'bg-gray-100 text-gray-800'}">${content}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
 }
 
-function drawGrowthRadar() {
-  drawRadar('growth-radar-canvas', [85, 80, 75, 70, 65], ['沟通力','表达力','共情力','情绪控制','应变力'], 240);
-}
+function finishTraining() {
+  if (!currentTraining) return;
 
-// ===== 弹窗控制 =====
-function showModal(id) {
-  document.getElementById(id).classList.add('show');
-}
-function closeModal(id) {
-  document.getElementById(id).classList.remove('show');
-}
-
-// 点击弹窗遮罩关闭
-document.querySelectorAll('.modal-overlay').forEach(overlay => {
-  overlay.addEventListener('click', function(e) {
-    if (e.target === this) this.classList.remove('show');
+  let totalPoints = 0, goodCount = 0, safeCount = 0, coldCount = 0;
+  trainingChoices.forEach(c => {
+    totalPoints += c.option.points;
+    if (c.option.quality === 'good') goodCount++;
+    else if (c.option.quality === 'safe') safeCount++;
+    else coldCount++;
   });
-});
 
-// ===== 会员中心点击 =====
-document.querySelector('.menu-item').addEventListener('click', function() {
-  showModal('modal-member');
-});
+  trainingPointsGain = Math.max(10, Math.min(50, totalPoints + Math.floor(Math.random()*10)));
+  // 双倍积分卡效果（参考"与你"PRD §9.1）
+  if (useDoublePoints) {
+    doublePointCards--;
+    trainingPointsGain *= 2;
+  }
+  userData.points += trainingPointsGain;
+  weeklyTrainingDays = Math.min(7, weeklyTrainingDays + (checkedInToday ? 0 : 1));
 
-// ===== 晚安计划点击 =====
-document.querySelectorAll('.menu-item')[1].addEventListener('click', function() {
-  showModal('modal-night-plan');
-});
+  const total = currentTraining.rounds.length;
+  trainingScore = Math.floor((goodCount*100 + safeCount*60 + coldCount*20) / total);
 
-// ===== 晚安计划功能 =====
-function selectNightCoach(el) {
-  document.querySelectorAll('#coach-select .coach-select-item').forEach(item => item.classList.remove('active'));
-  el.classList.add('active');
+  currentTraining.completed = true;
+
+  // 生成情绪日记
+  const emotionTag = goodCount >= total*0.7 ? '😊' : goodCount >= total*0.4 ? '😐' : '😟';
+  diaries.unshift({
+    id: Date.now(), date: new Date().toLocaleDateString(),
+    time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),
+    sceneName: currentTraining.name, emotionTag,
+    score: trainingScore, insight: trainingScore>=80 ? '表现很棒！' : trainingScore>=60 ? '继续加油！' : '别灰心，继续练习'
+  });
+
+  // 更新能力
+  const inc = Math.floor(trainingScore / 20);
+  abilityStats.communication = Math.min(100, abilityStats.communication + inc);
+  abilityStats.expression = Math.min(100, abilityStats.expression + inc);
+  abilityStats.empathy = Math.min(100, abilityStats.empathy + inc);
+  abilityStats.emotionControl = Math.min(100, abilityStats.emotionControl + Math.floor(inc/2));
+  abilityStats.adaptability = Math.min(100, abilityStats.adaptability + Math.floor(inc/2));
+
+  if (trainingScore >= 90) trainingFeedback = '🎉 太棒了！你的社交能力很强，继续保持！';
+  else if (trainingScore >= 70) trainingFeedback = '👍 表现不错！有些地方还可以做得更好~';
+  else if (trainingScore >= 60) trainingFeedback = '💪 及格了！多练习几次就会越来越好的！';
+  else trainingFeedback = '📚 别灰心，学习需要过程，再来一次吧！';
+
+  // 检查场景解锁
+  checkSceneUnlocks();
+  saveData();
+
+  showTrainingReport = true;
+  showTrainingOptions = false;
+  const opts = $('training-options');
+  if (opts) opts.remove();
+
+  // 显示结果
+  setTimeout(() => {
+    const msgs = $('training-messages');
+    msgs.innerHTML = `
+      <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-4 text-white animate-in">
+        <h4 class="font-semibold text-center mb-2">🎉 训练完成！</h4>
+        <p class="text-sm text-center mb-3">${trainingFeedback}</p>
+        <div class="flex items-center justify-center gap-6">
+          <div class="text-center"><div class="text-2xl font-bold">${trainingScore}</div><div class="text-xs opacity-80">综合得分</div></div>
+          <div class="text-center"><div class="text-2xl font-bold">+${trainingPointsGain}</div><div class="text-xs opacity-80">训练积分</div></div>
+        </div>
+      </div>
+      <div class="bg-gray-50 rounded-xl p-4 animate-in">
+        <h5 class="text-sm font-semibold text-gray-800 mb-2">📊 能力变化</h5>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="flex items-center justify-between text-xs"><span class="text-gray-500">沟通力</span><span class="text-indigo-600">+${inc}</span></div>
+          <div class="flex items-center justify-between text-xs"><span class="text-gray-500">表达力</span><span class="text-indigo-600">+${inc}</span></div>
+          <div class="flex items-center justify-between text-xs"><span class="text-gray-500">共情力</span><span class="text-indigo-600">+${inc}</span></div>
+          <div class="flex items-center justify-between text-xs"><span class="text-gray-500">情绪控制</span><span class="text-indigo-600">+${Math.floor(inc/2)}</span></div>
+        </div>
+      </div>
+      <div class="bg-gray-50 rounded-xl p-4 animate-in">
+        <h5 class="text-sm font-semibold text-gray-800 mb-2">📝 选择回顾</h5>
+        ${trainingChoices.map(c => `
+          <div class="flex items-center gap-2 text-xs mb-1">
+            <span class="${c.option.quality==='good'?'text-green-500':c.option.quality==='cold'?'text-red-500':'text-gray-400'}">${c.option.quality==='good'?'✅':c.option.quality==='cold'?'❌':'⚪'}</span>
+            <span class="text-gray-600">第${c.round}轮</span>
+            <span class="text-gray-400 truncate">${c.option.text}</span>
+          </div>`).join('')}
+      </div>
+      <button onclick="closeModal('training')" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all animate-in">返回训练列表</button>
+    `;
+    msgs.scrollTop = msgs.scrollHeight;
+
+    // 18点后显示晚安引导
+    if (new Date().getHours() >= 18) {
+      setTimeout(() => {
+        if (confirm('🌙 训练辛苦了，想听教练说晚安吗？')) showGoodnight();
+      }, 1000);
+    }
+  }, 500);
 }
 
-function toggleNightSwitch() {
-  const toggle = document.getElementById('night-toggle');
-  toggle.classList.toggle('on');
+function checkSceneUnlocks() {
+  trainingScenes.forEach(scene => {
+    if (scene.unlocked) return;
+    const prevStageScenes = trainingScenes.filter(s => s.stage === scene.stage - 1);
+    const prevCompleted = prevStageScenes.length === 0 || prevStageScenes.every(s => s.completed);
+    if (prevCompleted && userData.points >= scene.difficulty * 100) {
+      scene.unlocked = true;
+    }
+  });
 }
 
-function saveNightPlan() {
-  const coach = document.querySelector('#coach-select .coach-select-item.active .cs-name').textContent;
-  const hour = document.getElementById('night-hour').value;
-  const minute = document.getElementById('night-minute').value;
-  const isOn = document.getElementById('night-toggle').classList.contains('on');
-  closeModal('modal-night-plan');
-  // 简易提示
-  const toast = document.createElement('div');
-  toast.style.cssText = 'position:fixed;top:60px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:12px 24px;border-radius:24px;font-size:14px;z-index:2000;box-shadow:0 4px 16px rgba(0,0,0,0.2);animation:modalFadeIn 0.3s ease;';
-  toast.textContent = (isOn ? '✅ 晚安计划已开启' : '⏸ 晚安计划已关闭') + ' - ' + coach + ' ' + hour + ':' + minute;
-  document.body.appendChild(toast);
-  setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.3s'; }, 2000);
-  setTimeout(() => toast.remove(), 2400);
+// ===== 成长页 =====
+function renderGrowth() {
+  const labels = ['沟通力','表达力','共情力','情绪控制','应变力'];
+  const values = [abilityStats.communication, abilityStats.expression, abilityStats.empathy, abilityStats.emotionControl, abilityStats.adaptability];
+  const icons = ['💬','🎤','❤️','💪','⚡'];
+  const colors = ['indigo','purple','pink','amber','green'];
+
+  $('ability-grid').innerHTML = labels.map((l,i) => `
+    <div class="p-3 bg-${colors[i]}-50 rounded-xl text-center">
+      <div class="text-2xl mb-1">${icons[i]}</div>
+      <div class="text-xs text-gray-500 mb-1">${l}</div>
+      <div class="font-bold text-${colors[i]}-600">${values[i]}%</div>
+    </div>`).join('');
+
+  // 进步曲线
+  renderProgressChart();
+
+  // 周报
+  const completed = trainingScenes.filter(s => s.completed).length;
+  $('weekly-report-count').textContent = completed;
+  $('weekly-report-change').textContent = '+' + userData.points;
+  $('weekly-report-msg').textContent = completed >= 5 ? '🎉 本周训练勤奋！继续加油！' : completed >= 3 ? '👍 表现不错！' : completed >= 1 ? '💪 迈出了第一步！' : '📚 本周还没有训练记录';
+
+  // 情绪日记
+  $('diary-count').textContent = diaries.length + '篇';
+  $('diary-list').innerHTML = diaries.length > 0
+    ? diaries.slice(0,5).map(d => `
+      <div class="p-3 bg-gray-50 rounded-xl mb-2">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-sm font-medium text-gray-800">${d.sceneName}</span>
+          <span class="text-lg">${d.emotionTag}</span>
+        </div>
+        <div class="flex items-center gap-2 text-xs text-gray-500">
+          <span>${d.date} ${d.time}</span>
+          <span class="text-indigo-500">得分: ${d.score}</span>
+        </div>
+        <p class="text-xs text-gray-500 mt-1">💡 ${d.insight}</p>
+      </div>`).join('')
+    : '<div class="text-center py-6 text-gray-400"><div class="text-4xl mb-2">📝</div><p class="text-sm">完成训练后自动生成</p></div>';
+
+  // 学习卡片
+  $('card-grid').innerHTML = learningCards.slice(0,4).map(c => `
+    <div class="p-3 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl cursor-pointer hover:from-indigo-100 hover:to-purple-100 transition-all" onclick="showCards()">
+      <div class="flex items-center justify-between mb-1">
+        <span class="text-xs font-medium text-indigo-600">${c.category}</span>
+        ${collectedCards.find(c2 => c2.id===c.id) ? '<span class="text-xs text-green-500">✓</span>' : ''}
+      </div>
+      <p class="text-sm font-medium text-gray-800">${c.title}</p>
+    </div>`).join('');
+
+  // 成就
+  $('achievement-list').innerHTML = [
+    { icon:'🏆', name:'新手入门' },
+    { icon:'💬', name:'沟通达人' },
+    { icon:'❤️', name:'共情专家' },
+    { icon:'🌟', name:'社交之星' }
+  ].map(a => `<div class="flex flex-col items-center p-3 bg-gray-50 rounded-xl"><span class="text-2xl">${a.icon}</span><span class="text-xs text-gray-500 mt-1">${a.name}</span></div>`).join('');
+
+  // 里程碑
+  const completedScenes = trainingScenes.filter(s => s.completed).length;
+  const milestones = [
+    { id:1, icon:'🌱', title:'初次见面', desc:'开启社交训练之旅', unlocked:true },
+    { id:2, icon:'💬', title:'沟通入门', desc:'完成所有阶段1场景', unlocked:trainingScenes.filter(s=>s.stage===1).every(s=>s.completed) },
+    { id:3, icon:'❤️', title:'建立好感', desc:'训练积分≥200', unlocked:userData.points>=200 },
+    { id:4, icon:'🌟', title:'社交达人', desc:'完成5次训练', unlocked:completedScenes>=5 },
+    { id:5, icon:'🤝', title:'共情高手', desc:'共情力≥60%', unlocked:abilityStats.empathy>=60 },
+    { id:6, icon:'💕', title:'亲密伙伴', desc:'训练积分≥600', unlocked:userData.points>=600 }
+  ];
+
+  $('milestone-list').innerHTML = `<div class="absolute left-3 top-0 bottom-0 w-0.5 bg-gray-200"></div>` +
+    milestones.map((m,i) => `
+      <div class="relative pl-8 pb-4 last:pb-0">
+        <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${m.unlocked ? 'bg-indigo-500 text-white' : 'bg-gray-200 text-gray-400'}">${m.unlocked ? '✓' : i+1}</div>
+        <div class="mt-2">
+          <div class="flex items-center gap-2"><span class="text-lg">${m.icon}</span><span class="font-medium text-gray-800">${m.title}</span></div>
+          <p class="text-xs text-gray-500 mt-1">${m.desc}</p>
+        </div>
+      </div>`).join('');
+
+  // 教练寄语
+  renderCoachMessage();
+}
+
+function renderCoachMessage() {
+  const weeklyMsgs = [
+    '每一次练习都在进步，继续保持！',
+    '这周你完成了' + trainingScenes.filter(s => s.completed).length + '个场景训练，表现不错！',
+    '沟通力提升' + Math.round((abilityStats.communication - 50) * 2) + '%，继续加油！',
+    '尝试把训练中学到的技巧用到日常生活中吧！',
+    '你已经坚持训练' + userData.streak + '天了，真了不起！'
+  ];
+  const monthlyMsgs = [
+    '这一个月来，你的社交能力有了明显提升，为你感到骄傲！',
+    '共情力已达到' + abilityStats.empathy + '%，继续保持这种状态！',
+    '你已经完成了' + trainingScenes.filter(s => s.completed).length + '个场景，离社交达人又近了一步！',
+    '记住，真正的成长来自于每一次勇敢的尝试。',
+    '下个月的目标是继续提升表达力，加油！'
+  ];
+  const type = window._coachMsgType || 'weekly';
+  const msgs = type === 'weekly' ? weeklyMsgs : monthlyMsgs;
+  const msg = msgs[Math.floor(Math.random() * msgs.length)];
+  $('coach-message-text').textContent = msg;
+  $('coach-message-type').textContent = type === 'weekly' ? '本周总结' : '本月总结';
+  const now = new Date();
+  $('coach-message-date').textContent = now.getFullYear() + '年' + (now.getMonth() + 1) + '月' + now.getDate() + '日';
+}
+
+function setCoachMsgType(type) {
+  window._coachMsgType = type;
+  $('coach-msg-weekly').className = 'px-3 py-1 text-xs rounded-full transition-colors ' + (type === 'weekly' ? 'bg-purple-100 text-purple-600 font-medium' : 'bg-white text-gray-500');
+  $('coach-msg-monthly').className = 'px-3 py-1 text-xs rounded-full transition-colors ' + (type === 'monthly' ? 'bg-purple-100 text-purple-600 font-medium' : 'bg-white text-gray-500');
+  renderCoachMessage();
+}
+
+function regenerateCoachMsg() {
+  renderCoachMessage();
+}
+
+function renderProgressChart() {
+  const days = progressDays;
+  const data = [];
+  const today = new Date();
+  const baseScore = 50;
+  for (let i=days-1; i>=0; i--) {
+    const d = new Date(today); d.setDate(d.getDate()-i);
+    const label = days===7 ? ['日','一','二','三','四','五','六'][d.getDay()] : (d.getMonth()+1)+'/'+d.getDate();
+    const score = Math.min(100, Math.max(30, baseScore + Math.floor(i*3) + Math.floor(Math.random()*15)-5));
+    data.push({ label, score });
+  }
+  $('progress-chart').innerHTML = data.map(d => `<div class="flex-1 flex flex-col items-center gap-1"><div class="w-full bg-gradient-to-t from-indigo-500 to-purple-400 rounded-t-md transition-all" style="height:${d.score}%"></div><span class="text-xs text-gray-400">${d.label}</span></div>`).join('');
+
+  if (data.length >= 2) {
+    const avg = Math.round((data[data.length-1].score - data[0].score) / data.length * 10) / 10;
+    $('avg-improvement').textContent = '平均提升 +' + avg + '%';
+  }
+}
+
+function setProgressDays(d) {
+  progressDays = d;
+  $('prog-7').className = 'px-3 py-1 text-xs rounded-md ' + (d===7 ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500');
+  $('prog-30').className = 'px-3 py-1 text-xs rounded-md ' + (d===30 ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500');
+  renderProgressChart();
+}
+
+// ===== 我的页 =====
+function renderProfile() {
+  $('profile-name').textContent = userData.nickname;
+  $('profile-avatar').textContent = userData.avatar || userData.nickname.charAt(0);
+  const level = getLevel(userData.points);
+  $('profile-level').textContent = level.name;
+  $('profile-points').textContent = userData.points;
+  $('profile-streak').textContent = userData.streak;
+  $('profile-scenes').textContent = trainingScenes.filter(s => s.completed).length;
+  renderCalendar();
+}
+
+// ===== 编辑资料 =====
+let selectedEditAvatar = '👤';
+
+function selectAvatar(avatar) {
+  selectedEditAvatar = avatar;
+  $('edit-avatar-preview').textContent = avatar;
+  document.querySelectorAll('.avatar-option').forEach(el => {
+    el.classList.remove('bg-indigo-100', 'ring-2', 'ring-indigo-400');
+    el.classList.add('bg-gray-50', 'hover:bg-gray-100');
+  });
+  const btn = document.querySelector(`.avatar-option[data-avatar="${avatar}"]`);
+  if (btn) {
+    btn.classList.remove('bg-gray-50', 'hover:bg-gray-100');
+    btn.classList.add('bg-indigo-100', 'ring-2', 'ring-indigo-400');
+  }
+}
+
+function saveProfileEdit() {
+  const nick = $('edit-nickname').value.trim();
+  if (nick) userData.nickname = nick;
+  userData.avatar = selectedEditAvatar;
+  saveData();
+  closeModal('editprofile');
+  renderProfile();
+  renderHome();
+}
+
+// 确认密码实时匹配验证
+function setupPwdMatchCheck() {
+  const regPwd = $('reg-password');
+  const regConfirm = $('reg-confirm-password');
+  const matchEl = $('reg-pwd-match');
+  if (regConfirm) {
+    regConfirm.addEventListener('input', function() {
+      if (this.value.length === 0) {
+        matchEl.style.display = 'none';
+      } else if (this.value === regPwd.value) {
+        matchEl.style.display = 'block';
+        matchEl.className = 'text-xs mt-1 text-green-500';
+        matchEl.textContent = '✓ 密码匹配';
+      } else {
+        matchEl.style.display = 'block';
+        matchEl.className = 'text-xs mt-1 text-red-500';
+        matchEl.textContent = '✗ 密码不一致';
+      }
+    });
+  }
+}
+
+// 编辑资料弹窗初始化
+function renderModal(name) {
+  if (name === 'editprofile') {
+    selectedEditAvatar = userData.avatar || '👤';
+    $('edit-avatar-preview').textContent = selectedEditAvatar;
+    $('edit-nickname').value = userData.nickname;
+    // 设置邀请码
+    if (!userData.inviteCode) userData.inviteCode = generateInviteCode();
+    $('edit-invite-code').value = userData.inviteCode;
+    // 高亮已选头像
+    document.querySelectorAll('.avatar-option').forEach(el => {
+      el.classList.remove('bg-indigo-100', 'ring-2', 'ring-indigo-400');
+      el.classList.add('bg-gray-50', 'hover:bg-gray-100');
+      if (el.dataset.avatar === selectedEditAvatar) {
+        el.classList.remove('bg-gray-50', 'hover:bg-gray-100');
+        el.classList.add('bg-indigo-100', 'ring-2', 'ring-indigo-400');
+      }
+    });
+  } else if (name === 'member') {
+    $('member-status').textContent = { free:'免费版', daily:'体验日卡', weekly:'周卡', monthly:'月卡', yearly:'年卡' }[userData.member] || '免费版';
+    $('member-plans').innerHTML = [
+      { name:'体验日卡', price:'3.9', origPrice:'', color:'green', icon:'💫', desc:'1天体验所有会员功能', tag:'推荐' },
+      { name:'周卡', price:'19.9', origPrice:'29.9', color:'indigo', icon:'🌙', desc:'7天无限畅玩', tag:'' },
+      { name:'月卡', price:'69', origPrice:'99', color:'purple', icon:'⭐', desc:'30天无限畅玩+语音训练', tag:'最值' },
+      { name:'年卡', price:'499', origPrice:'799', color:'amber', icon:'👑', desc:'365天无限畅玩+专属福利', tag:'' }
+    ].map((p,i) => `
+      <div class="border${p.tag==='推荐'?'-2 border-green-500':' border-gray-200'} rounded-xl p-4 relative overflow-hidden">
+        ${p.tag ? `<div class="absolute top-0 right-0 bg-green-500 text-white text-xs px-2 py-0.5">${p.tag}</div>` : ''}
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-2xl">${p.icon}</span>
+          <div><div class="font-bold text-gray-800">${p.name}</div><div class="text-xs text-gray-500">${p.desc}</div></div>
+        </div>
+        <div class="flex items-end gap-1 mb-3">
+          <span class="text-sm text-gray-500">¥</span>
+          <span class="text-3xl font-bold text-${p.color}-600">${p.price}</span>
+          ${p.origPrice ? `<span class="text-xs text-gray-400 line-through mb-1">¥${p.origPrice}</span>` : ''}
+        </div>
+        <button onclick="alert('购买${p.name}功能开发中')" class="w-full py-2 bg-${p.color}-500 text-white font-semibold rounded-lg hover:bg-${p.color}-600 transition-colors">立即购买</button>
+      </div>`).join('');
+
+    $('member-benefits').innerHTML = `
+      <div class="flex items-center justify-between py-1 mb-1 border-b border-gray-200 pb-2">
+        <span class="text-xs font-medium text-gray-700">权益项目</span>
+        <div class="flex gap-2 text-xs font-medium">
+          <span class="w-14 text-center text-gray-400">免费</span>
+          <span class="w-14 text-center text-gray-400">日卡</span>
+          <span class="w-14 text-center text-green-600">周卡</span>
+          <span class="w-14 text-center text-green-600">月卡</span>
+          <span class="w-14 text-center text-green-600">年卡</span>
+        </div>
+      </div>` +
+    [
+      { label:'AI对话次数', free:'限次', daily:'限次', weekly:'无限', monthly:'无限', yearly:'无限' },
+      { label:'每周训练次数', free:'1次', daily:'20次', weekly:'无限', monthly:'无限', yearly:'无限' },
+      { label:'语音训练', free:'❌', daily:'❌', weekly:'✅', monthly:'✅', yearly:'✅' },
+      { label:'高难度关卡', free:'❌', daily:'❌', weekly:'✅', monthly:'✅', yearly:'✅' },
+      { label:'3D渲染教练', free:'❌', daily:'❌', weekly:'❌', monthly:'✅', yearly:'✅' },
+      { label:'专属客服', free:'❌', daily:'❌', weekly:'❌', monthly:'❌', yearly:'✅' },
+      { label:'时空穿梭券', free:'签到获取', daily:'签到获取', weekly:'3张/周', monthly:'10张/月', yearly:'15张/月' }
+    ].map(b => `
+      <div class="flex items-center justify-between py-1">
+        <span class="text-gray-500">${b.label}</span>
+        <div class="flex gap-2 text-xs">
+          <span class="w-14 text-center text-gray-400">${b.free}</span>
+          <span class="w-14 text-center text-gray-400">${b.daily}</span>
+          <span class="w-14 text-center text-green-500">${b.weekly}</span>
+          <span class="w-14 text-center text-green-500">${b.monthly}</span>
+          <span class="w-14 text-center text-green-500">${b.yearly}</span>
+        </div>
+      </div>`).join('');
+  } else if (name === 'realname') {
+    if (userData.realNameVerified) {
+      $('realname-content').innerHTML = '<div class="text-center py-8"><div class="text-5xl mb-3">✅</div><h4 class="text-lg font-semibold text-green-600 mb-1">已完成实名认证</h4><p class="text-sm text-gray-500">' + userData.realNameInfo.name + '（' + userData.realNameInfo.idCard.slice(0,3) + '****' + userData.realNameInfo.idCard.slice(-4) + '）</p></div>';
+    }
+  } else if (name === 'antiaddiction') {
+    // 每日时长限制选项
+    $('time-limit-options').innerHTML = [
+      { label:'1小时', value:1 },
+      { label:'2小时', value:2 },
+      { label:'3小时', value:3 },
+      { label:'无限制', value:0 }
+    ].map(o => `<button onclick="dailyTimeLimit=${o.value};renderModal('antiaddiction')" class="py-2.5 rounded-xl text-sm font-medium transition-colors ${dailyTimeLimit===o.value ? 'bg-indigo-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}">${o.label}</button>`).join('');
+
+    // 连续使用提醒选项
+    $('continuous-reminder-options').innerHTML = [
+      { label:'30分钟', value:30 },
+      { label:'60分钟', value:60 },
+      { label:'关闭', value:0 }
+    ].map(o => `<button onclick="continuousReminder=${o.value};renderModal('antiaddiction')" class="py-2.5 rounded-xl text-sm font-medium transition-colors ${continuousReminder===o.value ? 'bg-indigo-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}">${o.label}</button>`).join('');
+
+    $('time-limit-status').textContent = dailyTimeLimit ? dailyTimeLimit + '小时' : '无限制';
+    $('continuous-reminder-status').textContent = continuousReminder ? continuousReminder + '分钟' : '已关闭';
+    $('continuous-reminder-status').className = 'font-medium ' + (continuousReminder ? 'text-indigo-600' : 'text-gray-400');
+  }
+}
+
+function submitRealName() {
+  const name = $('realname-name').value.trim();
+  const id = $('realname-id').value.trim();
+  if (!name) { alert('请输入姓名'); return; }
+  if (!/^\d{17}[\dXx]$/.test(id)) { alert('请输入正确的18位身份证号'); return; }
+  userData.realNameVerified = true;
+  userData.realNameInfo = { name, idCard: id.toUpperCase() };
+  saveData();
+  alert('✅ 实名认证成功！');
+  closeModal('realname');
+  renderModal('realname');
+}
+
+// ===== CBT =====
+function showCBT() {
+  cbtTab = 'new';
+  cbtStep = 1;
+  $('modal-cbt').style.display = 'flex';
+  renderCBT();
+}
+
+function renderCBT() {
+  $('cbt-tab-new').className = 'flex-1 py-2 rounded-md text-xs font-medium ' + (cbtTab==='new' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500');
+  $('cbt-tab-history').className = 'flex-1 py-2 rounded-md text-xs font-medium ' + (cbtTab==='history' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500');
+
+  if (cbtTab === 'new') {
+    $('cbt-content').innerHTML = `
+      <div class="flex items-center justify-between mb-6">
+        ${[1,2,3,4,5].map(s => `
+          <div class="flex items-center">
+            <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${cbtStep>=s ? 'bg-indigo-500 text-white' : 'bg-gray-200 text-gray-500'}">${s}</div>
+            ${s<5 ? `<div class="w-6 h-0.5 mx-1 ${cbtStep>s ? 'bg-indigo-500' : 'bg-gray-200'}"></div>` : ''}
+          </div>`).join('')}
+      </div>
+      ${cbtStep===1 ? `
+        <h3 class="text-base font-semibold text-gray-800 mb-1">描述当时的情况</h3>
+        <p class="text-xs text-gray-400 mb-3">尽量客观描述，不要加入评价</p>
+        <textarea id="cbt-situation" rows="4" placeholder="例：今天开会时，我提出的方案被领导否定" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 resize-none"></textarea>
+      ` : cbtStep===2 ? `
+        <h3 class="text-base font-semibold text-gray-800 mb-1">你当时的想法是什么？</h3>
+        <p class="text-xs text-gray-400 mb-3">写下你脑海中闪过的想法...</p>
+        <textarea id="cbt-thought" rows="4" oninput="detectDistortions()" placeholder="例：他们肯定觉得我很差劲" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 resize-none"></textarea>
+        <div class="mt-3 flex flex-wrap gap-2" id="cbt-distortions"></div>
+      ` : cbtStep===3 ? `
+        <h3 class="text-base font-semibold text-gray-800 mb-3">选择你的情绪</h3>
+        <div class="flex flex-wrap gap-2 mb-4" id="cbt-emotions">
+          ${['焦虑','悲伤','愤怒','恐惧','沮丧','羞愧','挫败','委屈'].map(e => `<button onclick="toggleCBTEmotion(this,'${e}')" class="px-3 py-1.5 rounded-full text-sm transition-all ${cbtSelectedEmotions.includes(e) ? 'bg-indigo-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}">${e}</button>`).join('')}
+        </div>
+        <div class="mt-4">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-sm text-gray-600">情绪强度</span>
+            <span class="text-sm font-bold text-indigo-600" id="cbt-intensity-label">${cbtEmotionIntensity}</span>
+          </div>
+          <input type="range" min="1" max="10" value="${cbtEmotionIntensity}" oninput="cbtEmotionIntensity=parseInt(this.value);$('cbt-intensity-label').textContent=this.value" class="w-full accent-indigo-500">
+          <div class="flex justify-between text-xs text-gray-400 mt-1">
+            <span>轻微</span>
+            <span>强烈</span>
+          </div>
+        </div>
+      ` : cbtStep===4 ? `
+        <h3 class="text-base font-semibold text-gray-800 mb-3">检验你的想法</h3>
+        <div class="mb-4">
+          <label class="block text-sm text-gray-600 mb-1.5">✅ 支持证据</label>
+          <textarea id="cbt-evidence-for" rows="3" placeholder="支持这个想法的客观事实" class="w-full px-4 py-3 bg-green-50 border border-green-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500/50 resize-none"></textarea>
+        </div>
+        <div>
+          <label class="block text-sm text-gray-600 mb-1.5">❌ 反对证据</label>
+          <textarea id="cbt-evidence-against" rows="3" placeholder="不支持这个想法的客观事实" class="w-full px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-500/50 resize-none"></textarea>
+        </div>
+      ` : cbtStep===5 ? `
+        <h3 class="text-base font-semibold text-gray-800 mb-3">重新思考</h3>
+        <textarea id="cbt-alternative" rows="3" placeholder="写下更合理的想法" class="w-full px-4 py-3 bg-indigo-50 border border-indigo-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 resize-none mb-4"></textarea>
+        <div class="mb-4">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-sm text-gray-600">重新评估情绪强度</span>
+            <span class="text-sm font-bold text-indigo-600" id="cbt-after-label">${cbtEmotionAfter}</span>
+          </div>
+          <input type="range" min="1" max="10" value="${cbtEmotionAfter}" oninput="cbtEmotionAfter=parseInt(this.value);$('cbt-after-label').textContent=this.value" class="w-full accent-indigo-500">
+        </div>
+        <div class="bg-gray-50 rounded-xl p-4 text-center">
+          <p class="text-xs text-gray-400 mb-2">情绪变化</p>
+          <div class="flex items-center justify-center gap-3">
+            <span class="text-2xl font-bold text-orange-500">${cbtEmotionIntensity}</span>
+            <span class="text-gray-400">→</span>
+            <span class="text-2xl font-bold ${cbtEmotionAfter < cbtEmotionIntensity ? 'text-green-500' : 'text-orange-500'}">${cbtEmotionAfter}</span>
+          </div>
+          <p class="text-xs mt-2 ${cbtEmotionAfter < cbtEmotionIntensity ? 'text-green-500' : 'text-gray-400'}">
+            ${cbtEmotionAfter < cbtEmotionIntensity ? '✨ 情绪有所缓解' : '继续练习，会越来越好的'}
+          </p>
+        </div>
+      ` : ''}
+      <div class="flex gap-3 mt-6">
+        ${cbtStep>1 ? `<button onclick="cbtStep--;renderCBT()" class="flex-1 py-3 bg-gray-100 text-gray-600 font-medium rounded-xl hover:bg-gray-200 transition-all">上一步</button>` : ''}
+        ${cbtStep<5 ? `<button onclick="cbtStep++;renderCBT()" class="flex-1 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all">下一步</button>` : ''}
+        ${cbtStep===5 ? `<button onclick="saveCBT();closeModal('cbt')" class="flex-1 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all">完成</button>` : ''}
+      </div>`;
+    // 检测认知扭曲
+    if (cbtStep === 2) detectDistortions();
+  } else {
+    $('cbt-content').innerHTML = cbtRecords.length > 0
+      ? cbtRecords.map(r => `<div class="p-3 bg-gray-50 rounded-xl mb-2">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs text-gray-400">${r.date}</span>
+            <div class="flex gap-1">${(r.emotions||[]).map(e => `<span class="text-xs px-1.5 py-0.5 bg-indigo-50 text-indigo-600 rounded">${e}</span>`).join('')}</div>
+          </div>
+          <p class="text-sm text-gray-700 mb-1"><span class="text-gray-400">情境：</span>${r.situation}</p>
+          <p class="text-sm text-gray-700 mb-1"><span class="text-gray-400">想法：</span>${r.thought}</p>
+          ${r.distortions && r.distortions.length > 0 ? `<div class="flex flex-wrap gap-1 mb-1">${r.distortions.map(d => `<span class="text-xs px-1.5 py-0.5 bg-amber-50 text-amber-600 rounded">⚠️ ${d}</span>`).join('')}</div>` : ''}
+          <p class="text-sm text-gray-700 mb-1"><span class="text-gray-400">替代想法：</span>${r.alternative}</p>
+          ${r.emotionIntensity ? `<div class="flex items-center gap-2 text-xs"><span class="text-orange-500">${r.emotionIntensity}</span><span class="text-gray-400">→</span><span class="text-green-500">${r.emotionAfter}</span></div>` : ''}
+        </div>`).join('')
+      : '<div class="text-center py-10 text-gray-400"><div class="text-4xl mb-2">📋</div><p class="text-sm">暂无思维记录</p></div>';
+  }
+}
+
+function detectDistortions() {
+  const thought = $('cbt-thought');
+  if (!thought) { cbtDetectedDistortions = []; return; }
+  const text = thought.value;
+  if (!text) { cbtDetectedDistortions = []; $('cbt-distortions').innerHTML = ''; return; }
+  const detected = [];
+  for (const pattern of distortionPatterns) {
+    if (pattern.keywords.some(kw => text.includes(kw))) {
+      detected.push(pattern.name);
+    }
+  }
+  cbtDetectedDistortions = detected;
+  if (detected.length > 0) {
+    $('cbt-distortions').innerHTML = detected.map(d => `<span class="px-2.5 py-1 bg-amber-50 text-amber-600 text-xs rounded-full border border-amber-200">⚠️ ${d}</span>`).join('');
+  } else {
+    $('cbt-distortions').innerHTML = '<span class="px-2.5 py-1 bg-green-50 text-green-600 text-xs rounded-full border border-green-200">✓ 未检测到明显认知扭曲</span>';
+  }
+}
+
+function toggleCBTEmotion(btn, emotion) {
+  const idx = cbtSelectedEmotions.indexOf(emotion);
+  if (idx >= 0) {
+    cbtSelectedEmotions.splice(idx, 1);
+    btn.className = 'px-3 py-1.5 rounded-full text-sm transition-all bg-gray-100 text-gray-600 hover:bg-gray-200';
+  } else {
+    cbtSelectedEmotions.push(emotion);
+    btn.className = 'px-3 py-1.5 rounded-full text-sm transition-all bg-indigo-500 text-white';
+  }
+}
+
+function saveCBT() {
+  const sit = $('cbt-situation');
+  const thought = $('cbt-thought');
+  const evFor = $('cbt-evidence-for');
+  const evAgainst = $('cbt-evidence-against');
+  const alt = $('cbt-alternative');
+  cbtRecords.unshift({
+    date: new Date().toLocaleDateString('zh-CN'),
+    situation: sit ? sit.value : '',
+    thought: thought ? thought.value : '',
+    emotions: [...cbtSelectedEmotions],
+    emotionIntensity: cbtEmotionIntensity,
+    evidenceFor: evFor ? evFor.value : '',
+    evidenceAgainst: evAgainst ? evAgainst.value : '',
+    alternative: alt ? alt.value : '',
+    emotionAfter: cbtEmotionAfter,
+    distortions: [...cbtDetectedDistortions]
+  });
+  // 重置状态
+  cbtSelectedEmotions = [];
+  cbtEmotionIntensity = 5;
+  cbtEmotionAfter = 5;
+  cbtDetectedDistortions = [];
+  cbtStep = 1;
+  saveData();
+  alert('✅ 思维记录已保存！');
+}
+
+// ===== NVC =====
+function showNVC() {
+  nvcStep = 1;
+  $('modal-nvc').style.display = 'flex';
+  renderNVC();
+}
+
+function renderNVC() {
+  $('nvc-steps').innerHTML = [1,2,3,4].map(s => `
+    <div class="flex items-center">
+      <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${nvcStep>=s ? 'bg-indigo-500 text-white' : 'bg-gray-200 text-gray-500'}">${s}</div>
+      ${s<4 ? `<div class="w-8 h-0.5 mx-1 ${nvcStep>s ? 'bg-indigo-500' : 'bg-gray-200'}"></div>` : ''}
+    </div>`).join('');
+
+  $('nvc-content').innerHTML = (nvcStep===1 ? `
+    <h3 class="text-base font-semibold text-gray-800 mb-1">观察</h3>
+    <p class="text-xs text-gray-400 mb-3">描述客观事实（不带评价）</p>
+    <textarea id="nvc-observation" rows="4" oninput="checkNvcEvaluation()" placeholder="例：当你提高音量说话时" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 resize-none"></textarea>
+    <div class="mt-2" id="nvc-eval-warning"></div>
+    <div class="mt-3 space-y-2">
+      <div class="p-2 bg-green-50 rounded-lg"><p class="text-xs text-green-700">✅ 好的观察："当你提高音量说话时"</p></div>
+      <div class="p-2 bg-red-50 rounded-lg"><p class="text-xs text-red-700">❌ 避免评价："当你态度很差时"</p></div>
+    </div>
+  ` : nvcStep===2 ? `
+    <h3 class="text-base font-semibold text-gray-800 mb-1">感受</h3>
+    <p class="text-xs text-gray-400 mb-3">选择你的感受，而不是想法</p>
+    <select id="nvc-feeling" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50">
+      <option value="">选择感受</option>
+      ${['受伤','生气','难过','焦虑','失望','挫败','委屈','害怕','其他'].map(f => `<option value="${f}">${f}</option>`).join('')}
+    </select>
+    <div class="mt-3 p-2 bg-green-50 rounded-lg"><p class="text-xs text-green-700">✅ 好的感受："我感到受伤"</p></div>
+  ` : nvcStep===3 ? `
+    <h3 class="text-base font-semibold text-gray-800 mb-1">需要</h3>
+    <p class="text-xs text-gray-400 mb-3">你需要什么？</p>
+    <select id="nvc-need" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50">
+      <option value="">选择需要</option>
+      ${['尊重','被倾听','理解','信任','公平','支持','安全感','合作','其他'].map(n => `<option value="${n}">${n}</option>`).join('')}
+    </select>
+  ` : nvcStep===4 ? `
+    <h3 class="text-base font-semibold text-gray-800 mb-1">请求</h3>
+    <p class="text-xs text-gray-400 mb-3">具体、可行的请求</p>
+    <textarea id="nvc-request" rows="4" oninput="updateNvcPreview()" placeholder="例：你愿意下次先用平和语气和我说吗？" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 resize-none"></textarea>
+    <div class="mt-4 p-4 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl" id="nvc-preview-box">
+      <p class="text-xs text-gray-400 mb-2">完整句子</p>
+      <p class="text-sm leading-relaxed" id="nvc-preview">当你<span class="text-indigo-600 font-medium">...</span>，我感到<span class="text-pink-600 font-medium">...</span>，因为我需要<span class="text-purple-600 font-medium">...</span>，你愿意<span class="text-green-600 font-medium">...</span>吗？</p>
+    </div>
+  ` : '') + `
+    <div class="flex gap-3 mt-6">
+      ${nvcStep>1 ? `<button onclick="nvcStep--;renderNVC()" class="flex-1 py-3 bg-gray-100 text-gray-600 font-medium rounded-xl hover:bg-gray-200">上一步</button>` : ''}
+      ${nvcStep<4 ? `<button onclick="nvcStep++;renderNVC()" class="flex-1 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-600 hover:to-purple-700">下一步</button>` : ''}
+      ${nvcStep===4 ? `<button onclick="saveNVC();closeModal('nvc')" class="flex-1 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-600 hover:to-purple-700">完成</button>` : ''}
+    </div>`;
+}
+
+function checkNvcEvaluation() {
+  const obs = $('nvc-observation');
+  const warning = $('nvc-eval-warning');
+  if (!obs || !warning) return;
+  const text = obs.value;
+  if (!text) { warning.innerHTML = ''; return; }
+  const hasEval = nvcEvaluationWords.some(w => text.includes(w));
+  if (hasEval) {
+    warning.innerHTML = '<div class="px-3 py-2 bg-amber-50 text-amber-600 text-xs rounded-lg border border-amber-200">⚠️ 检测到评价性词语，尝试只描述客观行为</div>';
+  } else {
+    warning.innerHTML = '';
+  }
+}
+
+function updateNvcPreview() {
+  const obs = $('nvc-observation');
+  const feeling = $('nvc-feeling');
+  const need = $('nvc-need');
+  const req = $('nvc-request');
+  const preview = $('nvc-preview');
+  if (!preview) return;
+  const o = obs ? obs.value || '...' : '...';
+  const f = feeling ? feeling.value || '...' : '...';
+  const n = need ? need.value || '...' : '...';
+  const r = req ? req.value || '...' : '...';
+  preview.innerHTML = `当你<span class="text-indigo-600 font-medium">${o}</span>，我感到<span class="text-pink-600 font-medium">${f}</span>，因为我需要<span class="text-purple-600 font-medium">${n}</span>，你愿意<span class="text-green-600 font-medium">${r}</span>吗？`;
+}
+
+function saveNVC() {
+  nvcRecords.unshift({ date: new Date().toLocaleDateString('zh-CN') });
+  saveData();
+  alert('✅ NVC记录已保存！');
+}
+
+// ===== 学习卡片 =====
+function showCards() {
+  cardFilter = '全部';
+  $('modal-cards').style.display = 'flex';
+  renderCards();
+}
+
+function renderCards() {
+  const categories = ['全部','沟通技巧','情感表达','职场社交'];
+  $('card-filters').innerHTML = categories.map(c =>
+    `<button onclick="cardFilter='${c}';renderCards()" class="px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${cardFilter===c ? 'bg-indigo-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}">${c}</button>`
+  ).join('');
+
+  const filtered = cardFilter==='全部' ? learningCards : learningCards.filter(c => c.category===cardFilter);
+  $('card-list').innerHTML = filtered.length > 0
+    ? filtered.map(c => `
+      <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 cursor-pointer hover:from-indigo-100 hover:to-purple-100 transition-all">
+        <div class="flex items-center justify-between mb-2">
+          <span class="px-2 py-0.5 bg-indigo-100 text-indigo-600 text-xs rounded-full">${c.category}</span>
+          ${collectedCards.find(c2 => c2.id===c.id) ? '<span class="text-xs text-green-500">⭐ 已收藏</span>' : ''}
+        </div>
+        <h4 class="font-semibold text-gray-800">${c.title}</h4>
+        <p class="text-sm text-gray-600 mt-1">${c.content}</p>
+        <div class="mt-2 space-y-1">
+          ${c.tips.map(t => `<p class="text-xs text-gray-500">• ${t}</p>`).join('')}
+        </div>
+        ${!collectedCards.find(c2 => c2.id===c.id)
+          ? `<button onclick="collectCard(${c.id})" class="w-full mt-2 py-2 bg-indigo-100 text-indigo-600 text-sm rounded-lg hover:bg-indigo-200 transition-colors">+ 收藏</button>`
+          : `<button onclick="removeCard(${c.id})" class="w-full mt-2 py-2 bg-gray-100 text-gray-500 text-sm rounded-lg hover:bg-gray-200 transition-colors">取消收藏</button>`}
+      </div>`).join('')
+    : '<div class="text-center py-8 text-gray-400 text-sm">该分类暂无卡片</div>';
+}
+
+function collectCard(id) {
+  const card = learningCards.find(c => c.id===id);
+  if (card && !collectedCards.find(c => c.id===id)) {
+    collectedCards.push(card);
+    saveData();
+    renderCards();
+  }
+}
+
+function removeCard(id) {
+  collectedCards = collectedCards.filter(c => c.id!==id);
+  saveData();
+  renderCards();
+}
+
+// ===== 晚安计划 =====
+function showGoodnight() {
+  $('modal-goodnight').style.display = 'flex';
+  $('modal-goodnight').querySelector('.modal-content').style.background = 'transparent';
+  $('modal-goodnight').querySelector('.modal-content').style.boxShadow = 'none';
+  $('goodnight-title').textContent = '晚安，' + userData.nickname;
+  const messages = [
+    '今天辛苦了，好好休息吧。愿你今晚有个甜甜的梦，明天又是充满希望的一天。',
+    '夜深了，记得盖好被子。无论今天发生了什么，明天都是新的开始，晚安。',
+    '愿月光温柔地陪伴你入睡，所有的烦恼都留在今天，晚安好梦。',
+    '今天的你已经很棒了，好好放松一下。明天醒来，又是元气满满的一天！',
+    '夜幕降临，是时候给自己一个拥抱了。晚安，愿你梦里有星辰大海。'
+  ];
+  $('goodnight-content').textContent = messages[Math.floor(Math.random() * messages.length)];
+
+  // 统计信息
+  const completedScenes = trainingScenes.filter(s => s.completed).length;
+  $('goodnight-scenes').textContent = completedScenes;
+  $('goodnight-points').textContent = '+' + userData.points;
+
+  // 明日鼓励
+  const encouragements = [
+    '明天继续加油，你会越来越棒的！',
+    '每一次练习都在进步，继续保持！',
+    '明天的你，会比今天更优秀。',
+    '新的一天，新的挑战，加油！',
+    '相信自己，你比想象中更强大。'
+  ];
+  $('goodnight-encourage').textContent = encouragements[Math.floor(Math.random() * encouragements.length)];
+}
+
+// ===== 隐私 =====
+let confirmClearAllActive = false;
+
+function clearChatHistory() {
+  if (confirm('确定要清除聊天记录吗？此操作不可撤销。')) {
+    diaries = [];
+    trainingMessages = [];
+    trainingChoices = [];
+    saveData();
+    alert('✅ 聊天记录已清除');
+  }
+}
+
+function confirmClearAllData() {
+  $('privacy-clear-btn').style.display = 'none';
+  $('privacy-clear-confirm').style.display = 'block';
+  confirmClearAllActive = true;
+}
+
+function cancelClearAll() {
+  $('privacy-clear-btn').style.display = 'block';
+  $('privacy-clear-confirm').style.display = 'none';
+  confirmClearAllActive = false;
+}
+
+function executeClearAll() {
+  Object.keys(localStorage).forEach(k => { if (k.startsWith(STORAGE_PREFIX)) localStorage.removeItem(k); });
+  alert('所有数据已清除');
+  closeModal('privacy');
+  location.reload();
+}
+
+function exportData() {
+  const data = {};
+  for (let i=0; i<localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key.startsWith(STORAGE_PREFIX)) data[key] = localStorage.getItem(key);
+  }
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'dl_data_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function generateInviteCode() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let code = 'DL';
+  for (let i = 0; i < 6; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+}
+
+function copyInviteCode() {
+  const code = $('edit-invite-code');
+  if (!code || !code.value) return;
+  navigator.clipboard.writeText(code.value).then(() => {
+    alert('✅ 邀请码已复制：' + code.value);
+  }).catch(() => {
+    code.select();
+    document.execCommand('copy');
+    alert('✅ 邀请码已复制：' + code.value);
+  });
+}
+
+function showInviteRewards() {
+  $('modal-invite').style.display = 'flex';
+}
+
+// ===== 道具系统（参考"与你"实现，PRD §9 + §13.1） =====
+
+// 时空穿梭券 - 回到上一轮重新选择（PRD §13.1）
+function useTimeRewind() {
+  if (timeRewindTickets <= 0 || trainingRoundIdx <= 0) return;
+  if (!confirm('⏳ 是否使用1张时空穿梭券，回到上一轮重新选择？')) return;
+
+  timeRewindTickets--;
+  // 回退到上一轮
+  trainingRoundIdx--;
+  // 移除最后一条用户消息和反馈
+  if (trainingChoices.length > 0) trainingChoices.pop();
+  // 移除最后两条消息（反馈+用户选择）
+  const msgs = $('training-messages');
+  const children = msgs.children;
+  if (children.length >= 2) {
+    msgs.removeChild(children[children.length - 1]);
+    msgs.removeChild(children[children.length - 1]);
+  }
+  // 隐藏穿梭按钮
+  $('rewind-btn').style.display = 'none';
+  updatePropButtons();
+  saveData();
+  // 显示新的一轮
+  setTimeout(() => showRound(), 500);
+}
+
+// 提示卡 - 标记本轮最佳选项（PRD §9.1）
+function useHintCardNow() {
+  if (hintCards <= 0 || useHintCard || !showTrainingOptions) return;
+  hintCards--;
+  useHintCard = true;
+  updatePropButtons();
+  saveData();
+  // 重新渲染选项，标记最佳选项
+  const opts = $('training-options');
+  if (opts) {
+    const round = currentTraining.rounds[trainingRoundIdx];
+    const hintIdx = round.options.findIndex(o => o.quality === 'good');
+    const btns = opts.querySelectorAll('button');
+    btns.forEach((btn, idx) => {
+      if (idx === hintIdx) {
+        btn.innerHTML = '<span class="text-xs mr-2">' + ['A','B','C'][idx] + '</span>🌟' + round.options[idx].text;
+        btn.style.borderColor = '#f59e0b';
+        btn.style.borderWidth = '2px';
+      }
+    });
+  }
+  addTrainingMessage('💡 教练提示：标记了最佳选项（🌟）', false, true);
+}
+
+// 情绪护盾 - 本轮负面情绪效果减半（PRD §9.1）
+function useShieldCardNow() {
+  if (shieldCards <= 0 || useShieldCard) return;
+  shieldCards--;
+  useShieldCard = true;
+  updatePropButtons();
+  saveData();
+  addTrainingMessage('🛡️ 情绪护盾已激活，本轮负面效果减半', false, true);
+}
+
+// 双倍积分卡 - 本次训练积分翻倍（PRD §9.1）
+function toggleDoublePoints() {
+  if (doublePointCards <= 0 || useDoublePoints) return;
+  useDoublePoints = true;
+  updatePropButtons();
+  addTrainingMessage('✨ 双倍积分卡已激活，本次训练积分翻倍！', false, true);
+}
+
+// ===== 退出登录 =====
+function logout() {
+  if (confirm('确定要退出登录吗？')) {
+    showView('page-login');
+    $('tab-bar').classList.remove('show');
+  }
 }
 
 // ===== 初始化 =====
-document.getElementById('tab-bar').style.display = 'none';
+generateCoachMoments();
+setupPwdMatchCheck();
 </script>
 </body>
 </html>
