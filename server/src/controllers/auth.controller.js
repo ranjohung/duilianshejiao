@@ -31,9 +31,19 @@ exports.register = async (req, res) => {
     // 生成JWT
     const token = generateToken(userId, 'free');
 
-    successResponse(res, { userId, token }, '注册成功');
+    successResponse(res, {
+      userId,
+      token,
+      refreshToken: token,
+      nickname,
+      memberLevel: 'free',
+      trainingPoints: 0,
+      realNameLevel: 0,
+      realNameRequired: true,
+    }, '注册成功');
   } catch (err) {
-    errorResponse(res, 500, err.message);
+    console.error('注册错误:', err);
+    errorResponse(res, 500, err.message || '注册失败，请稍后重试');
   }
 };
 
@@ -62,7 +72,16 @@ exports.login = async (req, res) => {
     // 生成JWT
     const token = generateToken(user.id, user.member_level);
 
-    successResponse(res, { userId: user.id, token }, '登录成功');
+    successResponse(res, {
+      userId: user.id,
+      token,
+      refreshToken: token,
+      nickname: user.nickname,
+      memberLevel: user.member_level || 'free',
+      trainingPoints: user.training_points || 0,
+      realNameLevel: user.is_real_name_verified ? 1 : 0,
+      realNameRequired: !user.is_real_name_verified,
+    }, '登录成功');
   } catch (err) {
     errorResponse(res, 500, err.message);
   }
@@ -122,7 +141,7 @@ exports.verifyRealName = async (req, res) => {
 
 exports.refreshToken = async (req, res) => {
   try {
-    const { token: oldToken } = req.body;
+    const { refreshToken: oldToken } = req.body;
 
     if (!oldToken) {
       return errorResponse(res, 400, '缺少令牌');
@@ -149,7 +168,7 @@ exports.refreshToken = async (req, res) => {
     // 生成新token
     const newToken = generateToken(user.id, user.member_level);
 
-    successResponse(res, { token: newToken }, '令牌刷新成功');
+    successResponse(res, { token: newToken, refreshToken: newToken }, '令牌刷新成功');
   } catch (err) {
     errorResponse(res, 500, err.message);
   }

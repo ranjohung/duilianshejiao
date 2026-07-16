@@ -13,7 +13,7 @@ class TrainingService {
     required String sceneId,
   }) async {
     final res = await _client.post(
-      ApiRoutes.sceneStart + '/$sceneId/start',
+      ApiRoutes.trainingStart,
       data: {
         'coachId': coachId,
         'sceneId': sceneId,
@@ -32,14 +32,14 @@ class TrainingService {
   /// 发送对话消息（LLM路由）
   /// 后端根据会员等级自动路由到DeepSeek或Ollama
   Future<Map<String, dynamic>> sendMessage({
-    required String trainingId,
+    required String sessionId,
     required String message,
     String? audioUrl,
   }) async {
     final res = await _client.post(
-      ApiRoutes.trainingChat,
+      ApiRoutes.trainingMessage,
       data: {
-        'trainingId': trainingId,
+        'sessionId': sessionId,
         'message': message,
         if (audioUrl != null) 'audioUrl': audioUrl,
       },
@@ -56,14 +56,14 @@ class TrainingService {
 
   /// SSE流式发送对话消息
   Stream<String> sendMessageStream({
-    required String trainingId,
+    required String sessionId,
     required String message,
     String? audioUrl,
   }) {
     return _client.postSSE(
-      ApiRoutes.trainingChat,
+      ApiRoutes.trainingMessage,
       data: {
-        'trainingId': trainingId,
+        'sessionId': sessionId,
         'message': message,
         if (audioUrl != null) 'audioUrl': audioUrl,
       },
@@ -71,10 +71,10 @@ class TrainingService {
   }
 
   /// 结束训练
-  Future<Map<String, dynamic>> endTraining(String trainingId) async {
+  Future<Map<String, dynamic>> endTraining(String sessionId) async {
     final res = await _client.post(
-      ApiRoutes.sceneComplete + '/$trainingId/complete',
-      data: {'trainingId': trainingId},
+      ApiRoutes.trainingEnd,
+      data: {'sessionId': sessionId},
     );
     final apiRes = ApiResponse.fromJson(
       res.data,
@@ -89,14 +89,14 @@ class TrainingService {
   /// 发送对话消息（LLM路由）
   /// 后端根据会员等级自动路由到DeepSeek或Ollama
   Future<ApiResponse<Map<String, dynamic>>> chat({
-    required String trainingId,
+    required String sessionId,
     required String message,
     String? audioUrl,
   }) async {
     final res = await _client.post(
-      ApiRoutes.trainingChat,
+      ApiRoutes.trainingMessage,
       data: {
-        'trainingId': trainingId,
+        'sessionId': sessionId,
         'message': message,
         if (audioUrl != null) 'audioUrl': audioUrl,
       },

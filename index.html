@@ -212,8 +212,8 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
         </div>
         <div class="flex items-center justify-between">
           <div>
-            <h3 class="font-bold text-lg" id="recommend-name">☕ 咖啡厅破冰</h3>
-            <p class="text-sm opacity-80 mt-0.5" id="recommend-desc">与陌生人初次见面练习</p>
+            <h3 class="font-bold text-lg" id="recommend-name">💑 相亲模拟</h3>
+            <p class="text-sm opacity-80 mt-0.5" id="recommend-desc">朋友介绍的第一次见面</p>
           </div>
           <button onclick="startTraining(getRecommendedScene())" class="px-4 py-2 bg-white text-orange-500 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">开始训练</button>
         </div>
@@ -1424,7 +1424,7 @@ let trainingScenes = [
       { text:'下次不会了', quality:'safe', points:3 }
     ]}
   ]},
-  { id:6, icon:'🤗', name:'安慰失落的TA', desc:'安慰情绪低落的朋友', stage:3, difficulty:2, duration:'8min', unlocked:false, completed:false, rounds:[
+  { id:6, icon:'🤗', name:'共情沟通训练', desc:'学习如何回应他人的情绪', stage:3, difficulty:2, duration:'8min', unlocked:false, completed:false, rounds:[
     { ai:'我今天被老板骂了，感觉自己什么都做不好...', options:[
       { text:'别难过了', quality:'safe', points:3 },
       { text:'被骂的感觉一定很委屈吧。你愿意跟我说说发生了什么吗？', quality:'good', points:10 },
@@ -2096,17 +2096,17 @@ function startTraining(sceneId) {
   const personalityLabels = { '友好型':'😊', '内向型':'😌', '挑剔型':'😒', '理性型':'🤔' };
   currentPersonalityLabel = personalityLabels[currentPersonality] + ' ' + currentPersonality;
 
-  const sceneTypeMap = { '相亲模拟': '生活社交', '模拟面试': '工作沟通', '加薪谈判': '工作沟通', '兴趣社群自我介绍': '生活社交', '被朋友误解(NVC)': '生活社交', '安慰失落的TA': '生活社交' };
-  const yourRoleMap = { '相亲模拟': '相亲者', '模拟面试': '求职者', '加薪谈判': '员工', '兴趣社群自我介绍': '新人', '被朋友误解(NVC)': '被误解者', '安慰失落的TA': '安慰者' };
-  const otherRoleMap = { '相亲模拟': '相亲对象', '模拟面试': '面试官', '加薪谈判': '老板', '兴趣社群自我介绍': '社群成员', '被朋友误解(NVC)': '朋友', '安慰失落的TA': '失落的朋友' };
-  const targetMap = { '相亲模拟': '给对方留下好印象', '模拟面试': '通过面试', '加薪谈判': '成功加薪', '兴趣社群自我介绍': '融入社群', '被朋友误解(NVC)': '化解误会', '安慰失落的TA': '安慰朋友' };
+  const sceneTypeMap = { '相亲模拟': '生活社交', '模拟面试': '工作沟通', '加薪谈判': '工作沟通', '兴趣社群自我介绍': '生活社交', '被朋友误解(NVC)': '生活社交', '共情沟通训练': '生活社交' };
+  const yourRoleMap = { '相亲模拟': '相亲者', '模拟面试': '求职者', '加薪谈判': '员工', '兴趣社群自我介绍': '新人', '被朋友误解(NVC)': '被误解者', '共情沟通训练': '倾听者' };
+  const otherRoleMap = { '相亲模拟': '相亲对象', '模拟面试': '面试官', '加薪谈判': '老板', '兴趣社群自我介绍': '社群成员', '被朋友误解(NVC)': '朋友', '共情沟通训练': '情绪低落者' };
+  const targetMap = { '相亲模拟': '给对方留下好印象', '模拟面试': '通过面试', '加薪谈判': '成功加薪', '兴趣社群自我介绍': '融入社群', '被朋友误解(NVC)': '化解误会', '共情沟通训练': '有效共情回应' };
   const tipMap = {
     '相亲模拟': '在相亲中，对方的第一印象很大程度上来源于你的外表',
     '模拟面试': '面试官会在7秒内形成第一印象',
     '加薪谈判': '专业形象有助于提升谈判信心',
     '兴趣社群自我介绍': '得体的形象能让你更快融入集体',
     '被朋友误解(NVC)': '真诚的态度比外表更重要',
-    '安慰失落的TA': '温暖的形象能传递安全感'
+    '共情沟通训练': '温暖的形象能传递安全感'
   };
 
   $('prepare-title').textContent = scene.icon + ' ' + scene.name;
@@ -2133,7 +2133,7 @@ function goToBeautyClub() {
     '加薪谈判': '商务休闲风格，既专业又不失亲和力',
     '兴趣社群自我介绍': '轻松休闲，展现个人风格',
     '被朋友误解(NVC)': '舒适自然，让对方感到放松',
-    '安慰失落的TA': '温暖柔和的色调，传递安全感'
+    '共情沟通训练': '温暖柔和的色调，传递安全感'
   };
   const makeupMap = {
     '相亲模拟': '淡妆为主，突出自然好气色',
@@ -2141,7 +2141,7 @@ function goToBeautyClub() {
     '加薪谈判': '精致得体，展现自信',
     '兴趣社群自我介绍': '自然清新，展现个性',
     '被朋友误解(NVC)': '素净自然，传递真诚',
-    '安慰失落的TA': '温柔妆容，传递温暖'
+    '共情沟通训练': '温柔妆容，传递温暖'
   };
   const hairMap = {
     '相亲模拟': '清爽整洁，展现自信气质',
@@ -2149,7 +2149,7 @@ function goToBeautyClub() {
     '加薪谈判': '精心打理，展现自信',
     '兴趣社群自我介绍': '随性自然，展现个性',
     '被朋友误解(NVC)': '柔和自然，传递真诚',
-    '安慰失落的TA': '温暖亲和的发型'
+    '共情沟通训练': '温暖亲和的发型'
   };
 
   $('beauty-outfit').textContent = outfitMap[currentTraining.name] || '选择适合的穿搭';

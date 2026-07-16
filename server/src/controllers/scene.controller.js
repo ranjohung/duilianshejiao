@@ -125,7 +125,9 @@ exports.getGroupedByStage = async (req, res) => {
     }
 
     // 计算每个阶段的解锁状态
-    const result = STAGE_ORDER.map((stage, index) => {
+    const result = [];
+    for (let index = 0; index < STAGE_ORDER.length; index++) {
+      const stage = STAGE_ORDER[index];
       const scenes = grouped[stage] || [];
       const prevStage = index > 0 ? STAGE_ORDER[index - 1] : null;
       let unlocked = true;
@@ -136,12 +138,12 @@ exports.getGroupedByStage = async (req, res) => {
         unlocked = prevCompletedCount >= 1;
       }
 
-      return {
+      result.push({
         stage,
         unlocked,
         scenes,
-      };
-    });
+      });
+    }
 
     successResponse(res, result, '获取阶段分组场景成功');
   } catch (err) {

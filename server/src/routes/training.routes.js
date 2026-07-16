@@ -13,10 +13,10 @@ router.post('/message', auth, antiAddictionCheck, chatLimiter, trainingControlle
 // POST /api/training/end - 结束训练
 router.post('/end', auth, trainingController.endTraining);
 
-// GET /api/training/history - 训练历史
-router.get('/history', auth, trainingController.getHistory);
+// GET /api/training/records - 训练历史
+router.get('/records', auth, trainingController.getHistory);
 
-// GET /api/training/:id - 训练详情
-router.get('/:id', auth, trainingController.getDetail);
+// GET /api/training/records/:id - 训练详情
+router.get('/records/:id', auth, trainingController.getDetail);
 
 module.exports = router;

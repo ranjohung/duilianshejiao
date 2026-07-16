@@ -27,11 +27,11 @@ class ApiRoutes {
   // ============ 场景模块 ============
   static const String sceneList = '$_prefix/scenes';
   static const String sceneDetail = '$_prefix/scenes'; // + /:id
-  static const String sceneStart = '$_prefix/scenes'; // + /:id/start
-  static const String sceneComplete = '$_prefix/scenes'; // + /:id/complete
 
   // ============ 训练模块 ============
-  static const String trainingChat = '$_prefix/training/chat';
+  static const String trainingStart = '$_prefix/training/start';
+  static const String trainingMessage = '$_prefix/training/message';
+  static const String trainingEnd = '$_prefix/training/end';
   static const String trainingRecords = '$_prefix/training/records';
   static const String trainingRecordDetail =
       '$_prefix/training/records'; // + /:id

@@ -277,7 +277,7 @@ exports.getHistory = async (req, res) => {
   try {
     const userId = req.user.id;
     const page = parseInt(req.query.page) || 1;
-    const pageSize = parseInt(req.query.pageSize) || 10;
+    const pageSize = parseInt(req.query.page_size) || parseInt(req.query.pageSize) || 20;
 
     const result = await TrainingRecord.findByUser(userId, { page, pageSize });
 

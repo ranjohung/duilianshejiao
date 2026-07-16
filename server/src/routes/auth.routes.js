@@ -29,9 +29,9 @@ router.post('/verify-real-name', auth, validate(Joi.object({
   idCard: Joi.string().length(18).required(),
 })), authController.verifyRealName);
 
-// POST /api/auth/refresh-token
-router.post('/refresh-token', validate(Joi.object({
-  token: Joi.string().required(),
+// POST /api/auth/refresh
+router.post('/refresh', validate(Joi.object({
+  refreshToken: Joi.string().required(),
 })), authController.refreshToken);
 
 // POST /api/auth/logout

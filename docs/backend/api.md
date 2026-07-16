@@ -424,9 +424,9 @@
         "scenes": [
           {
             "id": 1,
-            "name": "咖啡厅破冰",
-            "difficulty": 1,
-            "estimated_duration": 10,
+            "name": "相亲模拟",
+            "difficulty": 2,
+            "estimated_duration": 12,
             "completion_rate": 75,
             "best_score": 85,
             "is_unlocked": true,
@@ -452,12 +452,12 @@
   "code": 0,
   "data": {
     "id": 1,
-    "name": "咖啡厅破冰",
-    "description": "在一家温馨的咖啡厅，你注意到旁边座位的人正在看一本你也喜欢的书。如何自然地开启一段对话？",
+    "name": "相亲模拟",
+    "description": "朋友介绍了一个条件不错的相亲对象，你们约在咖啡厅第一次见面。如何给对方留下好印象？",
     "stage": 1,
     "stage_name": "破冰期",
-    "difficulty": 1,
-    "difficulty_label": "简单",
+    "difficulty": 2,
+    "difficulty_label": "中等",
     "rounds": 5,
     "estimated_duration": 10,
     "teaching_point": "自然开启对话、制造话题",
@@ -501,9 +501,9 @@
   "data": {
     "training_id": 5001,
     "scene": {
-      "name": "咖啡厅破冰",
-      "description": "在一家温馨的咖啡厅...",
-      "npc": {"name": "小林", "opening_line": "你好，这个位置有人吗？"}
+      "name": "相亲模拟",
+      "description": "朋友介绍了一个条件不错的相亲对象...",
+      "npc": {"name": "小雨", "opening_line": "你好，我是XXX介绍的小雨"}
     },
     "coach": {
       "name": "沈清欢",
@@ -560,10 +560,10 @@
       "adaptability": 68
     },
     "evaluation_report": {
-      "summary": "你在本次咖啡厅破冰训练中表现良好...",
+      "summary": "你在本次相亲模拟训练中表现良好...",
       "strengths": ["能主动开启话题", "语气自然友好"],
       "improvements": ["可以多用开放式问题延续对话"],
-      "coach_comment": "你今天的开场很自然！下次试试问对方为什么喜欢那本书，会让对话更有深度。——沈清欢"
+      "coach_comment": "你今天的开场很自然！下次试试问对方平时喜欢做什么，会让对话更有深度。——沈清欢"
     },
     "points_earned": 25,
     "total_points": 375,
@@ -665,8 +665,8 @@
     "records": [
       {
         "id": 5001,
-        "scene_name": "咖啡厅破冰",
-        "scene_difficulty": 1,
+        "scene_name": "相亲模拟",
+        "scene_difficulty": 2,
         "coach_name": "沈清欢",
         "score": 82,
         "star_rating": 2,
@@ -691,7 +691,7 @@
   "code": 0,
   "data": {
     "id": 5001,
-    "scene_name": "咖啡厅破冰",
+    "scene_name": "相亲模拟",
     "coach_name": "沈清欢",
     "score": 82,
     "star_rating": 2,
@@ -703,7 +703,7 @@
       "adaptability": 68
     },
     "evaluation_report": {
-      "summary": "你在本次咖啡厅破冰训练中表现良好...",
+      "summary": "你在本次相亲模拟训练中表现良好...",
       "strengths": ["能主动开启话题", "语气自然友好"],
       "improvements": ["可以多用开放式问题延续对话"],
       "coach_comment": "你今天的开场很自然！——沈清欢"
