@@ -108,9 +108,11 @@ class TrainingResultPage extends StatelessWidget {
                   children: [
                     Text(
                       _score.toInt().toString(),
-                      style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 40, fontWeight: FontWeight.bold),
                     ),
-                    const Text('分', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                    const Text('分',
+                        style: TextStyle(fontSize: 14, color: Colors.grey)),
                   ],
                 ),
               ],
@@ -139,11 +141,14 @@ class TrainingResultPage extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 8)],
+        boxShadow: [
+          BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 8)
+        ],
       ),
       child: Column(
         children: [
-          const Text('能力维度', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+          const Text('能力维度',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
           const SizedBox(height: 16),
           SizedBox(
             height: 220,
@@ -156,12 +161,15 @@ class TrainingResultPage extends StatelessWidget {
                     borderColor: AppConfig.primaryColor,
                     borderWidth: 2,
                     entryRadius: 4,
-                    dataEntries: _dimensionValues.map((v) => RadarEntry(value: v)).toList(),
+                    dataEntries: _dimensionValues
+                        .map((v) => RadarEntry(value: v))
+                        .toList(),
                   ),
                 ],
                 radarBackgroundColor: Colors.transparent,
                 radarBorderData: const BorderSide(color: Colors.grey, width: 1),
-                gridBorderData: const BorderSide(color: Colors.grey, width: 0.5),
+                gridBorderData:
+                    const BorderSide(color: Colors.grey, width: 0.5),
                 tickBorderData: const BorderSide(color: Colors.transparent),
                 ticksTextStyle: const TextStyle(fontSize: 0),
                 getTitle: (index, _) {
@@ -169,7 +177,8 @@ class TrainingResultPage extends StatelessWidget {
                   return RadarChartTitle(text: titles[index]);
                 },
                 titlePositionFactorOffset: 0.2,
-                titleTextStyle: const TextStyle(fontSize: 12, color: Colors.black54),
+                titleTextStyle:
+                    const TextStyle(fontSize: 12, color: Colors.black54),
               ),
             ),
           ),
@@ -185,22 +194,28 @@ class TrainingResultPage extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 8)],
+        boxShadow: [
+          BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 8)
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.chat_bubble_outline, size: 18, color: AppConfig.primaryColor),
+              Icon(Icons.chat_bubble_outline,
+                  size: 18, color: AppConfig.primaryColor),
               const SizedBox(width: 6),
-              Text('$_coachName点评', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+              Text('$_coachName点评',
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w600)),
             ],
           ),
           const SizedBox(height: 10),
           Text(
             _coachComment,
-            style: TextStyle(fontSize: 14, color: Colors.grey[700], height: 1.6),
+            style:
+                TextStyle(fontSize: 14, color: Colors.grey[700], height: 1.6),
           ),
         ],
       ),
@@ -217,7 +232,8 @@ class TrainingResultPage extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.stars_rounded, color: AppConfig.accentColor, size: 28),
+          const Icon(Icons.stars_rounded,
+              color: AppConfig.accentColor, size: 28),
           const SizedBox(width: 8),
           const Text('获得积分', style: TextStyle(fontSize: 16)),
           const SizedBox(width: 8),
@@ -239,11 +255,13 @@ class TrainingResultPage extends StatelessWidget {
       children: [
         Expanded(
           child: OutlinedButton(
-            onPressed: () => Navigator.of(context).popUntil((route) => route.isFirst),
+            onPressed: () =>
+                Navigator.of(context).popUntil((route) => route.isFirst),
             style: OutlinedButton.styleFrom(
               side: BorderSide(color: AppConfig.primaryColor),
               padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
             ),
             child: const Text('返回', style: TextStyle(fontSize: 16)),
           ),
@@ -256,7 +274,8 @@ class TrainingResultPage extends StatelessWidget {
               backgroundColor: AppConfig.primaryColor,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
             ),
             child: const Text('再来一次', style: TextStyle(fontSize: 16)),
           ),

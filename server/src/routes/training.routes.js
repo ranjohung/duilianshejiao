@@ -19,4 +19,7 @@ router.get('/records', auth, trainingController.getHistory);
 // GET /api/training/records/:id - 训练详情
 router.get('/records/:id', auth, trainingController.getDetail);
 
+// POST /api/training/item/use - 使用道具
+router.post('/item/use', auth, trainingController.useItem);
+
 module.exports = router;

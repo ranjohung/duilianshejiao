@@ -460,6 +460,28 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
         <div class="flex flex-wrap gap-3" id="achievement-list"></div>
       </div>
 
+      <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-4 shadow-sm mb-4">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-semibold text-gray-800">✨ 我的天赋</h3>
+          <button onclick="unlockTalent()" class="px-3 py-1 bg-amber-500 text-white text-xs font-medium rounded-lg hover:bg-amber-600 transition-colors">
+            解锁天赋（100积分）
+          </button>
+        </div>
+        <div class="space-y-2" id="talent-list">
+          <div class="text-center text-gray-400 text-sm py-4">暂无天赋，消耗100积分解锁新天赋</div>
+        </div>
+      </div>
+
+      <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-4 shadow-sm mb-4">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-semibold text-gray-800">🎯 真实挑战</h3>
+          <button onclick="loadChallenges()" class="text-xs text-green-600 hover:text-green-700">刷新</button>
+        </div>
+        <div class="space-y-2" id="challenge-list">
+          <div class="text-center text-gray-400 text-sm py-4">加载中...</div>
+        </div>
+      </div>
+
       <div class="bg-white rounded-2xl p-4 shadow-sm">
         <h3 class="text-sm font-semibold text-gray-800 mb-4">🚀 成长里程碑</h3>
         <div class="relative" id="milestone-list"></div>
@@ -562,6 +584,14 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
           <div class="flex items-center gap-3">
             <span class="text-xl">🎒</span>
             <div><div class="text-gray-700 text-sm">道具背包</div><div class="text-xs text-gray-400">查看和使用训练道具</div></div>
+          </div>
+          <span class="text-gray-400">→</span>
+        </button>
+
+        <button onclick="showModal('invite')" class="w-full bg-white rounded-xl p-4 shadow-sm flex items-center justify-between hover:bg-gray-50 transition-all">
+          <div class="flex items-center gap-3">
+            <span class="text-xl">👥</span>
+            <div><div class="text-gray-700 text-sm">邀请好友</div><div class="text-xs text-gray-400">邀好友得奖励</div></div>
           </div>
           <span class="text-gray-400">→</span>
         </button>
@@ -1239,38 +1269,72 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
     </div>
   </div>
 
-  <!-- ===== 邀请奖励弹窗 ===== -->
+  <!-- ===== 邀请好友弹窗 ===== -->
   <div class="modal-overlay" id="modal-invite" style="display:none">
-    <div class="modal-content">
+    <div class="modal-content max-h-[80vh]">
       <div class="flex items-center justify-between p-4 border-b border-gray-100">
-        <h3 class="font-semibold text-gray-800">🎁 邀请奖励规则</h3>
+        <h3 class="font-semibold text-gray-800">👥 邀请好友</h3>
         <button onclick="closeModal('invite')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
       </div>
-      <div class="p-4 space-y-4">
-        <div class="bg-indigo-50 rounded-xl p-4">
-          <div class="flex items-center gap-2 mb-2">
-            <span class="text-lg">🎉</span>
-            <span class="font-medium text-indigo-700">好友注册成功</span>
+      <div class="p-4 space-y-4 overflow-y-auto">
+        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-4 text-white">
+          <div class="text-center">
+            <div class="text-4xl mb-2">🎁</div>
+            <div class="font-bold mb-1">邀请好友得奖励</div>
+            <div class="text-sm text-white/80">好友使用你的邀请码注册</div>
+            <div class="text-sm text-white/80">双方都获得丰厚奖励</div>
           </div>
-          <p class="text-sm text-indigo-600">邀请人获得 <strong>+3张</strong> 时空穿梭券</p>
         </div>
-        <div class="bg-purple-50 rounded-xl p-4">
-          <div class="flex items-center gap-2 mb-2">
-            <span class="text-lg">🎯</span>
-            <span class="font-medium text-purple-700">好友完成首次训练</span>
+
+        <div class="bg-white rounded-xl p-4 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-sm font-medium text-gray-700">我的邀请码</span>
+            <button onclick="copyInviteCode()" class="text-xs text-indigo-600 hover:text-indigo-700">复制</button>
           </div>
-          <p class="text-sm text-purple-600">邀请人获得 <strong>+5张</strong> 时空穿梭券</p>
-          <p class="text-sm text-purple-600">被邀请人获得 <strong>+3张</strong> 时空穿梭券</p>
-        </div>
-        <div class="bg-amber-50 rounded-xl p-4">
-          <div class="flex items-center gap-2 mb-2">
-            <span class="text-lg">💎</span>
-            <span class="font-medium text-amber-700">好友购买会员</span>
+          <div class="bg-gray-100 rounded-lg p-3 text-center">
+            <span class="text-lg font-bold text-gray-800 tracking-wider" id="invite-code-display">--</span>
           </div>
-          <p class="text-sm text-amber-600">邀请人获得 <strong>+10张</strong> 时空穿梭券</p>
-          <p class="text-sm text-amber-600">被邀请人获得 <strong>+1张</strong> 体验日卡</p>
+          <button onclick="generateNewInviteCode()" class="w-full mt-3 py-2 bg-amber-50 text-amber-600 text-sm font-medium rounded-lg hover:bg-amber-100 transition-colors">
+            🔄 重新生成邀请码
+          </button>
         </div>
-        <button onclick="closeModal('invite')" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-xl">我知道了</button>
+
+        <div class="bg-white rounded-xl p-4 shadow-sm">
+          <div class="text-sm font-medium text-gray-700 mb-3">邀请奖励规则</div>
+          <div class="space-y-2 text-sm">
+            <div class="flex items-center gap-2">
+              <span>✅</span>
+              <span class="text-gray-600">邀请人：<strong class="text-amber-600">+50积分</strong> + <strong class="text-indigo-600">1张时空穿梭券</strong></span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span>🎁</span>
+              <span class="text-gray-600">被邀请人：<strong class="text-amber-600">+20积分</strong> + <strong class="text-indigo-600">1张提示卡</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-4 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-sm font-medium text-gray-700">邀请人数</span>
+            <span class="text-lg font-bold text-indigo-600" id="invitee-count">0</span>
+          </div>
+          <div class="text-xs text-gray-400 text-center">继续邀请好友，解锁更多奖励！</div>
+        </div>
+
+        <div class="bg-gray-50 rounded-xl p-4">
+          <div class="text-sm font-medium text-gray-700 mb-3">使用邀请码</div>
+          <div class="flex gap-2">
+            <input id="use-invite-code" type="text" placeholder="输入好友邀请码"
+              class="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300">
+            <button onclick="submitInviteCode()" class="px-4 py-2.5 bg-indigo-500 text-white text-sm font-medium rounded-xl hover:bg-indigo-600 transition-colors">
+              兑换
+            </button>
+          </div>
+        </div>
+
+        <button onclick="shareInvite()" class="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all">
+          📤 分享邀请链接
+        </button>
       </div>
     </div>
   </div>
@@ -2557,6 +2621,10 @@ function renderGrowth() {
 
   // 教练寄语
   renderCoachMessage();
+
+  // 加载天赋和挑战数据
+  loadTalents();
+  loadChallenges();
 }
 
 function renderCoachMessage() {
@@ -3300,6 +3368,374 @@ function toggleDoublePoints() {
   updatePropButtons();
   addTrainingMessage('✨ 双倍积分卡已激活，本次训练积分翻倍！', false, true);
 }
+
+// ===== 天赋系统 =====
+let userTalents = [];
+
+function loadTalents() {
+  const url = '/api/talent';
+  fetch(url, { headers: getAuthHeaders() })
+    .then(res => res.json())
+    .then(data => {
+      if (data.code === 200 && data.data) {
+        userTalents = data.data.talents || [];
+        renderTalents();
+      } else {
+        renderTalents();
+      }
+    })
+    .catch(() => {
+      renderTalents();
+    });
+}
+
+function renderTalents() {
+  const container = $('talent-list');
+  if (!container) return;
+
+  if (userTalents.length === 0) {
+    container.innerHTML = '<div class="text-center text-gray-400 text-sm py-4">暂无天赋，消耗100积分解锁新天赋</div>';
+    return;
+  }
+
+  container.innerHTML = userTalents.map(talent => `
+    <div class="bg-white rounded-xl p-3 shadow-sm">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-medium text-gray-800">${talent.name}</span>
+            <span class="px-2 py-0.5 bg-amber-100 text-amber-600 text-xs rounded-full">Lv.${talent.level}</span>
+          </div>
+          <div class="text-xs text-gray-500 mt-0.5">${talent.description}</div>
+        </div>
+        <button onclick="upgradeTalent(${talent.id})" class="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-medium rounded-lg hover:opacity-90 transition-opacity">
+          升级（${talent.level * 50}积分）
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function unlockTalent() {
+  if (userData.points < 100) {
+    alert('⚠️ 积分不足，需要100积分解锁天赋');
+    return;
+  }
+
+  if (!confirm('确定消耗100积分解锁随机天赋吗？')) return;
+
+  const url = '/api/talent/unlock';
+  fetch(url, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.code === 200 && data.data) {
+        userData.points -= 100;
+        saveData();
+        loadTalents();
+        renderGrowth();
+        alert('🎉 恭喜解锁新天赋：' + data.data.name);
+      } else {
+        alert(data.message || '解锁失败');
+      }
+    })
+    .catch(() => {
+      alert('解锁失败，请稍后重试');
+    });
+}
+
+function upgradeTalent(talentId) {
+  const talent = userTalents.find(t => t.id === talentId);
+  if (!talent) return;
+
+  const cost = talent.level * 50;
+  if (userData.points < cost) {
+    alert(`⚠️ 积分不足，升级需要${cost}积分`);
+    return;
+  }
+
+  if (!confirm(`确定消耗${cost}积分升级天赋吗？`)) return;
+
+  const url = `/api/talent/${talentId}/upgrade`;
+  fetch(url, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.code === 200 && data.data) {
+        userData.points -= cost;
+        saveData();
+        loadTalents();
+        renderGrowth();
+        alert('🎉 天赋升级成功！');
+      } else {
+        alert(data.message || '升级失败');
+      }
+    })
+    .catch(() => {
+      alert('升级失败，请稍后重试');
+    });
+}
+
+// ===== 真实挑战系统 =====
+let challenges = [];
+
+function loadChallenges() {
+  const url = '/api/challenge';
+  fetch(url, { headers: getAuthHeaders() })
+    .then(res => res.json())
+    .then(data => {
+      if (data.code === 200 && data.data) {
+        challenges = data.data.challenges || [];
+        renderChallenges();
+      } else {
+        loadMockChallenges();
+      }
+    })
+    .catch(() => {
+      loadMockChallenges();
+    });
+}
+
+function loadMockChallenges() {
+  challenges = [
+    { id: 1, title: '主动打招呼', description: '在现实生活中主动向3个陌生人打招呼', category: 'social', difficulty: 'easy', target_count: 3, reward_points: 20, userStatus: null },
+    { id: 2, title: '深度对话', description: '与他人进行一次超过10分钟的深度对话', category: 'social', difficulty: 'medium', target_count: 1, reward_points: 30, userStatus: null },
+    { id: 3, title: '公开表达', description: '在至少5人面前进行一次公开表达', category: 'expression', difficulty: 'hard', target_count: 1, reward_points: 50, userStatus: null },
+    { id: 4, title: '倾听练习', description: '完整倾听他人倾诉一次，不打断', category: 'empathy', difficulty: 'medium', target_count: 1, reward_points: 25, userStatus: null },
+    { id: 5, title: '赞美他人', description: '真诚地赞美5个人', category: 'social', difficulty: 'easy', target_count: 5, reward_points: 15, userStatus: null },
+    { id: 6, title: '拒绝练习', description: '在合适的场合拒绝一次不合理的请求', category: 'confidence', difficulty: 'medium', target_count: 1, reward_points: 35, userStatus: null },
+  ];
+  renderChallenges();
+}
+
+function renderChallenges() {
+  const container = $('challenge-list');
+  if (!container) return;
+
+  container.innerHTML = challenges.map(challenge => {
+    const status = challenge.userStatus;
+    const isCompleted = status && status.status === 'completed';
+    const isInProgress = status && status.status === 'in_progress';
+    const progress = status ? status.progress : 0;
+    const progressPercent = Math.min(100, (progress / challenge.target_count) * 100);
+
+    let actionBtn = '';
+    if (isCompleted) {
+      actionBtn = '<button disabled class="w-full py-2 bg-gray-100 text-gray-400 text-xs font-medium rounded-lg">✓ 已完成</button>';
+    } else if (isInProgress) {
+      actionBtn = `
+        <div class="space-y-2">
+          <div class="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+            <div class="h-full bg-green-500 rounded-full" style="width:${progressPercent}%"></div>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="updateChallengeProgress(${challenge.id})" class="flex-1 py-2 bg-green-500 text-white text-xs font-medium rounded-lg hover:bg-green-600 transition-colors">
+              +1 进度
+            </button>
+            <button onclick="completeChallenge(${challenge.id})" class="flex-1 py-2 bg-emerald-500 text-white text-xs font-medium rounded-lg hover:bg-emerald-600 transition-colors">
+              完成挑战
+            </button>
+          </div>
+        </div>
+      `;
+    } else {
+      actionBtn = `<button onclick="startChallenge(${challenge.id})" class="w-full py-2 bg-green-500 text-white text-xs font-medium rounded-lg hover:bg-green-600 transition-colors">开始挑战</button>`;
+    }
+
+    const difficultyColors = { easy: 'bg-green-100 text-green-600', medium: 'bg-yellow-100 text-yellow-600', hard: 'bg-red-100 text-red-600' };
+    const difficultyLabels = { easy: '简单', medium: '中等', hard: '困难' };
+
+    return `
+      <div class="bg-white rounded-xl p-3 shadow-sm">
+        <div class="flex items-start justify-between mb-2">
+          <div class="flex-1">
+            <div class="flex items-center gap-2">
+              <span class="font-medium text-gray-800">${challenge.title}</span>
+              <span class="px-2 py-0.5 ${difficultyColors[challenge.difficulty]} text-xs rounded-full">${difficultyLabels[challenge.difficulty]}</span>
+            </div>
+            <div class="text-xs text-gray-500 mt-0.5">${challenge.description}</div>
+          </div>
+        </div>
+        <div class="flex items-center justify-between text-xs text-gray-400 mb-2">
+          <span>目标：${isInProgress ? progress : 0}/${challenge.target_count}</span>
+          <span>奖励：+${challenge.reward_points}积分</span>
+        </div>
+        ${actionBtn}
+      </div>
+    `;
+  }).join('');
+}
+
+function startChallenge(challengeId) {
+  const url = `/api/challenge/${challengeId}/start`;
+  fetch(url, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.code === 200) {
+        loadChallenges();
+        alert('🚀 挑战已开始！');
+      } else {
+        alert(data.message || '开始挑战失败');
+      }
+    })
+    .catch(() => {
+      alert('开始挑战失败，请稍后重试');
+    });
+}
+
+function updateChallengeProgress(challengeId) {
+  const url = `/api/challenge/${challengeId}/progress`;
+  fetch(url, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ increment: 1 }),
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.code === 200) {
+        loadChallenges();
+        if (data.data.completed) {
+          userData.points += data.data.reward_points;
+          saveData();
+          renderGrowth();
+          alert(`🎉 挑战完成！获得 ${data.data.reward_points} 积分`);
+        } else {
+          alert('✅ 进度已更新');
+        }
+      } else {
+        alert(data.message || '更新失败');
+      }
+    })
+    .catch(() => {
+      alert('更新失败，请稍后重试');
+    });
+}
+
+function completeChallenge(challengeId) {
+  const url = `/api/challenge/${challengeId}/complete`;
+  fetch(url, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.code === 200) {
+        userData.points += data.data.reward_points;
+        saveData();
+        loadChallenges();
+        renderGrowth();
+        alert(`🎉 挑战完成！获得 ${data.data.reward_points} 积分`);
+      } else {
+        alert(data.message || '完成挑战失败');
+      }
+    })
+    .catch(() => {
+      alert('完成失败，请稍后重试');
+    });
+}
+
+// ===== 邀请系统 =====
+function loadInviteInfo() {
+  const url = '/api/social/invite-info';
+  fetch(url, { headers: getAuthHeaders() })
+    .then(res => res.json())
+    .then(data => {
+      if (data.code === 200 && data.data) {
+        $('invite-code-display').textContent = data.data.inviteCode || '--';
+        $('invitee-count').textContent = data.data.inviteeCount || 0;
+      }
+    })
+    .catch(() => {});
+}
+
+function generateNewInviteCode() {
+  const url = '/api/social/invite';
+  fetch(url, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.code === 200 && data.data) {
+        $('invite-code-display').textContent = data.data.inviteCode;
+        alert('✅ 邀请码已重新生成');
+      } else {
+        alert(data.message || '生成失败');
+      }
+    })
+    .catch(() => {
+      alert('生成失败，请稍后重试');
+    });
+}
+
+function submitInviteCode() {
+  const code = $('use-invite-code').value.trim();
+  if (!code) {
+    alert('请输入邀请码');
+    return;
+  }
+
+  const url = '/api/social/invite/use';
+  fetch(url, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ code }),
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.code === 200) {
+        $('use-invite-code').value = '';
+        userData.points += 20;
+        saveData();
+        renderGrowth();
+        renderProfile();
+        alert('🎉 使用邀请码成功！获得20积分和1张提示卡');
+      } else {
+        alert(data.message || '使用失败');
+      }
+    })
+    .catch(() => {
+      alert('使用失败，请稍后重试');
+    });
+}
+
+function shareInvite() {
+  const code = $('invite-code-display').textContent;
+  if (!code || code === '--') {
+    alert('请先生成邀请码');
+    return;
+  }
+
+  const link = `${window.location.origin}/invite/${code}`;
+  navigator.clipboard.writeText(link).then(() => {
+    alert('✅ 邀请链接已复制，快去分享给好友吧！');
+  }).catch(() => {
+    alert('分享链接：' + link);
+  });
+}
+
+function getAuthHeaders() {
+  const token = localStorage.getItem(STORAGE_PREFIX + 'token');
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+  return headers;
+}
+
+// 重写showModal处理邀请弹窗
+const originalShowModal = window.showModal;
+window.showModal = function(name) {
+  originalShowModal(name);
+  if (name === 'invite') {
+    loadInviteInfo();
+  }
+};
 
 // ===== 退出登录 =====
 function logout() {

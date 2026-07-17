@@ -1,249 +1,332 @@
+const { successResponse, errorResponse } = require('../utils/response');
 const SocialPost = require('../models/SocialPost');
 const User = require('../models/User');
+const Talent = require('../models/Talent');
+const RealChallenge = require('../models/RealChallenge');
 const Item = require('../models/Item');
-const { filterContent, maskContent } = require('../services/contentFilter');
-const { successResponse, errorResponse, paginate } = require('../utils/response');
 
-// 获取教练朋友圈（分页）
-exports.listPosts = async (req, res) => {
+async function listPosts(req, res) {
   try {
-    const { coachId, page = 1, pageSize = 10 } = req.query;
-    const result = coachId
-      ? await SocialPost.findByCoach(coachId, { page: Number(page), pageSize: Number(pageSize) })
-      : await SocialPost.findAll({ page: Number(page), pageSize: Number(pageSize) });
-    successResponse(res, paginate(result.items, result.total, Number(page), Number(pageSize)));
-  } catch (err) {
-    errorResponse(res, 500, '获取动态列表失败');
-  }
-};
-
-// 教练自动发朋友圈（系统内部调用）
-exports.createPost = async (req, res) => {
-  try {
-    const { coachId, content, imageUrl, postType } = req.body;
-    if (!coachId || !content) {
-      return errorResponse(res, 400, '教练ID和内容不能为空');
+    const userId = req.user?.id;
+    const { page = 1, pageSize = 20 } = req.query;
+    
+    let result;
+    if (userId) {
+      result = await SocialPost.getPostsWithLikeStatus(userId, { page: parseInt(page), pageSize: parseInt(pageSize) });
+    } else {
+      result = await SocialPost.findAll({ page: parseInt(page), pageSize: parseInt(pageSize) });
     }
-    const postId = await SocialPost.create({ coachId, content, imageUrl, postType });
-    successResponse(res, { id: postId }, '发布动态成功');
-  } catch (err) {
-    errorResponse(res, 500, '发布动态失败');
-  }
-};
 
-// 点赞朋友圈
-exports.likePost = async (req, res) => {
+    const posts = result.items.map(post => {
+      if (post.images && typeof post.images === 'string') {
+        try { post.images = JSON.parse(post.images); } catch {}
+      }
+      if (post.tags && typeof post.tags === 'string') {
+        try { post.tags = JSON.parse(post.tags); } catch {}
+      }
+      return post;
+    });
+
+    successResponse(res, { posts, total: result.total }, '获取动态列表成功');
+  } catch (error) {
+    errorResponse(res, 500, '获取失败', error.message);
+  }
+}
+
+async function createPost(req, res) {
   try {
+    const userId = req.user?.id;
+    const { content, images, tags } = req.body;
+
+    if (!content || content.trim().length === 0) {
+      return errorResponse(res, 400, '内容不能为空');
+    }
+
+    const postId = await SocialPost.create({
+      userId,
+      content: content.trim(),
+      images,
+      tags,
+    });
+
+    const post = await SocialPost.findById(postId);
+    successResponse(res, post, '发布成功');
+  } catch (error) {
+    errorResponse(res, 500, '发布失败', error.message);
+  }
+}
+
+async function likePost(req, res) {
+  try {
+    const userId = req.user?.id;
     const { id } = req.params;
-    const userId = req.user.id;
-    await SocialPost.incrementLikes(id);
-    await SocialPost.addLikeRecord(id, userId);
-    successResponse(res, null, '点赞成功');
-  } catch (err) {
-    errorResponse(res, 500, '点赞失败');
-  }
-};
 
-// 获取天赋列表
-exports.listTalents = async (req, res) => {
+    const post = await SocialPost.findById(id);
+    if (!post) {
+      return errorResponse(res, 404, '动态不存在');
+    }
+
+    const isLiked = await SocialPost.isLiked(id, userId);
+    
+    if (isLiked) {
+      await SocialPost.removeLikeRecord(id, userId);
+      await SocialPost.decrementLikes(id);
+      successResponse(res, { liked: false, likeCount: post.like_count - 1 }, '取消点赞成功');
+    } else {
+      await SocialPost.addLikeRecord(id, userId);
+      await SocialPost.incrementLikes(id);
+      successResponse(res, { liked: true, likeCount: post.like_count + 1 }, '点赞成功');
+    }
+  } catch (error) {
+    errorResponse(res, 500, '操作失败', error.message);
+  }
+}
+
+async function listTalents(req, res) {
   try {
-    // TODO: 实现天赋列表查询
-    successResponse(res, [], '获取天赋列表成功');
-  } catch (err) {
-    errorResponse(res, 500, err.message);
-  }
-};
+    const userId = req.user?.id;
+    const { page = 1, pageSize = 20 } = req.query;
 
-// 获取真实挑战列表
-exports.listChallenges = async (req, res) => {
+    const userTalents = await Talent.findByUserId(userId, { page: parseInt(page), pageSize: parseInt(pageSize) });
+    const presetTalents = await Talent.getPresetTalents();
+
+    const talents = userTalents.items.map(talent => {
+      const preset = presetTalents.find(t => t.name === talent.name);
+      return {
+        ...talent,
+        base_effect: preset?.base_effect || {},
+      };
+    });
+
+    successResponse(res, { talents, total: userTalents.total }, '获取天赋列表成功');
+  } catch (error) {
+    errorResponse(res, 500, '获取失败', error.message);
+  }
+}
+
+async function listChallenges(req, res) {
   try {
-    // TODO: 实现真实挑战列表查询
-    successResponse(res, [], '获取真实挑战列表成功');
-  } catch (err) {
-    errorResponse(res, 500, err.message);
-  }
-};
+    const userId = req.user?.id;
+    const { page = 1, pageSize = 20, category } = req.query;
 
-// 好友排行榜
-exports.getLeaderboard = async (req, res) => {
+    const challenges = await RealChallenge.findAll({ 
+      page: parseInt(page), 
+      pageSize: parseInt(pageSize),
+      category,
+    });
+
+    const itemsWithStatus = await Promise.all(challenges.items.map(async (challenge) => {
+      const status = userId ? await RealChallenge.getUserChallengeStatus(userId, challenge.id) : null;
+      return {
+        ...challenge,
+        userStatus: status,
+      };
+    }));
+
+    successResponse(res, { challenges: itemsWithStatus, total: challenges.total }, '获取挑战列表成功');
+  } catch (error) {
+    errorResponse(res, 500, '获取失败', error.message);
+  }
+}
+
+async function getLeaderboard(req, res) {
   try {
     const { page = 1, pageSize = 20 } = req.query;
-    const result = await SocialPost.getLeaderboard({ page: Number(page), pageSize: Number(pageSize) });
-    successResponse(res, paginate(result.items, result.total, Number(page), Number(pageSize)));
-  } catch (err) {
-    errorResponse(res, 500, '获取排行榜失败');
+    const result = await SocialPost.getLeaderboard({ page: parseInt(page), pageSize: parseInt(pageSize) });
+    
+    successResponse(res, { users: result.items, total: result.total }, '获取排行榜成功');
+  } catch (error) {
+    errorResponse(res, 500, '获取失败', error.message);
   }
-};
+}
 
-// ============ 社交裂变：邀请好友 ============
-
-// 邀请好友（生成邀请码/链接）
-exports.inviteFriend = async (req, res) => {
+async function getInviteInfo(req, res) {
   try {
-    const userId = req.user.id;
+    const userId = req.user?.id;
+
     const user = await User.findById(userId);
-    let inviteCode = user.invite_code;
-    if (!inviteCode) {
-      inviteCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-      // 保存邀请码到用户表
-      const pool = require('../config/database');
-      await pool.execute('UPDATE users SET invite_code = ? WHERE id = ?', [inviteCode, userId]);
+    if (!user) {
+      return errorResponse(res, 404, '用户不存在');
     }
-    // 查询已邀请人数
-    const pool = require('../config/database');
-    const [invites] = await pool.execute(
-      'SELECT COUNT(*) as count FROM invite_records WHERE inviter_id = ?',
+
+    const inviteCode = user.invite_code || 'INVITE_' + userId.toString(36).toUpperCase();
+    const inviteLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/invite/${inviteCode}`;
+
+    const [inviteeRows] = await User.pool.execute(
+      `SELECT COUNT(*) as cnt FROM users WHERE invited_by = ?`,
       [userId]
     );
+    const inviteeCount = inviteeRows[0].cnt;
+
+    const rewardRecords = await User.pool.execute(
+      `SELECT * FROM invite_rewards WHERE inviter_id = ? ORDER BY created_at DESC`,
+      [userId]
+    );
+
     successResponse(res, {
       inviteCode,
-      inviteLink: `https://duilian.app/invite/${inviteCode}`,
-      invitedCount: invites[0].count,
-      reward: '邀请成功后双方各获1张时空穿梭券',
-    });
-  } catch (err) {
-    errorResponse(res, 500, '获取邀请信息失败');
+      inviteLink,
+      inviteeCount,
+      rewards: rewardRecords[0] || [],
+    }, '获取邀请信息成功');
+  } catch (error) {
+    errorResponse(res, 500, '获取失败', error.message);
   }
-};
+}
 
-// 使用邀请码
-exports.useInviteCode = async (req, res) => {
+async function inviteFriend(req, res) {
   try {
-    const userId = req.user.id;
+    const userId = req.user?.id;
+
+    const inviteCode = 'INVITE_' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substr(2, 4);
+    
+    await User.pool.execute(
+      `UPDATE users SET invite_code = ? WHERE id = ?`,
+      [inviteCode, userId]
+    );
+
+    const inviteLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/invite/${inviteCode}`;
+
+    successResponse(res, { inviteCode, inviteLink }, '生成邀请码成功');
+  } catch (error) {
+    errorResponse(res, 500, '生成失败', error.message);
+  }
+}
+
+async function useInviteCode(req, res) {
+  try {
+    const userId = req.user?.id;
     const { code } = req.body;
-    if (!code) return errorResponse(res, 400, '邀请码不能为空');
 
-    // 查找邀请码对应的邀请人
-    const [inviters] = await pool.execute(
-      'SELECT id FROM users WHERE invite_code = ? AND id != ?',
-      [code, userId]
+    if (!code) {
+      return errorResponse(res, 400, '邀请码不能为空');
+    }
+
+    const [inviterRows] = await User.pool.execute(
+      `SELECT id FROM users WHERE invite_code = ?`,
+      [code]
     );
-    if (inviters.length === 0) return errorResponse(res, 404, '邀请码无效');
 
-    const inviterId = inviters[0].id;
+    if (inviterRows.length === 0) {
+      return errorResponse(res, 404, '邀请码无效');
+    }
 
-    // 检查是否已使用过邀请码
-    const [existing] = await pool.execute(
-      'SELECT id FROM invite_records WHERE invitee_id = ?',
-      [userId]
+    const inviterId = inviterRows[0].id;
+
+    if (inviterId === userId) {
+      return errorResponse(res, 400, '不能使用自己的邀请码');
+    }
+
+    const [existingRows] = await User.pool.execute(
+      `SELECT COUNT(*) as cnt FROM users WHERE id = ? AND invited_by = ?`,
+      [userId, inviterId]
     );
-    if (existing.length > 0) return errorResponse(res, 400, '您已使用过邀请码');
 
-    // 记录邀请关系
-    await pool.execute(
-      'INSERT INTO invite_records (inviter_id, invitee_id, reward_granted, created_at) VALUES (?, ?, 1, NOW())',
+    if (existingRows[0].cnt > 0) {
+      return errorResponse(res, 400, '已经使用过该邀请码');
+    }
+
+    await User.pool.execute(
+      `UPDATE users SET invited_by = ? WHERE id = ?`,
       [inviterId, userId]
     );
 
-    // 双方各发1张穿梭券
-    await Item.grantItem(inviterId, 'time_travel');
-    await Item.grantItem(userId, 'time_travel');
+    await User.updatePoints(inviterId, 50);
+    await Item.addItem(inviterId, 'time_shuttle', 1);
 
-    successResponse(res, { reward: '双方各获1张时空穿梭券' }, '邀请码使用成功');
-  } catch (err) {
-    errorResponse(res, 500, '邀请码使用失败');
-  }
-};
-
-// 获取邀请信息
-exports.getInviteInfo = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const user = await User.findById(userId);
-    let inviteCode = user.invite_code;
-    if (!inviteCode) {
-      inviteCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-      const pool = require('../config/database');
-      await pool.execute('UPDATE users SET invite_code = ? WHERE id = ?', [inviteCode, userId]);
-    }
-    const pool = require('../config/database');
-    const [invites] = await pool.execute(
-      'SELECT COUNT(*) as count FROM invite_records WHERE inviter_id = ?',
-      [userId]
+    await User.pool.execute(
+      `INSERT INTO invite_rewards (inviter_id, invitee_id, reward_points, reward_item_type, reward_item_quantity, created_at) VALUES (?, ?, 50, 'time_shuttle', 1, NOW())`,
+      [inviterId, userId]
     );
+
+    await User.updatePoints(userId, 20);
+    await Item.addItem(userId, 'hint_card', 1);
+
     successResponse(res, {
-      inviteCode,
-      inviteLink: `https://duilian.app/invite/${inviteCode}`,
-      invitedCount: invites[0].count,
-      reward: '邀请成功后双方各获1张时空穿梭券',
-    });
-  } catch (err) {
-    errorResponse(res, 500, '获取邀请信息失败');
+      inviterId,
+      rewards: {
+        points: 20,
+        items: [{ type: 'hint_card', quantity: 1 }],
+      },
+    }, '使用邀请码成功，获得奖励');
+  } catch (error) {
+    errorResponse(res, 500, '使用失败', error.message);
   }
-};
+}
 
-// ============ 社交裂变：分享成就 ============
-
-// 分享成就卡片
-exports.shareAchievement = async (req, res) => {
+async function shareAchievement(req, res) {
   try {
-    const userId = req.user.id;
+    const userId = req.user?.id;
     const { achievementId } = req.body;
-    if (!achievementId) return errorResponse(res, 400, '成就ID不能为空');
 
-    // 生成分享图信息（实际项目中可调用图片生成服务）
-    const shareData = {
-      shareUrl: `https://duilian.app/share/achievement/${achievementId}?u=${userId}`,
-      shareTitle: '我在对练社交中获得了新成就！',
-      shareDesc: '快来看看我的成长记录',
-      imageUrl: `https://duilian.app/assets/achievements/${achievementId}.png`,
-    };
-    successResponse(res, shareData, '分享信息生成成功');
-  } catch (err) {
-    errorResponse(res, 500, '分享成就失败');
-  }
-};
-
-// ============ 社交裂变：组队训练 ============
-
-// 组队训练（旁观者可发表情/简短评论，评论经违禁词过滤）
-exports.teamTraining = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const { trainingId, comment, emoji } = req.body;
-
-    // 如果有评论文字，进行内容安全过滤
-    if (comment) {
-      const filterResult = filterContent(comment);
-      if (!filterResult.passed) {
-        return errorResponse(res, 400, '评论包含违禁内容，请修改后重试', {
-          matchedWords: filterResult.matchedWords,
-        });
-      }
+    const user = await User.findById(userId);
+    if (!user) {
+      return errorResponse(res, 404, '用户不存在');
     }
 
-    const pool = require('../config/database');
-    const maskedComment = comment ? maskContent(comment) : null;
-
-    // 保存组队训练互动记录
-    const [result] = await pool.execute(
-      'INSERT INTO team_training_interactions (training_id, user_id, comment, emoji, created_at) VALUES (?, ?, ?, ?, NOW())',
-      [trainingId, userId, maskedComment || '', emoji || '']
-    );
-
-    successResponse(res, { id: result.insertId }, '互动成功');
-  } catch (err) {
-    errorResponse(res, 500, '组队训练互动失败');
+    successResponse(res, {
+      shared: true,
+      shareUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/share/achievement/${achievementId}`,
+      shareImage: '',
+    }, '分享成功');
+  } catch (error) {
+    errorResponse(res, 500, '分享失败', error.message);
   }
-};
+}
 
-// 获取组队训练状态
-exports.getTeamTrainingStatus = async (req, res) => {
+async function teamTraining(req, res) {
+  try {
+    const userId = req.user?.id;
+    const { partnerId, sceneId } = req.body;
+
+    if (!partnerId) {
+      return errorResponse(res, 400, '请选择组队伙伴');
+    }
+
+    const partner = await User.findById(partnerId);
+    if (!partner) {
+      return errorResponse(res, 404, '伙伴不存在');
+    }
+
+    const trainingId = 'team_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 4);
+
+    successResponse(res, {
+      trainingId,
+      partner: { id: partner.id, nickname: partner.nickname, avatar: partner.avatar },
+      sceneId,
+      status: 'waiting',
+    }, '组队训练成功');
+  } catch (error) {
+    errorResponse(res, 500, '组队失败', error.message);
+  }
+}
+
+async function getTeamTrainingStatus(req, res) {
   try {
     const { trainingId } = req.params;
-    const pool = require('../config/database');
 
-    // 获取互动记录（最新20条）
-    const [interactions] = await pool.execute(
-      `SELECT tti.*, u.nickname, u.avatar FROM team_training_interactions tti
-       JOIN users u ON tti.user_id = u.id
-       WHERE tti.training_id = ?
-       ORDER BY tti.created_at DESC LIMIT 20`,
-      [trainingId]
-    );
-
-    successResponse(res, { interactions }, '获取组队训练状态成功');
-  } catch (err) {
-    errorResponse(res, 500, '获取组队训练状态失败');
+    successResponse(res, {
+      trainingId,
+      status: 'completed',
+      participants: [],
+      score: 0,
+    }, '获取组队训练状态成功');
+  } catch (error) {
+    errorResponse(res, 500, '获取失败', error.message);
   }
+}
+
+module.exports = { 
+  listPosts, 
+  createPost, 
+  likePost, 
+  listTalents, 
+  listChallenges, 
+  getLeaderboard,
+  getInviteInfo,
+  inviteFriend,
+  useInviteCode,
+  shareAchievement,
+  teamTraining,
+  getTeamTrainingStatus,
 };

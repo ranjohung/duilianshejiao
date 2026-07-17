@@ -34,6 +34,7 @@ class TrainingService {
   Future<Map<String, dynamic>> sendMessage({
     required String sessionId,
     required String message,
+    int? choiceIndex,
     String? audioUrl,
   }) async {
     final res = await _client.post(
@@ -41,6 +42,7 @@ class TrainingService {
       data: {
         'sessionId': sessionId,
         'message': message,
+        if (choiceIndex != null) 'choiceIndex': choiceIndex,
         if (audioUrl != null) 'audioUrl': audioUrl,
       },
     );
@@ -124,5 +126,27 @@ class TrainingService {
       '${ApiRoutes.trainingRecordDetail}/$recordId',
     );
     return ApiResponse.fromJson(res.data, (d) => TrainingModel.fromJson(d));
+  }
+
+  /// 使用道具
+  Future<Map<String, dynamic>> useItem({
+    required String sessionId,
+    required String itemId,
+  }) async {
+    final res = await _client.post(
+      '${ApiRoutes.trainingStart}/item/use',
+      data: {
+        'sessionId': sessionId,
+        'itemId': itemId,
+      },
+    );
+    final apiRes = ApiResponse.fromJson(
+      res.data,
+      (d) => d as Map<String, dynamic>,
+    );
+    if (apiRes.isSuccess && apiRes.data != null) {
+      return apiRes.data!;
+    }
+    throw Exception(apiRes.message.isNotEmpty ? apiRes.message : '使用道具失败');
   }
 }

@@ -1,12 +1,34 @@
-const rateLimit = require('express-rate-limit');
+const rateLimit = (limit, windowMs) => {
+  const requests = new Map();
+  
+  return (req, res, next) => {
+    const key = req.ip || req.headers['x-forwarded-for'];
+    const now = Date.now();
+    const windowStart = now - windowMs;
+    
+    if (!requests.has(key)) {
+      requests.set(key, []);
+    }
+    
+    const userRequests = requests.get(key);
+    userRequests.push(now);
+    
+    const recentRequests = userRequests.filter(t => t > windowStart);
+    
+    if (recentRequests.length > limit) {
+      return res.status(429).json({ 
+        code: 429, 
+        message: '请求过于频繁，请稍后重试', 
+        data: null 
+      });
+    }
+    
+    requests.set(key, recentRequests);
+    next();
+  };
+};
 
-// 通用限制：每分钟60次
-const generalLimiter = rateLimit({ windowMs: 60 * 1000, max: 60 });
+const smsLimiter = rateLimit(5, 60000);
+const chatLimiter = rateLimit(30, 60000);
 
-// LLM对话：每分钟10次
-const chatLimiter = rateLimit({ windowMs: 60 * 1000, max: 10 });
-
-// 短信发送：每小时5次
-const smsLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 5 });
-
-module.exports = { generalLimiter, chatLimiter, smsLimiter };
+module.exports = { smsLimiter, chatLimiter };

@@ -25,11 +25,15 @@ const SQL_STATEMENTS = [
     streak_days INT UNSIGNED DEFAULT 0,
     has_double_points TINYINT(1) DEFAULT 0,
     has_shield TINYINT(1) DEFAULT 0,
+    invite_code VARCHAR(50),
+    invited_by BIGINT UNSIGNED,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_phone (phone),
     INDEX idx_member_level (member_level),
-    INDEX idx_student_level (student_level)
+    INDEX idx_student_level (student_level),
+    INDEX idx_invite_code (invite_code),
+    INDEX idx_invited_by (invited_by)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`,
 
   // 教练表
@@ -243,8 +247,41 @@ const SQL_STATEMENTS = [
     description TEXT,
     category VARCHAR(50),
     difficulty ENUM('easy','medium','hard') DEFAULT 'easy',
+    target_count INT UNSIGNED DEFAULT 1,
+    reward_points INT UNSIGNED DEFAULT 0,
+    sort_order INT DEFAULT 0,
     is_active TINYINT(1) DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`,
+
+  // 用户挑战关联表
+  `CREATE TABLE IF NOT EXISTS user_challenges (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NOT NULL,
+    challenge_id BIGINT UNSIGNED NOT NULL,
+    progress INT UNSIGNED DEFAULT 0,
+    status ENUM('in_progress','completed') DEFAULT 'in_progress',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_user_id (user_id),
+    INDEX idx_challenge_id (challenge_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (challenge_id) REFERENCES real_challenges(id) ON DELETE CASCADE
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`,
+
+  // 邀请奖励表
+  `CREATE TABLE IF NOT EXISTS invite_rewards (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    inviter_id BIGINT UNSIGNED NOT NULL,
+    invitee_id BIGINT UNSIGNED NOT NULL,
+    reward_points INT UNSIGNED DEFAULT 0,
+    reward_item_type VARCHAR(50),
+    reward_item_quantity INT UNSIGNED DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_inviter_id (inviter_id),
+    INDEX idx_invitee_id (invitee_id),
+    FOREIGN KEY (inviter_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (invitee_id) REFERENCES users(id) ON DELETE CASCADE
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`,
 
   // 里程碑表

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../config/app_config.dart';
@@ -22,6 +24,7 @@ class _TrainingPageState extends State<TrainingPage> {
   final _messageController = TextEditingController();
   final _scrollController = ScrollController();
   final _trainingService = TrainingService();
+  Timer? _timer;
 
   List<_UIMessage> _messages = [];
   bool _isLoading = false;
@@ -36,16 +39,25 @@ class _TrainingPageState extends State<TrainingPage> {
   int? _feedbackScoreDelta;
   String? _feedbackTip;
   bool _showFeedback = false;
+  bool _isWaitingForUser = false;
+  int _remainingTimeTravel = 0;
+  bool _canUseHint = true;
   DateTime _trainingStartTime = DateTime.now();
 
   @override
   void initState() {
     super.initState();
     _startTraining();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) {
+        setState(() {});
+      }
+    });
   }
 
   @override
   void dispose() {
+    _timer?.cancel();
     _messageController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -64,17 +76,28 @@ class _TrainingPageState extends State<TrainingPage> {
         _totalRounds = result['totalRounds'] ?? widget.scene.rounds;
         _currentScore = result['currentScore'] ?? 0;
         _trainingStartTime = DateTime.now();
+        _isWaitingForUser = true;
+        _remainingTimeTravel = result['remainingTimeTravel'] ?? 0;
+        _canUseHint = result['canUseHint'] ?? true;
       });
       if (result['message'] != null) {
         _addMessage(_UIMessage(
           role: 'assistant',
           content: result['message'] as String,
-          options: result['options'] != null ? List<String>.from(result['options']) : null,
+          options: result['options'] != null
+              ? List<String>.from(result['options'])
+              : null,
         ));
+      }
+      if (result['options'] != null) {
+        setState(() {
+          _options = List<String>.from(result['options']);
+        });
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('启动训练失败: $e')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('启动训练失败: $e')));
       }
     } finally {
       setState(() => _isLoading = false);
@@ -90,23 +113,25 @@ class _TrainingPageState extends State<TrainingPage> {
       _options = null;
       _isSending = true;
       _showFeedback = false;
+      _isWaitingForUser = false;
     });
 
     try {
       final result = await _trainingService.sendMessage(
         sessionId: _sessionId!,
         message: text.trim(),
+        choiceIndex: choiceIndex,
       );
 
       setState(() {
         if (result['feedback'] != null) {
-          _feedbackContent = result['feedback']['choice_analysis']?.toString();
+          _feedbackContent = result['feedback']['content']?.toString();
           _feedbackScoreDelta = result['feedback']['score_delta'] as int?;
           _currentScore += _feedbackScoreDelta ?? 0;
           _showFeedback = true;
           _feedbackTip = result['feedback']['tip']?.toString();
 
-          Future.delayed(const Duration(milliseconds: 2000), () {
+          Future.delayed(const Duration(milliseconds: 1500), () {
             if (mounted) {
               setState(() {
                 _showFeedback = false;
@@ -121,20 +146,26 @@ class _TrainingPageState extends State<TrainingPage> {
         _addMessage(_UIMessage(
           role: 'assistant',
           content: result['message'] as String,
-          options: result['options'] != null ? List<String>.from(result['options']) : null,
+          options: result['options'] != null
+              ? List<String>.from(result['options'])
+              : null,
         ));
       }
 
       setState(() {
         _currentRound = result['currentRound'] ?? _currentRound;
-        _options = result['options'] != null ? List<String>.from(result['options']) : null;
+        _options = result['options'] != null
+            ? List<String>.from(result['options'])
+            : null;
+        _isWaitingForUser = _options != null && _options!.isNotEmpty;
         if (result['isFinished'] == true) {
           _endTraining();
         }
       });
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('发送失败: $e')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('发送失败: $e')));
       }
     } finally {
       setState(() => _isSending = false);
@@ -148,7 +179,12 @@ class _TrainingPageState extends State<TrainingPage> {
   }
 
   void _addMessage(_UIMessage msg) {
-    setState(() => _messages.add(msg));
+    setState(() => _messages.add(_UIMessage(
+          role: msg.role,
+          content: msg.content,
+          options: msg.options,
+          timestamp: msg.timestamp ?? DateTime.now(),
+        )));
     _scrollToBottom();
   }
 
@@ -169,11 +205,13 @@ class _TrainingPageState extends State<TrainingPage> {
     try {
       final result = await _trainingService.endTraining(_sessionId!);
       if (mounted) {
-        Navigator.of(context).pushReplacementNamed('/training-result', arguments: result);
+        Navigator.of(context)
+            .pushReplacementNamed('/training-result', arguments: result);
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('结束训练失败: $e')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('结束训练失败: $e')));
       }
     }
   }
@@ -185,7 +223,8 @@ class _TrainingPageState extends State<TrainingPage> {
         title: const Text('结束训练'),
         content: const Text('确定要提前结束本次训练吗？当前进度将不会保存。'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('继续训练')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx), child: const Text('继续训练')),
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
@@ -213,16 +252,8 @@ class _TrainingPageState extends State<TrainingPage> {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: _confirmEndTraining,
         ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(widget.scene.name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            Text(
-              '${widget.coach.displayName} · 阶段${widget.scene.stage}',
-              style: const TextStyle(fontSize: 12, opacity: 0.8),
-            ),
-          ],
-        ),
+        title: Text(widget.scene.name,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         backgroundColor: AppConfig.primaryColor,
         foregroundColor: Colors.white,
         centerTitle: false,
@@ -231,14 +262,22 @@ class _TrainingPageState extends State<TrainingPage> {
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Row(
               children: [
+                const Icon(Icons.timer_outlined, size: 16),
+                const SizedBox(width: 4),
                 Text(
                   _formatDuration(),
                   style: const TextStyle(fontSize: 12, opacity: 0.8),
                 ),
                 const SizedBox(width: 16),
+                const Text(
+                  '进度',
+                  style: TextStyle(fontSize: 12, opacity: 0.8),
+                ),
+                const SizedBox(width: 4),
                 Text(
                   '$_currentRound/$_totalRounds',
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 12, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(width: 8),
                 IconButton(
@@ -252,7 +291,8 @@ class _TrainingPageState extends State<TrainingPage> {
         ],
       ),
       body: _isLoading
-          ? const Center(child: Column(
+          ? const Center(
+              child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 CircularProgressIndicator(color: AppConfig.primaryColor),
@@ -262,23 +302,21 @@ class _TrainingPageState extends State<TrainingPage> {
             ))
           : Column(
               children: [
-                LinearProgressIndicator(
-                  value: _totalRounds > 0 ? _currentRound / _totalRounds : 0,
-                  backgroundColor: Colors.grey[100],
-                  valueColor: const AlwaysStoppedAnimation(AppConfig.accentColor),
-                  minHeight: 4,
-                ),
                 Expanded(
                   child: ListView.builder(
                     controller: _scrollController,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
                     itemCount: _messages.length,
-                    itemBuilder: (context, index) => _buildMessageBubble(_messages[index]),
+                    itemBuilder: (context, index) =>
+                        _buildMessageBubble(_messages[index]),
                   ),
                 ),
                 if (_showFeedback) _buildFeedbackArea(),
-                if (_options != null && _options!.isNotEmpty && !_showFeedback) _buildOptionArea(),
+                if (_options != null && _options!.isNotEmpty && !_showFeedback)
+                  _buildOptionArea(),
                 _buildInputArea(),
+                Container(height: 1, color: Colors.grey[200]),
                 if (_currentRound > 0) _buildScoreBar(),
               ],
             ),
@@ -287,33 +325,49 @@ class _TrainingPageState extends State<TrainingPage> {
 
   Widget _buildMessageBubble(_UIMessage msg) {
     final isUser = msg.role == 'user';
+    final timeStr = DateFormat('HH:mm').format(msg.timestamp ?? DateTime.now());
+    final name = isUser ? '我' : widget.coach.displayName;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
-        mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment:
+            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!isUser) ...[
             CircleAvatar(
               radius: 18,
               backgroundColor: AppConfig.primaryColor.withOpacity(0.1),
-              child: Icon(Icons.person, size: 20, color: AppConfig.primaryColor),
+              child:
+                  Icon(Icons.person, size: 20, color: AppConfig.primaryColor),
             ),
             const SizedBox(width: 10),
           ],
           Flexible(
             child: Column(
-              crossAxisAlignment: isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Text(
-                    isUser ? '我' : widget.coach.displayName,
-                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                  ),
+                Row(
+                  mainAxisAlignment:
+                      isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      timeStr,
+                      style: TextStyle(fontSize: 10, color: Colors.grey[400]),
+                    ),
+                  ],
                 ),
+                const SizedBox(height: 4),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
                     color: isUser ? AppConfig.primaryColor : Colors.grey[100],
                     borderRadius: BorderRadius.only(
@@ -339,13 +393,6 @@ class _TrainingPageState extends State<TrainingPage> {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 4),
-                  child: Text(
-                    DateFormat('HH:mm').format(DateTime.now()),
-                    style: TextStyle(fontSize: 10, color: Colors.grey[400]),
-                  ),
-                ),
               ],
             ),
           ),
@@ -354,7 +401,8 @@ class _TrainingPageState extends State<TrainingPage> {
             CircleAvatar(
               radius: 18,
               backgroundColor: Colors.grey[200],
-              child: const Icon(Icons.account_circle, size: 20, color: Colors.grey[500]),
+              child: const Icon(Icons.account_circle,
+                  size: 20, color: Colors.grey[500]),
             ),
           ],
         ],
@@ -364,21 +412,32 @@ class _TrainingPageState extends State<TrainingPage> {
 
   Widget _buildOptionArea() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      color: Colors.grey[50],
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey[200]),
+      ),
       child: Column(
         children: [
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: Row(
               children: [
-                Icon(Icons.lightbulb_outline, size: 16, color: AppConfig.accentColor),
+                const Text('💡', style: TextStyle(fontSize: 16)),
                 const SizedBox(width: 6),
-                const Text('选择你的回应方式：', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                const Text('选择你的回应方式：',
+                    style:
+                        TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
               ],
             ),
           ),
-          ..._options!.asMap().entries.map((e) => _buildOptionCard(e.value, e.key)).toList(),
+          ..._options!
+              .asMap()
+              .entries
+              .map((e) => _buildOptionCard(e.value, e.key))
+              .toList(),
         ],
       ),
     );
@@ -395,7 +454,9 @@ class _TrainingPageState extends State<TrainingPage> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: Colors.grey.shade200),
-          boxShadow: [BoxShadow(blurRadius: 4, color: Colors.black.withOpacity(0.05))],
+          boxShadow: [
+            BoxShadow(blurRadius: 4, color: Colors.black.withOpacity(0.05))
+          ],
         ),
         child: Row(
           children: [
@@ -409,7 +470,10 @@ class _TrainingPageState extends State<TrainingPage> {
               child: Center(
                 child: Text(
                   labels[index],
-                  style: TextStyle(color: AppConfig.primaryColor, fontWeight: FontWeight.bold, fontSize: 13),
+                  style: TextStyle(
+                      color: AppConfig.primaryColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13),
                 ),
               ),
             ),
@@ -417,7 +481,8 @@ class _TrainingPageState extends State<TrainingPage> {
             Expanded(
               child: Text(
                 text,
-                style: const TextStyle(fontSize: 14, color: Colors.black87, height: 1.4),
+                style: const TextStyle(
+                    fontSize: 14, color: Colors.black87, height: 1.4),
               ),
             ),
           ],
@@ -440,7 +505,10 @@ class _TrainingPageState extends State<TrainingPage> {
               Expanded(
                 child: Text(
                   _feedbackContent ?? '',
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.black87),
+                  style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black87),
                 ),
               ),
             ],
@@ -449,11 +517,16 @@ class _TrainingPageState extends State<TrainingPage> {
             const SizedBox(height: 10),
             Row(
               children: [
-                const Icon(Icons.trending_up, color: AppConfig.accentColor, size: 18),
+                const Icon(Icons.trending_up,
+                    color: AppConfig.accentColor, size: 18),
                 const SizedBox(width: 6),
                 Text(
                   '得分 ${_feedbackScoreDelta! > 0 ? '+' : ''}$_feedbackScoreDelta (累计: $_currentScore/$_totalScore)',
-                  style: TextStyle(fontSize: 13, color: _feedbackScoreDelta! >= 0 ? Colors.green : Colors.red),
+                  style: TextStyle(
+                      fontSize: 13,
+                      color: _feedbackScoreDelta! >= 0
+                          ? Colors.green
+                          : Colors.red),
                 ),
               ],
             ),
@@ -462,7 +535,8 @@ class _TrainingPageState extends State<TrainingPage> {
             const SizedBox(height: 10),
             Row(
               children: [
-                const Icon(Icons.lightbulb, color: AppConfig.accentColor, size: 16),
+                const Icon(Icons.lightbulb,
+                    color: AppConfig.accentColor, size: 16),
                 const SizedBox(width: 6),
                 Text(
                   '💡 $_feedbackTip',
@@ -481,18 +555,17 @@ class _TrainingPageState extends State<TrainingPage> {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 4)],
+        boxShadow: [
+          BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 4)
+        ],
       ),
       child: Row(
         children: [
-          IconButton(
-            icon: const Icon(Icons.add_circle_outline, size: 28, color: Colors.grey[500]),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('附件功能开发中')),
-              );
-            },
-          ),
+          _buildItemButton(
+              '⏳', _remainingTimeTravel, () => _useItem('time_shuttle')),
+          const SizedBox(width: 4),
+          _buildItemButton(
+              '💡', _canUseHint ? 1 : 0, () => _useItem('hint_card')),
           const SizedBox(width: 4),
           Expanded(
             child: TextField(
@@ -504,7 +577,8 @@ class _TrainingPageState extends State<TrainingPage> {
                   borderRadius: BorderRadius.all(Radius.circular(20)),
                   borderSide: BorderSide(color: Colors.grey),
                 ),
-                contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               ),
               onSubmitted: _sendMessage,
             ),
@@ -512,19 +586,106 @@ class _TrainingPageState extends State<TrainingPage> {
           const SizedBox(width: 8),
           IconButton(
             icon: _isSending
-                ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2))
-                : Icon(Icons.send, color: AppConfig.primaryColor, size: 24),
-            onPressed: _isSending ? null : () => _sendMessage(_messageController.text),
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2))
+                : Icon(Icons.send_rounded,
+                    color: AppConfig.primaryColor, size: 24),
+            onPressed:
+                _isSending ? null : () => _sendMessage(_messageController.text),
           ),
         ],
       ),
     );
   }
 
+  Widget _buildItemButton(String icon, int count, VoidCallback onPressed) {
+    return InkWell(
+      onTap: count > 0 && !_isSending ? onPressed : null,
+      child: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: count > 0 && !_isSending ? Colors.grey[100] : Colors.grey[50],
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Text(icon, style: const TextStyle(fontSize: 18)),
+            if (count > 0)
+              Positioned(
+                right: 0,
+                top: 0,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                  decoration: BoxDecoration(
+                    color: AppConfig.accentColor,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    count.toString(),
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _useItem(String itemId) async {
+    if (_sessionId == null) return;
+    try {
+      final result = await _trainingService.useItem(
+        sessionId: _sessionId!,
+        itemId: itemId,
+      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result['effect'] ?? '道具使用成功')),
+        );
+      }
+
+      setState(() {
+        if (itemId == 'time_shuttle') {
+          _remainingTimeTravel = result['remaining'] ?? 0;
+        } else if (itemId == 'hint_card') {
+          _canUseHint = false;
+        }
+
+        if (result['hint'] != null) {
+          _feedbackTip = result['hint'];
+          _showFeedback = true;
+          Future.delayed(const Duration(milliseconds: 3000), () {
+            if (mounted) {
+              setState(() {
+                _showFeedback = false;
+              });
+            }
+          });
+        }
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('使用道具失败: $e')));
+      }
+    }
+  }
+
   Widget _buildScoreBar() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      color: Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      color: AppConfig.accentColor.withOpacity(0.05),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -534,7 +695,10 @@ class _TrainingPageState extends State<TrainingPage> {
           ),
           Text(
             '累计得分 $_currentScore/$_totalScore',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: AppConfig.accentColor),
+            style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: AppConfig.accentColor),
           ),
         ],
       ),
@@ -547,6 +711,11 @@ class _UIMessage {
   final String role;
   final String content;
   final List<String>? options;
+  final DateTime? timestamp;
 
-  _UIMessage({required this.role, required this.content, this.options});
+  _UIMessage(
+      {required this.role,
+      required this.content,
+      this.options,
+      this.timestamp});
 }

@@ -2,6 +2,7 @@ import '../api_client.dart';
 import '../api_routes.dart';
 import '../api_response.dart';
 import '../../models/scene_model.dart';
+import '../../pages/scene/scene_select_page.dart';
 
 /// 场景服务
 class SceneService {
@@ -22,6 +23,15 @@ class SceneService {
     return ApiResponse.fromJsonList(
       res.data,
       (d) => d.map((e) => SceneModel.fromJson(e)).toList(),
+    );
+  }
+
+  /// 按阶段分组获取场景列表
+  Future<ApiResponse<List<_StageGroup>>> getGroupedScenes() async {
+    final res = await _client.get(ApiRoutes.sceneGrouped);
+    return ApiResponse.fromJsonList(
+      res.data,
+      (d) => d.map((e) => _StageGroup.fromJson(e)).toList(),
     );
   }
 

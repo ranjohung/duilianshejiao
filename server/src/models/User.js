@@ -1,78 +1,157 @@
 const pool = require('../config/database');
-const bcrypt = require('bcryptjs');
+
+const LEVELS = ['bronze', 'silver', 'gold', 'platinum', 'diamond', 'master'];
+const LEVEL_THRESHOLDS = [0, 50, 150, 300, 500, 800];
 
 class User {
   static async findById(id) {
     const [rows] = await pool.execute('SELECT * FROM users WHERE id = ?', [id]);
-    return rows[0] || null;
+    return rows[0];
   }
 
   static async findByPhone(phone) {
     const [rows] = await pool.execute('SELECT * FROM users WHERE phone = ?', [phone]);
-    return rows[0] || null;
+    return rows[0];
   }
 
-  static async create({ phone, nickname, password, avatar, gender, age, memberLevel = 'free' }) {
-    const hashedPassword = password ? await bcrypt.hash(password, 10) : null;
+  static async create(userData) {
+    const { phone, password, nickname, avatar } = userData;
     const [result] = await pool.execute(
-      `INSERT INTO users (phone, nickname, password, avatar, gender, age, member_level, training_points, total_points, student_level, weekly_trainings_used, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0, 'bronze', 0, NOW(), NOW())`,
-      [phone, nickname, hashedPassword, avatar || '', gender || 'other', age || null, memberLevel]
+      'INSERT INTO users (phone, password, nickname, avatar, points, level) VALUES (?, ?, ?, ?, ?, ?)',
+      [phone, password, nickname || '用户', avatar || '', 0, 'bronze']
     );
     return result.insertId;
   }
 
-  static async updateProfile(id, { nickname, avatar, gender, age }) {
-    const fields = [];
-    const values = [];
-    if (nickname) { fields.push('nickname = ?'); values.push(nickname); }
-    if (avatar) { fields.push('avatar = ?'); values.push(avatar); }
-    if (gender) { fields.push('gender = ?'); values.push(gender); }
-    if (age) { fields.push('age = ?'); values.push(age); }
-    if (fields.length === 0) return;
-    fields.push('updated_at = NOW()');
-    values.push(id);
-    await pool.execute(`UPDATE users SET ${fields.join(', ')} WHERE id = ?`, values);
+  static async updatePoints(userId, delta) {
+    const [result] = await pool.execute(
+      'UPDATE users SET points = points + ? WHERE id = ?',
+      [delta, userId]
+    );
+
+    const [userRows] = await pool.execute('SELECT points FROM users WHERE id = ?', [userId]);
+    const newPoints = userRows[0]?.points || 0;
+
+    await this._updateLevel(userId, newPoints);
+
+    return { success: result.affectedRows > 0, newPoints };
   }
 
-  static async updateMemberLevel(id, memberLevel) {
-    await pool.execute('UPDATE users SET member_level = ?, updated_at = NOW() WHERE id = ?', [memberLevel, id]);
-  }
+  static async _updateLevel(userId, points) {
+    let newLevel = 'bronze';
+    for (let i = LEVEL_THRESHOLDS.length - 1; i >= 0; i--) {
+      if (points >= LEVEL_THRESHOLDS[i]) {
+        newLevel = LEVELS[i];
+        break;
+      }
+    }
 
-  static async addTrainingPoints(id, points) {
     await pool.execute(
-      'UPDATE users SET training_points = training_points + ?, total_points = total_points + ?, updated_at = NOW() WHERE id = ?',
-      [points, points, id]
+      'UPDATE users SET level = ? WHERE id = ?',
+      [newLevel, userId]
+    );
+
+    return newLevel;
+  }
+
+  static async getUserStats(userId) {
+    const [rows] = await pool.execute(
+      'SELECT points, level, experience, streak, total_trainings FROM users WHERE id = ?',
+      [userId]
+    );
+    return rows[0];
+  }
+
+  static async incrementExperience(userId, amount) {
+    await pool.execute(
+      'UPDATE users SET experience = experience + ? WHERE id = ?',
+      [amount, userId]
     );
   }
 
-  static async consumeTrainingPoints(id, points) {
-    const [rows] = await pool.execute('SELECT training_points FROM users WHERE id = ?', [id]);
-    if (!rows[0] || rows[0].training_points < points) return false;
-    await pool.execute('UPDATE users SET training_points = training_points - ?, updated_at = NOW() WHERE id = ?', [points, id]);
-    return true;
+  static async incrementStreak(userId) {
+    await pool.execute(
+      'UPDATE users SET streak = streak + 1, last_checkin = NOW() WHERE id = ?',
+      [userId]
+    );
   }
 
-  static async updateStudentLevel(id, studentLevel) {
-    await pool.execute('UPDATE users SET student_level = ?, updated_at = NOW() WHERE id = ?', [studentLevel, id]);
+  static async resetStreak(userId) {
+    await pool.execute(
+      'UPDATE users SET streak = 0 WHERE id = ?',
+      [userId]
+    );
   }
 
-  static async verifyPassword(user, password) {
-    if (!user.password) return false;
-    return bcrypt.compare(password, user.password);
+  static async incrementTotalTrainings(userId) {
+    await pool.execute(
+      'UPDATE users SET total_trainings = total_trainings + 1 WHERE id = ?',
+      [userId]
+    );
   }
 
-  static async setRealNameVerified(id) {
-    await pool.execute('UPDATE users SET is_real_name_verified = 1, updated_at = NOW() WHERE id = ?', [id]);
+  static async updateProfile(userId, profileData) {
+    const { nickname, avatar, gender, birthday, signature } = profileData;
+    const updateFields = [];
+    const values = [];
+
+    if (nickname !== undefined) { updateFields.push('nickname = ?'); values.push(nickname); }
+    if (avatar !== undefined) { updateFields.push('avatar = ?'); values.push(avatar); }
+    if (gender !== undefined) { updateFields.push('gender = ?'); values.push(gender); }
+    if (birthday !== undefined) { updateFields.push('birthday = ?'); values.push(birthday); }
+    if (signature !== undefined) { updateFields.push('signature = ?'); values.push(signature); }
+
+    if (updateFields.length === 0) return { success: false };
+
+    values.push(userId);
+
+    const [result] = await pool.execute(
+      `UPDATE users SET ${updateFields.join(', ')} WHERE id = ?`,
+      values
+    );
+
+    return { success: result.affectedRows > 0 };
   }
 
-  static async updateDoublePointsFlag(id, flag) {
-    await pool.execute('UPDATE users SET has_double_points = ?, updated_at = NOW() WHERE id = ?', [flag ? 1 : 0, id]);
-  }
+  static async getLevelInfo(points) {
+    let currentLevel = 'bronze';
+    let nextLevel = null;
+    let progress = 0;
 
-  static async updateShieldFlag(id, flag) {
-    await pool.execute('UPDATE users SET has_shield = ?, updated_at = NOW() WHERE id = ?', [flag ? 1 : 0, id]);
+    for (let i = LEVEL_THRESHOLDS.length - 1; i >= 0; i--) {
+      if (points >= LEVEL_THRESHOLDS[i]) {
+        currentLevel = LEVELS[i];
+        if (i < LEVEL_THRESHOLDS.length - 1) {
+          nextLevel = LEVELS[i + 1];
+          const currentThreshold = LEVEL_THRESHOLDS[i];
+          const nextThreshold = LEVEL_THRESHOLDS[i + 1];
+          progress = Math.min(100, ((points - currentThreshold) / (nextThreshold - currentThreshold)) * 100);
+        }
+        break;
+      }
+    }
+
+    return {
+      level: currentLevel,
+      levelName: _getLevelName(currentLevel),
+      nextLevel: nextLevel,
+      nextLevelName: nextLevel ? _getLevelName(nextLevel) : null,
+      progress: Math.round(progress),
+      points,
+    };
   }
+}
+
+function _getLevelName(level) {
+  const names = {
+    'bronze': '青铜学员',
+    'silver': '白银学员',
+    'gold': '黄金学员',
+    'platinum': '铂金学员',
+    'diamond': '钻石学员',
+    'master': '社交大师',
+  };
+  return names[level] || level;
 }
 
 module.exports = User;

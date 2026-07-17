@@ -27,6 +27,7 @@ class ApiRoutes {
   // ============ 场景模块 ============
   static const String sceneList = '$_prefix/scenes';
   static const String sceneDetail = '$_prefix/scenes'; // + /:id
+  static const String sceneGrouped = '$_prefix/scenes/grouped';
 
   // ============ 训练模块 ============
   static const String trainingStart = '$_prefix/training/start';
