@@ -746,18 +746,7 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
 
       <div class="bg-white rounded-xl p-4 shadow-sm mb-3">
         <h3 class="text-sm font-semibold text-gray-800 mb-3">🏆 关卡进度</h3>
-        <div class="flex items-center gap-2" id="level-progress-bars">
-          ${levelSystem.map((l, idx) => {
-            const isCompleted = userData.completedLevels && userData.completedLevels.includes(l.id);
-            const isUnlocked = (userData.points || 0) >= l.pointsRequired;
-            return `<div class="flex-1 relative group">
-              <div class="aspect-square bg-gray-100 rounded-lg flex items-center justify-center text-sm ${isCompleted ? 'bg-gradient-to-br from-amber-100 to-orange-100' : isUnlocked ? 'bg-indigo-50' : ''}" title="${l.name}">
-                ${isCompleted ? l.icon : isUnlocked ? '🔓' : '🔒'}
-              </div>
-              <div class="text-[10px] text-center mt-1 ${isCompleted ? 'text-orange-600 font-medium' : isUnlocked ? 'text-gray-600' : 'text-gray-400'}">${l.id}</div>
-            </div>`;
-          }).join('')}
-        </div>
+        <div class="flex items-center gap-2" id="level-progress-bars"></div>
         <div class="text-xs text-gray-400 mt-2 text-center" id="level-progress-text">已完成 0/7 关卡</div>
       </div>
 
@@ -771,9 +760,7 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
             </div>
           </div>
           <div class="flex-1">
-            <div class="flex gap-1" id="streak-calendar">
-              ${['日','一','二','三','四','五','六'].map(d => `<div class="flex-1 text-center text-[10px] text-gray-400">${d}</div>`).join('')}
-            </div>
+            <div class="flex gap-1" id="streak-calendar"></div>
             <div class="flex gap-1 mt-2" id="streak-days"></div>
           </div>
         </div>
@@ -2683,36 +2670,50 @@ function getLevel(points) {
   return { name:'青铜学员', color:'text-amber-600' };
 }
 
+function hashPassword(password) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hash = crypto.subtle.digestSync('SHA-256', data);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 function saveData() {
-  const key = STORAGE_PREFIX + 'user_' + userData.phone;
-  const data = { userData, trainingScenes, abilityStats, weeklyTrainingDays, checkedInToday, checkInDates, diaries, collectedCards, cbtRecords, nvcRecords, coachMoments, timeRewindTickets, hintCards, shieldCards, doublePointCards, coachEmotions, coachMemory };
-  localStorage.setItem(key, JSON.stringify(data));
+  try {
+    const key = STORAGE_PREFIX + 'user_' + userData.phone;
+    const data = { userData, trainingScenes, abilityStats, weeklyTrainingDays, checkedInToday, checkInDates, diaries, collectedCards, cbtRecords, nvcRecords, coachMoments, timeRewindTickets, hintCards, shieldCards, doublePointCards, coachEmotions, coachMemory };
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch(e) {
+    console.error('保存数据失败:', e);
+    alert('保存数据失败，请检查浏览器存储权限');
+  }
 }
 
 function loadData(phone) {
-  const key = STORAGE_PREFIX + 'user_' + phone;
-  const saved = localStorage.getItem(key);
-  if (saved) {
-    try {
+  try {
+    const key = STORAGE_PREFIX + 'user_' + phone;
+    const saved = localStorage.getItem(key);
+    if (saved) {
       const data = JSON.parse(saved);
-      if (data.userData) userData = data.userData;
-      if (data.trainingScenes) trainingScenes = data.trainingScenes;
-      if (data.abilityStats) abilityStats = data.abilityStats;
-      if (data.weeklyTrainingDays) weeklyTrainingDays = data.weeklyTrainingDays;
-      if (data.checkedInToday) checkedInToday = data.checkedInToday;
-      if (data.checkInDates) checkInDates = data.checkInDates;
-      if (data.diaries) diaries = data.diaries;
-      if (data.collectedCards) collectedCards = data.collectedCards;
-      if (data.cbtRecords) cbtRecords = data.cbtRecords;
-      if (data.nvcRecords) nvcRecords = data.nvcRecords;
-      if (data.coachMoments) coachMoments = data.coachMoments;
-      if (data.timeRewindTickets !== undefined) timeRewindTickets = data.timeRewindTickets;
-      if (data.hintCards !== undefined) hintCards = data.hintCards;
-      if (data.shieldCards !== undefined) shieldCards = data.shieldCards;
-      if (data.doublePointCards !== undefined) doublePointCards = data.doublePointCards;
-      if (data.coachEmotions) coachEmotions = data.coachEmotions;
-      if (data.coachMemory) coachMemory = data.coachMemory;
-    } catch(e) {}
+      if (data.userData && typeof data.userData === 'object') userData = data.userData;
+      if (data.trainingScenes && Array.isArray(data.trainingScenes)) trainingScenes = data.trainingScenes;
+      if (data.abilityStats && typeof data.abilityStats === 'object') abilityStats = data.abilityStats;
+      if (typeof data.weeklyTrainingDays === 'number') weeklyTrainingDays = data.weeklyTrainingDays;
+      if (typeof data.checkedInToday === 'boolean') checkedInToday = data.checkedInToday;
+      if (data.checkInDates && Array.isArray(data.checkInDates)) checkInDates = data.checkInDates;
+      if (data.diaries && Array.isArray(data.diaries)) diaries = data.diaries;
+      if (data.collectedCards && Array.isArray(data.collectedCards)) collectedCards = data.collectedCards;
+      if (data.cbtRecords && Array.isArray(data.cbtRecords)) cbtRecords = data.cbtRecords;
+      if (data.nvcRecords && Array.isArray(data.nvcRecords)) nvcRecords = data.nvcRecords;
+      if (data.coachMoments && Array.isArray(data.coachMoments)) coachMoments = data.coachMoments;
+      if (typeof data.timeRewindTickets === 'number') timeRewindTickets = data.timeRewindTickets;
+      if (typeof data.hintCards === 'number') hintCards = data.hintCards;
+      if (typeof data.shieldCards === 'number') shieldCards = data.shieldCards;
+      if (typeof data.doublePointCards === 'number') doublePointCards = data.doublePointCards;
+      if (data.coachEmotions && typeof data.coachEmotions === 'object') coachEmotions = data.coachEmotions;
+      if (data.coachMemory && typeof data.coachMemory === 'object') coachMemory = data.coachMemory;
+    }
+  } catch(e) {
+    console.error('加载数据失败:', e);
   }
   generateCoachMoments();
 }
@@ -2778,20 +2779,23 @@ function doLogin() {
       return;
     }
 
+    const hashedPwd = hashPassword($('login-password').value.trim());
+
     if (loginMode === 'password') {
       const pwd = $('login-password').value.trim();
       if (!pwd) { err.textContent='请输入密码'; err.style.display='block'; return; }
       const saved = localStorage.getItem(STORAGE_PREFIX + 'user_' + phone);
       if (!saved) {
         if (phone==='13800138000' && pwd==='123456') {
-          userData = { nickname:'演示用户', phone, password:'123456', points:650, streak:3, member:'free', level:'钻石学员', realNameVerified:false, realNameInfo:{name:'',idCard:''}, avatar:'👤', inviteCode:generateInviteCode() };
+          userData = { nickname:'演示用户', phone, password:hashPassword('123456'), points:650, streak:3, member:'free', level:'钻石学员', realNameVerified:false, realNameInfo:{name:'',idCard:''}, avatar:'👤', inviteCode:generateInviteCode() };
         } else {
           err.textContent='账号不存在，请先注册'; err.style.display='block'; return;
         }
       } else {
         const d = JSON.parse(saved);
-        if (d.userData && d.userData.password !== pwd) { err.textContent='密码错误'; err.style.display='block'; return; }
+        if (d.userData && d.userData.password !== hashedPwd && d.userData.password !== pwd) { err.textContent='密码错误'; err.style.display='block'; return; }
         if (d.userData) userData = d.userData;
+        if (userData.password === pwd) { userData.password = hashedPwd; }
       }
     } else {
       const sms = $('login-sms').value.trim();
@@ -2804,6 +2808,9 @@ function doLogin() {
 
     userData.phone = phone;
     loadData(phone);
+
+    localStorage.setItem(STORAGE_PREFIX + 'logged_in', phone);
+
     showView('page-home');
     $('tab-bar').classList.add('show');
     renderHome();
@@ -2840,6 +2847,7 @@ function doRegister() {
   const nick = $('reg-nickname').value.trim();
   const pwd = $('reg-password').value.trim();
   const confirmPwd = $('reg-confirm-password').value.trim();
+  const sms = $('reg-sms').value.trim();
   const agreeTerms = $('agree-terms').checked;
   const err = $('register-error');
 
@@ -2847,9 +2855,11 @@ function doRegister() {
   if (!nick) { err.textContent='请输入昵称'; err.style.display='block'; return; }
   if (!pwd || pwd.length<6) { err.textContent='密码至少6位'; err.style.display='block'; return; }
   if (pwd !== confirmPwd) { err.textContent='两次密码输入不一致'; err.style.display='block'; return; }
+  if (!sms || sms.length!==6) { err.textContent='请输入6位验证码'; err.style.display='block'; return; }
+  if (sms !== '123456') { err.textContent='验证码错误'; err.style.display='block'; return; }
   if (!agreeTerms) { err.textContent='请阅读并同意服务协议和隐私政策'; err.style.display='block'; return; }
 
-  userData = { nickname:nick, phone, password:pwd, points:0, streak:0, member:'free', level:'青铜学员', realNameVerified:false, realNameInfo:{name:'',idCard:''} };
+  userData = { nickname:nick, phone, password:hashPassword(pwd), points:0, streak:0, member:'free', level:'青铜学员', realNameVerified:false, realNameInfo:{name:'',idCard:''} };
   saveData();
   showView('page-home');
   $('tab-bar').classList.add('show');
@@ -6158,8 +6168,12 @@ function renderLevelProgress() {
 
 function renderStreak() {
   const completedLevels = userData.completedLevels || [];
+  const currentPoints = userData.points || 0;
   const streak = completedLevels.length + Math.floor(currentPoints / 500);
   $('streak-count').textContent = streak;
+
+  const weekDays = ['日','一','二','三','四','五','六'];
+  $('streak-calendar').innerHTML = weekDays.map(d => `<div class="flex-1 text-center text-[10px] text-gray-400">${d}</div>`).join('');
 
   const now = new Date();
   const days = [];
@@ -8215,6 +8229,7 @@ window.showModal = function(name) {
 // ===== 退出登录 =====
 function logout() {
   if (confirm('确定要退出登录吗？')) {
+    localStorage.removeItem(STORAGE_PREFIX + 'logged_in');
     showView('page-login');
     $('tab-bar').classList.remove('show');
   }
@@ -8227,6 +8242,18 @@ function initApp() {
   });
   generateCoachMoments();
   setupPwdMatchCheck();
+
+  const loggedInPhone = localStorage.getItem(STORAGE_PREFIX + 'logged_in');
+  if (loggedInPhone) {
+    try {
+      loadData(loggedInPhone);
+      showView('page-home');
+      $('tab-bar').classList.add('show');
+      renderHome();
+    } catch(e) {
+      console.error('自动登录失败:', e);
+    }
+  }
 }
 
 initApp();
