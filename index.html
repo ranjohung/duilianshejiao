@@ -12,8 +12,9 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
 .scrollbar-hide { -ms-overflow-style:none; scrollbar-width:none; }
 .line-clamp-2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
 .app { max-width:430px; margin:0 auto; height:100vh; position:relative; overflow:hidden; background:#fff; }
-.page { display:none; height:100%; overflow-y:auto; }
-.page.active { display:block; }
+.page { display:none; height:100%; overflow-y:auto; position:absolute; inset:0; }
+.page.active { display:block; animation:pageSlideIn 0.3s ease-out; }
+@keyframes pageSlideIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
 .page-content { padding:16px; padding-bottom:80px; }
 .tab-bar { display:none; position:absolute; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #f0f0f0; padding:6px 12px; padding-bottom:calc(6px + env(safe-area-inset-bottom)); z-index:100; }
 .tab-bar.show { display:flex; }
@@ -22,10 +23,25 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
 .tab-item .tab-label { font-size:10px; }
 .tab-item.active { color:#6366f1; }
 .tab-item:not(.active) { color:#9ca3af; }
-.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:200; padding:16px; }
-.modal-content { background:#fff; border-radius:16px; width:100%; max-width:400px; max-height:85vh; display:flex; flex-direction:column; }
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:200; padding:16px; animation:modalFadeIn 0.2s ease-out; }
+@keyframes modalFadeIn { from { opacity:0; } to { opacity:1; } }
+.modal-content { background:#fff; border-radius:16px; width:100%; max-width:400px; max-height:85vh; display:flex; flex-direction:column; animation:modalSlideUp 0.3s ease-out; }
+@keyframes modalSlideUp { from { opacity:0; transform:translateY(30px) scale(0.95); } to { opacity:1; transform:translateY(0) scale(1); } }
+
+.skeleton { background:linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size:200% 100%; animation:skeletonWave 1.5s infinite; }
+@keyframes skeletonWave { 0% { background-position:200% 0; } 100% { background-position:-200% 0; } }
+
 @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 .animate-in { animation:fadeIn .3s ease-out; }
+
+@keyframes bounceIn { 0% { opacity:0; transform:scale(0.3); } 50% { transform:scale(1.05); } 70% { transform:scale(0.9); } 100% { opacity:1; transform:scale(1); } }
+.animate-bounce-in { animation:bounceIn 0.5s ease-out; }
+
+@keyframes pulse-glow { 0%, 100% { box-shadow:0 0 0 0 rgba(99,102,241,0.4); } 50% { box-shadow:0 0 0 10px rgba(99,102,241,0); } }
+.animate-pulse-glow { animation:pulse-glow 2s infinite; }
+
+@keyframes float { 0%, 100% { transform:translateY(0); } 50% { transform:translateY(-5px); } }
+.animate-float { animation:float 3s ease-in-out infinite; }
 
 .grid { display:grid; }
 .grid-cols-3 { grid-template-columns:repeat(3,1fr); }
@@ -220,6 +236,54 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
     </div>
   </div>
 
+  <!-- 新手引导弹窗 -->
+  <div class="modal-overlay" id="modal-onboarding" style="display:none">
+    <div class="modal-content max-w-sm">
+      <div class="p-6 text-center">
+        <div class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl animate-float">🎯</div>
+        <h3 class="text-xl font-bold text-gray-800 mb-2">欢迎来到对练社交！</h3>
+        <p class="text-sm text-gray-500 mb-6">在这里，你将通过AI模拟训练提升社交能力，成为更自信的沟通者。</p>
+
+        <div class="space-y-4 mb-6">
+          <div class="flex items-start gap-3 text-left">
+            <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 flex-shrink-0">1️⃣</div>
+            <div>
+              <div class="text-sm font-medium text-gray-800">选择训练场景</div>
+              <div class="text-xs text-gray-500">从45个真实社交场景中选择你想练习的</div>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 text-left">
+            <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 flex-shrink-0">2️⃣</div>
+            <div>
+              <div class="text-sm font-medium text-gray-800">AI教练指导</div>
+              <div class="text-xs text-gray-500">专业教练会给出针对性的反馈和建议</div>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 text-left">
+            <div class="w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center text-pink-600 flex-shrink-0">3️⃣</div>
+            <div>
+              <div class="text-sm font-medium text-gray-800">积累积分成长</div>
+              <div class="text-xs text-gray-500">完成训练获得积分，解锁更多高级功能</div>
+            </div>
+          </div>
+        </div>
+
+        <button onclick="closeOnboarding()" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-xl hover:opacity-90 transition-all animate-pulse-glow">
+          开始训练
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 功能引导提示 -->
+  <div class="fixed bottom-20 left-0 right-0 z-50 flex justify-center pointer-events-none" id="guide-hint">
+    <div class="bg-gray-900/90 text-white px-4 py-2 rounded-full text-xs shadow-lg flex items-center gap-2 animate-in pointer-events-auto">
+      <span>💡</span>
+      <span id="guide-text">点击底部导航切换页面</span>
+      <button onclick="$('guide-hint').style.display='none'" class="text-gray-400 hover:text-white">✕</button>
+    </div>
+  </div>
+
   <!-- ===== 首页 ===== -->
   <div class="page" id="page-home">
     <div class="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 px-4 pt-8 pb-6 text-white">
@@ -264,7 +328,44 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
       </div>
     </div>
 
-    <div class="page-content">
+    <!-- 加载骨架屏 -->
+    <div id="home-skeleton" class="page-content">
+      <div class="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-4 mb-4">
+        <div class="h-4 bg-white/30 rounded w-3/4 mb-3"></div>
+        <div class="h-8 bg-white/20 rounded w-1/2"></div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <div class="bg-white rounded-xl p-4">
+          <div class="h-6 bg-gray-200 rounded w-2/3 mb-3"></div>
+          <div class="h-3 bg-gray-100 rounded w-full mb-2"></div>
+          <div class="h-3 bg-gray-100 rounded w-1/2"></div>
+        </div>
+        <div class="bg-white rounded-xl p-4">
+          <div class="h-6 bg-gray-200 rounded w-2/3 mb-3"></div>
+          <div class="h-3 bg-gray-100 rounded w-full mb-2"></div>
+          <div class="h-3 bg-gray-100 rounded w-1/2"></div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl p-4 mb-4">
+        <div class="h-4 bg-gray-200 rounded w-1/3 mb-3"></div>
+        <div class="h-20 bg-gray-100 rounded"></div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div class="bg-white rounded-xl p-4">
+          <div class="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+          <div class="h-3 bg-gray-100 rounded w-full"></div>
+        </div>
+        <div class="bg-white rounded-xl p-4">
+          <div class="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+          <div class="h-3 bg-gray-100 rounded w-full"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-content" id="home-content">
       <div class="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-4 text-white shadow-lg mb-4">
         <div class="flex items-center justify-between mb-2">
           <span class="text-xs font-medium bg-white/20 px-2 py-0.5 rounded-full">📌 今日推荐训练</span>
@@ -643,6 +744,41 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
         </div>
       </div>
 
+      <div class="bg-white rounded-xl p-4 shadow-sm mb-3">
+        <h3 class="text-sm font-semibold text-gray-800 mb-3">🏆 关卡进度</h3>
+        <div class="flex items-center gap-2" id="level-progress-bars">
+          ${levelSystem.map((l, idx) => {
+            const isCompleted = userData.completedLevels && userData.completedLevels.includes(l.id);
+            const isUnlocked = (userData.points || 0) >= l.pointsRequired;
+            return `<div class="flex-1 relative group">
+              <div class="aspect-square bg-gray-100 rounded-lg flex items-center justify-center text-sm ${isCompleted ? 'bg-gradient-to-br from-amber-100 to-orange-100' : isUnlocked ? 'bg-indigo-50' : ''}" title="${l.name}">
+                ${isCompleted ? l.icon : isUnlocked ? '🔓' : '🔒'}
+              </div>
+              <div class="text-[10px] text-center mt-1 ${isCompleted ? 'text-orange-600 font-medium' : isUnlocked ? 'text-gray-600' : 'text-gray-400'}">${l.id}</div>
+            </div>`;
+          }).join('')}
+        </div>
+        <div class="text-xs text-gray-400 mt-2 text-center" id="level-progress-text">已完成 0/7 关卡</div>
+      </div>
+
+      <div class="bg-white rounded-xl p-4 shadow-sm mb-3">
+        <h3 class="text-sm font-semibold text-gray-800 mb-3">🔥 训练连胜</h3>
+        <div class="flex items-center gap-4">
+          <div class="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center text-white">
+            <div class="text-center">
+              <div class="text-xl font-bold" id="streak-count">0</div>
+              <div class="text-[10px]">天</div>
+            </div>
+          </div>
+          <div class="flex-1">
+            <div class="flex gap-1" id="streak-calendar">
+              ${['日','一','二','三','四','五','六'].map(d => `<div class="flex-1 text-center text-[10px] text-gray-400">${d}</div>`).join('')}
+            </div>
+            <div class="flex gap-1 mt-2" id="streak-days"></div>
+          </div>
+        </div>
+      </div>
+
       <div class="grid grid-cols-2 gap-3 mb-4">
         <div onclick="showCBT()" class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 cursor-pointer hover:shadow-md transition-all">
           <div class="text-2xl mb-2">🧠</div>
@@ -992,7 +1128,7 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
       </div>
       <div class="flex-1 overflow-auto p-4">
         <div class="bg-gradient-to-br from-pink-50 to-rose-50 rounded-2xl p-6 text-center mb-4">
-          <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto text-4xl shadow-md" id="custom-coach-preview">👤</div>
+          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Smiley" class="w-20 h-20 rounded-full mx-auto shadow-md object-cover" id="custom-coach-preview" alt="教练预览">
           <h4 class="font-semibold text-gray-800 mt-3" id="custom-coach-name-preview">自定义教练</h4>
         </div>
 
@@ -1047,9 +1183,7 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
 
         <div class="bg-white rounded-xl p-4 shadow-sm mb-4">
           <h4 class="text-sm font-semibold text-gray-800 mb-3">头像风格</h4>
-          <div class="grid grid-cols-4 gap-2">
-            ${['Smiley','Angry','Glasses','Shy','Happy','Sad','Wink','Confused'].map(s => `<button onclick="selectAvatarSeed('${s}')" class="aspect-square bg-gray-100 rounded-lg flex items-center justify-center text-xl hover:bg-pink-100 transition-all" id="avatar-${s}">👤</button>`).join('')}
-          </div>
+          <div class="grid grid-cols-4 gap-2" id="avatar-select-grid"></div>
         </div>
 
         <div class="bg-white rounded-xl p-4 shadow-sm">
@@ -2551,7 +2685,7 @@ function getLevel(points) {
 
 function saveData() {
   const key = STORAGE_PREFIX + 'user_' + userData.phone;
-  const data = { userData, trainingScenes, abilityStats, weeklyTrainingDays, checkedInToday, checkInDates, diaries, collectedCards, cbtRecords, nvcRecords, coachMoments, timeRewindTickets, hintCards, shieldCards, doublePointCards };
+  const data = { userData, trainingScenes, abilityStats, weeklyTrainingDays, checkedInToday, checkInDates, diaries, collectedCards, cbtRecords, nvcRecords, coachMoments, timeRewindTickets, hintCards, shieldCards, doublePointCards, coachEmotions, coachMemory };
   localStorage.setItem(key, JSON.stringify(data));
 }
 
@@ -2576,6 +2710,8 @@ function loadData(phone) {
       if (data.hintCards !== undefined) hintCards = data.hintCards;
       if (data.shieldCards !== undefined) shieldCards = data.shieldCards;
       if (data.doublePointCards !== undefined) doublePointCards = data.doublePointCards;
+      if (data.coachEmotions) coachEmotions = data.coachEmotions;
+      if (data.coachMemory) coachMemory = data.coachMemory;
     } catch(e) {}
   }
   generateCoachMoments();
@@ -2671,10 +2807,32 @@ function doLogin() {
     showView('page-home');
     $('tab-bar').classList.add('show');
     renderHome();
+
+    if (!userData.hasSeenOnboarding) {
+      setTimeout(() => {
+        $('modal-onboarding').style.display = 'flex';
+      }, 500);
+    }
+
+    showGuideHint('点击底部导航切换页面');
   } catch(e) {
     console.error('登录失败:', e);
     alert('登录失败，请重试。错误信息：' + e.message);
   }
+}
+
+function closeOnboarding() {
+  $('modal-onboarding').style.display = 'none';
+  userData.hasSeenOnboarding = true;
+  saveData();
+}
+
+function showGuideHint(text) {
+  $('guide-text').textContent = text;
+  $('guide-hint').style.display = 'flex';
+  setTimeout(() => {
+    $('guide-hint').style.display = 'none';
+  }, 5000);
 }
 
 function doRegister() {
@@ -2862,6 +3020,9 @@ function saveTip() {
 }
 
 function renderHome() {
+  $('home-skeleton').style.display = 'none';
+  $('home-content').style.display = 'block';
+
   $('greeting-text').textContent = getGreeting();
   $('user-name').textContent = userData.nickname;
   const level = getLevel(userData.points);
@@ -3129,7 +3290,7 @@ function showCustomCoachModal() {
   };
   $('custom-coach-name').value = '';
   $('custom-coach-calling').value = '';
-  $('custom-coach-preview').textContent = '👤';
+  $('custom-coach-preview').src = 'https://api.dicebear.com/7.x/avataaars/svg?seed=Smiley';
   $('custom-coach-name-preview').textContent = '自定义教练';
 
   document.querySelectorAll('.custom-coach-style-btn').forEach(btn => {
@@ -3140,6 +3301,13 @@ function showCustomCoachModal() {
     btn.classList.remove('bg-indigo-500', 'text-white');
     btn.classList.add('bg-gray-100', 'text-gray-600');
   });
+
+  const avatarSeeds = ['Smiley', 'Angry', 'Glasses', 'Shy', 'Happy', 'Sad', 'Wink', 'Confused'];
+  $('avatar-select-grid').innerHTML = avatarSeeds.map(s => `
+    <button onclick="selectAvatarSeed('${s}')" class="aspect-square bg-gray-100 rounded-lg flex items-center justify-center hover:bg-pink-100 transition-all" id="avatar-${s}">
+      <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${s}" class="w-full h-full object-cover rounded-lg">
+    </button>
+  `).join('');
 
   $('modal-custom-coach').style.display = 'flex';
 }
@@ -3178,7 +3346,6 @@ function selectPersonality(dimension, value) {
 function selectAvatarSeed(seed) {
   customCoachData.avatarSeed = seed;
   $('custom-coach-preview').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`;
-  $('custom-coach-preview').textContent = '';
 
   document.querySelectorAll('[id^="avatar-"]').forEach(btn => {
     btn.classList.remove('ring-2', 'ring-pink-500');
@@ -3703,75 +3870,6 @@ function resetVoiceRecording() {
   voiceStartTime = 0;
   $('voice-timer').textContent = '00:00';
   $('voice-analysis').innerHTML = '<div class="text-center py-4 text-gray-400">录制完成后，AI 将分析你的语音表达</div>';
-}
-
-function simulateVoiceAnalysis() {
-  if (!voiceRecording) return;
-
-  stopVoiceRecording();
-
-  const analysis = {
-    clarity: Math.floor(Math.random() * 30) + 70,
-    confidence: Math.floor(Math.random() * 30) + 70,
-    fluency: Math.floor(Math.random() * 30) + 70,
-    emotion: Math.floor(Math.random() * 20) + 60,
-    suggestions: [
-      '语速适中，表达清晰，继续保持！',
-      '语气自信，给人良好的第一印象',
-      '建议增加一些停顿，让表达更有节奏感',
-      '整体表现不错，可以尝试加入更多情感表达'
-    ]
-  };
-
-  $('voice-analysis').innerHTML = `
-    <div class="space-y-3">
-      <div class="flex items-center justify-between">
-        <span class="text-xs text-gray-500">清晰度</span>
-        <div class="flex items-center gap-2">
-          <div class="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
-            <div class="h-full bg-green-500 rounded-full" style="width:${analysis.clarity}%"></div>
-          </div>
-          <span class="text-xs font-medium text-gray-700">${analysis.clarity}%</span>
-        </div>
-      </div>
-      <div class="flex items-center justify-between">
-        <span class="text-xs text-gray-500">自信心</span>
-        <div class="flex items-center gap-2">
-          <div class="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
-            <div class="h-full bg-blue-500 rounded-full" style="width:${analysis.confidence}%"></div>
-          </div>
-          <span class="text-xs font-medium text-gray-700">${analysis.confidence}%</span>
-        </div>
-      </div>
-      <div class="flex items-center justify-between">
-        <span class="text-xs text-gray-500">流畅度</span>
-        <div class="flex items-center gap-2">
-          <div class="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
-            <div class="h-full bg-purple-500 rounded-full" style="width:${analysis.fluency}%"></div>
-          </div>
-          <span class="text-xs font-medium text-gray-700">${analysis.fluency}%</span>
-        </div>
-      </div>
-      <div class="flex items-center justify-between">
-        <span class="text-xs text-gray-500">情感表达</span>
-        <div class="flex items-center gap-2">
-          <div class="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
-            <div class="h-full bg-pink-500 rounded-full" style="width:${analysis.emotion}%"></div>
-          </div>
-          <span class="text-xs font-medium text-gray-700">${analysis.emotion}%</span>
-        </div>
-      </div>
-      <div class="mt-3 pt-3 border-t border-gray-100">
-        <div class="text-xs font-medium text-gray-500 mb-2">💡 改进建议</div>
-        <ul class="text-xs text-gray-600 space-y-1">
-          ${analysis.suggestions.map(s => `<li>• ${s}</li>`).join('')}
-        </ul>
-      </div>
-    </div>
-  `;
-
-  const pointsEarned = Math.floor(analysis.clarity / 10) + 5;
-  addPoints(pointsEarned, '语音训练奖励');
 }
 
 function showMomentDetail(momentId) {
@@ -6029,9 +6127,58 @@ function renderGrowth() {
   // 教练寄语
   renderCoachMessage();
 
+  renderLevelProgress();
+  renderStreak();
+
   // 加载天赋和挑战数据
   loadTalents();
   loadChallenges();
+}
+
+function renderLevelProgress() {
+  const completedLevels = userData.completedLevels || [];
+  const currentPoints = userData.points || 0;
+
+  const levelBars = levelSystem.map((l, idx) => {
+    const isCompleted = completedLevels.includes(l.id);
+    const isUnlocked = currentPoints >= l.pointsRequired;
+    return `
+      <div class="flex-1 relative group">
+        <div class="aspect-square bg-gray-100 rounded-lg flex items-center justify-center text-sm transition-all ${isCompleted ? 'bg-gradient-to-br from-amber-100 to-orange-100 animate-bounce-in' : isUnlocked ? 'bg-indigo-50' : ''}" title="${l.name}">
+          ${isCompleted ? l.icon : isUnlocked ? '🔓' : '🔒'}
+        </div>
+        <div class="text-[10px] text-center mt-1 ${isCompleted ? 'text-orange-600 font-medium' : isUnlocked ? 'text-gray-600' : 'text-gray-400'}">${l.id}</div>
+      </div>
+    `;
+  }).join('');
+
+  $('level-progress-bars').innerHTML = levelBars;
+  $('level-progress-text').textContent = `已完成 ${completedLevels.length}/${levelSystem.length} 关卡`;
+}
+
+function renderStreak() {
+  const completedLevels = userData.completedLevels || [];
+  const streak = completedLevels.length + Math.floor(currentPoints / 500);
+  $('streak-count').textContent = streak;
+
+  const now = new Date();
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    const dateStr = d.toISOString().split('T')[0];
+    const isToday = i === 0;
+    const isCheckedIn = checkInDates.includes(dateStr);
+    const isFuture = i < 0;
+
+    days.push(`
+      <div class="flex-1 aspect-square rounded-md flex items-center justify-center text-[10px] ${isCheckedIn ? 'bg-green-500 text-white' : isToday ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-100 text-gray-400'}">
+        ${isCheckedIn ? '✓' : isToday ? '今' : d.getDate()}
+      </div>
+    `);
+  }
+
+  $('streak-days').innerHTML = days.join('');
 }
 
 function renderCoachMessage() {
