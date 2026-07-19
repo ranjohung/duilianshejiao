@@ -2670,10 +2670,10 @@ function getLevel(points) {
   return { name:'青铜学员', color:'text-amber-600' };
 }
 
-function hashPassword(password) {
+async function hashPassword(password) {
   const encoder = new TextEncoder();
   const data = encoder.encode(password);
-  const hash = crypto.subtle.digestSync('SHA-256', data);
+  const hash = await crypto.subtle.digest('SHA-256', data);
   return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
@@ -2768,7 +2768,7 @@ function fillDemoAccount() {
   }
 }
 
-function doLogin() {
+async function doLogin() {
   try {
     const phone = $('login-phone').value.trim();
     const err = $('login-error');
@@ -2779,7 +2779,7 @@ function doLogin() {
       return;
     }
 
-    const hashedPwd = hashPassword($('login-password').value.trim());
+    const hashedPwd = await hashPassword($('login-password').value.trim());
 
     if (loginMode === 'password') {
       const pwd = $('login-password').value.trim();
@@ -2787,7 +2787,7 @@ function doLogin() {
       const saved = localStorage.getItem(STORAGE_PREFIX + 'user_' + phone);
       if (!saved) {
         if (phone==='13800138000' && pwd==='123456') {
-          userData = { nickname:'演示用户', phone, password:hashPassword('123456'), points:650, streak:3, member:'free', level:'钻石学员', realNameVerified:false, realNameInfo:{name:'',idCard:''}, avatar:'👤', inviteCode:generateInviteCode() };
+          userData = { nickname:'演示用户', phone, password:await hashPassword('123456'), points:650, streak:3, member:'free', level:'钻石学员', realNameVerified:false, realNameInfo:{name:'',idCard:''}, avatar:'👤', inviteCode:generateInviteCode() };
         } else {
           err.textContent='账号不存在，请先注册'; err.style.display='block'; return;
         }
@@ -2842,7 +2842,7 @@ function showGuideHint(text) {
   }, 5000);
 }
 
-function doRegister() {
+async function doRegister() {
   const phone = $('reg-phone').value.trim();
   const nick = $('reg-nickname').value.trim();
   const pwd = $('reg-password').value.trim();
@@ -2859,7 +2859,7 @@ function doRegister() {
   if (sms !== '123456') { err.textContent='验证码错误'; err.style.display='block'; return; }
   if (!agreeTerms) { err.textContent='请阅读并同意服务协议和隐私政策'; err.style.display='block'; return; }
 
-  userData = { nickname:nick, phone, password:hashPassword(pwd), points:0, streak:0, member:'free', level:'青铜学员', realNameVerified:false, realNameInfo:{name:'',idCard:''} };
+  userData = { nickname:nick, phone, password:await hashPassword(pwd), points:0, streak:0, member:'free', level:'青铜学员', realNameVerified:false, realNameInfo:{name:'',idCard:''} };
   saveData();
   showView('page-home');
   $('tab-bar').classList.add('show');
