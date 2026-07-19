@@ -2678,7 +2678,8 @@ function renderHome() {
 
   // 晚安计划（21点后显示）
   const h = new Date().getHours();
-  $('goodnight-card').style.display = h >= 21 ? 'block' : 'none';
+  const nightCard = $('goodnight-card');
+  if (nightCard) nightCard.style.display = h >= 21 ? 'block' : 'none';
 }
 
 function doCheckin() {
