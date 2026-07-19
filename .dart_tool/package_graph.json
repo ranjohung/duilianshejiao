@@ -17,7 +17,8 @@
         "intl",
         "json_annotation",
         "provider",
-        "shared_preferences"
+        "shared_preferences",
+        "socket_io_client"
       ],
       "devDependencies": [
         "build_runner",
@@ -1081,6 +1082,22 @@
         "collection",
         "meta",
         "pub_semver"
+      ]
+    },
+    {
+      "name": "socket_io_client",
+      "version": "2.0.3+1",
+      "dependencies": [
+        "js",
+        "logging",
+        "socket_io_common"
+      ]
+    },
+    {
+      "name": "socket_io_common",
+      "version": "2.0.3",
+      "dependencies": [
+        "logging"
       ]
     }
   ],

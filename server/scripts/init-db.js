@@ -69,9 +69,20 @@ const SQL_STATEMENTS = [
     messages JSON,
     score INT,
     duration INT UNSIGNED DEFAULT 0,
+    total_rounds INT DEFAULT 0,
+    suggestions_history JSON,
+    npc_attitude_history JSON,
+    topics_covered JSON,
+    completion_reason VARCHAR(50),
+    net_score INT DEFAULT 0,
+    positive_score INT DEFAULT 0,
+    negative_score INT DEFAULT 0,
+    learning_card_id BIGINT UNSIGNED,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_user_id (user_id),
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    INDEX idx_learning_card_id (learning_card_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (learning_card_id) REFERENCES learning_cards(id) ON DELETE SET NULL
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`,
 
   // 成长档案表

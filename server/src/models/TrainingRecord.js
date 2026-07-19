@@ -19,15 +19,20 @@ class TrainingRecord {
     return { items: rows, total: count[0].total };
   }
 
-  static async create({ userId, coachId, sceneId, chatMessages, scores, evaluation }) {
+  static async create({ user_id, coach_id, scene_id, messages, score, duration, total_rounds, suggestions_history, npc_attitude_history, topics_covered, completion_reason, net_score, positive_score, negative_score, learning_card_id }) {
     const [result] = await pool.execute(
-      `INSERT INTO training_records (user_id, coach_id, scene_id, chat_messages, scores, evaluation, status, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, 'completed', NOW(), NOW())`,
+      `INSERT INTO training_records (user_id, coach_id, scene_id, messages, score, duration, total_rounds, suggestions_history, npc_attitude_history, topics_covered, completion_reason, net_score, positive_score, negative_score, learning_card_id)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        userId, coachId, sceneId,
-        JSON.stringify(chatMessages),
-        JSON.stringify(scores),
-        JSON.stringify(evaluation),
+        user_id, coach_id, scene_id,
+        messages, score, duration,
+        total_rounds, suggestions_history,
+        npc_attitude_history, topics_covered,
+        completion_reason,
+        net_score || 0,
+        positive_score || 0,
+        negative_score || 0,
+        learning_card_id || null
       ]
     );
     return result.insertId;
