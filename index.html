@@ -2368,11 +2368,18 @@ function sendRegSms() {
 }
 
 function fillDemoAccount() {
-  loginMode = 'password';
-  $('login-phone').value = '13800138000';
-  $('login-password').value = '123456';
-  switchLoginMode('password');
-  $('login-error').style.display = 'none';
+  console.log('fillDemoAccount called');
+  try {
+    loginMode = 'password';
+    $('login-phone').value = '13800138000';
+    $('login-password').value = '123456';
+    switchLoginMode('password');
+    $('login-error').style.display = 'none';
+    console.log('fillDemoAccount completed successfully');
+  } catch(e) {
+    console.error('fillDemoAccount error:', e);
+    alert('演示账号填充失败：' + e.message);
+  }
 }
 
 function doLogin() {
@@ -7340,8 +7347,15 @@ function logout() {
 }
 
 // ===== 初始化 =====
-generateCoachMoments();
-setupPwdMatchCheck();
+function initApp() {
+  document.querySelectorAll('.modal-overlay').forEach(modal => {
+    modal.style.display = 'none';
+  });
+  generateCoachMoments();
+  setupPwdMatchCheck();
+}
+
+initApp();
 </script>
 </body>
 </html>
