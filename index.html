@@ -489,67 +489,52 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
 
   <!-- 语音训练弹窗（PRD §7.2） -->
   <div class="modal-overlay" id="modal-voice-training" style="display:none">
-    <div class="modal-content h-[70vh]">
+    <div class="modal-content h-[85vh] flex flex-col">
       <div class="flex items-center justify-between p-4 border-b border-gray-100">
-        <h3 class="font-semibold text-gray-800">🎙️ 语音训练</h3>
-        <button onclick="closeVoiceTraining()" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+        <div class="flex items-center gap-3">
+          <h3 class="font-semibold text-gray-800">🎙️ 语音训练</h3>
+          <span class="text-xs px-2 py-1 bg-green-100 text-green-600 rounded-full" id="voice-scene-name">选择场景</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-gray-400" id="voice-round-info">第 1/3 轮</span>
+          <button onclick="closeVoiceTraining()" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+        </div>
       </div>
-      <div class="flex-1 overflow-auto p-4">
-        <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 text-center mb-4">
-          <div class="text-5xl mb-3">🎤</div>
-          <h4 class="font-semibold text-gray-800 mb-2">真实语音对话训练</h4>
-          <p class="text-sm text-gray-600">通过真实语音对话，提升你的口语表达和沟通能力</p>
+
+      <div class="flex-1 overflow-auto p-4 bg-gray-50" id="voice-message-list">
+        <div class="text-center py-8 text-gray-400">
+          <div class="text-4xl mb-3">🎤</div>
+          <p>选择场景后开始语音训练</p>
+          <p class="text-xs mt-2">教练用语音提问，你用文字回复</p>
+        </div>
+      </div>
+
+      <div class="border-t border-gray-100 p-4 bg-white">
+        <div id="voice-options-area" style="display:none">
+          <div class="text-xs text-gray-400 mb-2">选择你的回复：</div>
+          <div class="grid grid-cols-1 gap-2" id="voice-options-list"></div>
         </div>
 
-        <div class="bg-white rounded-xl p-4 shadow-sm mb-4">
-          <div class="flex items-center justify-between mb-3">
-            <span class="text-sm font-medium text-gray-700">当前场景</span>
-            <span class="text-xs px-2 py-1 bg-green-100 text-green-600 rounded-full" id="voice-scene-name">选择场景</span>
-          </div>
-          <button onclick="showVoiceSceneSelect()" class="w-full py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors">
-            🎯 选择训练场景
-          </button>
-        </div>
-
-        <div class="bg-white rounded-xl p-4 shadow-sm mb-4">
-          <div class="text-center">
-            <div class="text-sm text-gray-500 mb-2">录音时长</div>
-            <div class="text-3xl font-bold text-gray-800 mb-4" id="voice-timer">00:00</div>
-
-            <div class="flex items-center justify-center gap-4">
-              <button id="voice-record-btn" onclick="toggleVoiceRecording()" class="w-16 h-16 rounded-full bg-gradient-to-r from-red-500 to-pink-500 text-white flex items-center justify-center hover:opacity-90 transition-all shadow-lg shadow-red-200">
-                🎙️
+        <div id="voice-record-area">
+          <div class="flex items-center gap-3">
+            <div class="flex-1">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs text-gray-500">录音时长</span>
+                <span class="text-xs font-medium" id="voice-timer">00:00</span>
+              </div>
+              <button id="voice-record-btn" onclick="toggleVoiceRecording()" class="w-full py-3 rounded-xl bg-gradient-to-r from-red-500 to-pink-500 text-white font-medium hover:opacity-90 transition-all shadow-lg shadow-red-200">
+                🎙️ 按住录音
               </button>
-            </div>
-
-            <div class="mt-4 flex items-center justify-center gap-4">
-              <button onclick="playVoiceRecording()" class="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg text-sm text-gray-600 hover:bg-gray-200 transition-colors">
-                ▶️ 播放
-              </button>
-              <button onclick="resetVoiceRecording()" class="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg text-sm text-gray-600 hover:bg-gray-200 transition-colors">
-                🔄 重置
-              </button>
-            </div>
-          </div>
-
-          <div class="mt-4">
-            <div class="text-xs text-gray-400 mb-2">波形可视化</div>
-            <div class="h-16 bg-gray-100 rounded-lg flex items-center justify-center">
-              <div class="flex items-center gap-1" id="voice-waveform">
-                <div class="w-1 h-4 bg-green-500 rounded-full animate-pulse"></div>
-                <div class="w-1 h-6 bg-green-500 rounded-full animate-pulse" style="animation-delay:0.1s"></div>
-                <div class="w-1 h-8 bg-green-500 rounded-full animate-pulse" style="animation-delay:0.2s"></div>
-                <div class="w-1 h-6 bg-green-500 rounded-full animate-pulse" style="animation-delay:0.3s"></div>
-                <div class="w-1 h-4 bg-green-500 rounded-full animate-pulse" style="animation-delay:0.4s"></div>
+              <div class="mt-2 h-8 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                <div class="flex items-center gap-0.5" id="voice-waveform">
+                  <div class="w-1 h-3 bg-gray-400 rounded-full"></div>
+                  <div class="w-1 h-4 bg-gray-400 rounded-full"></div>
+                  <div class="w-1 h-5 bg-gray-400 rounded-full"></div>
+                  <div class="w-1 h-4 bg-gray-400 rounded-full"></div>
+                  <div class="w-1 h-3 bg-gray-400 rounded-full"></div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        <div class="bg-white rounded-xl p-4 shadow-sm">
-          <div class="text-sm font-medium text-gray-700 mb-3">AI 分析结果</div>
-          <div id="voice-analysis" class="text-sm text-gray-600">
-            <div class="text-center py-4 text-gray-400">录制完成后，AI 将分析你的语音表达</div>
           </div>
         </div>
       </div>
@@ -984,12 +969,99 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
 
   <!-- 教练选择弹窗 -->
   <div class="modal-overlay" id="modal-coach-select" style="display:none">
-    <div class="modal-content h-[80vh]">
+    <div class="modal-content h-[85vh]">
       <div class="flex items-center justify-between p-4 border-b border-gray-100">
         <h3 class="font-semibold text-gray-800">👥 选择教练</h3>
         <button onclick="closeModal('coach-select')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
       </div>
       <div class="flex-1 overflow-auto p-4 space-y-3" id="coach-select-list"></div>
+      <div class="p-4 border-t border-gray-100">
+        <button onclick="showCustomCoachModal()" class="w-full py-3 bg-gradient-to-r from-pink-500 to-rose-500 text-white font-semibold rounded-xl hover:opacity-90 transition-all">
+          🎨 创建自定义教练（消耗100积分）
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 自定义教练创建弹窗 -->
+  <div class="modal-overlay" id="modal-custom-coach" style="display:none">
+    <div class="modal-content h-[90vh]">
+      <div class="flex items-center justify-between p-4 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-800">🎨 创建自定义教练</h3>
+        <button onclick="closeModal('custom-coach')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+      </div>
+      <div class="flex-1 overflow-auto p-4">
+        <div class="bg-gradient-to-br from-pink-50 to-rose-50 rounded-2xl p-6 text-center mb-4">
+          <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto text-4xl shadow-md" id="custom-coach-preview">👤</div>
+          <h4 class="font-semibold text-gray-800 mt-3" id="custom-coach-name-preview">自定义教练</h4>
+        </div>
+
+        <div class="bg-white rounded-xl p-4 shadow-sm mb-4">
+          <h4 class="text-sm font-semibold text-gray-800 mb-3">教练名称</h4>
+          <input type="text" id="custom-coach-name" placeholder="输入教练名称" maxlength="10" class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-500/50" oninput="updateCustomCoachPreview()">
+        </div>
+
+        <div class="bg-white rounded-xl p-4 shadow-sm mb-4">
+          <h4 class="text-sm font-semibold text-gray-800 mb-3">教学风格</h4>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="selectCustomCoachStyle('鼓励型')" class="custom-coach-style-btn py-2 px-3 bg-gray-100 rounded-lg text-sm text-gray-600 hover:bg-pink-100 hover:text-pink-600 transition-all" data-style="鼓励型">😊 鼓励型</button>
+            <button onclick="selectCustomCoachStyle('支持型')" class="custom-coach-style-btn py-2 px-3 bg-gray-100 rounded-lg text-sm text-gray-600 hover:bg-pink-100 hover:text-pink-600 transition-all" data-style="支持型">🤝 支持型</button>
+            <button onclick="selectCustomCoachStyle('挑战型')" class="custom-coach-style-btn py-2 px-3 bg-gray-100 rounded-lg text-sm text-gray-600 hover:bg-pink-100 hover:text-pink-600 transition-all" data-style="挑战型">⚡ 挑战型</button>
+            <button onclick="selectCustomCoachStyle('分析型')" class="custom-coach-style-btn py-2 px-3 bg-gray-100 rounded-lg text-sm text-gray-600 hover:bg-pink-100 hover:text-pink-600 transition-all" data-style="分析型">🧠 分析型</button>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-4 shadow-sm mb-4">
+          <h4 class="text-sm font-semibold text-gray-800 mb-3">性格维度</h4>
+          <div class="space-y-3">
+            <div>
+              <div class="text-xs text-gray-500 mb-2">社交能量</div>
+              <div class="flex gap-2">
+                <button onclick="selectPersonality('socialEnergy', '外向')" class="personality-btn flex-1 py-2 bg-gray-100 rounded-lg text-sm text-gray-600 hover:bg-indigo-100 transition-all" data-dim="socialEnergy" data-val="外向">🌞 外向(E)</button>
+                <button onclick="selectPersonality('socialEnergy', '内向')" class="personality-btn flex-1 py-2 bg-gray-100 rounded-lg text-sm text-gray-600 hover:bg-indigo-100 transition-all" data-dim="socialEnergy" data-val="内向">🌙 内向(I)</button>
+              </div>
+            </div>
+            <div>
+              <div class="text-xs text-gray-500 mb-2">信息处理</div>
+              <div class="flex gap-2">
+                <button onclick="selectPersonality('infoProcess', '实感')" class="personality-btn flex-1 py-2 bg-gray-100 rounded-lg text-sm text-gray-600 hover:bg-indigo-100 transition-all" data-dim="infoProcess" data-val="实感">👀 实感(S)</button>
+                <button onclick="selectPersonality('infoProcess', '直觉')" class="personality-btn flex-1 py-2 bg-gray-100 rounded-lg text-sm text-gray-600 hover:bg-indigo-100 transition-all" data-dim="infoProcess" data-val="直觉">💡 直觉(N)</button>
+              </div>
+            </div>
+            <div>
+              <div class="text-xs text-gray-500 mb-2">决策依据</div>
+              <div class="flex gap-2">
+                <button onclick="selectPersonality('decision', '感性')" class="personality-btn flex-1 py-2 bg-gray-100 rounded-lg text-sm text-gray-600 hover:bg-indigo-100 transition-all" data-dim="decision" data-val="感性">❤️ 感性(F)</button>
+                <button onclick="selectPersonality('decision', '理性')" class="personality-btn flex-1 py-2 bg-gray-100 rounded-lg text-sm text-gray-600 hover:bg-indigo-100 transition-all" data-dim="decision" data-val="理性">🧠 理性(T)</button>
+              </div>
+            </div>
+            <div>
+              <div class="text-xs text-gray-500 mb-2">生活态度</div>
+              <div class="flex gap-2">
+                <button onclick="selectPersonality('lifestyle', '计划')" class="personality-btn flex-1 py-2 bg-gray-100 rounded-lg text-sm text-gray-600 hover:bg-indigo-100 transition-all" data-dim="lifestyle" data-val="计划">📅 计划(J)</button>
+                <button onclick="selectPersonality('lifestyle', '随性')" class="personality-btn flex-1 py-2 bg-gray-100 rounded-lg text-sm text-gray-600 hover:bg-indigo-100 transition-all" data-dim="lifestyle" data-val="随性">🌈 随性(P)</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-4 shadow-sm mb-4">
+          <h4 class="text-sm font-semibold text-gray-800 mb-3">头像风格</h4>
+          <div class="grid grid-cols-4 gap-2">
+            ${['Smiley','Angry','Glasses','Shy','Happy','Sad','Wink','Confused'].map(s => `<button onclick="selectAvatarSeed('${s}')" class="aspect-square bg-gray-100 rounded-lg flex items-center justify-center text-xl hover:bg-pink-100 transition-all" id="avatar-${s}">👤</button>`).join('')}
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-4 shadow-sm">
+          <h4 class="text-sm font-semibold text-gray-800 mb-3">称呼方式</h4>
+          <input type="text" id="custom-coach-calling" placeholder="例如：同学、小伙伴、学员" maxlength="10" class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pink-500/50">
+        </div>
+      </div>
+      <div class="p-4 border-t border-gray-100">
+        <button onclick="createCustomCoach()" class="w-full py-3 bg-gradient-to-r from-pink-500 to-rose-500 text-white font-semibold rounded-xl hover:opacity-90 transition-all">
+          创建自定义教练（-100积分）
+        </button>
+      </div>
     </div>
   </div>
 
@@ -1479,12 +1551,34 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
         <button onclick="closeModal('challenge')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
       </div>
       <div class="flex-1 overflow-auto p-4">
-        <div class="bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl p-4 text-white mb-4">
-          <div class="text-sm opacity-80">进行中挑战</div>
-          <div class="text-3xl font-bold" id="modal-challenge-count">0个</div>
-          <div class="text-xs opacity-60 mt-1">完成挑战获得积分奖励</div>
+        <div class="grid grid-cols-2 gap-3 mb-4">
+          <button onclick="showChallengeMissions()" class="py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-semibold text-sm flex flex-col items-center justify-center gap-1">
+            <span class="text-lg">📋</span>
+            <span>任务挑战</span>
+          </button>
+          <button onclick="showLevelSystem()" class="py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl font-semibold text-sm flex flex-col items-center justify-center gap-1">
+            <span class="text-lg">🏆</span>
+            <span>关卡系统</span>
+          </button>
         </div>
-        <div class="space-y-2" id="modal-challenge-list"></div>
+
+        <div id="challenge-content-area">
+          <div class="bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl p-4 text-white mb-4">
+            <div class="text-sm opacity-80">进行中挑战</div>
+            <div class="text-3xl font-bold" id="modal-challenge-count">0个</div>
+            <div class="text-xs opacity-60 mt-1">完成挑战获得积分奖励</div>
+          </div>
+          <div class="space-y-2" id="modal-challenge-list"></div>
+        </div>
+
+        <div id="level-content-area" class="hidden">
+          <div class="bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl p-4 text-white mb-4">
+            <div class="text-sm opacity-80">当前关卡</div>
+            <div class="text-3xl font-bold" id="current-level-display">第1关</div>
+            <div class="text-xs opacity-60 mt-1">通关解锁更高难度挑战</div>
+          </div>
+          <div class="space-y-3" id="level-list"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -2147,6 +2241,161 @@ let coaches = [
 let currentCoach = coaches[0];
 let coachAvatar = 'https://api.dicebear.com/7.x/avataaars/svg?seed=Coach';
 let userAvatar = 'https://api.dicebear.com/7.x/avataaars/svg?seed=User';
+
+let coachEmotions = {
+  happiness: 80,
+  energy: 70,
+  patience: 90,
+  encouragement: 85
+};
+
+let coachMemory = {
+  lastTrainingDate: '',
+  lastTrainingScene: '',
+  userStrengths: [],
+  userWeaknesses: [],
+  trainingHistory: [],
+  userPreferences: {}
+};
+
+function updateCoachEmotion(type, delta) {
+  if (coachEmotions[type] !== undefined) {
+    coachEmotions[type] = Math.max(0, Math.min(100, coachEmotions[type] + delta));
+  }
+}
+
+function getEmotionBasedResponse(baseResponse) {
+  const emotions = [];
+  if (coachEmotions.happiness > 70) emotions.push('😊');
+  if (coachEmotions.energy > 70) emotions.push('💪');
+  if (coachEmotions.patience > 80) emotions.push('🤝');
+
+  let prefix = '';
+  if (coachEmotions.encouragement > 70) {
+    const encouragements = ['很棒！', '做得好！', '继续加油！', '不错哦！'];
+    prefix = encouragements[Math.floor(Math.random() * encouragements.length)] + ' ';
+  }
+
+  return prefix + baseResponse + (emotions.length > 0 ? ' ' + emotions.join('') : '');
+}
+
+function saveCoachMemory(key, value) {
+  coachMemory[key] = value;
+  if (key === 'lastTrainingDate' || key === 'lastTrainingScene') {
+    if (!coachMemory.trainingHistory) coachMemory.trainingHistory = [];
+    coachMemory.trainingHistory.push({
+      date: new Date().toISOString().split('T')[0],
+      scene: key === 'lastTrainingScene' ? value : coachMemory.lastTrainingScene,
+      type: key
+    });
+    if (coachMemory.trainingHistory.length > 20) {
+      coachMemory.trainingHistory.shift();
+    }
+  }
+}
+
+function updateUserStrength(skill, value) {
+  const idx = coachMemory.userStrengths.findIndex(s => s.skill === skill);
+  if (idx >= 0) {
+    coachMemory.userStrengths[idx].value = Math.min(100, coachMemory.userStrengths[idx].value + value);
+  } else {
+    coachMemory.userStrengths.push({ skill, value: Math.min(100, value) });
+  }
+}
+
+function updateUserWeakness(skill, value) {
+  const idx = coachMemory.userWeaknesses.findIndex(s => s.skill === skill);
+  if (idx >= 0) {
+    coachMemory.userWeaknesses[idx].value = Math.min(100, coachMemory.userWeaknesses[idx].value + value);
+  } else {
+    coachMemory.userWeaknesses.push({ skill, value: Math.min(100, value) });
+  }
+}
+
+function getPersonalizedFeedback(scene) {
+  const feedback = [];
+
+  const relatedStrengths = coachMemory.userStrengths.filter(s =>
+    scene.includes(s.skill) || ['沟通', '表达', '倾听', '共情', '谈判', '拒绝'].some(k => s.skill.includes(k))
+  );
+
+  if (relatedStrengths.length > 0) {
+    const strengths = relatedStrengths.map(s => s.skill).join('、');
+    feedback.push(`我注意到你在${strengths}方面表现不错，继续保持！`);
+  }
+
+  const relatedWeaknesses = coachMemory.userWeaknesses.filter(w =>
+    scene.includes(w.skill) || ['沟通', '表达', '倾听', '共情', '谈判', '拒绝'].some(k => w.skill.includes(k))
+  );
+
+  if (relatedWeaknesses.length > 0) {
+    const weaknesses = relatedWeaknesses.map(w => w.skill).join('、');
+    feedback.push(`这次可以重点关注${weaknesses}方面，相信你会有很大提升！`);
+  }
+
+  if (coachMemory.lastTrainingScene && coachMemory.lastTrainingScene !== scene) {
+    feedback.push(`上次你训练了「${coachMemory.lastTrainingScene}」，这次换个场景试试，很棒的选择！`);
+  }
+
+  return feedback.length > 0 ? feedback.join('\n') : '';
+}
+
+function ensurePersonalityConsistency(text) {
+  const personality = currentCoach.personality || '沉稳理性';
+
+  if (personality.includes('外向') || personality.includes('活泼')) {
+    const exclamations = ['！', '~', '✨', '🎉'];
+    const hasExclamation = exclamations.some(e => text.includes(e));
+    if (!hasExclamation && text.length > 10) {
+      text += '！';
+    }
+  }
+
+  if (personality.includes('理性') || personality.includes('分析')) {
+    if (!['因为', '所以', '分析', '逻辑', '建议'].some(w => text.includes(w)) && text.length > 15) {
+      text += ' 让我们来分析一下具体原因。';
+    }
+  }
+
+  if (personality.includes('感性') || personality.includes('共情')) {
+    if (!['理解', '感受', '情绪', '心情', '难过', '开心'].some(w => text.includes(w)) && text.length > 15) {
+      text += ' 我能感受到你的心情。';
+    }
+  }
+
+  if (personality.includes('随性') || personality.includes('灵活')) {
+    const casualPhrases = ['没关系', '慢慢来', '随心就好', '不用太紧张'];
+    if (!casualPhrases.some(p => text.includes(p)) && text.length > 10) {
+      text += ' 慢慢来，不用太紧张。';
+    }
+  }
+
+  return text;
+}
+
+function getCoachGreeting() {
+  const now = new Date();
+  const hour = now.getHours();
+  let greeting = '';
+
+  if (hour < 6) greeting = '夜深了，注意休息';
+  else if (hour < 12) greeting = '早上好';
+  else if (hour < 14) greeting = '中午好';
+  else if (hour < 18) greeting = '下午好';
+  else if (hour < 22) greeting = '晚上好';
+  else greeting = '夜深了，注意休息';
+
+  const calling = currentCoach.calling || '学员';
+
+  const styleResponses = {
+    '鼓励型': `${greeting}，${calling}！今天也要充满活力地训练哦！💪`,
+    '支持型': `${greeting}，${calling}。我一直在你身边支持你，有什么需要帮助的吗？🤝`,
+    '挑战型': `${greeting}，${calling}！准备好迎接今天的挑战了吗？⚡`,
+    '分析型': `${greeting}，${calling}。让我们来分析一下今天的训练计划。🧠`
+  };
+
+  return styleResponses[currentCoach.style] || `${greeting}，${calling}！今天想训练什么呢？`;
+}
 
 // 能力数据
 let abilityStats = { communication:65, expression:55, empathy:70, emotionControl:50, adaptability:45 };
@@ -2857,6 +3106,150 @@ function selectCoach(index) {
   renderCoach();
 }
 
+let customCoachData = {
+  name: '',
+  style: '',
+  personality: {
+    socialEnergy: '',
+    infoProcess: '',
+    decision: '',
+    lifestyle: ''
+  },
+  avatarSeed: 'Smiley',
+  calling: ''
+};
+
+function showCustomCoachModal() {
+  customCoachData = {
+    name: '',
+    style: '',
+    personality: { socialEnergy: '', infoProcess: '', decision: '', lifestyle: '' },
+    avatarSeed: 'Smiley',
+    calling: ''
+  };
+  $('custom-coach-name').value = '';
+  $('custom-coach-calling').value = '';
+  $('custom-coach-preview').textContent = '👤';
+  $('custom-coach-name-preview').textContent = '自定义教练';
+
+  document.querySelectorAll('.custom-coach-style-btn').forEach(btn => {
+    btn.classList.remove('bg-pink-500', 'text-white');
+    btn.classList.add('bg-gray-100', 'text-gray-600');
+  });
+  document.querySelectorAll('.personality-btn').forEach(btn => {
+    btn.classList.remove('bg-indigo-500', 'text-white');
+    btn.classList.add('bg-gray-100', 'text-gray-600');
+  });
+
+  $('modal-custom-coach').style.display = 'flex';
+}
+
+function updateCustomCoachPreview() {
+  const name = $('custom-coach-name').value.trim();
+  $('custom-coach-name-preview').textContent = name || '自定义教练';
+}
+
+function selectCustomCoachStyle(style) {
+  customCoachData.style = style;
+  document.querySelectorAll('.custom-coach-style-btn').forEach(btn => {
+    if (btn.dataset.style === style) {
+      btn.classList.remove('bg-gray-100', 'text-gray-600');
+      btn.classList.add('bg-pink-500', 'text-white');
+    } else {
+      btn.classList.remove('bg-pink-500', 'text-white');
+      btn.classList.add('bg-gray-100', 'text-gray-600');
+    }
+  });
+}
+
+function selectPersonality(dimension, value) {
+  customCoachData.personality[dimension] = value;
+  document.querySelectorAll(`.personality-btn[data-dim="${dimension}"]`).forEach(btn => {
+    if (btn.dataset.val === value) {
+      btn.classList.remove('bg-gray-100', 'text-gray-600');
+      btn.classList.add('bg-indigo-500', 'text-white');
+    } else {
+      btn.classList.remove('bg-indigo-500', 'text-white');
+      btn.classList.add('bg-gray-100', 'text-gray-600');
+    }
+  });
+}
+
+function selectAvatarSeed(seed) {
+  customCoachData.avatarSeed = seed;
+  $('custom-coach-preview').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`;
+  $('custom-coach-preview').textContent = '';
+
+  document.querySelectorAll('[id^="avatar-"]').forEach(btn => {
+    btn.classList.remove('ring-2', 'ring-pink-500');
+    btn.classList.add('hover:bg-pink-100');
+  });
+  const selectedBtn = $(`avatar-${seed}`);
+  if (selectedBtn) {
+    selectedBtn.classList.add('ring-2', 'ring-pink-500');
+    selectedBtn.classList.remove('hover:bg-pink-100');
+  }
+}
+
+function createCustomCoach() {
+  const name = $('custom-coach-name').value.trim();
+  const calling = $('custom-coach-calling').value.trim();
+
+  if (!name) {
+    alert('请输入教练名称！');
+    return;
+  }
+  if (!customCoachData.style) {
+    alert('请选择教学风格！');
+    return;
+  }
+
+  const requiredPersonality = ['socialEnergy', 'infoProcess', 'decision', 'lifestyle'];
+  const missingPersonality = requiredPersonality.filter(d => !customCoachData.personality[d]);
+  if (missingPersonality.length > 0) {
+    alert('请完成所有性格维度的选择！');
+    return;
+  }
+
+  if (userData.points < 100) {
+    alert('积分不足！创建自定义教练需要100积分。');
+    return;
+  }
+
+  userData.points -= 100;
+
+  const personalityStr = Object.values(customCoachData.personality).join(' · ');
+  const traits = [customCoachData.style, ...Object.values(customCoachData.personality)];
+
+  const newCoach = {
+    id: 'custom_' + Date.now(),
+    name: name,
+    title: '自定义教练',
+    desc: customCoachData.style + '教学风格',
+    avatarSeed: customCoachData.avatarSeed,
+    personality: personalityStr,
+    level: '自定义',
+    traits: traits,
+    hobbies: ['个性化', '定制化'],
+    skills: ['自定义训练', '专属指导'],
+    specialty: `根据你的喜好定制的${customCoachData.style}教练，${calling ? `称呼你为"${calling}"` : '陪伴你成长'}`,
+    style: customCoachData.style,
+    philosophy: '每一次练习都是成长的机会',
+    points: 0,
+    calling: calling || '学员',
+    isCustom: true
+  };
+
+  coaches.push(newCoach);
+  selectCoach(coaches.length - 1);
+
+  saveUserData();
+  closeModal('custom-coach');
+  closeModal('coach-select');
+
+  alert(`🎉 自定义教练「${name}」创建成功！\n- 消耗100积分\n- 教学风格：${customCoachData.style}\n- 性格特征：${personalityStr}`);
+}
+
 function renderCoach() {
   const level = getLevel(userData.points);
   $('coach-points').textContent = currentCoach.points + '/1000';
@@ -3010,18 +3403,70 @@ let voiceRecording = false;
 let voiceStartTime = 0;
 let voiceTimerInterval = null;
 let voiceCurrentScene = null;
+let voiceRoundIdx = 0;
+let voiceMessages = [];
+let voiceTrainingActive = false;
+let voiceScore = 0;
+let voicePointsGain = 0;
+
+const voiceSceneDialogs = {
+  '模拟面试': [
+    { ai: '你好，请先做一下自我介绍吧。', options: ['我叫张三，毕业于XX大学', '我有3年工作经验', '很高兴认识你'] },
+    { ai: '你为什么想来我们公司工作？', options: ['贵公司发展前景好', '我喜欢这个行业', '我觉得能学到很多'] },
+    { ai: '你最大的优点是什么？', options: ['我学习能力强', '我很有责任心', '我善于团队合作'] }
+  ],
+  '加薪谈判': [
+    { ai: '最近工作怎么样？有什么想和我聊聊的吗？', options: ['老板，我想谈谈加薪的事', '我最近表现不错', '我想讨论一下薪资'] },
+    { ai: '好的，你说说看。', options: ['我过去一年业绩增长了30%', '我承担了更多责任', '希望能有合理的薪资调整'] },
+    { ai: '我们会考虑的，还有其他事吗？', options: ['希望能尽快得到答复', '谢谢老板', '期待好消息'] }
+  ],
+  '相亲模拟': [
+    { ai: '你好，很高兴认识你。', options: ['你好，我也是', '很高兴认识你', '你看起来很随和'] },
+    { ai: '平时喜欢做什么？', options: ['我喜欢看书和运动', '我喜欢旅行', '我喜欢看电影'] },
+    { ai: '你觉得什么样的关系最理想？', options: ['互相尊重和理解', '有共同兴趣', '能一起成长'] }
+  ],
+  '兴趣社群自我介绍': [
+    { ai: '欢迎加入我们社群！请做个自我介绍吧。', options: ['大家好，我是新来的', '我对这个话题很感兴趣', '希望能和大家多交流'] },
+    { ai: '你对这个领域有什么了解？', options: ['我入门不久', '我研究过一些', '希望能向大家学习'] },
+    { ai: '期待你在社群的分享！', options: ['谢谢大家', '我会努力的', '请多指教'] }
+  ],
+  '共情沟通训练': [
+    { ai: '我今天心情不太好...', options: ['怎么了？愿意说说吗', '发生什么事了', '我在这儿陪你'] },
+    { ai: '工作上遇到了很多挫折...', options: ['听起来确实不容易', '你已经很努力了', '我理解你的感受'] },
+    { ai: '谢谢你愿意听我说。', options: ['不用谢', '随时可以找我聊', '希望能帮到你'] }
+  ],
+  '被朋友误解(NVC)': [
+    { ai: '你昨天为什么没回我消息？', options: ['我不是故意的', '我昨天太累了', '对不起让你担心了'] },
+    { ai: '你总是这样，感觉你不在乎我。', options: ['我很在乎你的', '让你有这种感觉我很抱歉', '我们聊聊吧'] },
+    { ai: '好吧，我原谅你了。', options: ['谢谢你的理解', '我会注意的', '真的很感谢'] }
+  ]
+};
 
 function showVoiceTraining() {
   voiceRecording = false;
   voiceStartTime = 0;
+  voiceRoundIdx = 0;
+  voiceMessages = [];
+  voiceTrainingActive = false;
+  voiceScore = 50;
+  voicePointsGain = 0;
   $('voice-timer').textContent = '00:00';
   $('voice-analysis').innerHTML = '<div class="text-center py-4 text-gray-400">录制完成后，AI 将分析你的语音表达</div>';
+  $('voice-scene-name').textContent = '选择场景';
+  voiceCurrentScene = null;
+
+  if ((userData.points || 0) < 600) {
+    alert('🔒 语音训练需要铂金学员等级（600积分）才能解锁！\n\n当前积分：' + (userData.points || 0));
+    return;
+  }
+
   showModal('voice-training');
 }
 
 function closeVoiceTraining() {
   stopVoiceRecording();
   closeModal('voice-training');
+  window.speechSynthesis.cancel();
 }
 
 function showVoiceSceneSelect() {
@@ -3045,7 +3490,150 @@ function selectVoiceScene(sceneId) {
   if (voiceCurrentScene) {
     $('voice-scene-name').textContent = voiceCurrentScene.icon + ' ' + voiceCurrentScene.name;
     closeModal('voice-scene');
+    startVoiceTrainingSession();
   }
+}
+
+function startVoiceTrainingSession() {
+  voiceTrainingActive = true;
+  voiceRoundIdx = 0;
+  voiceMessages = [];
+  voiceScore = 50;
+  voicePointsGain = 0;
+
+  $('voice-message-list').innerHTML = '';
+  $('voice-round-info').textContent = `第 ${voiceRoundIdx + 1}/3 轮`;
+
+  nextVoiceRound();
+}
+
+function nextVoiceRound() {
+  const dialogs = voiceSceneDialogs[voiceCurrentScene.name];
+  if (!dialogs || voiceRoundIdx >= dialogs.length) {
+    endVoiceTraining();
+    return;
+  }
+
+  const dialog = dialogs[voiceRoundIdx];
+
+  let aiResponse = dialog.ai;
+
+  aiResponse = getEmotionBasedResponse(aiResponse);
+  aiResponse = ensurePersonalityConsistency(aiResponse);
+
+  if (voiceRoundIdx === 0) {
+    const personalizedFeedback = getPersonalizedFeedback(voiceCurrentScene.name);
+    if (personalizedFeedback) {
+      aiResponse = personalizedFeedback + '\n\n' + aiResponse;
+    }
+  }
+
+  voiceMessages.push({ type: 'ai', text: aiResponse });
+  renderVoiceMessages();
+
+  $('voice-record-area').style.display = 'none';
+  $('voice-options-area').style.display = 'block';
+
+  $('voice-options-list').innerHTML = dialog.options.map((opt, idx) => `
+    <button onclick="selectVoiceOption(${idx})" class="w-full py-3 px-4 bg-white border border-gray-200 rounded-xl text-left text-sm text-gray-700 hover:bg-indigo-50 hover:border-indigo-300 transition-all">
+      <span class="text-indigo-500 font-medium mr-2">${String.fromCharCode(65 + idx)}.</span>${opt}
+    </button>
+  `).join('');
+
+  speakText(aiResponse);
+}
+
+function speakText(text) {
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'zh-CN';
+  utterance.rate = 0.9;
+  utterance.pitch = 1;
+  window.speechSynthesis.speak(utterance);
+}
+
+function selectVoiceOption(optionIdx) {
+  const dialogs = voiceSceneDialogs[voiceCurrentScene.name];
+  const dialog = dialogs[voiceRoundIdx];
+  const selectedText = dialog.options[optionIdx];
+
+  voiceMessages.push({ type: 'user', text: selectedText });
+  renderVoiceMessages();
+
+  const scores = [10, 5, -5];
+  const scoreGain = scores[optionIdx];
+  voiceScore = Math.min(100, Math.max(0, voiceScore + scoreGain));
+  voicePointsGain += Math.max(0, scoreGain);
+
+  $('voice-options-area').style.display = 'none';
+  $('voice-record-area').style.display = 'block';
+
+  setTimeout(() => {
+    voiceRoundIdx++;
+    $('voice-round-info').textContent = `第 ${voiceRoundIdx + 1}/3 轮`;
+    nextVoiceRound();
+  }, 1500);
+}
+
+function renderVoiceMessages() {
+  const list = $('voice-message-list');
+  list.innerHTML = voiceMessages.map(msg => `
+    <div class="flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'} mb-4">
+      <div class="${msg.type === 'user' ? 'bg-indigo-500 text-white' : 'bg-white text-gray-800'} rounded-2xl px-4 py-3 max-w-[80%] shadow-sm">
+        <div class="text-sm">${msg.text}</div>
+      </div>
+    </div>
+  `).join('');
+  list.scrollTop = list.scrollHeight;
+}
+
+function endVoiceTraining() {
+  voiceTrainingActive = false;
+
+  const pointsEarned = Math.floor(voiceScore / 10) + 10;
+  addPoints(pointsEarned, '语音训练奖励');
+
+  saveCoachMemory('lastTrainingDate', new Date().toISOString().split('T')[0]);
+  saveCoachMemory('lastTrainingScene', voiceCurrentScene.name);
+
+  if (voiceScore >= 80) {
+    updateUserStrength(voiceCurrentScene.name, 10);
+    updateCoachEmotion('happiness', 5);
+    updateCoachEmotion('encouragement', 5);
+  } else if (voiceScore < 60) {
+    updateUserWeakness(voiceCurrentScene.name, 5);
+    updateCoachEmotion('patience', -5);
+  }
+
+  let feedback = '';
+  if (voiceScore >= 90) {
+    feedback = '🌟 太棒了！你的表现非常出色！';
+  } else if (voiceScore >= 70) {
+    feedback = '👍 做得不错，继续加油！';
+  } else if (voiceScore >= 50) {
+    feedback = '💪 还需要多加练习哦！';
+  } else {
+    feedback = '📚 建议回顾一下之前的知识点。';
+  }
+
+  feedback = ensurePersonalityConsistency(feedback);
+
+  $('voice-message-list').innerHTML += `
+    <div class="bg-white rounded-2xl p-4 shadow-sm mt-4">
+      <div class="text-center">
+        <div class="text-lg font-bold text-gray-800 mb-2">🎉 训练完成！</div>
+        <div class="text-2xl font-bold text-indigo-500 mb-1">${voiceScore}分</div>
+        <div class="text-xs text-gray-400 mb-2">获得 ${pointsEarned} 积分</div>
+        <div class="text-sm text-gray-600 mb-4">${feedback}</div>
+        <button onclick="closeVoiceTraining()" class="mt-4 px-6 py-2 bg-indigo-500 text-white rounded-xl text-sm font-medium hover:bg-indigo-600 transition-colors">
+          完成
+        </button>
+      </div>
+    </div>
+  `;
+
+  $('voice-options-area').style.display = 'none';
+  $('voice-record-area').style.display = 'none';
 }
 
 function toggleVoiceRecording() {
@@ -3066,7 +3654,7 @@ function startVoiceRecording() {
   voiceStartTime = Date.now();
   $('voice-record-btn').classList.remove('from-red-500', 'to-pink-500');
   $('voice-record-btn').classList.add('from-green-500', 'to-emerald-500');
-  $('voice-record-btn').textContent = '⏹️';
+  $('voice-record-btn').textContent = '⏹️ 停止录音';
 
   animateWaveform(true);
 
@@ -3076,10 +3664,6 @@ function startVoiceRecording() {
     const seconds = (elapsed % 60).toString().padStart(2, '0');
     $('voice-timer').textContent = `${minutes}:${seconds}`;
   }, 1000);
-
-  setTimeout(() => {
-    simulateVoiceAnalysis();
-  }, 5000);
 }
 
 function stopVoiceRecording() {
@@ -3087,7 +3671,7 @@ function stopVoiceRecording() {
   clearInterval(voiceTimerInterval);
   $('voice-record-btn').classList.remove('from-green-500', 'to-emerald-500');
   $('voice-record-btn').classList.add('from-red-500', 'to-pink-500');
-  $('voice-record-btn').textContent = '🎙️';
+  $('voice-record-btn').textContent = '🎙️ 按住录音';
   animateWaveform(false);
 }
 
@@ -3096,16 +3680,16 @@ function animateWaveform(isRecording) {
   if (isRecording) {
     waveform.innerHTML = '';
     for (let i = 0; i < 20; i++) {
-      const height = Math.random() * 24 + 8;
-      waveform.innerHTML += `<div class="w-1 bg-green-500 rounded-full animate-pulse" style="height:${height}px;animation-delay:${i * 0.05}s"></div>`;
+      const height = Math.random() * 20 + 6;
+      waveform.innerHTML += `<div class="w-1 bg-green-500 rounded-full animate-pulse" style="height:${height}px;animation-delay:${i * 0.03}s"></div>`;
     }
   } else {
     waveform.innerHTML = `
+      <div class="w-1 h-3 bg-gray-400 rounded-full"></div>
       <div class="w-1 h-4 bg-gray-400 rounded-full"></div>
-      <div class="w-1 h-6 bg-gray-400 rounded-full"></div>
-      <div class="w-1 h-8 bg-gray-400 rounded-full"></div>
-      <div class="w-1 h-6 bg-gray-400 rounded-full"></div>
+      <div class="w-1 h-5 bg-gray-400 rounded-full"></div>
       <div class="w-1 h-4 bg-gray-400 rounded-full"></div>
+      <div class="w-1 h-3 bg-gray-400 rounded-full"></div>
     `;
   }
 }
@@ -7170,6 +7754,122 @@ function analyzeDigitalChallenge(title, answer, len, hasNegative, hasDetail, has
   return { scoreDelta: 2, comment: '基本表达', suggestion: '数字社交需要更清晰和具体的表达。', correctAnswer: '', correctReason: '' };
 }
 
+const levelSystem = [
+  { id: 1, name: '初出茅庐', icon: '🌱', description: '学习基本的沟通技巧', difficulty: '简单', pointsRequired: 0, rewards: [50, '初级沟通者徽章'], challenges: ['主动打招呼', '赞美练习'] },
+  { id: 2, name: '渐入佳境', icon: '🌿', description: '掌握倾听和共情能力', difficulty: '简单', pointsRequired: 100, rewards: [80, '倾听者徽章'], challenges: ['倾听练习', '深度对话'] },
+  { id: 3, name: '初露锋芒', icon: '🌸', description: '学习职场沟通技巧', difficulty: '中等', pointsRequired: 300, rewards: [120, '职场新人徽章'], challenges: ['公开表达', '职场道歉', '向上汇报'] },
+  { id: 4, name: '稳步前行', icon: '🌳', description: '掌握关系维护和冲突处理', difficulty: '中等', pointsRequired: 600, rewards: [150, '关系达人徽章'], challenges: ['吵架后缓和关系', '被误解后澄清', '面对挑衅/侮辱'] },
+  { id: 5, name: '游刃有余', icon: '🔥', description: '精通谈判和说服技巧', difficulty: '困难', pointsRequired: 1000, rewards: [200, '谈判高手徽章'], challenges: ['加薪谈判', '4S店砍价', '投诉应对'] },
+  { id: 6, name: '登堂入室', icon: '⭐', description: '掌握复杂社交场景', difficulty: '困难', pointsRequired: 1500, rewards: [250, '社交精英徽章'], challenges: ['见家长', '家庭聚会中的社交', '亲戚问敏感问题'] },
+  { id: 7, name: '炉火纯青', icon: '👑', description: '成为社交大师', difficulty: '专家', pointsRequired: 2000, rewards: [300, '社交大师徽章'], challenges: ['紧急情况求助', '团队合作分歧', '客户投诉应对'] }
+];
+
+function showChallengeMissions() {
+  $('challenge-content-area').classList.remove('hidden');
+  $('level-content-area').classList.add('hidden');
+  renderChallenges(true);
+}
+
+function showLevelSystem() {
+  $('challenge-content-area').classList.add('hidden');
+  $('level-content-area').classList.remove('hidden');
+
+  const currentPoints = userData.points || 0;
+  const currentLevel = levelSystem.find(l => currentPoints >= l.pointsRequired &&
+    !levelSystem.find(l2 => l2.id > l.id && currentPoints >= l2.pointsRequired)) || levelSystem[0];
+
+  $('current-level-display').textContent = `${currentLevel.icon} 第${currentLevel.id}关 ${currentLevel.name}`;
+
+  const levelList = $('level-list');
+  levelList.innerHTML = levelSystem.map((level, idx) => {
+    const isUnlocked = currentPoints >= level.pointsRequired;
+    const isCurrent = currentLevel.id === level.id;
+    const isCompleted = userData.completedLevels && userData.completedLevels.includes(level.id);
+
+    let actionBtn = '';
+    if (isCompleted) {
+      actionBtn = '<button disabled class="w-full py-2 bg-gray-100 text-gray-400 text-xs font-medium rounded-lg">✅ 已通关</button>';
+    } else if (isUnlocked) {
+      actionBtn = `<button onclick="startLevelChallenge(${level.id})" class="w-full py-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white text-xs font-medium rounded-lg hover:opacity-90 transition-opacity">开始挑战</button>`;
+    } else {
+      actionBtn = `<button disabled class="w-full py-2 bg-gray-100 text-gray-400 text-xs font-medium rounded-lg">🔒 需${level.pointsRequired}积分</button>`;
+    }
+
+    const difficultyColors = { '简单': 'bg-green-100 text-green-600', '中等': 'bg-yellow-100 text-yellow-600', '困难': 'bg-red-100 text-red-600', '专家': 'bg-purple-100 text-purple-600' };
+
+    return `
+      <div class="bg-white rounded-xl p-4 shadow-sm ${isCurrent ? 'border-2 border-amber-500' : isUnlocked ? '' : 'opacity-60'}">
+        <div class="flex items-start justify-between mb-3">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-gradient-to-br from-amber-100 to-orange-100 rounded-xl flex items-center justify-center text-2xl">${level.icon}</div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-gray-800">第${level.id}关 ${level.name}</span>
+                ${isCurrent ? '<span class="px-2 py-0.5 bg-amber-100 text-amber-600 text-xs rounded-full">当前</span>' : ''}
+                ${isCompleted ? '<span class="px-2 py-0.5 bg-green-100 text-green-600 text-xs rounded-full">已通关</span>' : ''}
+              </div>
+              <div class="text-xs text-gray-500 mt-0.5">${level.description}</div>
+            </div>
+          </div>
+          <span class="px-2 py-1 ${difficultyColors[level.difficulty] || 'bg-gray-100 text-gray-600'} text-xs font-medium rounded-full">${level.difficulty}</span>
+        </div>
+        <div class="flex items-center gap-4 text-xs text-gray-400 mb-3">
+          <span>🎯 挑战任务：${level.challenges.length}个</span>
+          <span>💰 奖励：+${level.rewards[0]}积分</span>
+        </div>
+        <div class="flex flex-wrap gap-1 mb-3">
+          ${level.challenges.map(c => `<span class="text-[10px] px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">${c}</span>`).join('')}
+        </div>
+        ${!isUnlocked ? `<div class="text-xs text-orange-500 mb-3">🔒 当前${currentPoints}分，还需${level.pointsRequired - currentPoints}分解锁</div>` : ''}
+        ${actionBtn}
+      </div>
+    `;
+  }).join('');
+}
+
+function startLevelChallenge(levelId) {
+  const level = levelSystem.find(l => l.id === levelId);
+  if (!level) return;
+
+  const currentPoints = userData.points || 0;
+  if (currentPoints < level.pointsRequired) {
+    alert(`🔒 该关卡未解锁！\n\n需要 ${level.pointsRequired} 积分才能解锁，当前 ${currentPoints} 积分。`);
+    return;
+  }
+
+  closeModal('challenge');
+
+  window.currentLevelId = levelId;
+  window.levelChallengesCompleted = 0;
+  window.levelScore = 0;
+
+  const firstChallengeTitle = level.challenges[0];
+  const challenge = challenges.find(c => c.title === firstChallengeTitle);
+
+  if (challenge) {
+    startChallenge(challenge.id);
+  }
+}
+
+function completeLevelChallenge() {
+  const level = levelSystem.find(l => l.id === window.currentLevelId);
+  if (!level) return;
+
+  if (!userData.completedLevels) {
+    userData.completedLevels = [];
+  }
+
+  if (!userData.completedLevels.includes(level.id)) {
+    userData.completedLevels.push(level.id);
+    addPoints(level.rewards[0], `通关第${level.id}关奖励`);
+    saveUserData();
+
+    alert(`🎉 恭喜通关第${level.id}关「${level.name}」！\n\n奖励：+${level.rewards[0]}积分\n徽章：${level.rewards[1]}`);
+  }
+
+  window.currentLevelId = null;
+}
+
 function showChallengeResult() {
   const challenge = challenges.find(c => c.id === window.currentChallengeId);
 
@@ -7180,10 +7880,36 @@ function showChallengeResult() {
     const success = totalScore >= 0;
 
     if (success) {
-      alert(`🎉 挑战成功！获得 ${challenge.reward_points} 积分！\n\n评价：你的表现非常出色，很好地完成了这次挑战！\n\n建议：继续保持这种沟通方式，把学到的技巧应用到日常生活中。`);
       userData.points += challenge.reward_points;
       saveData();
       renderGrowth();
+
+      if (window.currentLevelId) {
+        const level = levelSystem.find(l => l.id === window.currentLevelId);
+        if (level) {
+          window.levelChallengesCompleted++;
+          window.levelScore += challenge.reward_points;
+
+          const currentChallengeIdx = level.challenges.indexOf(challenge.title);
+          if (currentChallengeIdx < level.challenges.length - 1) {
+            const nextChallengeTitle = level.challenges[currentChallengeIdx + 1];
+            const nextChallenge = challenges.find(c => c.title === nextChallengeTitle);
+
+            if (nextChallenge) {
+              setTimeout(() => {
+                alert(`✅ 完成第${window.levelChallengesCompleted}/${level.challenges.length}个任务\n\n继续挑战：${nextChallengeTitle}`);
+                startChallenge(nextChallenge.id);
+              }, 500);
+              return;
+            }
+          } else {
+            completeLevelChallenge();
+            return;
+          }
+        }
+      }
+
+      alert(`🎉 挑战成功！获得 ${challenge.reward_points} 积分！\n\n评价：你的表现非常出色，很好地完成了这次挑战！\n\n建议：继续保持这种沟通方式，把学到的技巧应用到日常生活中。`);
     } else {
       alert(`💪 挑战未通过，再接再厉！\n\n评价：这次的表现还不错，但还有提升空间。\n\n建议：回顾一下刚才的分析，试着用正确的方式再练习一次。`);
     }
