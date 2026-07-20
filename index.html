@@ -2152,122 +2152,122 @@ let userData = {
 
 // 训练数据
 let trainingScenes = [
-  { id:1, icon:'💑', name:'相亲模拟', desc:'朋友介绍的第一次见面', stage:1, difficulty:2, duration:'12min', unlocked:true, completed:false, rounds:[
-    { ai:'你好，我是XXX介绍的小雨', options:[
-      { text:'你好！终于见到了，路上堵吗？', quality:'good', points:10 },
-      { text:'你好你好', quality:'safe', points:3 },
-      { text:'哦，你就是小雨啊', quality:'cold', points:-3 }
-    ]},
-    { ai:'我听XXX说你是个工程师，平时工作忙吗？', options:[
-      { text:'是有点忙，但工作再忙也要有自己的生活。你平时下班喜欢做什么？', quality:'good', points:10 },
-      { text:'还好吧', quality:'safe', points:3 },
-      { text:'天天加班，累死了', quality:'cold', points:-5 }
-    ]},
-    { ai:'（沉默了几秒……）', options:[
-      { text:'这家咖啡厅的提拉米苏很有名，要不要试试？', quality:'good', points:8 },
-      { text:'（低头看手机）', quality:'cold', points:-5 },
-      { text:'嗯…那个…', quality:'safe', points:2 }
-    ]},
-    { ai:'你平时喜欢看电影吗？', options:[
-      { text:'喜欢啊！最近看了一部很不错的，你平时喜欢什么类型的电影？', quality:'good', points:10 },
-      { text:'还行', quality:'safe', points:3 },
-      { text:'不爱看', quality:'cold', points:-3 }
-    ]},
-    { ai:'时间过得真快，今天聊得很开心', options:[
-      { text:'我也是！下次可以去那家新开的书店看看', quality:'good', points:10 },
-      { text:'嗯，再见', quality:'safe', points:3 },
-      { text:'（起身就走）', quality:'cold', points:-5 }
-    ]}
+  { id:1, icon:'💑', name:'相亲模拟', desc:'朋友介绍的第一次见面', stage:1, difficulty:2, duration:'12min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+    { ai:'你好，我是XXX介绍的小雨', thinking:[
+      { type:'A', label:'主动型', desc:'具体描述你的工作内容，展现热情', example:'我是做互联网产品的，主要负责用户增长方向，挺有意思的！' },
+      { type:'B', label:'平衡型', desc:'简要回答 + 反问对方的工作情况', example:'我做互联网相关的工作，你呢？' },
+      { type:'C', label:'含蓄型', desc:'简单回应，看对方反应再说', example:'还行吧' }
+    ], bestAnswer:'我是做互联网产品的，主要负责用户增长方向，挺有意思的！你呢？' },
+    { ai:'我听XXX说你是个工程师，平时工作忙吗？', thinking:[
+      { type:'A', label:'主动型', desc:'具体描述工作状态，展现生活态度', example:'是有点忙，但工作再忙也要有自己的生活。你平时下班喜欢做什么？' },
+      { type:'B', label:'平衡型', desc:'回答工作情况 + 反问对方爱好', example:'还好，偶尔加班。你平时喜欢做什么？' },
+      { type:'C', label:'含蓄型', desc:'简单回应，不展开', example:'还好吧' }
+    ], bestAnswer:'是有点忙，但工作再忙也要有自己的生活。你平时下班喜欢做什么？' },
+    { ai:'（沉默了几秒……）', thinking:[
+      { type:'A', label:'主动型', desc:'主动开启新话题，打破尴尬', example:'这家咖啡厅的提拉米苏很有名，要不要试试？' },
+      { type:'B', label:'平衡型', desc:'温和询问对方感受', example:'怎么了？有什么心事吗？' },
+      { type:'C', label:'含蓄型', desc:'等待对方开口', example:'（微笑等待）' }
+    ], bestAnswer:'这家咖啡厅的提拉米苏很有名，要不要试试？' },
+    { ai:'你平时喜欢看电影吗？', thinking:[
+      { type:'A', label:'主动型', desc:'具体分享喜好，展现热情', example:'喜欢啊！最近看了一部很不错的，你平时喜欢什么类型的电影？' },
+      { type:'B', label:'平衡型', desc:'表明喜好 + 反问对方', example:'挺喜欢的，你呢？' },
+      { type:'C', label:'含蓄型', desc:'简单回应', example:'还行' }
+    ], bestAnswer:'喜欢啊！最近看了一部很不错的，你平时喜欢什么类型的电影？' },
+    { ai:'时间过得真快，今天聊得很开心', thinking:[
+      { type:'A', label:'主动型', desc:'积极表达感受，提出下次见面', example:'我也是！下次可以去那家新开的书店看看' },
+      { type:'B', label:'平衡型', desc:'表达感谢，保持开放', example:'是啊，今天很开心，希望以后还有机会见面' },
+      { type:'C', label:'含蓄型', desc:'礼貌道别', example:'嗯，再见' }
+    ], bestAnswer:'我也是！下次可以去那家新开的书店看看' }
   ]},
-  { id:2, icon:'🎤', name:'兴趣社群自我介绍', desc:'在兴趣社群中做自我介绍', stage:1, difficulty:2, duration:'10min', unlocked:false, completed:false, rounds:[
-    { ai:'欢迎加入！你也来说说吧~', options:[
-      { text:'大家好，请多多指教', quality:'safe', points:3 },
-      { text:'大家好！我叫小雨，喜欢摄影和旅行，很高兴认识大家', quality:'good', points:8 },
-      { text:'嗨', quality:'cold', points:-2 }
-    ]},
-    { ai:'你最喜欢的摄影题材是什么？', options:[
-      { text:'风景吧', quality:'safe', points:3 },
-      { text:'我喜欢拍人物，尤其是街头抓拍', quality:'good', points:8 },
-      { text:'随便拍拍', quality:'cold', points:-2 }
-    ]}
+  { id:2, icon:'🎤', name:'兴趣社群自我介绍', desc:'在兴趣社群中做自我介绍', stage:1, difficulty:2, duration:'10min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+    { ai:'欢迎加入！你也来说说吧~', thinking:[
+      { type:'A', label:'主动型', desc:'详细介绍自己，展现热情', example:'大家好！我叫小雨，喜欢摄影和旅行，很高兴认识大家' },
+      { type:'B', label:'平衡型', desc:'简要介绍 + 表达期待', example:'大家好，请多多指教，希望能和大家一起学习交流' },
+      { type:'C', label:'含蓄型', desc:'简单打招呼', example:'嗨' }
+    ], bestAnswer:'大家好！我叫小雨，喜欢摄影和旅行，很高兴认识大家' },
+    { ai:'你最喜欢的摄影题材是什么？', thinking:[
+      { type:'A', label:'主动型', desc:'具体分享喜好，展示作品方向', example:'我喜欢拍人物，尤其是街头抓拍，能捕捉到很多真实的瞬间' },
+      { type:'B', label:'平衡型', desc:'分享喜好 + 询问对方', example:'我比较喜欢拍风景，你呢？' },
+      { type:'C', label:'含蓄型', desc:'简单回答', example:'风景吧' }
+    ], bestAnswer:'我喜欢拍人物，尤其是街头抓拍，能捕捉到很多真实的瞬间' }
   ]},
-  { id:3, icon:'💼', name:'模拟面试', desc:'模拟求职面试场景', stage:2, difficulty:3, duration:'15min', unlocked:false, completed:false, rounds:[
-    { ai:'请先做个自我介绍', options:[
-      { text:'我叫张三，毕业两年', quality:'cold', points:-2 },
-      { text:'面试官您好，我叫张三，有两年产品经理经验', quality:'good', points:10 },
-      { text:'我做过一些项目', quality:'safe', points:3 }
-    ]},
-    { ai:'为什么从上一家公司离职？', options:[
-      { text:'公司太坑了', quality:'cold', points:-5 },
-      { text:'业务方向调整，希望找到更符合职业发展的机会', quality:'good', points:8 },
-      { text:'想换个环境', quality:'safe', points:3 }
-    ]},
-    { ai:'你的缺点是什么？', options:[
-      { text:'没有缺点', quality:'cold', points:-3 },
-      { text:'我有时候会追求完美，正在学习平衡质量与效率', quality:'good', points:8 },
-      { text:'我比较内向', quality:'safe', points:3 }
-    ]},
-    { ai:'你做过最有成就感的项目是什么？', options:[
-      { text:'一个电商项目', quality:'safe', points:3 },
-      { text:'我主导了一个用户增长项目，3个月内DAU增长50%', quality:'good', points:10 },
-      { text:'忘了', quality:'cold', points:-3 }
-    ]},
-    { ai:'你还有什么想问我的？', options:[
-      { text:'没有了', quality:'cold', points:-3 },
-      { text:'团队目前的主要挑战是什么？', quality:'good', points:8 },
-      { text:'薪资多少？', quality:'safe', points:2 }
-    ]}
+  { id:3, icon:'💼', name:'模拟面试', desc:'模拟求职面试场景', stage:2, difficulty:3, duration:'15min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+    { ai:'请先做个自我介绍', thinking:[
+      { type:'A', label:'主动型', desc:'完整介绍背景和优势', example:'面试官您好，我叫张三，有两年产品经理经验，主导过多个用户增长项目' },
+      { type:'B', label:'平衡型', desc:'简要介绍 + 表达求职意愿', example:'我叫张三，毕业两年，对贵公司的产品很感兴趣' },
+      { type:'C', label:'含蓄型', desc:'简单陈述基本信息', example:'我叫张三，毕业两年' }
+    ], bestAnswer:'面试官您好，我叫张三，有两年产品经理经验，主导过多个用户增长项目' },
+    { ai:'为什么从上一家公司离职？', thinking:[
+      { type:'A', label:'主动型', desc:'正面说明原因，展示职业规划', example:'业务方向调整，希望找到更符合职业发展的机会' },
+      { type:'B', label:'平衡型', desc:'客观说明 + 表达对新机会的期待', example:'想寻找更有挑战性的工作机会' },
+      { type:'C', label:'含蓄型', desc:'简单回答', example:'想换个环境' }
+    ], bestAnswer:'业务方向调整，希望找到更符合职业发展的机会' },
+    { ai:'你的缺点是什么？', thinking:[
+      { type:'A', label:'主动型', desc:'诚实说明 + 展示改进行动', example:'我有时候会追求完美，正在学习平衡质量与效率' },
+      { type:'B', label:'平衡型', desc:'客观说明 + 表达改进意愿', example:'我需要更果断一些，正在锻炼这方面的能力' },
+      { type:'C', label:'含蓄型', desc:'简单回答', example:'我比较内向' }
+    ], bestAnswer:'我有时候会追求完美，正在学习平衡质量与效率' },
+    { ai:'你做过最有成就感的项目是什么？', thinking:[
+      { type:'A', label:'主动型', desc:'详细描述项目成果', example:'我主导了一个用户增长项目，3个月内DAU增长50%' },
+      { type:'B', label:'平衡型', desc:'描述项目 + 说明收获', example:'做过一个电商项目，学到了很多' },
+      { type:'C', label:'含蓄型', desc:'简单提及', example:'一个电商项目' }
+    ], bestAnswer:'我主导了一个用户增长项目，3个月内DAU增长50%' },
+    { ai:'你还有什么想问我的？', thinking:[
+      { type:'A', label:'主动型', desc:'深入询问团队情况', example:'团队目前的主要挑战是什么？未来的发展方向是怎样的？' },
+      { type:'B', label:'平衡型', desc:'询问关键信息', example:'团队目前的主要挑战是什么？' },
+      { type:'C', label:'含蓄型', desc:'礼貌表示没有问题', example:'没有了，谢谢' }
+    ], bestAnswer:'团队目前的主要挑战是什么？未来的发展方向是怎样的？' }
   ]},
-  { id:4, icon:'💰', name:'加薪谈判', desc:'向老板提出加薪请求', stage:2, difficulty:4, duration:'15min', unlocked:false, completed:false, rounds:[
-    { ai:'请坐，你说有重要的事要和我谈？', options:[
-      { text:'老板，我想涨工资', quality:'cold', points:-3 },
-      { text:'老板，感谢公司的培养，我想和您聊聊我的职业发展', quality:'good', points:8 },
-      { text:'老板，我觉得工资太低了', quality:'safe', points:2 }
-    ]},
-    { ai:'说说你的理由', options:[
-      { text:'我都来两年了，工资一直没涨', quality:'cold', points:-3 },
-      { text:'过去一年我负责的项目带来了200万营收，还培养了3名新人', quality:'good', points:10 },
-      { text:'我觉得自己能力提升了', quality:'safe', points:3 }
-    ]},
-    { ai:'公司今年业绩不太好，加薪可能比较困难', options:[
-      { text:'那没办法了', quality:'cold', points:-5 },
-      { text:'我理解公司的困难，能否考虑绩效奖金或期权激励？', quality:'good', points:10 },
-      { text:'可是别的公司给我开了更高的工资', quality:'safe', points:3 }
-    ]},
-    { ai:'你觉得你值多少钱？', options:[
-      { text:'至少涨50%', quality:'cold', points:-5 },
-      { text:'根据市场行情和我的贡献，希望能有20%-30%的涨幅', quality:'good', points:10 },
-      { text:'您看着办吧', quality:'safe', points:2 }
-    ]},
-    { ai:'好，我考虑一下，下周给你答复', options:[
-      { text:'行', quality:'safe', points:3 },
-      { text:'感谢您的考虑！我会继续努力工作的', quality:'good', points:8 },
-      { text:'希望尽快', quality:'cold', points:-2 }
-    ]}
+  { id:4, icon:'💰', name:'加薪谈判', desc:'向老板提出加薪请求', stage:2, difficulty:4, duration:'15min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+    { ai:'请坐，你说有重要的事要和我谈？', thinking:[
+      { type:'A', label:'主动型', desc:'开门见山但礼貌表达', example:'老板，感谢公司的培养，我想和您聊聊我的职业发展和薪资调整' },
+      { type:'B', label:'平衡型', desc:'先表达感谢再谈主题', example:'老板，感谢您的时间，我想和您聊聊我的工作情况' },
+      { type:'C', label:'含蓄型', desc:'试探性提及', example:'老板，我想和您聊聊' }
+    ], bestAnswer:'老板，感谢公司的培养，我想和您聊聊我的职业发展和薪资调整' },
+    { ai:'说说你的理由', thinking:[
+      { type:'A', label:'主动型', desc:'具体展示业绩成果', example:'过去一年我负责的项目带来了200万营收，还培养了3名新人' },
+      { type:'B', label:'平衡型', desc:'说明贡献 + 表达价值', example:'我觉得自己的能力和贡献值得更高的薪资' },
+      { type:'C', label:'含蓄型', desc:'简单说明', example:'我觉得自己能力提升了' }
+    ], bestAnswer:'过去一年我负责的项目带来了200万营收，还培养了3名新人' },
+    { ai:'公司今年业绩不太好，加薪可能比较困难', thinking:[
+      { type:'A', label:'主动型', desc:'理解公司 + 提出替代方案', example:'我理解公司的困难，能否考虑绩效奖金或期权激励？' },
+      { type:'B', label:'平衡型', desc:'表达理解 + 重申价值', example:'我理解，但希望公司能考虑我的贡献' },
+      { type:'C', label:'含蓄型', desc:'接受现实', example:'那没办法了' }
+    ], bestAnswer:'我理解公司的困难，能否考虑绩效奖金或期权激励？' },
+    { ai:'你觉得你值多少钱？', thinking:[
+      { type:'A', label:'主动型', desc:'基于市场和贡献提出具体期望', example:'根据市场行情和我的贡献，希望能有20%-30%的涨幅' },
+      { type:'B', label:'平衡型', desc:'提出合理范围', example:'希望能有一定的涨幅，具体看公司安排' },
+      { type:'C', label:'含蓄型', desc:'让老板决定', example:'您看着办吧' }
+    ], bestAnswer:'根据市场行情和我的贡献，希望能有20%-30%的涨幅' },
+    { ai:'好，我考虑一下，下周给你答复', thinking:[
+      { type:'A', label:'主动型', desc:'表达感谢 + 重申承诺', example:'感谢您的考虑！我会继续努力工作，为公司创造更大价值' },
+      { type:'B', label:'平衡型', desc:'表达感谢 + 保持开放', example:'感谢您的考虑，期待好消息' },
+      { type:'C', label:'含蓄型', desc:'简单回应', example:'行' }
+    ], bestAnswer:'感谢您的考虑！我会继续努力工作，为公司创造更大价值' }
   ]},
-  { id:5, icon:'💔', name:'被朋友误解(NVC)', desc:'用非暴力沟通化解误会', stage:3, difficulty:3, duration:'10min', unlocked:false, completed:false, rounds:[
-    { ai:'你上次为什么没来聚会？大家都很失望', options:[
-      { text:'我有事啊', quality:'cold', points:-3 },
-      { text:'对不起让大家失望了，那天我身体不舒服，下次一定到', quality:'good', points:8 },
-      { text:'我忘了', quality:'safe', points:2 }
-    ]},
-    { ai:'可是你连消息都不回', options:[
-      { text:'我没看到', quality:'cold', points:-3 },
-      { text:'我理解你的感受，那天太难受了就直接睡了，对不起', quality:'good', points:10 },
-      { text:'下次不会了', quality:'safe', points:3 }
-    ]}
+  { id:5, icon:'💔', name:'被朋友误解(NVC)', desc:'用非暴力沟通化解误会', stage:3, difficulty:3, duration:'10min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+    { ai:'你上次为什么没来聚会？大家都很失望', thinking:[
+      { type:'A', label:'主动型', desc:'真诚道歉 + 说明原因', example:'对不起让大家失望了，那天我身体不舒服，下次一定到' },
+      { type:'B', label:'平衡型', desc:'道歉 + 表达关心', example:'对不起，那天有事耽误了，大家玩得开心吗？' },
+      { type:'C', label:'含蓄型', desc:'简单道歉', example:'对不起' }
+    ], bestAnswer:'对不起让大家失望了，那天我身体不舒服，下次一定到' },
+    { ai:'可是你连消息都不回', thinking:[
+      { type:'A', label:'主动型', desc:'承认错误 + 表达理解', example:'我理解你的感受，那天太难受了就直接睡了，对不起' },
+      { type:'B', label:'平衡型', desc:'解释原因 + 表达歉意', example:'那天确实没看到消息，对不起让你担心了' },
+      { type:'C', label:'含蓄型', desc:'简单解释', example:'我没看到' }
+    ], bestAnswer:'我理解你的感受，那天太难受了就直接睡了，对不起' }
   ]},
-  { id:6, icon:'🤗', name:'共情沟通训练', desc:'学习如何回应他人的情绪', stage:3, difficulty:2, duration:'8min', unlocked:false, completed:false, rounds:[
-    { ai:'我今天被老板骂了，感觉自己什么都做不好...', options:[
-      { text:'别难过了', quality:'safe', points:3 },
-      { text:'被骂的感觉一定很委屈吧。你愿意跟我说说发生了什么吗？', quality:'good', points:10 },
-      { text:'老板也是为你好', quality:'cold', points:-2 }
-    ]},
-    { ai:'我觉得自己能力不够...', options:[
-      { text:'你别想太多', quality:'cold', points:-2 },
-      { text:'我不这么觉得。你工作很努力，每个人都会遇到挫折', quality:'good', points:8 },
-      { text:'加油', quality:'safe', points:3 }
-    ]}
+  { id:6, icon:'🤗', name:'共情沟通训练', desc:'学习如何回应他人的情绪', stage:3, difficulty:2, duration:'8min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+    { ai:'我今天被老板骂了，感觉自己什么都做不好...', thinking:[
+      { type:'A', label:'主动型', desc:'共情表达 + 主动倾听', example:'被骂的感觉一定很委屈吧。你愿意跟我说说发生了什么吗？' },
+      { type:'B', label:'平衡型', desc:'表达理解 + 给予支持', example:'听起来你很难过，需要聊聊吗？' },
+      { type:'C', label:'含蓄型', desc:'简单安慰', example:'别难过了' }
+    ], bestAnswer:'被骂的感觉一定很委屈吧。你愿意跟我说说发生了什么吗？' },
+    { ai:'我觉得自己能力不够...', thinking:[
+      { type:'A', label:'主动型', desc:'肯定对方 + 鼓励支持', example:'我不这么觉得。你工作很努力，每个人都会遇到挫折，重要的是如何成长' },
+      { type:'B', label:'平衡型', desc:'表达不同看法 + 给予信心', example:'我觉得你做得很好，别太自责了' },
+      { type:'C', label:'含蓄型', desc:'简单鼓励', example:'加油' }
+    ], bestAnswer:'我不这么觉得。你工作很努力，每个人都会遇到挫折，重要的是如何成长' }
   ]}
 ];
 
@@ -3175,6 +3175,35 @@ function renderSigninCalendar() {
   }
 }
 
+function showToast(message) {
+  const toast = document.createElement('div');
+  toast.className = 'fixed top-4 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg text-sm z-50 animate-in fade-in slide-in-from-top-4 duration-200';
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add('fade-out');
+    setTimeout(() => toast.remove(), 200);
+  }, 3000);
+}
+
+function getTicketLimit() {
+  return userData.member === 'free' ? 10 : 20;
+}
+
+function addTickets(count) {
+  const limit = getTicketLimit();
+  const available = limit - timeRewindTickets;
+  const actual = Math.min(count, available);
+
+  if (actual > 0) {
+    timeRewindTickets += actual;
+    saveData();
+  }
+
+  return { actual, remaining: available };
+}
+
 function doSignin() {
   const todayStr = new Date().toISOString().slice(0,10);
   if (checkInDates.includes(todayStr)) return;
@@ -3183,14 +3212,30 @@ function doSignin() {
   userData.streak++;
   userData.points += 10;
 
+  let ticketReward = 1;
+  let bonusMessage = '';
+
+  if (userData.streak % 7 === 0) {
+    ticketReward += 3;
+    bonusMessage = ' 连续签到7天，额外获得3张穿梭券！';
+  }
+
+  const ticketResult = addTickets(ticketReward);
+  if (ticketResult.actual < ticketReward) {
+    bonusMessage = ' 穿梭券已达持有上限';
+  }
+
   saveUserData();
 
   const btn = $('signin-btn');
   btn.textContent = '✓ 签到成功！';
 
+  showToast(`签到成功！获得10积分${ticketResult.actual > 0 ? '，1张穿梭券' : ''}${bonusMessage}`);
+
   setTimeout(() => {
     renderSigninCalendar();
     renderProfile();
+    renderScenes();
   }, 1000);
 }
 
@@ -4076,9 +4121,202 @@ const sceneCategories = [
   { id:'数字社交', name:'数字社交', icon:'📱', color:'bg-indigo-500', count:4 }
 ];
 
+function checkInitialSceneSelection() {
+  if (userData.member !== 'free') {
+    trainingScenes.forEach(s => s.unlocked = true);
+    return;
+  }
+
+  const unlockedCount = trainingScenes.filter(s => s.unlocked).length;
+  if (unlockedCount === 0 && !userData.hasSelectedInitial) {
+    showInitialSceneSelection();
+  }
+}
+
+function showInitialSceneSelection() {
+  const dialog = document.createElement('div');
+  dialog.id = 'initial-selection-dialog';
+  dialog.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4';
+  dialog.innerHTML = `
+    <div class="bg-white rounded-2xl w-full max-w-md p-6 animate-in">
+      <div class="text-center mb-6">
+        <div class="text-4xl mb-3">🎮</div>
+        <h2 class="text-lg font-bold text-gray-800">选择你的第一个训练场景</h2>
+        <p class="text-sm text-gray-500 mt-1">首次进入，免费解锁一个场景开始你的社交训练之旅</p>
+      </div>
+      <div class="grid grid-cols-2 gap-3 mb-6">
+        ${trainingScenes.slice(0, 6).map(s => `
+          <div onclick="selectInitialScene(${s.id})"
+            class="p-4 bg-indigo-50 rounded-xl cursor-pointer hover:bg-indigo-100 transition-colors">
+            <div class="text-2xl text-center mb-2">${s.icon}</div>
+            <div class="text-sm font-medium text-gray-800 text-center">${s.name}</div>
+            <div class="text-xs text-gray-400 text-center">⭐${s.difficulty}</div>
+          </div>
+        `).join('')}
+      </div>
+      <p class="text-xs text-gray-400 text-center">其他场景需达到指定等级后解锁</p>
+    </div>
+  `;
+  document.body.appendChild(dialog);
+}
+
+function selectInitialScene(sceneId) {
+  const scene = trainingScenes.find(s => s.id === sceneId);
+  if (scene) {
+    scene.unlocked = true;
+    userData.hasSelectedInitial = true;
+    saveData();
+  }
+
+  const dialog = $('initial-selection-dialog');
+  if (dialog) dialog.remove();
+
+  renderSceneList();
+}
+
+function showUnlockConfirm(sceneId) {
+  const scene = trainingScenes.find(s => s.id === sceneId);
+  if (!scene) return;
+
+  const currentLevel = getLevel(userData.points).name;
+  const levelName = scene.unlockLevel + '学员';
+  const levelOk = currentLevel === levelName || (userData.points >= scene.unlockPoints);
+
+  const dialog = document.createElement('div');
+  dialog.id = 'unlock-confirm-dialog';
+  dialog.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4';
+  dialog.innerHTML = `
+    <div class="bg-white rounded-2xl w-full max-w-sm p-6 animate-in">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="text-xl">🔓</span>
+        <h2 class="text-lg font-bold text-gray-800">解锁新场景</h2>
+      </div>
+      <div class="bg-gray-50 rounded-xl p-4 mb-4">
+        <div class="text-sm font-medium text-gray-800 mb-3">场景名称：${scene.icon} ${scene.name}</div>
+        <div class="space-y-2 text-xs">
+          <div class="flex justify-between">
+            <span class="text-gray-500">所需等级</span>
+            <span class="${levelOk ? 'text-green-600' : 'text-red-500'}">${levelName}（当前：${currentLevel}）${levelOk ? '✅' : '❌'}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">所需积分</span>
+            <span class="${userData.points >= scene.unlockPoints ? 'text-green-600' : 'text-red-500'}">${scene.unlockPoints}分（当前：${userData.points}分）${userData.points >= scene.unlockPoints ? '✅' : '❌'}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">所需穿梭券</span>
+            <span class="${timeRewindTickets >= scene.unlockTickets ? 'text-green-600' : 'text-red-500'}">${scene.unlockTickets}张（当前：${timeRewindTickets}张）${timeRewindTickets >= scene.unlockTickets ? '✅' : '❌'}</span>
+          </div>
+        </div>
+      </div>
+      <div class="text-xs text-gray-400 mb-4 bg-yellow-50 p-3 rounded-lg">
+        <div class="font-medium text-yellow-700 mb-1">💡 提示：</div>
+        <div>· 解锁后该场景永久可用，可反复训练</div>
+        <div>· 会员用户可直接解锁全部场景，无需消耗积分和券</div>
+      </div>
+      <div class="flex gap-3">
+        <button onclick="confirmUnlock(${scene.id})" class="flex-1 py-2.5 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-sm font-medium rounded-xl hover:from-yellow-500 hover:to-orange-600 transition-all">
+          立即解锁
+        </button>
+        <button onclick="cancelUnlock()" class="flex-1 py-2.5 bg-gray-100 text-gray-600 text-sm font-medium rounded-xl hover:bg-gray-200 transition-all">
+          稍后再说
+        </button>
+      </div>
+      <button onclick="goToMember()" class="w-full mt-3 py-2 text-sm text-indigo-600 hover:text-indigo-700 transition-colors">
+        升级会员，解锁全部场景
+      </button>
+    </div>
+  `;
+  document.body.appendChild(dialog);
+}
+
+function confirmUnlock(sceneId) {
+  const scene = trainingScenes.find(s => s.id === sceneId);
+  if (!scene) return;
+
+  const prevPoints = userData.points;
+  const prevTickets = timeRewindTickets;
+
+  userData.points -= scene.unlockPoints;
+  timeRewindTickets -= scene.unlockTickets;
+  scene.unlocked = true;
+
+  saveData();
+
+  const dialog = $('unlock-confirm-dialog');
+  if (dialog) dialog.remove();
+
+  showUnlockSuccess(scene, prevPoints, prevTickets);
+}
+
+function showUnlockSuccess(scene, prevPoints, prevTickets) {
+  const dialog = document.createElement('div');
+  dialog.id = 'unlock-success-dialog';
+  dialog.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4';
+  dialog.innerHTML = `
+    <div class="bg-white rounded-2xl w-full max-w-sm p-6 animate-in">
+      <div class="text-center mb-4">
+        <div class="text-4xl mb-3">✅</div>
+        <h2 class="text-lg font-bold text-gray-800">解锁成功！</h2>
+      </div>
+      <div class="bg-green-50 rounded-xl p-4 mb-4 text-center">
+        <div class="text-sm font-medium text-gray-800 mb-3">场景「${scene.icon} ${scene.name}」已解锁</div>
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <div class="bg-white rounded-lg p-2">
+            <div class="text-gray-400">消耗积分</div>
+            <div class="text-red-500 font-medium">-${scene.unlockPoints}分</div>
+          </div>
+          <div class="bg-white rounded-lg p-2">
+            <div class="text-gray-400">消耗穿梭券</div>
+            <div class="text-red-500 font-medium">-${scene.unlockTickets}张</div>
+          </div>
+          <div class="bg-white rounded-lg p-2">
+            <div class="text-gray-400">剩余积分</div>
+            <div class="text-green-600 font-medium">${prevPoints - scene.unlockPoints}分</div>
+          </div>
+          <div class="bg-white rounded-lg p-2">
+            <div class="text-gray-400">剩余穿梭券</div>
+            <div class="text-green-600 font-medium">${prevTickets - scene.unlockTickets}张</div>
+          </div>
+        </div>
+      </div>
+      <div class="flex gap-3">
+        <button onclick="startTraining(${scene.id}); closeUnlockSuccess()" class="flex-1 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-medium rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all">
+          开始训练
+        </button>
+        <button onclick="closeUnlockSuccess()" class="flex-1 py-2.5 bg-gray-100 text-gray-600 text-sm font-medium rounded-xl hover:bg-gray-200 transition-all">
+          返回场景列表
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(dialog);
+}
+
+function closeUnlockSuccess() {
+  const dialog = $('unlock-success-dialog');
+  if (dialog) dialog.remove();
+  renderSceneList();
+}
+
+function cancelUnlock() {
+  const dialog = $('unlock-confirm-dialog');
+  if (dialog) dialog.remove();
+}
+
+function goToMember() {
+  const dialog = $('unlock-confirm-dialog');
+  if (dialog) dialog.remove();
+  showTab('member');
+}
+
 function renderScenes() {
   renderCustomScenes();
   renderTemplateScenes();
+  renderSceneList();
+}
+
+function renderSceneList() {
+  checkInitialSceneSelection();
 
   const stages = [
     { id:1, name:'破冰期', desc:'基础社交场景' },
@@ -4095,31 +4333,166 @@ function renderScenes() {
         <span class="text-xs text-gray-400">${stage.desc}</span>
       </div>
       <div class="space-y-3">
-        ${scenes.map(s => `
-          <div class="bg-white rounded-xl p-4 shadow-sm">
+        ${scenes.map(s => {
+          const status = getSceneUnlockStatus(s);
+          const currentLevel = getLevel(userData.points).name;
+          const levelName = s.unlockLevel + '学员';
+
+          let buttonHtml = '';
+          let lockInfo = '';
+          let iconClass = s.unlocked ? 'bg-indigo-100' : 'bg-gray-100';
+
+          if (status === 'unlocked') {
+            buttonHtml = `<button onclick="startTraining(${s.id})"
+              class="mt-3 w-full py-2 text-sm font-medium rounded-lg transition-all bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700">
+              ${s.completed ? '再次训练' : '开始训练'}
+            </button>`;
+          } else if (status === 'unlockable') {
+            buttonHtml = `<button onclick="showUnlockConfirm(${s.id})"
+              class="mt-3 w-full py-2 text-sm font-medium rounded-lg transition-all bg-gradient-to-r from-yellow-400 to-orange-500 text-white hover:from-yellow-500 hover:to-orange-600">
+              解锁 ${s.unlockPoints}积分+${s.unlockTickets}张券
+            </button>`;
+            iconClass = 'bg-yellow-100';
+          } else if (status === 'level') {
+            lockInfo = `<span class="text-xs text-gray-500">🔒 需${levelName}（当前：${currentLevel}）</span>`;
+            iconClass = 'bg-gray-100';
+            buttonHtml = `<button disabled
+              class="mt-3 w-full py-2 text-sm font-medium rounded-lg transition-all bg-gray-100 text-gray-400 cursor-not-allowed">
+              等级不足
+            </button>`;
+          } else if (status === 'points') {
+            lockInfo = `<span class="text-xs text-gray-500">🔒 需${s.unlockPoints}积分（当前：${userData.points}分）</span>`;
+            iconClass = 'bg-gray-100';
+            buttonHtml = `<button disabled
+              class="mt-3 w-full py-2 text-sm font-medium rounded-lg transition-all bg-gray-100 text-gray-400 cursor-not-allowed">
+              积分不足
+            </button>`;
+          } else if (status === 'tickets') {
+            lockInfo = `<span class="text-xs text-gray-500">🔒 需${s.unlockTickets}张穿梭券（当前：${timeRewindTickets}张）</span>`;
+            iconClass = 'bg-gray-100';
+            buttonHtml = `<button disabled
+              class="mt-3 w-full py-2 text-sm font-medium rounded-lg transition-all bg-gray-100 text-gray-400 cursor-not-allowed">
+              穿梭券不足
+            </button>`;
+          }
+
+          const previewButton = `<button onclick="showScenePreview(${s.id})"
+            class="mt-2 text-xs text-indigo-500 hover:text-indigo-600 transition-colors flex items-center gap-1">
+            👀 预览场景
+          </button>`;
+
+          return `<div class="bg-white rounded-xl p-4 shadow-sm">
             <div class="flex items-start gap-3">
-              <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl ${s.unlocked ? 'bg-indigo-100' : 'bg-gray-100'}">${s.icon}</div>
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl ${iconClass}">${s.icon}</div>
               <div class="flex-1">
                 <div class="flex items-center gap-2">
                   <h3 class="font-semibold text-gray-800">${s.name}</h3>
                   ${s.completed ? '<span class="px-1.5 py-0.5 bg-green-100 text-green-600 text-xs rounded-full">✓ 已完成</span>' : ''}
                 </div>
                 <p class="text-sm text-gray-500 mt-0.5">${s.desc}</p>
-                <div class="flex items-center gap-3 mt-2">
+                <div class="flex items-center gap-3 mt-2 flex-wrap">
                   <span class="flex items-center gap-1 text-xs text-gray-400">⭐ ${s.difficulty}</span>
                   <span class="text-xs text-gray-400">${s.duration}</span>
-                  ${!s.unlocked ? '<span class="text-xs text-orange-500">🔒 需完成上一阶段</span>' : ''}
+                  ${lockInfo}
                 </div>
               </div>
             </div>
-            <button onclick="startTraining(${s.id})" ${s.unlocked ? '' : 'disabled'}
-              class="mt-3 w-full py-2 text-sm font-medium rounded-lg transition-all ${s.unlocked ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}">
-              ${s.completed ? '再次训练' : '开始训练'}
-            </button>
-          </div>`).join('')}
+            ${buttonHtml}
+            ${previewButton}
+          </div>`;
+        }).join('')}
       </div>
     </div>`;
   }).join('');
+}
+
+function showScenePreview(sceneId) {
+  const scene = trainingScenes.find(s => s.id === sceneId);
+  if (!scene) return;
+
+  const dialog = document.createElement('div');
+  dialog.id = 'scene-preview-dialog';
+  dialog.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4';
+
+  const sampleRound = scene.rounds && scene.rounds.length > 0 ? scene.rounds[0] : null;
+
+  dialog.innerHTML = `
+    <div class="bg-white rounded-2xl w-full max-w-md p-6 animate-in">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">${scene.icon}</span>
+          <h2 class="text-lg font-bold text-gray-800">场景预览</h2>
+        </div>
+        <button onclick="closeScenePreview()" class="text-gray-400 hover:text-gray-600">✕</button>
+      </div>
+
+      <div class="bg-indigo-50 rounded-xl p-4 mb-4">
+        <div class="font-semibold text-gray-800 mb-1">${scene.name}</div>
+        <div class="text-sm text-gray-500">${scene.desc}</div>
+        <div class="flex items-center gap-3 mt-2">
+          <span class="flex items-center gap-1 text-xs text-gray-400">⭐ ${scene.difficulty}</span>
+          <span class="text-xs text-gray-400">${scene.duration}</span>
+          <span class="text-xs text-gray-400">${scene.stage}阶段</span>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <div class="text-xs text-gray-400 mb-2">🎯 训练目标</div>
+        <div class="text-sm text-gray-600 bg-gray-50 rounded-lg p-3">
+          ${getSceneTrainingGoal(scene.name)}
+        </div>
+      </div>
+
+      ${sampleRound ? `
+      <div class="mb-4">
+        <div class="text-xs text-gray-400 mb-2">💬 示例对话</div>
+        <div class="space-y-2">
+          <div class="bg-gray-50 rounded-lg p-3">
+            <div class="text-xs text-gray-400 mb-1">🤖 AI教练</div>
+            <div class="text-sm text-gray-700">${sampleRound.ai}</div>
+          </div>
+          <div class="bg-indigo-50 rounded-lg p-3">
+            <div class="text-xs text-indigo-500 mb-1">💡 思考方向提示</div>
+            <div class="text-sm text-gray-700">
+              ${sampleRound.thinking ? sampleRound.thinking.map(t => `${t.type}. ${t.label}: ${t.desc}`).join('<br>') : '参考提示思考如何回应'}
+            </div>
+          </div>
+        </div>
+      </div>
+      ` : ''}
+
+      <div class="flex gap-3">
+        ${scene.unlocked ? `
+        <button onclick="startTraining(${scene.id}); closeScenePreview()" class="flex-1 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-medium rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all">
+          开始训练
+        </button>` : `
+        <button onclick="showUnlockConfirm(${scene.id}); closeScenePreview()" class="flex-1 py-2.5 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-sm font-medium rounded-xl hover:from-yellow-500 hover:to-orange-600 transition-all">
+          解锁场景
+        </button>`}
+        <button onclick="closeScenePreview()" class="flex-1 py-2.5 bg-gray-100 text-gray-600 text-sm font-medium rounded-xl hover:bg-gray-200 transition-all">
+          关闭
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(dialog);
+}
+
+function closeScenePreview() {
+  const dialog = $('scene-preview-dialog');
+  if (dialog) dialog.remove();
+}
+
+function getSceneTrainingGoal(sceneName) {
+  const goals = {
+    '相亲模拟': '学习初次见面的自我介绍技巧，建立良好第一印象',
+    '兴趣社群自我介绍': '学会在社群中简洁有趣地介绍自己，吸引同好',
+    '模拟面试': '掌握面试中的自我介绍、优缺点回答等核心技巧',
+    '加薪谈判': '学习用数据和事实支撑自己的加薪诉求',
+    '被误解(NVC)': '运用非暴力沟通化解误会，表达自己的感受和需求',
+    '共情沟通训练': '培养同理心，学会倾听和理解他人的感受'
+  };
+  return goals[sceneName] || '通过对话练习提升社交沟通能力';
 }
 
 // 渲染自定义场景列表（PRD §2.1）
@@ -4482,6 +4855,14 @@ function startTraining(sceneId) {
   }
   if (!scene || !scene.unlocked) return;
 
+  if (userData.member === 'free') {
+    const dailyTrainingCount = userData.dailyTrainingCount || 0;
+    if (dailyTrainingCount >= 5) {
+      showToast('今日训练次数已达上限，请明天再来');
+      return;
+    }
+  }
+
   currentTraining = scene;
   trainingMessages = [];
   trainingRoundIdx = 0;
@@ -4802,51 +5183,42 @@ function showTrainingInput() {
   if (inputDiv) inputDiv.remove();
 
   const round = currentTraining.rounds[trainingRoundIdx];
-  let referenceOptions = [];
-  if (round && round.options && round.options.length > 0) {
-    referenceOptions = round.options.map((opt, idx) => ({
-      text: ['A', 'B', 'C', 'D'][idx],
-      content: opt.text,
-      quality: opt.quality
-    }));
-    referenceOptions.sort(() => Math.random() - 0.5);
-  } else if (round && round.tips && round.tips.length > 0) {
-    referenceOptions = round.tips.map((tip, idx) => ({
-      text: ['A', 'B', 'C', 'D'][idx],
-      content: tip
-    }));
-    referenceOptions.sort(() => Math.random() - 0.5);
+  let thinkingHints = [];
+  if (round && round.thinking && round.thinking.length > 0) {
+    thinkingHints = round.thinking;
   } else {
-    referenceOptions = [
-      { text: 'A', content: '试着表达你的想法', quality: 'safe' },
-      { text: 'B', content: '保持微笑，积极回应', quality: 'good' },
-      { text: 'C', content: '问对方一个问题', quality: 'good' }
+    thinkingHints = [
+      { type:'A', label:'主动型', desc:'具体描述，展现热情和自信', example:'详细说明你的想法' },
+      { type:'B', label:'平衡型', desc:'回答+反问对方，保持互动', example:'回答问题并询问对方' },
+      { type:'C', label:'含蓄型', desc:'简单回应，观察对方反应', example:'简短回答' }
     ];
-    referenceOptions.sort(() => Math.random() - 0.5);
   }
 
-  const optionsHtml = referenceOptions.length > 0 ? `
+  const hintsHtml = `
     <div class="mb-3">
-      <div class="text-xs text-gray-400 mb-2">💡 参考选项（选前全黑，仅供参考）</div>
+      <div class="text-xs text-indigo-500 mb-2 font-medium">💡 思考方向（仅供参考，不强制选择）</div>
       <div class="space-y-2">
-        ${referenceOptions.map(opt => `
-          <div class="option-card px-3 py-2 bg-gray-100 rounded-lg text-sm cursor-pointer hover:bg-gray-200 transition-colors"
-               onclick="selectReferenceOption('${opt.content}', this)" data-quality="${opt.quality || ''}">
-            <span class="font-medium text-gray-500">${opt.text}.</span>
-            <span class="option-text" style="color: #1f2937;">${opt.content}</span>
+        ${thinkingHints.map(hint => `
+          <div class="px-3 py-2.5 bg-indigo-50 rounded-lg text-xs border border-indigo-100">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="w-5 h-5 rounded-full bg-indigo-500 text-white text-[10px] flex items-center justify-center font-medium">${hint.type}</span>
+              <span class="font-medium text-indigo-700">${hint.label}</span>
+            </div>
+            <div class="text-gray-600 mb-1">${hint.desc}</div>
+            <div class="text-gray-400 text-[10px] italic">示例：${hint.example}</div>
           </div>
         `).join('')}
       </div>
     </div>
-  ` : '';
+  `;
 
   inputDiv = document.createElement('div');
   inputDiv.id = 'training-input-area';
   inputDiv.className = 'mt-3 animate-in';
   inputDiv.innerHTML = `
-    ${optionsHtml}
+    ${hintsHtml}
     <div class="flex gap-2">
-      <input type="text" id="training-input" placeholder="输入你的回答..."
+      <input type="text" id="training-input" placeholder="参考思路，输入你的回答..."
         class="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
         onkeypress="if(event.key==='Enter') sendUserMessage()">
       <button onclick="sendUserMessage()" class="px-4 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-medium rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all">
@@ -4914,6 +5286,13 @@ function sendUserMessage() {
   const userAnswer = input.value.trim();
   if (!userAnswer) return;
 
+  if (!checkContentSafety(userAnswer)) {
+    showToast('你的回答包含不当内容，请重新组织语言');
+    input.value = '';
+    input.focus();
+    return;
+  }
+
   showTrainingOptions = false;
   const inputArea = $('training-input-area');
   if (inputArea) inputArea.remove();
@@ -4935,21 +5314,36 @@ function sendUserMessage() {
   netScore = positiveScore - negativeScore;
 
   setTimeout(() => {
-    addTrainingMessage('📊 分析：' + analysis.comment, false, true);
-    addTrainingMessage('📈 净得分：' + (netScore > 0 ? '+' : '') + netScore, false, true);
+    addTrainingMessage(`【评分】${analysis.scoreDelta >= 0 ? '+' : ''}${analysis.scoreDelta}分（${analysis.grade}）`, false, true);
 
-    if (analysis.suggestion) {
+    if (analysis.whyGood) {
       setTimeout(() => {
-        addTrainingMessage('💡 改善建议：' + analysis.suggestion, false, true);
+        addTrainingMessage(`【为什么好】${analysis.whyGood}`, false, true);
+      }, 400);
+    }
+
+    if (analysis.whyBetter) {
+      setTimeout(() => {
+        addTrainingMessage(`【为什么可以更好】${analysis.whyBetter}`, false, true);
       }, 600);
     }
 
-    if (analysis.scoreDelta < 0 && analysis.correctAnswer) {
+    if (analysis.suggestion) {
       setTimeout(() => {
-        addTrainingMessage('✅ 正确回答参考：', false, true);
-        addTrainingMessage(analysis.correctAnswer, false, true);
-        addTrainingMessage('💬 为什么这么说：' + analysis.correctReason, false, true);
+        addTrainingMessage(`【应该怎么说】${analysis.suggestion}`, false, true);
       }, 800);
+    }
+
+    if (analysis.correctAnswer) {
+      setTimeout(() => {
+        addTrainingMessage(`✅ 试试这样说：${analysis.correctAnswer}`, false, true);
+      }, 1000);
+    }
+
+    if (analysis.thinkingUsed) {
+      setTimeout(() => {
+        addTrainingMessage(`【思路运用】你采用了${analysis.thinkingUsed.type}方向（${analysis.thinkingUsed.label}）`, false, true);
+      }, 1200);
     }
 
     setTimeout(() => {
@@ -4958,8 +5352,20 @@ function sendUserMessage() {
       } else {
         continueTrainingFlow(userAnswer, analysis);
       }
-    }, 1500);
+    }, 2000);
   }, 800);
+}
+
+function checkContentSafety(text) {
+  const sensitiveWords = [
+    '操', '靠', '滚', '死', '妈', '智障', '傻逼', '垃圾',
+    '麻痹', '卧槽', '尼玛', '去死', '自杀', '杀人', '强奸',
+    '色情', '裸体', '性器官', '吸毒', '赌博', '诈骗', '传销',
+    '恐怖', '炸弹', '袭击', '暴动', '台独', '港独', '藏独',
+    '反动', '反革命', '邪教', '法轮功'
+  ];
+
+  return !sensitiveWords.some(word => text.includes(word));
 }
 
 function showRewindDialog() {
@@ -5056,30 +5462,129 @@ function analyzeUserAnswer(answer, round) {
   const scenarioName = currentTraining ? currentTraining.name : '';
   const question = round ? round.ai : '';
 
-  let scoreDelta = 0;
-  let comment = '';
-  let suggestion = '';
-  let isGood = false;
-  let correctAnswer = '';
-  let correctReason = '';
-
-  // 根据场景获取分析数据
   const analysis = getScenarioAnalysis(scenarioName, question, answer, len);
 
-  scoreDelta = analysis.scoreDelta;
-  comment = analysis.comment;
-  suggestion = analysis.suggestion;
-  isGood = analysis.isGood;
-  correctAnswer = analysis.correctAnswer;
-  correctReason = analysis.correctReason;
+  const contentScore = calculateContentScore(answer, question, len, analysis);
+  const expressionScore = calculateExpressionScore(answer, len);
+  const thinkingScore = calculateThinkingScore(answer, round);
 
-  if (scoreDelta > 0) {
-    comment += ' +' + scoreDelta;
-  } else if (scoreDelta < 0) {
-    comment += ' ' + scoreDelta;
+  const weightedScore = contentScore * 0.4 + expressionScore * 0.3 + thinkingScore * 0.3;
+  const scoreDelta = Math.round(weightedScore - 5);
+
+  const grade = getGrade(scoreDelta);
+
+  const thinkingUsed = detectThinkingDirection(answer, round);
+
+  return {
+    scoreDelta,
+    grade,
+    contentScore,
+    expressionScore,
+    thinkingScore,
+    comment: analysis.comment,
+    whyGood: analysis.whyGood || '',
+    whyBetter: analysis.whyBetter || '',
+    suggestion: analysis.suggestion,
+    isGood: scoreDelta >= 0,
+    correctAnswer: analysis.correctAnswer || (round && round.bestAnswer ? round.bestAnswer : ''),
+    correctReason: analysis.correctReason,
+    thinkingUsed
+  };
+}
+
+function calculateContentScore(answer, question, len, analysis) {
+  if (len === 0) return 0;
+  if (len <= 5 && (answer.includes('嗯') || answer.includes('哦') || answer.includes('好'))) return 2;
+
+  let score = 5;
+
+  const hasDetail = len > 20 && (
+    answer.includes('因为') || answer.includes('所以') || answer.includes('比如') ||
+    answer.includes('例如') || answer.includes('第一') || answer.includes('首先') ||
+    answer.includes('去年') || answer.includes('今年') || answer.includes('之前') ||
+    answer.includes('项目') || answer.includes('经验') || answer.includes('学习')
+  );
+
+  if (hasDetail) score += 3;
+
+  const hasQuestion = answer.includes('你呢') || answer.includes('你怎么样') ||
+    answer.includes('你觉得呢') || answer.includes('你平时') || answer.includes('你最近');
+
+  if (hasQuestion) score += 2;
+
+  if (score > 10) score = 10;
+  return Math.round(score);
+}
+
+function calculateExpressionScore(answer, len) {
+  if (len === 0) return 0;
+
+  let score = 5;
+
+  const negativeWords = ['烦', '累', '压力', '加班', '累死了', '没意思', '无聊', '随便', '都行', '算了', '不知道'];
+  const hasNegative = negativeWords.some(w => answer.includes(w));
+
+  if (hasNegative) score -= 2;
+
+  const positiveWords = ['开心', '不错', '很好', '喜欢', '感谢', '谢谢', '学习', '成长'];
+  const hasPositive = positiveWords.some(w => answer.includes(w));
+
+  if (hasPositive) score += 2;
+
+  const hasProperPunctuation = answer.includes('。') || answer.includes('！') ||
+    answer.includes('？') || answer.includes('；') || answer.includes('，');
+
+  if (hasProperPunctuation) score += 1;
+
+  if (score < 0) score = 0;
+  if (score > 10) score = 10;
+  return Math.round(score);
+}
+
+function calculateThinkingScore(answer, round) {
+  const thinkingUsed = detectThinkingDirection(answer, round);
+
+  if (!thinkingUsed) return 3;
+
+  const len = answer.length;
+
+  if (thinkingUsed.type === 'A' && len > 20) return 9;
+  if (thinkingUsed.type === 'A' && len > 10) return 7;
+
+  if (thinkingUsed.type === 'B' && answer.includes('你呢')) return 9;
+  if (thinkingUsed.type === 'B' && answer.includes('你怎么样')) return 9;
+
+  if (thinkingUsed.type === 'C' && len <= 10) return 8;
+
+  return 5;
+}
+
+function detectThinkingDirection(answer, round) {
+  const len = answer.length;
+
+  if (len > 20 && (answer.includes('因为') || answer.includes('比如') ||
+    answer.includes('首先') || answer.includes('项目') || answer.includes('经验'))) {
+    return { type: 'A', label: '主动型' };
   }
 
-  return { scoreDelta, comment, suggestion, isGood, correctAnswer, correctReason };
+  if (answer.includes('你呢') || answer.includes('你怎么样') ||
+    answer.includes('你觉得呢') || answer.includes('你平时')) {
+    return { type: 'B', label: '平衡型' };
+  }
+
+  if (len <= 10) {
+    return { type: 'C', label: '含蓄型' };
+  }
+
+  return null;
+}
+
+function getGrade(scoreDelta) {
+  if (scoreDelta >= 5) return '优秀';
+  if (scoreDelta >= 2) return '良好';
+  if (scoreDelta >= -1) return '一般';
+  if (scoreDelta >= -4) return '较差';
+  return '很差';
 }
 
 function getScenarioAnalysis(scenario, question, answer, len) {
@@ -5894,12 +6399,71 @@ function finishTraining() {
     else coldCount++;
   });
 
-  trainingPointsGain = Math.max(10, Math.min(80, (netScore + 100) / 4));
+  const totalRounds = currentTraining.rounds.length;
+  const completedRounds = trainingRoundIdx + 1;
+  const completionRate = completedRounds / totalRounds;
+
+  let canEarnPoints = true;
+  let pointsReason = '';
+
+  if (completionRate < 0.7) {
+    canEarnPoints = false;
+    pointsReason = '训练完成度不足70%';
+  }
+
+  if (netScore < 30) {
+    canEarnPoints = false;
+    pointsReason = '训练评分低于30分';
+  }
+
+  if (userData.member === 'free' && userData.points >= 2000) {
+    canEarnPoints = false;
+    pointsReason = '累计积分已达上限';
+  }
+
+  let dailyTrainingCount = userData.dailyTrainingCount || 0;
+  if (userData.member === 'free' && dailyTrainingCount >= 5) {
+    canEarnPoints = false;
+    pointsReason = '今日训练次数已达上限';
+  }
+
+  const today = new Date().toISOString().slice(0, 10);
+  let sceneDailyCount = (userData.sceneDailyCounts && userData.sceneDailyCounts[currentTraining.id]) || {};
+  let sceneCountToday = sceneDailyCount[today] || 0;
+  let pointsMultiplier = 1;
+
+  if (sceneCountToday >= 3) {
+    pointsMultiplier = 0.5;
+  }
+
+  trainingPointsGain = Math.max(10, Math.min(80, (netScore + 100) / 4)) * pointsMultiplier;
   if (useDoublePoints) {
     doublePointCards--;
     trainingPointsGain *= 2;
   }
-  userData.points += trainingPointsGain;
+
+  if (canEarnPoints) {
+    userData.points += Math.floor(trainingPointsGain);
+    userData.dailyTrainingCount = dailyTrainingCount + 1;
+
+    if (!userData.sceneDailyCounts) userData.sceneDailyCounts = {};
+    if (!userData.sceneDailyCounts[currentTraining.id]) userData.sceneDailyCounts[currentTraining.id] = {};
+    userData.sceneDailyCounts[currentTraining.id][today] = sceneCountToday + 1;
+
+    if (netScore >= 80) {
+      userData.points += 10;
+    }
+
+    const stars = getStars(netScore);
+    const scene = trainingScenes.find(s => s.id === currentTraining.id);
+    if (stars === 3 && scene && !scene.threeStarCompleted) {
+      userData.points += 20;
+      scene.threeStarCompleted = true;
+    }
+  } else {
+    trainingPointsGain = 0;
+  }
+
   weeklyTrainingDays = Math.min(7, weeklyTrainingDays + (checkedInToday ? 0 : 1));
 
   currentTraining.completed = true;
