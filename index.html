@@ -779,6 +779,32 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
         </div>
       </div>
 
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <div onclick="showHomework()" class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 cursor-pointer hover:shadow-md transition-all">
+          <div class="text-2xl mb-2">📝</div>
+          <h3 class="text-sm font-semibold text-gray-800">我的作业</h3>
+          <p class="text-xs text-gray-500 mt-1">教练布置的专项练习</p>
+        </div>
+        <div onclick="showSkillProgress()" class="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl p-4 cursor-pointer hover:shadow-md transition-all">
+          <div class="text-2xl mb-2">🎯</div>
+          <h3 class="text-sm font-semibold text-gray-800">技能点进度</h3>
+          <p class="text-xs text-gray-500 mt-1">查看各技能掌握度</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <div onclick="showLeaderboard()" class="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl p-4 cursor-pointer hover:shadow-md transition-all">
+          <div class="text-2xl mb-2">🏆</div>
+          <h3 class="text-sm font-semibold text-gray-800">好友排行榜</h3>
+          <p class="text-xs text-gray-500 mt-1">看看好友的训练进度</p>
+        </div>
+        <div onclick="showEvolution()" class="bg-gradient-to-br from-cyan-50 to-blue-50 rounded-xl p-4 cursor-pointer hover:shadow-md transition-all">
+          <div class="text-2xl mb-2">🦋</div>
+          <h3 class="text-sm font-semibold text-gray-800">进化史</h3>
+          <p class="text-xs text-gray-500 mt-1">回顾成长历程</p>
+        </div>
+      </div>
+
       <div onclick="showDiary()" class="bg-white rounded-xl p-3 shadow-sm mb-3 cursor-pointer hover:shadow-md transition-all">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
@@ -948,6 +974,32 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
           </div>
           <span class="text-gray-400">→</span>
         </button>
+
+        <button onclick="showCustomerService()" class="w-full bg-white rounded-xl p-4 shadow-sm flex items-center justify-between hover:bg-gray-50 transition-all">
+          <div class="flex items-center gap-3">
+            <span class="text-xl">💬</span>
+            <div><div class="text-gray-700 text-sm">客服与反馈</div><div class="text-xs text-gray-400">FAQ、在线客服、意见反馈</div></div>
+          </div>
+          <span class="text-gray-400">→</span>
+        </button>
+
+        <button onclick="showNotificationSettings()" class="w-full bg-white rounded-xl p-4 shadow-sm flex items-center justify-between hover:bg-gray-50 transition-all">
+          <div class="flex items-center gap-3">
+            <span class="text-xl">🔔</span>
+            <div><div class="text-gray-700 text-sm">推送通知</div><div class="text-xs text-gray-400">管理推送开关和频率</div></div>
+          </div>
+          <span class="text-gray-400">→</span>
+        </button>
+
+        <button onclick="showDeviceManagement()" class="w-full bg-white rounded-xl p-4 shadow-sm flex items-center justify-between hover:bg-gray-50 transition-all">
+          <div class="flex items-center gap-3">
+            <span class="text-xl">📱</span>
+            <div><div class="text-gray-700 text-sm">设备管理</div><div class="text-xs text-gray-400">管理登录设备，最多3台</div></div>
+          </div>
+          <span class="text-gray-400">→</span>
+        </button>
+
+        ${renderDeleteAccountButton()}
 
         <button onclick="logout()" class="w-full bg-red-50 rounded-xl p-4 shadow-sm flex items-center justify-between hover:bg-red-100 transition-all">
           <div class="flex items-center gap-3">
@@ -1879,6 +1931,105 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
     </div>
   </div>
 
+  <!-- ===== 学习卡片复习弹窗 ===== -->
+  <div class="modal-overlay" id="modal-card-review" style="display:none">
+    <div class="modal-content h-[80vh]">
+      <div class="flex items-center justify-between p-4 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-800">📖 卡片复习</h3>
+        <button onclick="closeModal('card-review')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+      </div>
+      <div class="flex-1 overflow-auto p-4" id="card-review-content"></div>
+    </div>
+  </div>
+
+  <!-- ===== 客服与反馈弹窗 ===== -->
+  <div class="modal-overlay" id="modal-cs" style="display:none">
+    <div class="modal-content h-[80vh]">
+      <div class="flex items-center justify-between p-4 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-800">💬 客服与反馈</h3>
+        <button onclick="closeModal('cs')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+      </div>
+      <div class="flex-1 overflow-auto p-4" id="cs-content"></div>
+    </div>
+  </div>
+
+  <!-- ===== 模板评价弹窗 ===== -->
+  <div class="modal-overlay" id="modal-template-reviews" style="display:none">
+    <div class="modal-content h-[80vh]">
+      <div class="flex items-center justify-between p-4 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-800">📝 模板评价</h3>
+        <button onclick="closeModal('template-reviews')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+      </div>
+      <div class="flex-1 overflow-auto p-4" id="template-reviews-content"></div>
+    </div>
+  </div>
+
+  <!-- ===== 作业列表弹窗 ===== -->
+  <div class="modal-overlay" id="modal-homework" style="display:none">
+    <div class="modal-content h-[80vh]">
+      <div class="flex items-center justify-between p-4 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-800">📝 我的作业</h3>
+        <button onclick="closeModal('homework')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+      </div>
+      <div class="flex-1 overflow-auto p-4" id="homework-content"></div>
+    </div>
+  </div>
+
+  <!-- ===== 技能点进度弹窗 ===== -->
+  <div class="modal-overlay" id="modal-skill-progress" style="display:none">
+    <div class="modal-content h-[80vh]">
+      <div class="flex items-center justify-between p-4 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-800">🎯 技能点进度</h3>
+        <button onclick="closeModal('skill-progress')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+      </div>
+      <div class="flex-1 overflow-auto p-4" id="skill-progress-content"></div>
+    </div>
+  </div>
+
+  <!-- ===== 好友排行榜弹窗 ===== -->
+  <div class="modal-overlay" id="modal-leaderboard" style="display:none">
+    <div class="modal-content h-[80vh]">
+      <div class="flex items-center justify-between p-4 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-800">🏆 好友排行榜</h3>
+        <button onclick="closeModal('leaderboard')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+      </div>
+      <div class="flex-1 overflow-auto p-4" id="leaderboard-content"></div>
+    </div>
+  </div>
+
+  <!-- ===== 进化史弹窗 ===== -->
+  <div class="modal-overlay" id="modal-evolution" style="display:none">
+    <div class="modal-content h-[80vh]">
+      <div class="flex items-center justify-between p-4 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-800">🦋 进化史</h3>
+        <button onclick="closeModal('evolution')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+      </div>
+      <div class="flex-1 overflow-auto p-4" id="evolution-content"></div>
+    </div>
+  </div>
+
+  <!-- ===== 推送设置弹窗 ===== -->
+  <div class="modal-overlay" id="modal-notification" style="display:none">
+    <div class="modal-content h-[80vh]">
+      <div class="flex items-center justify-between p-4 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-800">🔔 推送通知设置</h3>
+        <button onclick="closeModal('notification')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+      </div>
+      <div class="flex-1 overflow-auto p-4" id="notification-content"></div>
+    </div>
+  </div>
+
+  <!-- ===== 设备管理弹窗 ===== -->
+  <div class="modal-overlay" id="modal-devices" style="display:none">
+    <div class="modal-content h-[80vh]">
+      <div class="flex items-center justify-between p-4 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-800">📱 设备管理</h3>
+        <button onclick="closeModal('devices')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+      </div>
+      <div class="flex-1 overflow-auto p-4" id="devices-content"></div>
+    </div>
+  </div>
+
   <!-- ===== 晚安计划弹窗 ===== -->
   <div class="modal-overlay" id="modal-goodnight" style="display:none">
     <div class="modal-content" style="background:transparent;box-shadow:none">
@@ -2147,7 +2298,10 @@ let userData = {
   realNameVerified: false,
   realNameInfo: { name: '', idCard: '' },
   avatar: '👤',
-  inviteCode: ''
+  inviteCode: '',
+  favorability: 0,
+  trainingCount: 0,
+  dailyAnalysisUnlocked: 0
 };
 
 // 训练数据
@@ -2668,6 +2822,18 @@ function getLevel(points) {
   if (points>=200) return { name:'黄金学员', color:'text-yellow-500' };
   if (points>=100) return { name:'白银学员', color:'text-gray-400' };
   return { name:'青铜学员', color:'text-amber-600' };
+}
+
+function getLevelPoints(levelName) {
+  const levelPoints = {
+    '青铜': 0,
+    '白银': 100,
+    '黄金': 200,
+    '铂金': 400,
+    '钻石': 600,
+    '大师': 800
+  };
+  return levelPoints[levelName] || 0;
 }
 
 async function hashPassword(password) {
@@ -3295,7 +3461,35 @@ function showCoachSelection() {
 }
 
 function selectCoach(index) {
-  currentCoach = coaches[index];
+  const newCoach = coaches[index];
+  if (currentCoach.id === newCoach.id) return;
+
+  const now = Date.now();
+  const lastSwitchTime = userData.lastCoachSwitchTime || 0;
+  const switchCooldown = 72 * 60 * 60 * 1000;
+
+  if (now - lastSwitchTime < switchCooldown) {
+    const remainingHours = Math.ceil((switchCooldown - (now - lastSwitchTime)) / (60 * 60 * 1000));
+    alert(`切换教练后需要等待${remainingHours}小时才能再次切换`);
+    return;
+  }
+
+  if (userData.member === 'free') {
+    const currentMonth = new Date().toISOString().slice(0, 7);
+    const switchCountThisMonth = userData.coachSwitchCount || {};
+    const count = switchCountThisMonth[currentMonth] || 0;
+    if (count >= 1) {
+      alert('免费用户每月限切换1次教练，请升级会员享受不限次数切换');
+      return;
+    }
+  }
+
+  if (!confirm(`切换教练后，你将与当前教练的师徒关系暂时中断，确定切换吗？\n\n当前教练：${currentCoach.name}\n新教练：${newCoach.name}`)) {
+    return;
+  }
+
+  const oldCoachId = currentCoach.id;
+  currentCoach = newCoach;
   coachAvatar = 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + currentCoach.avatarSeed;
 
   $('coach-big-avatar').src = coachAvatar;
@@ -3319,7 +3513,27 @@ function selectCoach(index) {
   const homeAffection = $('home-coach-affection');
   if (homeAffection) homeAffection.textContent = currentCoach.points + '/1000';
 
+  userData.lastCoachSwitchTime = now;
+  if (!userData.coachSwitchCount) userData.coachSwitchCount = {};
+  const currentMonth = new Date().toISOString().slice(0, 7);
+  userData.coachSwitchCount[currentMonth] = (userData.coachSwitchCount[currentMonth] || 0) + 1;
+
+  if (!userData.coachFavorability) userData.coachFavorability = {};
+  if (!userData.coachFavorability[oldCoachId]) userData.coachFavorability[oldCoachId] = userData.favorability || 0;
+
+  if (userData.member !== 'free') {
+    const inheritedFavorability = Math.floor((userData.favorability || 0) * 0.8);
+    currentCoach.points = Math.max(currentCoach.points, inheritedFavorability);
+    userData.favorability = currentCoach.points;
+  } else {
+    userData.favorability = 0;
+    currentCoach.points = 0;
+  }
+
+  saveData();
   renderCoach();
+
+  alert(`成功切换到教练「${currentCoach.name}」！`);
 }
 
 let customCoachData = {
@@ -3470,6 +3684,33 @@ function createCustomCoach() {
   closeModal('coach-select');
 
   alert(`🎉 自定义教练「${name}」创建成功！\n- 消耗100积分\n- 教学风格：${customCoachData.style}\n- 性格特征：${personalityStr}`);
+}
+
+function checkCoachContact() {
+  const lastLoginTime = userData.lastLoginTime || 0;
+  const now = Date.now();
+  const threeDaysAgo = 3 * 24 * 60 * 60 * 1000;
+
+  if (now - lastLoginTime > threeDaysAgo) {
+    const favorability = userData.favorability || 0;
+    if (favorability >= 20) {
+      setTimeout(() => {
+        if (confirm(`💬 ${currentCoach.name}发来消息：\n"最近没见你训练，还好吗？"`)) {
+          switchTab('coach');
+        }
+      }, 2000);
+    }
+  }
+
+  const totalTraining = userData.trainingCount || 0;
+  if (totalTraining > 0 && totalTraining % 5 === 0) {
+    setTimeout(() => {
+      alert(`🎉 ${currentCoach.name}发来消息：\n"你进步很快！继续加油！"`);
+    }, 1500);
+  }
+
+  userData.lastLoginTime = now;
+  saveData();
 }
 
 function renderCoach() {
@@ -4381,6 +4622,21 @@ function renderSceneList() {
             👀 预览场景
           </button>`;
 
+          const unlockInfo = s.unlockPoints > 0 || s.unlockTickets > 0 ? `
+            <div class="flex items-center gap-2 mt-2 text-xs">
+              ${s.unlockLevel !== '青铜' ? `<span class="flex items-center gap-1 ${userData.points >= getLevelPoints(s.unlockLevel) ? 'text-green-500' : 'text-orange-500'}">
+                <span>🏆</span>${s.unlockLevel}学员
+              </span>` : ''}
+              ${s.unlockPoints > 0 ? `<span class="flex items-center gap-1 ${userData.points >= s.unlockPoints ? 'text-green-500' : 'text-orange-500'}">
+                <span>⭐</span>${s.unlockPoints}积分
+              </span>` : ''}
+              ${s.unlockTickets > 0 ? `<span class="flex items-center gap-1 ${timeRewindTickets >= s.unlockTickets ? 'text-green-500' : 'text-orange-500'}">
+                <span>🎫</span>${s.unlockTickets}张券
+              </span>` : ''}
+              ${s.unlocked ? '<span class="text-green-500">✓ 已解锁</span>' : ''}
+            </div>
+          ` : (s.unlocked ? '<div class="mt-2 text-xs text-green-500">✓ 已解锁</div>' : '');
+
           return `<div class="bg-white rounded-xl p-4 shadow-sm">
             <div class="flex items-start gap-3">
               <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl ${iconClass}">${s.icon}</div>
@@ -4393,8 +4649,9 @@ function renderSceneList() {
                 <div class="flex items-center gap-3 mt-2 flex-wrap">
                   <span class="flex items-center gap-1 text-xs text-gray-400">⭐ ${s.difficulty}</span>
                   <span class="text-xs text-gray-400">${s.duration}</span>
-                  ${lockInfo}
                 </div>
+                ${unlockInfo}
+                ${lockInfo}
               </div>
             </div>
             ${buttonHtml}
@@ -4526,7 +4783,10 @@ function renderCustomScenes() {
 // 渲染场景模板市场（PRD §2.4）
 function renderTemplateScenes() {
   const featuredScenes = templateScenes.filter(s => s.creator === '官方推荐').slice(0, 6);
-  $('template-scene-list').innerHTML = featuredScenes.map(s => `
+  $('template-scene-list').innerHTML = featuredScenes.map(s => {
+    const ratings = getTemplateRatings(s.id);
+    const avgRating = ratings.length > 0 ? (ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length).toFixed(1) : '暂无评分';
+    return `
     <div class="bg-white rounded-xl p-3 shadow-sm">
       <div class="flex items-center gap-2 mb-2">
         <span class="text-xl">${s.icon}</span>
@@ -4536,13 +4796,18 @@ function renderTemplateScenes() {
       <p class="text-xs text-gray-500 mt-0.5 line-clamp-2">${s.desc}</p>
       <div class="flex items-center justify-between mt-2">
         <span class="text-xs text-gray-400">${s.creator}</span>
-        <span class="text-xs text-orange-500">${s.rating}分</span>
+        <span class="flex items-center gap-1 text-xs text-orange-500">${renderStars(parseFloat(avgRating))} ${avgRating}</span>
       </div>
-      <button onclick="useTemplateScene(${s.id})" class="w-full mt-2 py-1.5 text-xs font-medium bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-colors">
-        开始训练
-      </button>
+      <div class="flex gap-2 mt-2">
+        <button onclick="useTemplateScene(${s.id})" class="flex-1 py-1.5 text-xs font-medium bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-colors">
+          开始训练
+        </button>
+        <button onclick="showTemplateReviews(${s.id})" class="flex-1 py-1.5 text-xs font-medium bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors">
+          评价(${ratings.length})
+        </button>
+      </div>
     </div>
-  `).join('');
+  `}).join('');
 }
 
 let currentSceneCategory = '';
@@ -5316,34 +5581,51 @@ function sendUserMessage() {
   setTimeout(() => {
     addTrainingMessage(`【评分】${analysis.scoreDelta >= 0 ? '+' : ''}${analysis.scoreDelta}分（${analysis.grade}）`, false, true);
 
+    const favorability = userData.favorability || 0;
+    const favorabilityLevel = getFavorabilityLevel(favorability);
+    const isMember = userData.member !== 'free';
+    const trainingCount = userData.trainingCount || 0;
+    const isFirstTraining = trainingCount === 0;
+
+    const shouldExpandAnswer = isFirstTraining ||
+                               (favorabilityLevel >= 3) ||
+                               (isMember && favorabilityLevel >= 2);
+
+    const depthLevel = getAnalysisDepth(favorabilityLevel, isMember);
+
+    let delay = 400;
     if (analysis.whyGood) {
       setTimeout(() => {
         addTrainingMessage(`【为什么好】${analysis.whyGood}`, false, true);
-      }, 400);
+      }, delay);
+      delay += 200;
     }
 
-    if (analysis.whyBetter) {
+    if (analysis.whyBetter && (depthLevel >= 1)) {
       setTimeout(() => {
         addTrainingMessage(`【为什么可以更好】${analysis.whyBetter}`, false, true);
-      }, 600);
+      }, delay);
+      delay += 200;
     }
 
-    if (analysis.suggestion) {
+    if (analysis.suggestion && (depthLevel >= 1)) {
       setTimeout(() => {
         addTrainingMessage(`【应该怎么说】${analysis.suggestion}`, false, true);
-      }, 800);
+      }, delay);
+      delay += 200;
     }
 
     if (analysis.correctAnswer) {
       setTimeout(() => {
-        addTrainingMessage(`✅ 试试这样说：${analysis.correctAnswer}`, false, true);
-      }, 1000);
+        addAnswerHint(analysis.correctAnswer, shouldExpandAnswer, depthLevel);
+      }, delay);
+      delay += 200;
     }
 
-    if (analysis.thinkingUsed) {
+    if (analysis.thinkingUsed && (depthLevel >= 1)) {
       setTimeout(() => {
         addTrainingMessage(`【思路运用】你采用了${analysis.thinkingUsed.type}方向（${analysis.thinkingUsed.label}）`, false, true);
-      }, 1200);
+      }, delay);
     }
 
     setTimeout(() => {
@@ -5352,8 +5634,49 @@ function sendUserMessage() {
       } else {
         continueTrainingFlow(userAnswer, analysis);
       }
-    }, 2000);
+    }, delay + 800);
   }, 800);
+}
+
+function getFavorabilityLevel(favorability) {
+  if (favorability >= 120) return 4;
+  if (favorability >= 80) return 3;
+  if (favorability >= 50) return 2;
+  if (favorability >= 20) return 1;
+  return 0;
+}
+
+function getAnalysisDepth(favorabilityLevel, isMember) {
+  if (isMember) {
+    if (favorabilityLevel >= 3) return 3;
+    if (favorabilityLevel >= 2) return 2;
+    if (favorabilityLevel >= 1) return 1;
+    return 0;
+  }
+  if (favorabilityLevel >= 3) return 3;
+  if (favorabilityLevel >= 2) return 2;
+  return 0;
+}
+
+function addAnswerHint(correctAnswer, shouldExpand, depthLevel) {
+  const msgs = $('training-messages');
+  const div = document.createElement('div');
+  div.className = 'flex justify-center animate-in mb-2';
+
+  if (shouldExpand || depthLevel >= 2) {
+    div.innerHTML = `<div class="max-w-[85%] px-3 py-1.5 bg-green-100 text-green-700 text-xs rounded-lg">✅ 试试这样说：${correctAnswer}</div>`;
+  } else {
+    div.innerHTML = `<div class="max-w-[85%] px-3 py-1.5 bg-green-100 text-green-700 text-xs rounded-lg cursor-pointer hover:bg-green-200 transition-colors" onclick="expandAnswer(this, '${correctAnswer.replace(/'/g, "\\'")}')">✅ 示范回答（点击展开 ▼）</div>`;
+  }
+
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function expandAnswer(element, answer) {
+  element.innerHTML = `✅ 试试这样说：${answer}`;
+  element.classList.remove('cursor-pointer', 'hover:bg-green-200');
+  element.style.cursor = 'default';
 }
 
 function checkContentSafety(text) {
@@ -6468,6 +6791,8 @@ function finishTraining() {
 
   currentTraining.completed = true;
 
+  userData.trainingCount = (userData.trainingCount || 0) + 1;
+
   // 生成情绪日记
   const total = trainingChoices.length || currentTraining.rounds.length;
   const emotionTag = goodCount >= total*0.7 ? '😊' : goodCount >= total*0.4 ? '😐' : '😟';
@@ -6519,9 +6844,129 @@ function finishTraining() {
   const opts = $('training-options');
   if (opts) opts.remove();
 
-  // 显示结果
+  const trainingCount = userData.trainingCount || 1;
+  let analysisLevel = 'basic';
+  let analysisLabel = '';
+
+  if (userData.member !== 'free') {
+    analysisLevel = 'full';
+    analysisLabel = '会员专属完整分析';
+  } else {
+    if (trainingCount === 1) {
+      analysisLevel = 'full';
+      analysisLabel = '新人体验 - 完整分析';
+    } else if (trainingCount >= 2 && trainingCount <= 3) {
+      analysisLevel = 'preview';
+      analysisLabel = '预览模式 - 部分分析';
+    } else {
+      analysisLevel = 'basic';
+      analysisLabel = '基础分析';
+    }
+  }
+
   setTimeout(() => {
     const msgs = $('training-messages');
+
+    const fullAnalysis = `
+      <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 animate-in border border-green-100">
+        <div class="flex items-center justify-between mb-3">
+          <h5 class="text-sm font-semibold text-gray-800">🎯 深度分析报告</h5>
+          <span class="text-xs px-2 py-1 bg-green-100 text-green-600 rounded-full">${analysisLabel}</span>
+        </div>
+        <div class="space-y-3">
+          <div>
+            <div class="text-xs text-gray-500 mb-1">📊 三维评分详情</div>
+            <div class="grid grid-cols-3 gap-2">
+              <div class="bg-white p-2 rounded-lg text-center">
+                <div class="text-lg font-bold text-indigo-600">${Math.floor((netScore + 100) * 0.4)}</div>
+                <div class="text-[10px] text-gray-400">内容完整性</div>
+              </div>
+              <div class="bg-white p-2 rounded-lg text-center">
+                <div class="text-lg font-bold text-purple-600">${Math.floor((netScore + 100) * 0.3)}</div>
+                <div class="text-[10px] text-gray-400">表达得体度</div>
+              </div>
+              <div class="bg-white p-2 rounded-lg text-center">
+                <div class="text-lg font-bold text-pink-600">${Math.floor((netScore + 100) * 0.3)}</div>
+                <div class="text-[10px] text-gray-400">思路匹配度</div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="text-xs text-gray-500 mb-1">💡 改进建议</div>
+            <div class="bg-white p-3 rounded-lg text-sm text-gray-700">
+              ${netScore >= 80 ? '你的表现非常出色！建议尝试更复杂的场景来进一步挑战自己。' :
+                netScore >= 60 ? '整体表现不错，建议在表达细节上多加注意，让回答更有说服力。' :
+                netScore >= 30 ? '还有很大提升空间，建议多参考思考方向提示，尝试不同的表达方式。' :
+                '建议从头开始，仔细阅读思考方向提示，理解每个场景的核心沟通要点。'}
+            </div>
+          </div>
+          <div>
+            <div class="text-xs text-gray-500 mb-1">🎯 下次训练目标</div>
+            <div class="bg-white p-3 rounded-lg text-sm text-gray-700">
+              ${netScore >= 80 ? '挑战高难度场景，突破自我极限' :
+                netScore >= 60 ? '保持稳定发挥，争取三星通关' :
+                netScore >= 30 ? '提升回答质量，达到60分以上' :
+                '熟悉训练流程，掌握基本沟通技巧'}
+            </div>
+          </div>
+        </div>
+      </div>`;
+
+    const previewAnalysis = `
+      <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4 animate-in border border-amber-100">
+        <div class="flex items-center justify-between mb-3">
+          <h5 class="text-sm font-semibold text-gray-800">🎯 分析报告（预览）</h5>
+          <span class="text-xs px-2 py-1 bg-amber-100 text-amber-600 rounded-full">${analysisLabel}</span>
+        </div>
+        <div class="space-y-3">
+          <div>
+            <div class="text-xs text-gray-500 mb-1">📊 核心评分</div>
+            <div class="bg-white p-3 rounded-lg text-center">
+              <div class="text-2xl font-bold text-indigo-600">${trainingScore}</div>
+              <div class="text-xs text-gray-400">综合得分</div>
+            </div>
+          </div>
+          <div class="bg-white/50 p-3 rounded-lg text-sm text-gray-600 text-center">
+            💡 <span class="font-medium">升级会员</span>可查看完整深度分析报告，包括三维评分详情、个性化改进建议和训练目标规划
+          </div>
+          ${timeRewindTickets > 0 ? `
+          <button onclick="unlockFullAnalysis()" class="w-full py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all">
+            🎫 使用1张穿梭券解锁完整分析
+          </button>` : `
+          <div class="text-center text-xs text-gray-400 py-2">穿梭券不足，签到可获取</div>`}
+        </div>
+      </div>`;
+
+    const basicAnalysis = `
+      <div class="bg-gray-50 rounded-xl p-4 animate-in border border-gray-100">
+        <div class="flex items-center justify-between mb-3">
+          <h5 class="text-sm font-semibold text-gray-800">📊 基础分析</h5>
+          <span class="text-xs px-2 py-1 bg-gray-100 text-gray-500 rounded-full">${analysisLabel}</span>
+        </div>
+        <div class="text-center py-4">
+          <div class="text-3xl font-bold text-indigo-600 mb-2">${trainingScore}</div>
+          <div class="text-sm text-gray-600">综合得分</div>
+        </div>
+        <div class="bg-white/50 p-3 rounded-lg text-sm text-gray-600 text-center">
+          💡 <span class="font-medium">升级会员</span>可享受完整深度分析，帮助你更快提升沟通能力
+        </div>
+        ${timeRewindTickets > 0 ? `
+        <button onclick="unlockFullAnalysis()" class="w-full mt-3 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-sm font-medium rounded-lg hover:from-indigo-600 hover:to-purple-600 transition-all">
+          🎫 使用1张穿梭券解锁完整分析
+        </button>` : `
+        <div class="text-center text-xs text-gray-400 py-2 mt-2">穿梭券不足，签到可获取</div>`}
+      </div>`;
+
+    const transitionGuide = trainingCount === 3 && userData.member === 'free' ? `
+      <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-4 text-white animate-in mt-3">
+        <h4 class="font-semibold text-center mb-2">🌟 体验结束</h4>
+        <p class="text-sm text-center mb-3 opacity-90">你已经体验了3次高质量分析</p>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="closeModal('training')" class="py-2 bg-white/20 text-white text-sm font-medium rounded-lg hover:bg-white/30 transition-colors">继续免费训练</button>
+          <button onclick="showModal('member')" class="py-2 bg-white text-indigo-600 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors">升级会员</button>
+        </div>
+      </div>` : '';
+
     msgs.innerHTML = `
       <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-4 text-white animate-in">
         <h4 class="font-semibold text-center mb-2">🎉 训练完成！</h4>
@@ -6599,6 +7044,35 @@ function finishTraining() {
         <button onclick="goToBeautyClub()" class="w-full mt-3 py-2 bg-pink-500 text-white text-xs font-medium rounded-lg hover:bg-pink-600 transition-colors">去悦己颜值社搭配下次</button>
       </div>
 
+      ${analysisLevel === 'full' ? fullAnalysis : analysisLevel === 'preview' ? previewAnalysis : basicAnalysis}
+
+      <!-- 现实行动建议（v2.3新增） -->
+      <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4 animate-in border border-amber-100">
+        <h5 class="text-sm font-semibold text-gray-800 mb-3">💡 现实行动建议</h5>
+        <div class="space-y-3">
+          ${generateActionSuggestions().map((suggestion, idx) => `
+            <div class="bg-white rounded-lg p-3 border border-gray-100">
+              <div class="flex items-start gap-2">
+                <span class="text-amber-500 font-bold">${idx + 1}.</span>
+                <div class="flex-1">
+                  <div class="text-sm font-medium text-gray-800 mb-1">${suggestion.title}</div>
+                  <div class="text-xs text-gray-500 space-y-1">
+                    <div>• <span class="font-medium">做什么：</span>${suggestion.what}</div>
+                    <div>• <span class="font-medium">什么时候：</span>${suggestion.when}</div>
+                    <div>• <span class="font-medium">怎么做：</span>${suggestion.how}</div>
+                  </div>
+                  <button onclick="checkinActionSuggestion(${idx})" class="mt-2 px-3 py-1.5 bg-amber-100 text-amber-600 text-xs font-medium rounded-lg hover:bg-amber-200 transition-colors flex items-center gap-1">
+                    ✅ 记录我的现实练习 (+5积分 +2好感度)
+                  </button>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      ${transitionGuide}
+
       <button onclick="closeModal('training')" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all animate-in">返回训练列表</button>
     `;
     msgs.scrollTop = msgs.scrollHeight;
@@ -6621,6 +7095,75 @@ function checkSceneUnlocks() {
       scene.unlocked = true;
     }
   });
+}
+
+function generateActionSuggestions() {
+  const suggestions = {
+    '相亲模拟': [
+      { title:'本周内主动和一位陌生人开启对话', what:'在日常生活中，主动与一位陌生人开启对话', when:'今天下午或明天上午', how:'可以从赞美对方的穿着或物品开始，例如："你的包很特别，在哪里买的？"' },
+      { title:'练习复述对方的话', what:'在对话中，尝试用自己的话复述对方的观点', when:'每次与人交流时都可以练习', how:'等对方说完后，先说"我理解你的意思是..."然后复述' },
+      { title:'准备3个开放式问题', what:'准备3个可以问任何人的开放式问题', when:'今天晚上花10分钟', how:'避免"是/否"类问题，多用"如何""为什么""什么"开头' }
+    ],
+    '模拟面试': [
+      { title:'梳理3个STAR法则案例', what:'准备3个用STAR法则描述的工作案例', when:'明天花30分钟', how:'每个案例包含：情境(Situation)、任务(Task)、行动(Action)、结果(Result)' },
+      { title:'练习自我介绍', what:'准备一个30秒的自我介绍', when:'今天晚上', how:'包含：姓名、背景、亮点、目标，保持简洁有力' },
+      { title:'准备反问问题', what:'准备3个在面试结束时反问面试官的问题', when:'明天花10分钟', how:'例如："这个团队目前面临的最大挑战是什么？"' }
+    ],
+    '加薪谈判': [
+      { title:'收集数据证据', what:'整理过去一年的工作成果数据', when:'本周内完成', how:'列出具体项目、量化成果、对公司的贡献' },
+      { title:'练习自信表达', what:'对着镜子练习自信的表达方式', when:'今天晚上', how:'注意眼神、姿态和语气，保持坚定但友好' },
+      { title:'了解市场行情', what:'调研同行业同职位的薪资水平', when:'本周内', how:'通过招聘网站、行业报告了解市场薪资范围' }
+    ],
+    '兴趣社群自我介绍': [
+      { title:'加入一个兴趣社群', what:'加入一个你感兴趣的线上或线下社群', when:'本周内', how:'可以是运动、读书、艺术等任何你感兴趣的领域' },
+      { title:'准备30秒社群自我介绍', what:'准备一个适合社群的简短自我介绍', when:'今天花10分钟', how:'包含：名字、兴趣、期待收获' },
+      { title:'主动发起话题', what:'在社群中主动发起一个话题讨论', when:'本周内', how:'选择大家可能感兴趣的话题，例如："最近看了一本好书，推荐给大家"' }
+    ],
+    '被误解(NVC)': [
+      { title:'练习观察而非评论', what:'在日常中练习只描述观察，不做评论', when:'每天练习', how:'把"你总是迟到"改成"本周你迟到了3次"' },
+      { title:'表达感受而非判断', what:'练习表达自己的感受', when:'每次有情绪时', how:'把"你让我很生气"改成"我感到生气，因为..."' },
+      { title:'提出具体请求', what:'练习提出具体的请求而非命令', when:'需要他人配合时', how:'把"你应该..."改成"你可以...吗？"' }
+    ],
+    '共情沟通训练': [
+      { title:'练习倾听', what:'找一个朋友练习深度倾听', when:'本周内', how:'专注听对方说话，不打断，用点头和"嗯"回应' },
+      { title:'练习表达理解', what:'练习表达对他人感受的理解', when:'每次与人交流时', how:'使用"听起来你当时一定很..."这样的句式' },
+      { title:'分享自己的感受', what:'在安全的关系中分享自己的感受', when:'本周内', how:'选择信任的人，分享一件让你有感受的事' }
+    ]
+  };
+
+  const sceneName = currentTraining ? currentTraining.name : '相亲模拟';
+  return suggestions[sceneName] || suggestions['相亲模拟'];
+}
+
+function checkinActionSuggestion(index) {
+  const suggestions = generateActionSuggestions();
+  const suggestion = suggestions[index];
+
+  userData.points = (userData.points || 0) + 5;
+  userData.favorability = (userData.favorability || 0) + 2;
+
+  if (!userData.actionSuggestions) userData.actionSuggestions = [];
+  userData.actionSuggestions.push({
+    id: Date.now(),
+    title: suggestion.title,
+    date: new Date().toLocaleDateString(),
+    checkedIn: true
+  });
+
+  saveData();
+  alert(`🎉 打卡成功！\n+5积分 +2好感度\n\n"${suggestion.title}"已记录`);
+}
+
+function unlockFullAnalysis() {
+  if (timeRewindTickets > 0) {
+    if (confirm('确定使用1张时空穿梭券解锁完整分析报告吗？')) {
+      timeRewindTickets--;
+      saveData();
+      finishTraining();
+    }
+  } else {
+    alert('穿梭券不足，签到可获取！');
+  }
 }
 
 // ===== 成长页 =====
@@ -7072,6 +7615,370 @@ function renderModal(name) {
     $('time-limit-status').textContent = dailyTimeLimit ? dailyTimeLimit + '小时' : '无限制';
     $('continuous-reminder-status').textContent = continuousReminder ? continuousReminder + '分钟' : '已关闭';
     $('continuous-reminder-status').className = 'font-medium ' + (continuousReminder ? 'text-indigo-600' : 'text-gray-400');
+  } else if (name === 'homework') {
+    renderHomework();
+  } else if (name === 'skill-progress') {
+    renderSkillProgress();
+  } else if (name === 'leaderboard') {
+    renderLeaderboard();
+  } else if (name === 'evolution') {
+    renderEvolution();
+  } else if (name === 'notification') {
+    renderNotificationSettings();
+  } else if (name === 'devices') {
+    renderDeviceManagement();
+  }
+}
+
+// ===== 作业系统 =====
+function showHomework() {
+  showModal('homework');
+}
+
+function renderHomework() {
+  const homeworks = userData.homeworks || generateMockHomeworks();
+  $('homework-content').innerHTML = homeworks.length === 0 ? `
+    <div class="text-center py-12">
+      <div class="text-4xl mb-3">📝</div>
+      <p class="text-gray-500 text-sm">暂无作业</p>
+      <p class="text-gray-400 text-xs mt-1">完成训练后教练可能会布置作业</p>
+    </div>` : homeworks.map((hw, i) => `
+    <div class="bg-white rounded-xl p-4 mb-3 shadow-sm border border-gray-100">
+      <div class="flex items-start justify-between mb-2">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-lg">${hw.icon}</span>
+            <span class="font-semibold text-gray-800 text-sm">${hw.title}</span>
+          </div>
+          <span class="text-xs text-gray-400">${hw.category}</span>
+        </div>
+        <span class="text-xs px-2 py-0.5 rounded-full ${hw.status === 'completed' ? 'bg-green-100 text-green-600' : hw.status === 'overdue' ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-600'}">${hw.status === 'completed' ? '已完成' : hw.status === 'overdue' ? '已过期' : '进行中'}</span>
+      </div>
+      <p class="text-sm text-gray-600 mb-3">${hw.description}</p>
+      <div class="flex items-center justify-between text-xs text-gray-400 mb-3">
+        <span>截止时间：${hw.deadline}</span>
+        <span>奖励：+${hw.rewardPoints}积分 +${hw.rewardFavorability}好感度</span>
+      </div>
+      ${hw.status !== 'completed' && hw.status !== 'overdue' ? `
+        <button onclick="completeHomework(${i})" class="w-full py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-sm font-semibold rounded-lg hover:opacity-90 transition-all">完成作业</button>` :
+        hw.status === 'completed' ? `<div class="text-center py-2 text-green-600 text-sm font-medium">✅ 已完成</div>` : `<div class="text-center py-2 text-gray-400 text-sm">⏰ 已过期</div>`}
+    </div>`).join('');
+}
+
+function generateMockHomeworks() {
+  return [
+    { id:1, icon:'💬', title:'主动赞美练习', category:'沟通技巧', description:'在现实生活中，主动赞美一位同事或朋友，具体赞美TA的某个优点', deadline:'今天 23:59', status:'in_progress', rewardPoints:10, rewardFavorability:3 },
+    { id:2, icon:'🤝', title:'开放式提问', category:'倾听技巧', description:'与人聊天时，尝试用3个开放式问题代替封闭式问题', deadline:'明天 23:59', status:'in_progress', rewardPoints:10, rewardFavorability:3 },
+    { id:3, icon:'😌', title:'情绪觉察记录', category:'情绪管理', description:'记录一次你成功控制情绪的时刻，分析当时的感受和应对方式', deadline:'后天 23:59', status:'in_progress', rewardPoints:15, rewardFavorability:5 },
+    { id:4, icon:'💌', title:'感谢短信', category:'人际关系', description:'给一位帮助过你的人发一条感谢短信', deadline:'3天后', status:'completed', rewardPoints:8, rewardFavorability:2 }
+  ];
+}
+
+function completeHomework(index) {
+  if (!userData.homeworks) userData.homeworks = generateMockHomeworks();
+  userData.homeworks[index].status = 'completed';
+  userData.points += userData.homeworks[index].rewardPoints;
+  userData.favorability = (userData.favorability || 0) + userData.homeworks[index].rewardFavorability;
+  saveData();
+  renderHomework();
+  alert(`🎉 作业完成！获得 ${userData.homeworks[index].rewardPoints} 积分 + ${userData.homeworks[index].rewardFavorability} 好感度`);
+}
+
+// ===== 技能点进度 =====
+function showSkillProgress() {
+  showModal('skill-progress');
+}
+
+function renderSkillProgress() {
+  const skills = [
+    { name:'沟通力', value:abilityStats.communication || 65, icon:'💬', color:'indigo' },
+    { name:'表达力', value:abilityStats.expression || 55, icon:'🎤', color:'purple' },
+    { name:'共情力', value:abilityStats.empathy || 70, icon:'❤️', color:'pink' },
+    { name:'情绪控制', value:abilityStats.emotionControl || 50, icon:'🧘', color:'green' },
+    { name:'应变力', value:abilityStats.adaptability || 45, icon:'⚡', color:'orange' }
+  ];
+
+  $('skill-progress-content').innerHTML = `
+    <div class="space-y-4">
+      ${skills.map(s => {
+        const level = s.value >= 80 ? '精通' : s.value >= 60 ? '掌握' : s.value >= 40 ? '入门' : '初学';
+        return `
+        <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <span class="text-lg">${s.icon}</span>
+              <span class="font-semibold text-gray-800">${s.name}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-bold text-${s.color}-600">${s.value}</span>
+              <span class="text-xs px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full">${level}</span>
+            </div>
+          </div>
+          <div class="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-${s.color}-400 to-${s.color}-600 rounded-full transition-all duration-500" style="width:${s.value}%"></div>
+          </div>
+          <p class="text-xs text-gray-400 mt-2">${getSkillTip(s.name, s.value)}</p>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+function getSkillTip(skill, value) {
+  const tips = {
+    '沟通力': value < 40 ? '多练习主动开启话题' : value < 60 ? '尝试更多开放式提问' : value < 80 ? '注意倾听对方的潜台词' : '你的沟通能力很强！',
+    '表达力': value < 40 ? '多练习清晰表达观点' : value < 60 ? '尝试用具体例子说明' : value < 80 ? '注意语言的节奏感' : '你的表达很有感染力！',
+    '共情力': value < 40 ? '多练习换位思考' : value < 60 ? '尝试说出对方的感受' : value < 80 ? '注意肢体语言的配合' : '你很善于理解他人！',
+    '情绪控制': value < 40 ? '遇到情绪时先深呼吸' : value < 60 ? '尝试延迟回应' : value < 80 ? '学会识别情绪信号' : '你的情绪管理能力很棒！',
+    '应变力': value < 40 ? '多做即兴练习' : value < 60 ? '尝试提前准备Plan B' : value < 80 ? '学会快速分析场景' : '你很善于随机应变！'
+  };
+  return tips[skill] || '继续加油！';
+}
+
+// ===== 好友排行榜 =====
+function showLeaderboard() {
+  showModal('leaderboard');
+}
+
+function renderLeaderboard() {
+  const friends = generateMockFriends();
+  const userRank = friends.findIndex(f => f.id === 'user') + 1;
+
+  $('leaderboard-content').innerHTML = `
+    <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4 mb-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-xs text-gray-500">我的排名</p>
+          <p class="text-2xl font-bold text-amber-600">第 ${userRank} 名</p>
+        </div>
+        <div class="text-right">
+          <p class="text-xs text-gray-500">积分</p>
+          <p class="text-xl font-semibold text-gray-800">${userData.points}</p>
+        </div>
+      </div>
+    </div>
+    <div class="space-y-3">
+      ${friends.map((f, i) => {
+        const isUser = f.id === 'user';
+        return `
+        <div class="flex items-center gap-3 p-3 rounded-xl ${isUser ? 'bg-indigo-50 border border-indigo-200' : 'bg-white border border-gray-100'}">
+          <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${i === 0 ? 'bg-yellow-400 text-white' : i === 1 ? 'bg-gray-300 text-white' : i === 2 ? 'bg-amber-600 text-white' : 'bg-gray-100 text-gray-500'}">${i + 1}</div>
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white font-bold">${f.name.charAt(0)}</div>
+          <div class="flex-1">
+            <div class="font-medium text-gray-800 text-sm">${f.name} ${isUser ? '<span class="text-xs text-indigo-600">（我）</span>' : ''}</div>
+            <div class="text-xs text-gray-400">${f.level}</div>
+          </div>
+          <div class="text-right">
+            <div class="font-semibold text-gray-800">${f.points}</div>
+            <div class="text-xs text-gray-400">${f.trainingCount}次训练</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+function generateMockFriends() {
+  return [
+    { id:'1', name:'小明', level:'大师学员', points:980, trainingCount:45 },
+    { id:'2', name:'小红', level:'钻石学员', points:850, trainingCount:38 },
+    { id:'3', name:'小李', level:'铂金学员', points:720, trainingCount:32 },
+    { id:'user', name:userData.nickname, level:getLevel(userData.points).name, points:userData.points, trainingCount:userData.trainingCount || 15 },
+    { id:'4', name:'小王', level:'黄金学员', points:580, trainingCount:25 },
+    { id:'5', name:'小张', level:'黄金学员', points:490, trainingCount:20 },
+    { id:'6', name:'小陈', level:'白银学员', points:350, trainingCount:12 },
+    { id:'7', name:'小刘', level:'白银学员', points:280, trainingCount:8 },
+    { id:'8', name:'小赵', level:'青铜学员', points:150, trainingCount:5 },
+    { id:'9', name:'小孙', level:'青铜学员', points:90, trainingCount:3 }
+  ].sort((a, b) => b.points - a.points);
+}
+
+// ===== 进化史 =====
+function showEvolution() {
+  showModal('evolution');
+}
+
+function renderEvolution() {
+  const history = generateMockEvolutionHistory();
+
+  $('evolution-content').innerHTML = `
+    <div class="relative">
+      <div class="absolute left-[27px] top-0 bottom-0 w-0.5 bg-gray-200"></div>
+      <div class="space-y-6">
+        ${history.map((item, i) => `
+        <div class="relative flex gap-4">
+          <div class="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 ${item.type === 'achievement' ? 'bg-yellow-100 text-yellow-600' : item.type === 'level' ? 'bg-indigo-100 text-indigo-600' : item.type === 'training' ? 'bg-green-100 text-green-600' : 'bg-purple-100 text-purple-600'}">
+            <span class="text-xl">${item.icon}</span>
+          </div>
+          <div class="flex-1 bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+            <div class="flex items-center justify-between mb-1">
+              <h4 class="font-semibold text-gray-800">${item.title}</h4>
+              <span class="text-xs text-gray-400">${item.date}</span>
+            </div>
+            <p class="text-sm text-gray-600">${item.description}</p>
+            ${item.stats ? `<div class="mt-2 flex gap-3 text-xs">${item.stats.map(s => `<span class="text-${s.color}-600">${s.label}: ${s.value}</span>`).join('')}</div>` : ''}
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function generateMockEvolutionHistory() {
+  return [
+    { id:1, type:'level', icon:'⭐', title:'晋升钻石学员', date:'3天前', description:'累计积分达到600分，成功晋升钻石学员！', stats:[{ label:'当前积分', value:userData.points, color:'indigo' },{ label:'训练次数', value:userData.trainingCount || 15, color:'green' }] },
+    { id:2, type:'achievement', icon:'🏆', title:'连续签到7天', date:'5天前', description:'坚持每天签到，获得连续签到奖励！', stats:[{ label:'获得积分', value:'+30', color:'green' },{ label:'获得穿梭券', value:'+3张', color:'amber' }] },
+    { id:3, type:'training', icon:'🎯', title:'完成第10次训练', date:'1周前', description:'累计完成10次场景训练，社交能力稳步提升', stats:[{ label:'平均评分', value:'78分', color:'purple' },{ label:'好感度', value:'Lv.2', color:'pink' }] },
+    { id:4, type:'level', icon:'⭐', title:'晋升铂金学员', date:'2周前', description:'累计积分达到400分，成功晋升铂金学员！', stats:[{ label:'当前积分', value:'400', color:'indigo' }] },
+    { id:5, type:'achievement', icon:'💎', title:'首次三星通关', date:'2周前', description:'在「相亲模拟」场景中首次获得三星评价！', stats:[{ label:'评分', value:'95分', color:'green' },{ label:'获得积分', value:'+20', color:'green' }] },
+    { id:6, type:'training', icon:'💬', title:'完成第1次训练', date:'1个月前', description:'开始你的第一次社交训练之旅', stats:[{ label:'场景', value:'相亲模拟', color:'purple' }] },
+    { id:7, type:'achievement', icon:'🚀', title:'注册并登录', date:'1个月前', description:'欢迎加入对练社交！开启你的社交成长之旅', stats:[] }
+  ];
+}
+
+// ===== 推送通知设置 =====
+function showNotificationSettings() {
+  showModal('notification');
+}
+
+function renderNotificationSettings() {
+  const settings = userData.notificationSettings || {
+    trainingReminder: true,
+    memberExpiry: true,
+    achievement: true,
+    homeworkReminder: true,
+    sceneUpdate: true,
+    goodnight: false,
+    weeklyReport: true,
+    friendActivity: false,
+    maxDaily: 3
+  };
+
+  $('notification-content').innerHTML = `
+    <div class="space-y-4">
+      <div class="bg-gray-50 rounded-xl p-3">
+        <p class="text-xs text-gray-500">每日推送上限</p>
+        <div class="flex gap-2 mt-2">
+          ${[1, 3, 5].map(n => `<button onclick="updateNotificationLimit(${n})" class="flex-1 py-2 rounded-lg text-sm font-medium transition-all ${settings.maxDaily === n ? 'bg-indigo-500 text-white' : 'bg-white text-gray-600 border border-gray-200'}">${n}条</button>`).join('')}
+        </div>
+      </div>
+
+      ${[
+        { key:'trainingReminder', label:'训练提醒', desc:'3天未登录时提醒', icon:'📅' },
+        { key:'memberExpiry', label:'会员到期', desc:'到期前3天提醒续费', icon:'💳' },
+        { key:'achievement', label:'成就解锁', desc:'达成新成就时通知', icon:'🏆' },
+        { key:'homeworkReminder', label:'作业提醒', desc:'作业即将过期时提醒', icon:'📝' },
+        { key:'sceneUpdate', label:'场景更新', desc:'新场景上架通知', icon:'✨' },
+        { key:'goodnight', label:'晚安计划', desc:'每晚9点教练语音晚安（会员）', icon:'🌙' },
+        { key:'weeklyReport', label:'每周报告', desc:'每周一8点发送训练报告', icon:'📊' },
+        { key:'friendActivity', label:'好友动态', desc:'好友完成训练时通知', icon:'👥' }
+      ].map(item => `
+        <div class="flex items-center justify-between p-4 bg-white rounded-xl border border-gray-100">
+          <div class="flex items-center gap-3">
+            <span class="text-lg">${item.icon}</span>
+            <div>
+              <div class="font-medium text-gray-800 text-sm">${item.label}</div>
+              <div class="text-xs text-gray-400">${item.desc}</div>
+            </div>
+          </div>
+          <button onclick="toggleNotification('${item.key}')" class="w-11 h-6 rounded-full transition-all relative ${settings[item.key] ? 'bg-indigo-500' : 'bg-gray-200'}">
+            <div class="w-5 h-5 bg-white rounded-full absolute top-0.5 transition-all ${settings[item.key] ? 'left-5.5' : 'left-0.5'}"></div>
+          </button>
+        </div>`).join('')}
+    </div>`;
+}
+
+function toggleNotification(key) {
+  if (!userData.notificationSettings) userData.notificationSettings = {
+    trainingReminder: true, memberExpiry: true, achievement: true, homeworkReminder: true,
+    sceneUpdate: true, goodnight: false, weeklyReport: true, friendActivity: false, maxDaily: 3
+  };
+  userData.notificationSettings[key] = !userData.notificationSettings[key];
+  saveData();
+  renderNotificationSettings();
+}
+
+function updateNotificationLimit(limit) {
+  if (!userData.notificationSettings) userData.notificationSettings = {};
+  userData.notificationSettings.maxDaily = limit;
+  saveData();
+  renderNotificationSettings();
+}
+
+// ===== 设备管理 =====
+function showDeviceManagement() {
+  showModal('devices');
+}
+
+function renderDeviceManagement() {
+  if (!userData.devices) {
+    userData.devices = generateMockDevices();
+    saveData();
+  }
+
+  const devices = userData.devices;
+  const currentDeviceId = userData.currentDeviceId || devices[0]?.id;
+
+  $('devices-content').innerHTML = `
+    <div class="space-y-4">
+      <div class="bg-amber-50 rounded-xl p-3">
+        <p class="text-xs text-amber-600">💡 同一账号最多登录3台设备，超过后将自动下线最早登录的设备</p>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="text-sm font-medium text-gray-700">登录设备 (${devices.length}/3)</span>
+        <span class="text-xs text-gray-400">最多3台</span>
+      </div>
+      ${devices.map((device, index) => `
+        <div class="bg-white rounded-xl p-4 shadow-sm border ${device.id === currentDeviceId ? 'border-indigo-200 bg-indigo-50/50' : 'border-gray-100'}">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <span class="text-xl">${device.platform === 'ios' ? '📱' : device.platform === 'android' ? '🤖' : '🖥️'}</span>
+              <div>
+                <div class="font-medium text-gray-800 text-sm">${device.name}</div>
+                <div class="text-xs text-gray-400">${device.platform === 'ios' ? 'iPhone' : device.platform === 'android' ? 'Android' : '电脑'} · ${device.systemVersion}</div>
+              </div>
+            </div>
+            ${device.id === currentDeviceId ? '<span class="text-xs px-2 py-0.5 bg-indigo-100 text-indigo-600 rounded-full">当前设备</span>' : ''}
+          </div>
+          <div class="flex items-center justify-between text-xs text-gray-400">
+            <span>最近活跃：${device.lastActive}</span>
+            ${device.id !== currentDeviceId ? `<button onclick="removeDevice(${index})" class="text-red-500 hover:text-red-600">下线此设备</button>` : '<span class="text-gray-300">不可下线当前设备</span>'}
+          </div>
+        </div>
+      `).join('')}
+      <div class="bg-gray-50 rounded-xl p-4">
+        <h4 class="text-sm font-medium text-gray-700 mb-2">多端同步设置</h4>
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <div class="text-xs text-gray-600">训练数据同步</div>
+            <div class="text-[10px] text-gray-400">训练记录、积分、好感度实时同步</div>
+          </div>
+          <span class="text-green-500 text-xs">✅ 已开启</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="text-xs text-gray-600">离线数据处理</div>
+            <div class="text-[10px] text-gray-400">离线训练自动保存，联网后同步</div>
+          </div>
+          <span class="text-green-500 text-xs">✅ 已开启</span>
+        </div>
+      </div>
+    </div>`;
+}
+
+function generateMockDevices() {
+  return [
+    { id:'d1', name:'iPhone 15 Pro', platform:'ios', systemVersion:'iOS 18', lastActive:'刚刚' },
+    { id:'d2', name:'华为 Mate 60', platform:'android', systemVersion:'HarmonyOS 4', lastActive:'2小时前' },
+    { id:'d3', name:'办公电脑', platform:'web', systemVersion:'Windows 11', lastActive:'昨天' }
+  ];
+}
+
+function removeDevice(index) {
+  if (!userData.devices) return;
+  const device = userData.devices[index];
+  if (confirm(`确定要下线设备「${device.name}」吗？该设备将需要重新登录。`)) {
+    userData.devices.splice(index, 1);
+    saveData();
+    renderDeviceManagement();
+    alert(`✅ 设备「${device.name}」已下线`);
   }
 }
 
@@ -7364,7 +8271,10 @@ function renderCards() {
         </div>
         ${!collectedCards.find(c2 => c2.id===c.id)
           ? `<button onclick="collectCard(${c.id})" class="w-full mt-2 py-2 bg-indigo-100 text-indigo-600 text-sm rounded-lg hover:bg-indigo-200 transition-colors">+ 收藏</button>`
-          : `<button onclick="removeCard(${c.id})" class="w-full mt-2 py-2 bg-gray-100 text-gray-500 text-sm rounded-lg hover:bg-gray-200 transition-colors">取消收藏</button>`}
+          : `<div class="mt-2 space-y-1">
+              <button onclick="removeCard(${c.id})" class="w-full py-2 bg-gray-100 text-gray-500 text-sm rounded-lg hover:bg-gray-200 transition-colors">取消收藏</button>
+              <button onclick="startCardReview(${c.id})" class="w-full py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-sm font-medium rounded-lg hover:from-green-600 hover:to-emerald-700 transition-colors">📖 开始复习 (+1好感度 +5积分)</button>
+            </div>`}
       </div>`).join('')
     : '<div class="text-center py-8 text-gray-400 text-sm">该分类暂无卡片</div>';
 }
@@ -7382,6 +8292,543 @@ function removeCard(id) {
   collectedCards = collectedCards.filter(c => c.id!==id);
   saveData();
   renderCards();
+}
+
+// ===== 学习卡片复习功能 =====
+let currentReviewCard = null;
+let currentReviewQuestionIndex = 0;
+let reviewAnswers = [];
+
+function startCardReview(cardId) {
+  const card = learningCards.find(c => c.id === cardId);
+  if (!card) return;
+
+  const reviewProgress = userData.cardReviewProgress || {};
+  if (reviewProgress[cardId] && reviewProgress[cardId] >= 3) {
+    alert('该卡片已复习3次，达到复习上限');
+    return;
+  }
+
+  currentReviewCard = card;
+  currentReviewQuestionIndex = 0;
+  reviewAnswers = [];
+
+  $('modal-card-review').style.display = 'flex';
+  renderCardReviewQuestion();
+}
+
+function renderCardReviewQuestion() {
+  const card = currentReviewCard;
+  const questions = generateCardQuestions(card);
+  const question = questions[currentReviewQuestionIndex];
+
+  $('card-review-content').innerHTML = `
+    <div class="space-y-4">
+      <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border border-green-100">
+        <div class="flex items-center justify-between mb-2">
+          <span class="px-2 py-0.5 bg-green-100 text-green-600 text-xs rounded-full">${card.category}</span>
+          <span class="text-xs text-gray-400">第 ${currentReviewQuestionIndex + 1}/${questions.length} 题</span>
+        </div>
+        <h4 class="font-semibold text-gray-800">${card.title}</h4>
+      </div>
+
+      <div class="bg-white rounded-xl p-4 shadow-sm">
+        <div class="text-sm font-medium text-gray-800 mb-4">${question.question}</div>
+        <div class="space-y-2">
+          ${question.options.map((opt, idx) => `
+            <button onclick="submitReviewAnswer(${idx})" class="w-full text-left px-4 py-3 bg-gray-50 rounded-lg text-sm hover:bg-green-50 hover:border-green-200 border border-transparent transition-all flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-white border border-gray-200 flex items-center justify-center text-xs font-medium">${String.fromCharCode(65 + idx)}</span>
+              <span>${opt}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+
+      <div class="bg-amber-50 rounded-xl p-3">
+        <p class="text-xs text-amber-600">💡 提示：回答正确可获得奖励积分</p>
+      </div>
+    </div>
+  `;
+}
+
+function generateCardQuestions(card) {
+  const questionTemplates = {
+    '破冰技巧': [
+      { question:'初次见面时，以下哪种方式最适合开启话题？', options:['直接问对方收入', '从环境切入，赞美对方的选择', '保持沉默等待对方开口'], answer:1 },
+      { question:'以下哪个问题属于开放式问题？', options:['你喜欢旅游吗？', '你印象最深的一次旅行是去哪里？', '你去过北京吗？'], answer:1 },
+      { question:'初次见面时，应该避免哪些话题？', options:['兴趣爱好', '天气和环境', '收入、年龄、婚姻状况'], answer:2 }
+    ],
+    '积极倾听': [
+      { question:'积极倾听不包括以下哪一项？', options:['保持眼神接触', '适时点头回应', '急于表达自己的观点'], answer:2 },
+      { question:'当对方说话时，以下哪种做法是正确的？', options:['频繁打断对方', '专注倾听并用"嗯"鼓励对方', '一直看手机'], answer:1 },
+      { question:'倾听的目的是什么？', options:['等待说话机会', '理解对方的感受和观点', '找出对方的错误'], answer:1 }
+    ],
+    '开放式提问': [
+      { question:'以下哪个词不适合用于开放式问题？', options:['如何', '为什么', '是不是'], answer:2 },
+      { question:'开放式问题的好处是什么？', options:['回答简短', '让对话更深入', '容易控制话题'], answer:1 },
+      { question:'从对方兴趣入手提问的好处是？', options:['让对方感到被关注', '显得自己很聪明', '可以主导对话'], answer:0 }
+    ],
+    '情绪识别': [
+      { question:'情绪识别主要通过哪些方面？', options:['对方的穿着', '表情、语气、肢体语言', '对方的名字'], answer:1 },
+      { question:'观察微表情的目的是什么？', options:['评价对方的长相', '了解对方真实的情绪', '找对方的缺点'], answer:1 },
+      { question:'当对方语速加快时，可能表示什么情绪？', options:['放松', '紧张或激动', '无聊'], answer:1 }
+    ],
+    '赞美技巧': [
+      { question:'真诚赞美应该具备什么特点？', options:['夸张和泛泛而谈', '具体描述优点', '只赞美外貌'], answer:1 },
+      { question:'以下哪种赞美方式更好？', options:['你真棒！', '你今天的报告很清晰，数据很有说服力', '你长得真漂亮'], answer:1 },
+      { question:'赞美努力而非天赋的好处是？', options:['显得更真诚', '可能让对方骄傲', '没什么区别'], answer:0 }
+    ],
+    '冷场处理': [
+      { question:'遇到冷场时，以下哪种做法最不合适？', options:['主动提出新话题', '幽默化解尴尬', '指责对方不说话'], answer:2 },
+      { question:'准备备用话题的好处是？', options:['避免冷场', '显得自己话多', '让对方感到压力'], answer:0 },
+      { question:'大方承认冷场的好处是？', options:['让对方尴尬', '缓解紧张气氛', '显得自己很笨'], answer:1 }
+    ]
+  };
+
+  return questionTemplates[card.title] || questionTemplates['破冰技巧'];
+}
+
+function submitReviewAnswer(answerIndex) {
+  const card = currentReviewCard;
+  const questions = generateCardQuestions(card);
+  const question = questions[currentReviewQuestionIndex];
+
+  reviewAnswers.push({
+    question: question.question,
+    userAnswer: answerIndex,
+    correctAnswer: question.answer,
+    isCorrect: answerIndex === question.answer
+  });
+
+  const isCorrect = answerIndex === question.answer;
+  const feedback = isCorrect ? '✅ 回答正确！' : `❌ 回答错误，正确答案是 ${String.fromCharCode(65 + question.answer)}`;
+
+  alert(feedback);
+
+  currentReviewQuestionIndex++;
+
+  if (currentReviewQuestionIndex >= questions.length) {
+    finishCardReview();
+  } else {
+    renderCardReviewQuestion();
+  }
+}
+
+function finishCardReview() {
+  const card = currentReviewCard;
+  const correctCount = reviewAnswers.filter(a => a.isCorrect).length;
+  const totalQuestions = reviewAnswers.length;
+  const mastery = Math.round((correctCount / totalQuestions) * 100);
+
+  if (!userData.cardReviewProgress) userData.cardReviewProgress = {};
+  userData.cardReviewProgress[card.id] = (userData.cardReviewProgress[card.id] || 0) + 1;
+
+  if (!userData.cardMastery) userData.cardMastery = {};
+  userData.cardMastery[card.id] = Math.max(userData.cardMastery[card.id] || 0, mastery);
+
+  userData.points = (userData.points || 0) + 5;
+  userData.favorability = (userData.favorability || 0) + 1;
+
+  saveData();
+
+  let masteryLevel = '未掌握';
+  let masteryColor = 'text-red-500';
+  if (mastery >= 81) { masteryLevel = '精通'; masteryColor = 'text-green-600'; }
+  else if (mastery >= 61) { masteryLevel = '熟练掌握'; masteryColor = 'text-blue-600'; }
+  else if (mastery >= 31) { masteryLevel = '初步掌握'; masteryColor = 'text-amber-600'; }
+
+  $('card-review-content').innerHTML = `
+    <div class="text-center py-8">
+      <div class="text-6xl mb-4">🎓</div>
+      <h4 class="text-xl font-bold text-gray-800 mb-2">复习完成！</h4>
+      <p class="text-sm text-gray-500 mb-6">卡片「${card.title}」复习结束</p>
+
+      <div class="bg-white rounded-xl p-6 shadow-sm mb-6">
+        <div class="grid grid-cols-3 gap-4 mb-4">
+          <div>
+            <div class="text-2xl font-bold text-green-600">${correctCount}/${totalQuestions}</div>
+            <div class="text-xs text-gray-400">答对题数</div>
+          </div>
+          <div>
+            <div class="text-2xl font-bold text-indigo-600">+5</div>
+            <div class="text-xs text-gray-400">积分奖励</div>
+          </div>
+          <div>
+            <div class="text-2xl font-bold text-pink-600">+1</div>
+            <div class="text-xs text-gray-400">好感度</div>
+          </div>
+        </div>
+        <div>
+          <div class="flex justify-between text-sm mb-2">
+            <span class="text-gray-500">掌握度</span>
+            <span class="font-medium ${masteryColor}">${masteryLevel} (${mastery}%)</span>
+          </div>
+          <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full rounded-full transition-all" style="width:${mastery}%; background:${mastery >= 81 ? '#22c55e' : mastery >= 61 ? '#3b82f6' : mastery >= 31 ? '#f97316' : '#ef4444'}"></div>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="closeModal('card-review'); showCards()" class="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all">完成复习</button>
+    </div>
+  `;
+}
+
+// ===== 模板市场评分和评论功能 =====
+let currentReviewTemplateId = null;
+
+function getTemplateRatings(templateId) {
+  if (!userData.templateRatings) userData.templateRatings = {};
+  return userData.templateRatings[templateId] || [];
+}
+
+function renderStars(rating) {
+  if (isNaN(rating) || rating <= 0) return '☆☆☆☆☆';
+  let stars = '';
+  for (let i = 1; i <= 5; i++) {
+    stars += i <= Math.round(rating) ? '⭐' : '☆';
+  }
+  return stars;
+}
+
+function showTemplateReviews(templateId) {
+  currentReviewTemplateId = templateId;
+  $('modal-template-reviews').style.display = 'flex';
+  renderTemplateReviews();
+}
+
+function renderTemplateReviews() {
+  const template = templateScenes.find(s => s.id === currentReviewTemplateId);
+  const ratings = getTemplateRatings(currentReviewTemplateId);
+  const avgRating = ratings.length > 0 ? (ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length).toFixed(1) : '暂无评分';
+
+  $('template-reviews-content').innerHTML = `
+    <div class="space-y-4">
+      <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 border border-indigo-100">
+        <div class="flex items-center gap-3">
+          <span class="text-3xl">${template.icon}</span>
+          <div>
+            <h4 class="font-semibold text-gray-800">${template.name}</h4>
+            <p class="text-xs text-gray-500">平均评分：${renderStars(parseFloat(avgRating))} ${avgRating}（${ratings.length}条评价）</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl p-4 shadow-sm">
+        <h5 class="text-sm font-semibold text-gray-800 mb-3">发表评价</h5>
+        <div class="space-y-3">
+          <div>
+            <label class="text-xs text-gray-500 mb-1 block">评分</label>
+            <div class="flex gap-1">
+              ${[1,2,3,4,5].map(i => `
+                <button onclick="selectRating(${i})" class="text-2xl hover:scale-110 transition-transform" id="rating-star-${i}">☆</button>
+              `).join('')}
+            </div>
+          </div>
+          <div>
+            <label class="text-xs text-gray-500 mb-1 block">评价内容</label>
+            <textarea id="review-content" class="w-full h-24 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-indigo-400 resize-none" placeholder="说说你对这个模板的看法..."></textarea>
+          </div>
+          <button onclick="submitReview()" class="w-full py-2 bg-gradient-to-r from-orange-500 to-amber-600 text-white text-sm font-medium rounded-lg hover:from-orange-600 hover:to-amber-700 transition-all">发布评价</button>
+        </div>
+      </div>
+
+      <div>
+        <h5 class="text-sm font-semibold text-gray-800 mb-3">用户评价（${ratings.length}条）</h5>
+        ${ratings.length === 0 ? '<div class="text-center py-8 text-gray-400 text-sm">暂无评价，快来发表第一条吧！</div>' : `
+          <div class="space-y-3">
+            ${ratings.map(r => `
+              <div class="bg-white rounded-xl p-4 shadow-sm">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-sm font-medium text-gray-700">${r.userName || '用户'}</span>
+                  <span class="flex items-center gap-1 text-xs text-orange-500">${renderStars(r.rating)} ${r.rating}分</span>
+                </div>
+                <p class="text-sm text-gray-600">${r.content}</p>
+                <p class="text-xs text-gray-400 mt-2">${r.date}</p>
+              </div>
+            `).join('')}
+          </div>
+        `}
+      </div>
+    </div>
+  `;
+
+  if (userData.lastTemplateRating && userData.lastTemplateRating[currentReviewTemplateId]) {
+    selectRating(userData.lastTemplateRating[currentReviewTemplateId]);
+  }
+}
+
+let selectedRating = 0;
+
+function selectRating(rating) {
+  selectedRating = rating;
+  for (let i = 1; i <= 5; i++) {
+    const star = $(`rating-star-${i}`);
+    star.textContent = i <= rating ? '⭐' : '☆';
+  }
+}
+
+function submitReview() {
+  if (selectedRating === 0) {
+    alert('请选择评分');
+    return;
+  }
+
+  const content = $('review-content').value.trim();
+  if (!content) {
+    alert('请输入评价内容');
+    return;
+  }
+
+  if (!userData.templateRatings) userData.templateRatings = {};
+  if (!userData.templateRatings[currentReviewTemplateId]) userData.templateRatings[currentReviewTemplateId] = [];
+
+  userData.templateRatings[currentReviewTemplateId].unshift({
+    id: Date.now(),
+    rating: selectedRating,
+    content: content,
+    userName: userData.nickname || '用户',
+    date: new Date().toLocaleString(),
+    status: 'pending'
+  });
+
+  if (!userData.lastTemplateRating) userData.lastTemplateRating = {};
+  userData.lastTemplateRating[currentReviewTemplateId] = selectedRating;
+
+  saveData();
+
+  alert('✅ 评价已发布！\n\n评价将在审核通过后显示，感谢您的反馈。');
+  renderTemplateReviews();
+}
+
+// ===== 客服与反馈功能 =====
+function showCustomerService() {
+  $('modal-cs').style.display = 'flex';
+  renderCSHome();
+}
+
+function renderCSHome() {
+  $('cs-content').innerHTML = `
+    <div class="space-y-4">
+      <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 border border-indigo-100">
+        <div class="flex items-center gap-3">
+          <span class="text-3xl">💬</span>
+          <div>
+            <h4 class="font-semibold text-gray-800">有什么可以帮你的？</h4>
+            <p class="text-xs text-gray-500">客服响应时间：工作日 9:00-21:00，2小时内回复</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <button onclick="renderCSFAQ()" class="bg-white rounded-xl p-4 shadow-sm flex flex-col items-center gap-2 hover:bg-gray-50 transition-colors">
+          <span class="text-2xl">📚</span>
+          <span class="text-sm font-medium text-gray-700">常见问题</span>
+        </button>
+        <button onclick="renderCSOnline()" class="bg-white rounded-xl p-4 shadow-sm flex flex-col items-center gap-2 hover:bg-gray-50 transition-colors">
+          <span class="text-2xl">💬</span>
+          <span class="text-sm font-medium text-gray-700">在线客服</span>
+        </button>
+        <button onclick="renderCSFeedback()" class="bg-white rounded-xl p-4 shadow-sm flex flex-col items-center gap-2 hover:bg-gray-50 transition-colors">
+          <span class="text-2xl">📝</span>
+          <span class="text-sm font-medium text-gray-700">意见反馈</span>
+        </button>
+        <button onclick="renderCSAbout()" class="bg-white rounded-xl p-4 shadow-sm flex flex-col items-center gap-2 hover:bg-gray-50 transition-colors">
+          <span class="text-2xl">ℹ️</span>
+          <span class="text-sm font-medium text-gray-700">关于我们</span>
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function renderCSFAQ() {
+  const faqs = [
+    { q:'如何获取时空穿梭券？', a:'时空穿梭券可以通过每日签到、连续签到奖励、会员权益、积分兑换等方式获取。每日签到可获得1张，连续签到第7天额外获得3张。' },
+    { q:'会员有哪些权益？', a:'会员享有无限训练次数、全部场景解锁、专属教练渲染、双倍积分等权益。不同等级会员权益不同，详情可查看会员页面。' },
+    { q:'如何切换教练？', a:'在"我的"页面点击"教练设置"，选择"切换教练"。免费用户每月限切换1次，会员不限次数。切换后有72小时冷却期。' },
+    { q:'训练积分有什么用？', a:'训练积分可用于解锁新场景、兑换道具、升级会员等。积分可通过完成训练、签到、分享等方式获取。' },
+    { q:'如何注销账号？', a:'在"我的"页面找到"账号设置"，选择"注销账号"。注销申请提交后有7天冷静期，期间可随时撤销。' },
+    { q:'支持多设备同步吗？', a:'支持。在设置中开启"多端同步"，系统会自动同步您的训练记录、积分和进度。数据以最后修改时间为准。' },
+    { q:'学习卡片如何使用？', a:'完成训练后可获得学习卡片，点击卡片查看详细内容。收藏的卡片可在学习卡片库中查看，还可以通过复习功能巩固知识点。' },
+    { q:'自定义场景如何审核？', a:'自定义场景提交后，系统会先进行敏感词过滤，然后由人工抽样审核。审核通过后场景会对所有用户开放。' }
+  ];
+
+  $('cs-content').innerHTML = `
+    <div class="space-y-3">
+      <button onclick="renderCSHome()" class="flex items-center gap-2 text-sm text-indigo-600 mb-2">
+        ← 返回
+      </button>
+      <h4 class="font-semibold text-gray-800 mb-3">📚 常见问题</h4>
+      ${faqs.map((faq, idx) => `
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+          <button onclick="toggleFAQ(${idx})" class="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors text-left">
+            <span class="text-sm font-medium text-gray-700">${faq.q}</span>
+            <span class="text-gray-400 text-xs" id="faq-icon-${idx}">▼</span>
+          </button>
+          <div id="faq-content-${idx}" class="hidden px-4 pb-4">
+            <p class="text-sm text-gray-600">${faq.a}</p>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function toggleFAQ(idx) {
+  const content = $(`faq-content-${idx}`);
+  const icon = $(`faq-icon-${idx}`);
+  if (content.classList.contains('hidden')) {
+    content.classList.remove('hidden');
+    icon.textContent = '▲';
+  } else {
+    content.classList.add('hidden');
+    icon.textContent = '▼';
+  }
+}
+
+function renderCSOnline() {
+  $('cs-content').innerHTML = `
+    <div class="space-y-4">
+      <button onclick="renderCSHome()" class="flex items-center gap-2 text-sm text-indigo-600">
+        ← 返回
+      </button>
+      <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border border-green-100">
+        <div class="flex items-center gap-3">
+          <span class="text-3xl">💬</span>
+          <div>
+            <h4 class="font-semibold text-gray-800">在线客服</h4>
+            <p class="text-xs text-gray-500">当前在线，预计2小时内回复</p>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl p-4 shadow-sm space-y-3">
+        <div class="text-sm text-gray-600">
+          <p>您好！感谢您使用对练社交。</p>
+          <p>如果您有任何问题或建议，请在下方输入框中描述，我们会尽快为您解答。</p>
+        </div>
+        <textarea id="cs-message" class="w-full h-32 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-indigo-400 resize-none" placeholder="请输入您的问题或建议..."></textarea>
+        <button onclick="submitCSMessage()" class="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all">发送消息</button>
+      </div>
+    </div>
+  `;
+}
+
+function submitCSMessage() {
+  const message = $('cs-message').value.trim();
+  if (!message) {
+    alert('请输入您的问题或建议');
+    return;
+  }
+
+  if (!userData.csMessages) userData.csMessages = [];
+  userData.csMessages.push({
+    id: Date.now(),
+    content: message,
+    date: new Date().toLocaleString(),
+    status: 'pending'
+  });
+  saveData();
+
+  alert('✅ 消息已发送！\n\n客服人员会在工作日9:00-21:00期间尽快回复您。');
+  $('cs-message').value = '';
+  renderCSHome();
+}
+
+function renderCSFeedback() {
+  $('cs-content').innerHTML = `
+    <div class="space-y-4">
+      <button onclick="renderCSHome()" class="flex items-center gap-2 text-sm text-indigo-600">
+        ← 返回
+      </button>
+      <h4 class="font-semibold text-gray-800">📝 意见反馈</h4>
+      <div class="bg-white rounded-xl p-4 shadow-sm space-y-4">
+        <div>
+          <label class="text-sm font-medium text-gray-700 mb-2 block">反馈类型</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="selectFeedbackType('bug')" class="py-2 px-3 bg-gray-100 rounded-lg text-sm hover:bg-indigo-50 hover:text-indigo-600 transition-colors" id="fb-type-bug">🐛 功能问题</button>
+            <button onclick="selectFeedbackType('feature')" class="py-2 px-3 bg-gray-100 rounded-lg text-sm hover:bg-indigo-50 hover:text-indigo-600 transition-colors" id="fb-type-feature">✨ 功能建议</button>
+            <button onclick="selectFeedbackType('experience')" class="py-2 px-3 bg-gray-100 rounded-lg text-sm hover:bg-indigo-50 hover:text-indigo-600 transition-colors" id="fb-type-experience">🎨 用户体验</button>
+            <button onclick="selectFeedbackType('other')" class="py-2 px-3 bg-gray-100 rounded-lg text-sm hover:bg-indigo-50 hover:text-indigo-600 transition-colors" id="fb-type-other">📌 其他</button>
+          </div>
+        </div>
+        <div>
+          <label class="text-sm font-medium text-gray-700 mb-2 block">反馈内容</label>
+          <textarea id="feedback-content" class="w-full h-32 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-indigo-400 resize-none" placeholder="请详细描述您的反馈内容..."></textarea>
+        </div>
+        <div>
+          <label class="text-sm font-medium text-gray-700 mb-2 block">联系方式（选填）</label>
+          <input type="text" id="feedback-contact" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-indigo-400" placeholder="您的手机号或邮箱">
+        </div>
+        <button onclick="submitFeedback()" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all">提交反馈</button>
+      </div>
+    </div>
+  `;
+}
+
+let feedbackType = 'bug';
+
+function selectFeedbackType(type) {
+  feedbackType = type;
+  ['bug', 'feature', 'experience', 'other'].forEach(t => {
+    const btn = $(`fb-type-${t}`);
+    if (t === type) {
+      btn.classList.remove('bg-gray-100');
+      btn.classList.add('bg-indigo-100', 'text-indigo-600');
+    } else {
+      btn.classList.add('bg-gray-100');
+      btn.classList.remove('bg-indigo-100', 'text-indigo-600');
+    }
+  });
+}
+
+function submitFeedback() {
+  const content = $('feedback-content').value.trim();
+  if (!content) {
+    alert('请输入反馈内容');
+    return;
+  }
+
+  const types = { bug:'功能问题', feature:'功能建议', experience:'用户体验', other:'其他' };
+  if (!userData.feedbacks) userData.feedbacks = [];
+  userData.feedbacks.push({
+    id: Date.now(),
+    type: types[feedbackType],
+    content: content,
+    contact: $('feedback-contact').value.trim(),
+    date: new Date().toLocaleString(),
+    status: 'pending'
+  });
+  saveData();
+
+  alert('✅ 反馈已提交！\n\n感谢您的反馈，我们会认真对待每一条建议。');
+  renderCSHome();
+}
+
+function renderCSAbout() {
+  $('cs-content').innerHTML = `
+    <div class="space-y-4">
+      <button onclick="renderCSHome()" class="flex items-center gap-2 text-sm text-indigo-600">
+        ← 返回
+      </button>
+      <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-4 border border-indigo-100">
+        <div class="text-center">
+          <div class="text-4xl mb-2">💬</div>
+          <h4 class="font-bold text-gray-800">对练社交</h4>
+          <p class="text-xs text-gray-500">版本 v2.3</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl p-4 shadow-sm space-y-3 text-sm text-gray-600">
+        <p>对练社交是一款专注于社交能力训练的AI应用。通过模拟真实社交场景，帮助用户提升沟通技巧、表达能力和人际交往能力。</p>
+        <p>我们相信，良好的沟通能力是可以通过练习来提升的。每一次训练都是一次成长的机会。</p>
+        <div class="pt-3 border-t border-gray-100">
+          <p class="font-medium text-gray-800">联系我们</p>
+          <p>📧 邮箱：support@duilianshejiao.com</p>
+          <p>📱 微信：duilian_support</p>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 // ===== 晚安计划 =====
@@ -8789,6 +10236,120 @@ window.showModal = function(name) {
     loadInviteInfo();
   }
 };
+
+// ===== 用户注销冷静期功能 =====
+function renderDeleteAccountButton() {
+  const deleteRequest = userData.deleteAccountRequest;
+  if (!deleteRequest) {
+    return `
+      <button onclick="requestDeleteAccount()" class="w-full bg-gray-50 rounded-xl p-4 shadow-sm flex items-center justify-between hover:bg-gray-100 transition-all">
+        <div class="flex items-center gap-3">
+          <span class="text-xl">🗑️</span>
+          <div><div class="text-gray-700 text-sm">注销账号</div><div class="text-xs text-gray-400">7天冷静期，期间可撤销</div></div>
+        </div>
+        <span class="text-gray-400">→</span>
+      </button>
+    `;
+  }
+
+  const now = Date.now();
+  const requestTime = deleteRequest.time;
+  const coolDownPeriod = 7 * 24 * 60 * 60 * 1000;
+  const remainingTime = requestTime + coolDownPeriod - now;
+
+  if (remainingTime <= 0) {
+    return `
+      <button onclick="confirmDeleteAccount()" class="w-full bg-red-50 rounded-xl p-4 shadow-sm flex items-center justify-between hover:bg-red-100 transition-all">
+        <div class="flex items-center gap-3">
+          <span class="text-xl">🗑️</span>
+          <div><div class="text-red-600 text-sm">确认注销</div><div class="text-xs text-red-400">冷静期已结束，确认后将永久删除</div></div>
+        </div>
+        <span class="text-gray-400">→</span>
+      </button>
+    `;
+  }
+
+  const remainingDays = Math.ceil(remainingTime / (24 * 60 * 60 * 1000));
+  const remainingHours = Math.floor((remainingTime % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+  const remainingMinutes = Math.floor((remainingTime % (60 * 60 * 1000)) / (60 * 1000));
+
+  return `
+    <button onclick="showDeleteAccountStatus()" class="w-full bg-red-50 rounded-xl p-4 shadow-sm flex items-center justify-between hover:bg-red-100 transition-all">
+      <div class="flex items-center gap-3">
+        <span class="text-xl">⏳</span>
+        <div><div class="text-red-600 text-sm">注销申请处理中</div><div class="text-xs text-red-400">剩余 ${remainingDays}天${remainingHours}小时${remainingMinutes}分</div></div>
+      </div>
+      <span class="text-gray-400">→</span>
+    </button>
+  `;
+}
+
+function requestDeleteAccount() {
+  if (!confirm(`⚠️ 注销账号提醒\n\n注销后将无法恢复，以下数据将被永久删除：\n• 训练记录\n• 积分和好感度\n• 学习卡片\n• 自定义场景\n\n如需继续，请输入"确认注销"。`)) {
+    return;
+  }
+
+  const confirmText = prompt('请输入"确认注销"以继续：');
+  if (confirmText !== '确认注销') {
+    alert('输入不符，注销申请已取消');
+    return;
+  }
+
+  userData.deleteAccountRequest = {
+    time: Date.now(),
+    status: 'pending'
+  };
+  saveData();
+
+  alert(`✅ 注销申请已提交\n\n7天冷静期内您可以随时撤销申请。\n\n第1天：提醒您考虑清楚\n第3天：询问是否确定要注销\n第5天：最后一次挽留提醒\n第7天：确认后永久删除`);
+
+  renderMyPage();
+}
+
+function showDeleteAccountStatus() {
+  const deleteRequest = userData.deleteAccountRequest;
+  if (!deleteRequest) return;
+
+  const now = Date.now();
+  const requestTime = deleteRequest.time;
+  const coolDownPeriod = 7 * 24 * 60 * 60 * 1000;
+  const remainingTime = requestTime + coolDownPeriod - now;
+
+  if (remainingTime <= 0) {
+    if (confirm('冷静期已结束，确定要永久删除账号吗？此操作不可恢复！')) {
+      confirmDeleteAccount();
+    }
+    return;
+  }
+
+  const remainingDays = Math.ceil(remainingTime / (24 * 60 * 60 * 1000));
+
+  if (confirm(`⏳ 注销申请处理中\n\n申请时间：${new Date(requestTime).toLocaleString()}\n剩余时间：${remainingDays}天\n\n您确定要撤销注销申请吗？`)) {
+    cancelDeleteAccount();
+  }
+}
+
+function cancelDeleteAccount() {
+  delete userData.deleteAccountRequest;
+  saveData();
+  alert('✅ 注销申请已撤销\n\n您的账号安全了！如有任何问题，可以联系客服。');
+  renderMyPage();
+}
+
+function confirmDeleteAccount() {
+  if (!confirm('⚠️ 最终确认\n\n确定要永久删除账号吗？\n此操作不可恢复，所有数据将被永久删除！')) {
+    return;
+  }
+
+  localStorage.removeItem(STORAGE_PREFIX + 'user_data');
+  localStorage.removeItem(STORAGE_PREFIX + 'logged_in');
+
+  alert('🗑️ 账号已永久删除\n\n感谢您使用对练社交，期待您的再次光临！');
+
+  showView('page-login');
+  $('tab-bar').classList.remove('show');
+  renderPage();
+}
 
 // ===== 退出登录 =====
 function logout() {
