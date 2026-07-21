@@ -1,82 +1,97 @@
 const pool = require('../config/database');
 
 class Item {
-  // 查找所有道具（道具目录）
   static async findAll() {
-    const [rows] = await pool.execute('SELECT * FROM items WHERE is_active = 1 ORDER BY id');
+    const [rows] = await pool.execute('SELECT * FROM items');
     return rows;
   }
 
-  // 根据ID查找道具
   static async findById(id) {
     const [rows] = await pool.execute('SELECT * FROM items WHERE id = ?', [id]);
-    return rows[0] || null;
+    return rows[0];
   }
 
-  // 根据item_type查找道具
-  static async findByType(itemType) {
-    const [rows] = await pool.execute('SELECT * FROM items WHERE item_type = ?', [itemType]);
-    return rows[0] || null;
-  }
-
-  // 获取用户道具背包
-  static async findByUser(userId) {
+  static async getUserInventory(userId) {
     const [rows] = await pool.execute(
-      `SELECT ui.*, i.name, i.description, i.icon, i.category, i.item_type, i.price_coins
-       FROM user_items ui
+      `SELECT i.id, i.name, i.description, i.icon, i.price, ui.quantity
+       FROM user_inventory ui
        JOIN items i ON ui.item_id = i.id
-       WHERE ui.user_id = ? AND ui.quantity > 0
-       ORDER BY i.category, i.id`,
+       WHERE ui.user_id = ? AND ui.quantity > 0`,
       [userId]
     );
     return rows;
   }
 
-  // 查找用户某类道具
-  static async findByUserAndType(userId, itemType) {
+  static async getUserItemCount(userId, itemId) {
     const [rows] = await pool.execute(
-      `SELECT ui.*, i.name, i.item_type FROM user_items ui
-       JOIN items i ON ui.item_id = i.id
-       WHERE ui.user_id = ? AND i.item_type = ?`,
-      [userId, itemType]
+      'SELECT quantity FROM user_inventory WHERE user_id = ? AND item_id = ?',
+      [userId, itemId]
     );
-    return rows[0] || null;
+    return rows[0]?.quantity || 0;
   }
 
-  // 发放道具给用户
-  static async grantItem(userId, itemType, quantity = 1) {
-    const item = await this.findByType(itemType);
-    if (!item) return null;
-
+  static async addItemToUser(userId, itemId, quantity = 1) {
     const [existing] = await pool.execute(
-      'SELECT * FROM user_items WHERE user_id = ? AND item_id = ?',
-      [userId, item.id]
+      'SELECT quantity FROM user_inventory WHERE user_id = ? AND item_id = ?',
+      [userId, itemId]
     );
 
     if (existing.length > 0) {
       await pool.execute(
-        'UPDATE user_items SET quantity = quantity + ? WHERE id = ?',
-        [quantity, existing[0].id]
+        'UPDATE user_inventory SET quantity = quantity + ? WHERE user_id = ? AND item_id = ?',
+        [quantity, userId, itemId]
       );
-      return existing[0].id;
+    } else {
+      await pool.execute(
+        'INSERT INTO user_inventory (user_id, item_id, quantity) VALUES (?, ?, ?)',
+        [userId, itemId, quantity]
+      );
     }
 
+    return this.getUserItemCount(userId, itemId);
+  }
+
+  static async useItem(userId, itemId) {
+    const count = await this.getUserItemCount(userId, itemId);
+    if (count <= 0) {
+      return { success: false, message: '道具数量不足' };
+    }
+
+    await pool.execute(
+      'UPDATE user_inventory SET quantity = quantity - 1 WHERE user_id = ? AND item_id = ? AND quantity > 0',
+      [userId, itemId]
+    );
+
+    return {
+      success: true,
+      message: '道具使用成功',
+      remaining: await this.getUserItemCount(userId, itemId)
+    };
+  }
+
+  static async create(itemData) {
+    const { id, name, description, icon, price, type } = itemData;
     const [result] = await pool.execute(
-      'INSERT INTO user_items (user_id, item_id, quantity) VALUES (?, ?, ?)',
-      [userId, item.id, quantity]
+      'INSERT INTO items (id, name, description, icon, price, type) VALUES (?, ?, ?, ?, ?, ?)',
+      [id, name, description, icon, price, type]
     );
     return result.insertId;
   }
 
-  // 使用道具
-  static async useItem(userId, itemType, quantity = 1) {
-    const userItem = await this.findByUserAndType(userId, itemType);
-    if (!userItem || userItem.quantity < quantity) return false;
-    await pool.execute(
-      'UPDATE user_items SET quantity = quantity - ? WHERE id = ?',
-      [quantity, userItem.id]
-    );
-    return true;
+  static async initItems() {
+    const items = [
+      { id: 'time_shuttle', name: '时空穿梭券', description: '可以回到上一轮重新选择', icon: '⏳', price: 0, type: 'consumable' },
+      { id: 'hint_card', name: '提示卡', description: '获取教练的提示', icon: '💡', price: 0, type: 'consumable' },
+      { id: 'emotion_shield', name: '情绪护盾', description: '防止情绪波动', icon: '🛡️', price: 0, type: 'consumable' },
+      { id: 'double_points', name: '双倍积分卡', description: '本轮获得双倍积分', icon: '⭐', price: 0, type: 'consumable' },
+    ];
+
+    for (const item of items) {
+      const existing = await this.findById(item.id);
+      if (!existing) {
+        await this.create(item);
+      }
+    }
   }
 }
 

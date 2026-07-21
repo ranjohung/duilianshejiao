@@ -1,14 +1,17 @@
 const jwt = require('jsonwebtoken');
-const config = require('../config');
 
-const generateToken = (userId, memberLevel) => {
-  return jwt.sign({ userId, memberLevel }, config.jwt.secret, {
-    expiresIn: config.jwt.expiresIn,
-  });
+const JWT_SECRET = process.env.JWT_SECRET || 'duilian_jwt_secret_key';
+const JWT_EXPIRES_IN = '7d';
+
+const sign = (payload) => {
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 };
 
-const verifyToken = (token) => {
-  return jwt.verify(token, config.jwt.secret);
+const verify = (token) => {
+  return jwt.verify(token, JWT_SECRET);
 };
 
-module.exports = { generateToken, verifyToken };
+module.exports = {
+  sign,
+  verify
+};

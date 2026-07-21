@@ -108,8 +108,10 @@ class _CustomCoachPageState extends State<CustomCoachPage> {
               maxLength: 12,
               decoration: InputDecoration(
                 hintText: '给你的教练起个名字',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               ),
             ),
             const SizedBox(height: 20),
@@ -164,8 +166,10 @@ class _CustomCoachPageState extends State<CustomCoachPage> {
               maxLength: 30,
               decoration: InputDecoration(
                 hintText: '教练的标志性台词',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               ),
             ),
             const SizedBox(height: 32),
@@ -179,18 +183,21 @@ class _CustomCoachPageState extends State<CustomCoachPage> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppConfig.primaryColor,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
                   elevation: 4,
                 ),
                 child: _isCreating
                     ? const SizedBox(
                         width: 24,
                         height: 24,
-                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        child: CircularProgressIndicator(
+                            color: Colors.white, strokeWidth: 2),
                       )
                     : const Text(
                         '创建教练（消耗100积分）',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w600),
                       ),
               ),
             ),
@@ -226,7 +233,9 @@ class _CustomCoachPageState extends State<CustomCoachPage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 4)],
+        boxShadow: [
+          BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 4)
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -236,13 +245,15 @@ class _CustomCoachPageState extends State<CustomCoachPage> {
           Row(
             children: [
               Expanded(
-                child: _buildDimensionOption(leftLabel, currentValue == leftLabel.split(' ').last, () {
+                child: _buildDimensionOption(
+                    leftLabel, currentValue == leftLabel.split(' ').last, () {
                   onChanged(leftLabel.split(' ').last);
                 }),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _buildDimensionOption(rightLabel, currentValue == rightLabel.split(' ').last, () {
+                child: _buildDimensionOption(
+                    rightLabel, currentValue == rightLabel.split(' ').last, () {
                   onChanged(rightLabel.split(' ').last);
                 }),
               ),
@@ -253,14 +264,17 @@ class _CustomCoachPageState extends State<CustomCoachPage> {
     );
   }
 
-  Widget _buildDimensionOption(String label, bool selected, VoidCallback onTap) {
+  Widget _buildDimensionOption(
+      String label, bool selected, VoidCallback onTap) {
     final color = selected ? AppConfig.primaryColor : Colors.grey[300]!;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: selected ? AppConfig.primaryColor.withOpacity(0.1) : Colors.grey[50],
+          color: selected
+              ? AppConfig.primaryColor.withOpacity(0.1)
+              : Colors.grey[50],
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: color, width: 1.5),
         ),
@@ -291,10 +305,14 @@ class _CustomCoachPageState extends State<CustomCoachPage> {
             width: (MediaQuery.of(context).size.width - 60) / 2,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: selected ? AppConfig.primaryColor.withOpacity(0.08) : Colors.white,
+              color: selected
+                  ? AppConfig.primaryColor.withOpacity(0.08)
+                  : Colors.white,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: color, width: 1.5),
-              boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.08), blurRadius: 4)],
+              boxShadow: [
+                BoxShadow(color: Colors.grey.withOpacity(0.08), blurRadius: 4)
+              ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

@@ -2,6 +2,7 @@ import '../api_client.dart';
 import '../api_routes.dart';
 import '../api_response.dart';
 import '../../models/scene_model.dart';
+import '../../pages/scene/scene_select_page.dart';
 
 /// 场景服务
 class SceneService {
@@ -22,6 +23,15 @@ class SceneService {
     return ApiResponse.fromJsonList(
       res.data,
       (d) => d.map((e) => SceneModel.fromJson(e)).toList(),
+    );
+  }
+
+  /// 按阶段分组获取场景列表
+  Future<ApiResponse<List<_StageGroup>>> getGroupedScenes() async {
+    final res = await _client.get(ApiRoutes.sceneGrouped);
+    return ApiResponse.fromJsonList(
+      res.data,
+      (d) => d.map((e) => _StageGroup.fromJson(e)).toList(),
     );
   }
 
@@ -52,7 +62,7 @@ class SceneService {
     required String sceneId,
   }) async {
     final res = await _client.get(
-      '${ApiRoutes.sceneDetail}/$sceneId/unlock-check',
+      '${ApiRoutes.sceneDetail}/$sceneId/check-unlock',
     );
     return ApiResponse.fromJson(
       res.data,
@@ -67,7 +77,7 @@ class SceneService {
     String mode = 'text',
   }) async {
     final res = await _client.post(
-      '${ApiRoutes.sceneStart}/$sceneId/start',
+      '${ApiRoutes.sceneDetail}/$sceneId/start',
       data: {'coachId': coachId, 'mode': mode},
     );
     return ApiResponse.fromJson(res.data, null);
@@ -76,15 +86,15 @@ class SceneService {
   /// 完成训练（提交评估）
   Future<ApiResponse> completeTraining({
     required String sceneId,
-    required String trainingId,
+    required String sessionId,
     required double score,
     required int starRating,
     required List<Map<String, dynamic>> qualityMarks,
   }) async {
     final res = await _client.post(
-      '${ApiRoutes.sceneComplete}/$sceneId/complete',
+      ApiRoutes.trainingEnd,
       data: {
-        'trainingId': trainingId,
+        'sessionId': sessionId,
         'score': score,
         'starRating': starRating,
         'qualityMarks': qualityMarks,

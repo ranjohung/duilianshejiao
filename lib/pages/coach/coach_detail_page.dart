@@ -12,7 +12,8 @@ class CoachDetailPage extends StatefulWidget {
   final PresetCoachData? presetData;
   final int? presetIndex;
 
-  const CoachDetailPage({super.key, this.coach, this.presetData, this.presetIndex});
+  const CoachDetailPage(
+      {super.key, this.coach, this.presetData, this.presetIndex});
 
   @override
   State<CoachDetailPage> createState() => _CoachDetailPageState();
@@ -25,9 +26,9 @@ class _CoachDetailPageState extends State<CoachDetailPage> {
       final p = widget.coach!.personalityConfig;
       return [
         p.decisionBasis == 'feeling' ? 0.85 : 0.4, // 温暖度
-        p.infoProcessing == 'sensing' ? 0.9 : 0.5,  // 专业度
+        p.infoProcessing == 'sensing' ? 0.9 : 0.5, // 专业度
         p.lifeAttitude == 'spontaneous' ? 0.8 : 0.3, // 幽默度
-        p.decisionBasis == 'thinking' ? 0.85 : 0.4,  // 直接度
+        p.decisionBasis == 'thinking' ? 0.85 : 0.4, // 直接度
       ];
     }
     // 预设教练的默认雷达值
@@ -35,17 +36,24 @@ class _CoachDetailPageState extends State<CoachDetailPage> {
     const presets = [
       [0.9, 0.7, 0.6, 0.3], // 沈清欢：温暖高、直接低
       [0.4, 0.95, 0.3, 0.9], // 陆北辰：专业高、直接高
-      [0.7, 0.5, 0.9, 0.5],  // 顾星河：幽默高
+      [0.7, 0.5, 0.9, 0.5], // 顾星河：幽默高
       [0.85, 0.6, 0.5, 0.35], // 苏念：温暖高、直接低
     ];
     return presets[index];
   }
 
-  String get _name => widget.coach?.displayName ?? widget.presetData?.name ?? '';
-  String get _style => widget.coach?.teachingStyleDisplayName ?? widget.presetData?.style ?? '';
+  String get _name =>
+      widget.coach?.displayName ?? widget.presetData?.name ?? '';
+  String get _style =>
+      widget.coach?.teachingStyleDisplayName ?? widget.presetData?.style ?? '';
   Color get _themeColor {
     if (widget.presetData != null) return widget.presetData!.color;
-    const colors = [Color(0xFFE8B4B8), Color(0xFF5B7DB1), Color(0xFFF5A623), Color(0xFF9B8EC4)];
+    const colors = [
+      Color(0xFFE8B4B8),
+      Color(0xFF5B7DB1),
+      Color(0xFFF5A623),
+      Color(0xFF9B8EC4)
+    ];
     return colors[0];
   }
 
@@ -101,7 +109,9 @@ class _CoachDetailPageState extends State<CoachDetailPage> {
                   : Icon(_icon, size: 50, color: _themeColor),
             ),
             const SizedBox(height: 12),
-            Text(_name, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            Text(_name,
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             const SizedBox(height: 4),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -109,7 +119,8 @@ class _CoachDetailPageState extends State<CoachDetailPage> {
                 color: _themeColor.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Text(_style, style: TextStyle(fontSize: 14, color: _themeColor)),
+              child: Text(_style,
+                  style: TextStyle(fontSize: 14, color: _themeColor)),
             ),
             const SizedBox(height: 24),
 
@@ -119,11 +130,15 @@ class _CoachDetailPageState extends State<CoachDetailPage> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 8)],
+                boxShadow: [
+                  BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 8)
+                ],
               ),
               child: Column(
                 children: [
-                  const Text('性格维度', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  const Text('性格维度',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 16),
                   SizedBox(
                     height: 200,
@@ -136,20 +151,26 @@ class _CoachDetailPageState extends State<CoachDetailPage> {
                             borderColor: _themeColor,
                             borderWidth: 2,
                             entryRadius: 4,
-                            dataEntries: _radarValues.map((v) => RadarEntry(value: v)).toList(),
+                            dataEntries: _radarValues
+                                .map((v) => RadarEntry(value: v))
+                                .toList(),
                           ),
                         ],
                         radarBackgroundColor: Colors.transparent,
-                        radarBorderData: const BorderSide(color: Colors.grey, width: 1),
-                        gridBorderData: const BorderSide(color: Colors.grey, width: 0.5),
-                        tickBorderData: const BorderSide(color: Colors.transparent),
+                        radarBorderData:
+                            const BorderSide(color: Colors.grey, width: 1),
+                        gridBorderData:
+                            const BorderSide(color: Colors.grey, width: 0.5),
+                        tickBorderData:
+                            const BorderSide(color: Colors.transparent),
                         ticksTextStyle: const TextStyle(fontSize: 0),
                         getTitle: (index, _) {
                           const titles = ['温暖度', '专业度', '幽默度', '直接度'];
                           return RadarChartTitle(text: titles[index]);
                         },
                         titlePositionFactorOffset: 0.2,
-                        titleTextStyle: const TextStyle(fontSize: 12, color: Colors.black54),
+                        titleTextStyle: const TextStyle(
+                            fontSize: 12, color: Colors.black54),
                       ),
                     ),
                   ),
@@ -165,14 +186,20 @@ class _CoachDetailPageState extends State<CoachDetailPage> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 8)],
+                boxShadow: [
+                  BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 8)
+                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('教学风格', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  const Text('教学风格',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 8),
-                  Text(_styleDesc, style: TextStyle(fontSize: 14, color: Colors.grey[700], height: 1.6)),
+                  Text(_styleDesc,
+                      style: TextStyle(
+                          fontSize: 14, color: Colors.grey[700], height: 1.6)),
                 ],
               ),
             ),
@@ -187,10 +214,13 @@ class _CoachDetailPageState extends State<CoachDetailPage> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: _themeColor,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
                   elevation: 4,
                 ),
-                child: const Text('开始训练', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                child: const Text('开始训练',
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
               ),
             ),
           ],

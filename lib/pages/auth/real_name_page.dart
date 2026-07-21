@@ -76,11 +76,13 @@ class _RealNamePageState extends State<RealNamePage> {
                   decoration: BoxDecoration(
                     color: AppConfig.primaryColor.withOpacity(0.06),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppConfig.primaryColor.withOpacity(0.15)),
+                    border: Border.all(
+                        color: AppConfig.primaryColor.withOpacity(0.15)),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.info_outline, color: AppConfig.primaryColor, size: 20),
+                      Icon(Icons.info_outline,
+                          color: AppConfig.primaryColor, size: 20),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
@@ -117,7 +119,8 @@ class _RealNamePageState extends State<RealNamePage> {
                   decoration: InputDecoration(
                     hintText: '请输入您的真实姓名',
                     hintStyle: TextStyle(color: Colors.grey[400]),
-                    prefixIcon: Icon(Icons.person, color: AppConfig.primaryColor),
+                    prefixIcon:
+                        Icon(Icons.person, color: AppConfig.primaryColor),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(color: Colors.grey[300]!),
@@ -128,9 +131,11 @@ class _RealNamePageState extends State<RealNamePage> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: AppConfig.primaryColor, width: 1.5),
+                      borderSide:
+                          BorderSide(color: AppConfig.primaryColor, width: 1.5),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -150,7 +155,9 @@ class _RealNamePageState extends State<RealNamePage> {
                   maxLength: 18,
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) return '请输入身份证号';
-                    if (!RegExp(r'^[1-9]\d{5}(19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dXx]$').hasMatch(v.trim())) {
+                    if (!RegExp(
+                            r'^[1-9]\d{5}(19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dXx]$')
+                        .hasMatch(v.trim())) {
                       return '请输入正确的身份证号';
                     }
                     return null;
@@ -158,7 +165,8 @@ class _RealNamePageState extends State<RealNamePage> {
                   decoration: InputDecoration(
                     hintText: '请输入18位身份证号',
                     hintStyle: TextStyle(color: Colors.grey[400]),
-                    prefixIcon: Icon(Icons.badge, color: AppConfig.primaryColor),
+                    prefixIcon:
+                        Icon(Icons.badge, color: AppConfig.primaryColor),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(color: Colors.grey[300]!),
@@ -169,10 +177,12 @@ class _RealNamePageState extends State<RealNamePage> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: AppConfig.primaryColor, width: 1.5),
+                      borderSide:
+                          BorderSide(color: AppConfig.primaryColor, width: 1.5),
                     ),
                     counterText: '',
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
                   ),
                 ),
                 const SizedBox(height: 48),
@@ -202,7 +212,8 @@ class _RealNamePageState extends State<RealNamePage> {
                           )
                         : const Text(
                             '提交认证',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w600),
                           ),
                   ),
                 ),

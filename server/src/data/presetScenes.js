@@ -1,16 +1,16 @@
 module.exports = [
   {
     id: 'scene_coffee_break',
-    name: '咖啡厅破冰',
+    name: '相亲模拟',
     stage: '破冰期',
-    difficulty: 'easy',
-    description: '在咖啡厅和陌生人开启一段轻松对话',
+    difficulty: 'medium',
+    description: '朋友介绍了一个条件不错的相亲对象，你们约在咖啡厅第一次见面',
     total_rounds: 5,
     unlock_condition: { min_points: 0, min_level: 'bronze' },
-    teaching_points: ['眼神接触', '开放性问题', '积极倾听', '自然延续话题', '友好告别'],
-    npc_name: '咖啡厅陌生人',
-    npc_avatar: '/assets/npc/stranger_coffee.png',
-    opening: '你走进一家咖啡厅，发现只有吧台旁边还有一个空位。旁边坐着一个人正在看书。你会怎么做？',
+    teaching_points: ['开场白', '话题展开', '展示自己', '得体结束', '眼神接触'],
+    npc_name: '相亲对象',
+    npc_avatar: '/assets/npc/date_partner.png',
+    opening: '朋友介绍了一个条件不错的相亲对象，你们约在咖啡厅第一次见面。对方已经到了，正在等你。',
     rounds: [
       {
         round: 1,
@@ -301,10 +301,10 @@ module.exports = [
   },
   {
     id: 'scene_comfort_friend',
-    name: '安慰TA',
+    name: '共情沟通训练',
     stage: '熟悉期',
     difficulty: 'easy',
-    description: '朋友遇到困难来找你倾诉，练习如何正确地安慰和陪伴',
+    description: '朋友遇到困难来找你倾诉，学习如何进行有效的共情回应',
     total_rounds: 5,
     unlock_condition: { min_points: 50, min_level: 'bronze' },
     teaching_points: ['倾听不打断', '共情回应', '避免建议', '陪伴支持', '适度表达关心'],
@@ -376,16 +376,16 @@ module.exports = [
   },
   {
     id: 'scene_upward_report',
-    name: '向上汇报',
+    name: '加薪谈判',
     stage: '职场期',
     difficulty: 'hard',
-    description: '向领导做一次结构化的工作汇报，展示成果并应对追问',
+    description: '向老板提出加薪请求，用数据证明自己的价值并应对谈判',
     total_rounds: 5,
     unlock_condition: { min_points: 150, min_level: 'gold' },
-    teaching_points: ['结构化表达', '数据支撑', '应对追问', '控制节奏', '总结建议'],
-    npc_name: '部门领导',
+    teaching_points: ['结构化表达', '价值呈现', '应对追问', '谈判技巧', '自信表达'],
+    npc_name: '老板',
     npc_avatar: '/assets/npc/boss.png',
-    opening: '你需要向领导汇报本季度项目进展。领导时间有限，希望你简明扼要地说明情况。',
+    opening: '你已经在公司工作了两年，表现出色，现在准备向老板提出加薪请求。',
     rounds: [
       {
         round: 1,
