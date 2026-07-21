@@ -279,6 +279,19 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
           </div>
         </div>
 
+        <div class="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-4 mb-6 text-left">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-amber-600 text-lg">📊</span>
+            <span class="text-sm font-medium text-amber-800">成长规则</span>
+          </div>
+          <div class="space-y-2 text-xs text-amber-700">
+            <div>💰 <strong>积分：</strong>完成训练获得积分，用于解锁新场景</div>
+            <div>👑 <strong>会员：</strong>普通会员每天可训练3次，VIP无限次</div>
+            <div>❤️ <strong>好感度：</strong>当前为第1级好感，提升好感解锁专属教练</div>
+            <div>⏰ <strong>时空穿梭券：</strong>当前拥有0张，可重新选择对话分支</div>
+          </div>
+        </div>
+
         <button onclick="closeOnboarding()" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-xl hover:opacity-90 transition-all animate-pulse-glow">
           开始训练
         </button>
@@ -1164,7 +1177,7 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
           <span class="text-gray-400">→</span>
         </button>
 
-        ${renderDeleteAccountButton()}
+        <div id="delete-account-button"></div>
 
         <button onclick="logout()" class="w-full bg-red-50 rounded-xl p-4 shadow-sm flex items-center justify-between hover:bg-red-100 transition-all">
           <div class="flex items-center gap-3">
@@ -5918,6 +5931,27 @@ function getFavorabilityLevel(favorability) {
   return 0;
 }
 
+function getNextFavorabilityThreshold(favorability) {
+  if (favorability < 20) return 20;
+  if (favorability < 50) return 50;
+  if (favorability < 80) return 80;
+  if (favorability < 120) return 120;
+  return 120;
+}
+
+function getNextSceneUnlockInfo() {
+  const lockedScenes = trainingScenes.filter(s => !s.unlocked);
+  if (lockedScenes.length === 0) {
+    return '🎉 所有场景已解锁！';
+  }
+  const nextScene = lockedScenes[0];
+  const pointsNeeded = Math.max(0, nextScene.difficulty * 100 - userData.points);
+  if (pointsNeeded <= 0) {
+    return '✨ 积分足够，完成前置场景即可解锁下一个训练项目';
+  }
+  return `还差 ${pointsNeeded} 积分解锁「${nextScene.name}」`;
+}
+
 function getAnalysisDepth(favorabilityLevel, isMember) {
   if (isMember) {
     if (favorabilityLevel >= 3) return 3;
@@ -7261,6 +7295,44 @@ function finishTraining() {
           <div class="flex items-center justify-between text-xs"><span class="text-gray-500">情绪控制</span><span class="text-indigo-600">+${Math.floor(inc/2)}</span></div>
         </div>
       </div>
+      <div class="bg-gradient-to-r from-pink-50 to-rose-50 rounded-xl p-4 animate-in border border-pink-100">
+        <h5 class="text-sm font-semibold text-gray-800 mb-3">❤️ 好感度与积分进度</h5>
+        <div class="space-y-3">
+          <div>
+            <div class="flex justify-between text-xs mb-1">
+              <span class="text-gray-500">当前好感度</span>
+              <span class="font-medium text-pink-600">Lv.${getFavorabilityLevel(userData.favorability || 0)} (${userData.favorability || 0}分)</span>
+            </div>
+            <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div class="h-full bg-pink-500 rounded-full transition-all" style="width:${Math.min(100, ((userData.favorability || 0) % 40) / 40 * 100)}%"></div>
+            </div>
+            <div class="text-xs text-gray-400 mt-1">
+              ${getFavorabilityLevel(userData.favorability || 0) >= 4 ? '🎉 已达到最高好感度！' : `还差 ${getNextFavorabilityThreshold(userData.favorability || 0) - (userData.favorability || 0)} 好感度升级到 Lv.${getFavorabilityLevel(userData.favorability || 0) + 1}`}
+            </div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs mb-1">
+              <span class="text-gray-500">当前积分</span>
+              <span class="font-medium text-amber-600">${userData.points} 分</span>
+            </div>
+            <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div class="h-full bg-amber-500 rounded-full transition-all" style="width:${Math.min(100, (userData.points % 500) / 500 * 100)}%"></div>
+            </div>
+            <div class="text-xs text-gray-400 mt-1">
+              ${getNextSceneUnlockInfo()}
+            </div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs">
+              <span class="text-gray-500">时空穿梭券</span>
+              <span class="font-medium text-indigo-600">${timeRewindTickets} 张</span>
+            </div>
+            <div class="text-xs text-gray-400 mt-1">
+              ${timeRewindTickets < 2 ? '⚠️ 时空穿梭券不足，建议签到获取' : '✨ 时空穿梭券充足，可以随时重新选择对话'}
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="bg-gray-50 rounded-xl p-4 animate-in">
         <h5 class="text-sm font-semibold text-gray-800 mb-2">📝 对话回顾</h5>
         ${trainingChoices.map(c => {
@@ -7716,6 +7788,57 @@ function renderProfile() {
   $('profile-avatar-preview').textContent = userData.avatar || '👤';
   $('profile-avatar-name').textContent = userData.avatar ? '自定义形象' : '默认形象';
   $('profile-avatar-time').textContent = userData.avatar ? '已创建' : '未创建';
+
+  updateDeleteAccountButton();
+}
+
+function updateDeleteAccountButton() {
+  const container = $('delete-account-button');
+  if (!container) return;
+
+  const deleteRequest = userData.deleteAccountRequest;
+  if (!deleteRequest) {
+    container.innerHTML = `
+      <button onclick="requestDeleteAccount()" class="w-full bg-gray-50 rounded-xl p-4 shadow-sm flex items-center justify-between hover:bg-gray-100 transition-all">
+        <div class="flex items-center gap-3">
+          <span class="text-xl">🗑️</span>
+          <div><div class="text-gray-700 text-sm">注销账号</div><div class="text-xs text-gray-400">7天冷静期，期间可撤销</div></div>
+        </div>
+        <span class="text-gray-400">→</span>
+      </button>
+    `;
+    return;
+  }
+
+  const now = Date.now();
+  const requestTime = deleteRequest.time;
+  const coolDownPeriod = 7 * 24 * 60 * 60 * 1000;
+  const remainingTime = requestTime + coolDownPeriod - now;
+
+  if (remainingTime <= 0) {
+    container.innerHTML = `
+      <button onclick="confirmDeleteAccount()" class="w-full bg-red-50 rounded-xl p-4 shadow-sm flex items-center justify-between hover:bg-red-100 transition-all">
+        <div class="flex items-center gap-3">
+          <span class="text-xl">🗑️</span>
+          <div><div class="text-red-600 text-sm">确认注销</div><div class="text-xs text-red-400">冷静期已结束，确认后将永久删除</div></div>
+        </div>
+        <span class="text-gray-400">→</span>
+      </button>
+    `;
+    return;
+  }
+
+  const days = Math.floor(remainingTime / (24 * 60 * 60 * 1000));
+  const hours = Math.floor((remainingTime % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+  container.innerHTML = `
+    <button onclick="cancelDeleteAccount()" class="w-full bg-gray-50 rounded-xl p-4 shadow-sm flex items-center justify-between hover:bg-gray-100 transition-all">
+      <div class="flex items-center gap-3">
+        <span class="text-xl">⏳</span>
+        <div><div class="text-gray-700 text-sm">注销申请中</div><div class="text-xs text-gray-400">${days}天${hours}小时后可确认，可随时撤销</div></div>
+      </div>
+      <span class="text-gray-400">→</span>
+    </button>
+  `;
 }
 
 // 我的形象相关函数（PRD §3.2）
