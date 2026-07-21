@@ -221,9 +221,20 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
               <p class="text-xs mt-1" id="reg-pwd-match" style="display:none"></p>
             </div>
           </div>
+
+          <div class="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+            <div class="flex items-start gap-2">
+              <span class="text-amber-600 text-lg flex-shrink-0 mt-0.5">⚠️</span>
+              <div>
+                <p class="text-sm font-medium text-amber-800 mb-1">重要提示</p>
+                <p class="text-xs text-amber-700">本产品仅供社交技能训练参考，不提供专业心理治疗服务。如有心理健康问题，请寻求专业帮助。详情请阅读 <span class="font-medium cursor-pointer hover:underline" onclick="showView('page-disclaimer')">《免责声明》</span>。</p>
+              </div>
+            </div>
+          </div>
+
           <label class="flex items-start cursor-pointer mt-4">
             <input id="agree-terms" type="checkbox" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500 mt-0.5">
-            <span class="ml-2 text-sm text-gray-500">我已阅读并同意 <span class="text-indigo-600">《服务协议》</span> 和 <span class="text-indigo-600">《隐私政策》</span></span>
+            <span class="ml-2 text-sm text-gray-500">我已仔细阅读并同意 <span class="text-indigo-600 cursor-pointer hover:underline" onclick="showView('page-terms')">《服务协议》</span>、<span class="text-indigo-600 cursor-pointer hover:underline" onclick="showView('page-privacy')">《隐私政策》</span> 和 <span class="text-amber-600 font-medium cursor-pointer hover:underline" onclick="showView('page-disclaimer')">《免责声明》</span></span>
           </label>
           <div id="register-error" class="mt-3 px-3 py-2 bg-red-50 text-red-600 text-sm rounded-lg text-center" style="display:none"></div>
           <button onclick="doRegister()" class="w-full mt-4 py-3.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all shadow-lg shadow-indigo-200 active:scale-[0.98]">注 册</button>
@@ -281,6 +292,160 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
       <span>💡</span>
       <span id="guide-text">点击底部导航切换页面</span>
       <button onclick="$('guide-hint').style.display='none'" class="text-gray-400 hover:text-white">✕</button>
+    </div>
+  </div>
+
+  <!-- ===== 免责声明 ===== -->
+  <div class="page" id="page-disclaimer">
+    <div class="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 px-4 pt-8 pb-6 text-white">
+      <div class="flex items-center gap-3">
+        <button onclick="showView('page-login')" class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">←</button>
+        <h1 class="text-xl font-bold">免责声明</h1>
+      </div>
+    </div>
+    <div class="px-4 py-6 max-w-2xl mx-auto">
+      <div class="prose prose-sm max-w-none">
+        <p class="text-sm text-gray-500 mb-4">版本：v1.0 | 更新日期：2026年7月22日 | 适用产品：「对练社交」—— AI对话社交训练平台</p>
+
+        <h3 class="text-lg font-bold text-gray-800 mt-6 mb-3">一、关于AI生成内容</h3>
+        <p class="text-gray-600 mb-2">1.1 「对练社交」App（以下简称"本产品"）中的AI教练回复、对话建议、训练反馈、评估报告等内容，均由人工智能模型（LLM）生成，不代表任何专业机构、心理咨询师或认证人士的意见。</p>
+        <p class="text-gray-600 mb-2">1.2 本产品中所有AI生成内容仅供参考和辅助训练使用，不构成任何形式的专业建议、诊断或治疗方案。用户不应将AI生成内容视为专业心理咨询、法律意见、医疗诊断或任何其他专业服务的替代品。</p>
+        <p class="text-gray-600 mb-2">1.3 尽管我们通过话术库、心理学框架（CBT、NVC、依恋理论等）和内容审核机制努力提升AI输出的质量与安全性，但AI生成内容仍可能存在不准确、不完整、不适当或与实际情况不符的情况。用户应自行判断并承担使用后果。</p>
+
+        <h3 class="text-lg font-bold text-gray-800 mt-6 mb-3">二、关于心理健康</h3>
+        <p class="text-gray-600 mb-2">2.1 本产品定位于社交技能训练工具，旨在帮助用户在安全、低压的环境中进行社交练习，不提供任何形式的心理治疗、心理干预或危机干预服务。</p>
+        <p class="text-gray-600 mb-2">2.2 如果用户正在经历或怀疑自己正在经历心理健康问题（包括但不限于抑郁症、焦虑症、社交恐惧症、创伤后应激障碍等），请立即停止依赖本产品，并寻求专业心理咨询师或医疗机构的帮助。</p>
+        <p class="text-gray-600 mb-2">2.3 如用户在训练过程中表达出自伤、自杀、伤害他人或其他危险意图，本产品将触发"三级心理响应机制"：</p>
+        <ul class="list-disc list-inside text-gray-600 mb-2">
+          <li>立即显示心理援助热线信息；</li>
+          <li>建议用户寻求专业帮助；</li>
+          <li>记录事件（脱敏处理）并可能通知紧急联系人（如用户已绑定）。</li>
+        </ul>
+        <p class="text-gray-600 mb-2">全国心理援助热线：400-161-9995（希望24热线）</p>
+        <p class="text-gray-600 mb-2">北京心理危机干预中心：010-82951332</p>
+        <p class="text-gray-600 mb-2">2.4 本产品不保证通过训练能改善用户的社交能力、心理健康状态或现实生活中的社交表现。训练效果因人而异，取决于用户的参与度、个人情况和实际应用。</p>
+
+        <h3 class="text-lg font-bold text-gray-800 mt-6 mb-3">三、关于用户行为与责任</h3>
+        <p class="text-gray-600 mb-2">3.1 用户在使用本产品过程中，应遵守国家法律法规、社会公德和网络信息安全规定，不得利用本产品进行以下行为：</p>
+        <ul class="list-disc list-inside text-gray-600 mb-2">
+          <li>发布、传播违法、违规、淫秽、暴力、歧视、仇恨言论；</li>
+          <li>恶意攻击、骚扰其他用户或AI系统；</li>
+          <li>利用系统漏洞获取不正当利益；</li>
+          <li>其他违反法律法规或社会公序良俗的行为。</li>
+        </ul>
+        <p class="text-gray-600 mb-2">3.2 用户应对自己在使用本产品过程中产生的所有言论和行为承担全部法律责任。本产品不对用户之间的互动、纠纷或由此产生的任何后果承担责任。</p>
+        <p class="text-gray-600 mb-2">3.3 用户在真实社交场景中应用本产品训练所学内容时，应自行判断和承担相应风险。本产品不保证训练内容在现实中的适用性和效果。</p>
+
+        <h3 class="text-lg font-bold text-gray-800 mt-6 mb-3">四、关于数据与隐私</h3>
+        <p class="text-gray-600 mb-2">4.1 本产品重视用户隐私保护。用户的训练记录、对话内容、情绪日记等数据将按照《隐私政策》进行加密存储和处理。详情请查阅本产品的《隐私政策》文档。</p>
+        <p class="text-gray-600 mb-2">4.2 用户上传的照片、语音等生物特征数据将进行端到端加密处理，仅用于生成变美报告和形象建议，绝不用于训练通用AI模型，绝不与第三方共享（用户明确授权的情况除外）。</p>
+        <p class="text-gray-600 mb-2">4.3 用户可随时在"我的页→隐私设置"中查看、导出或申请删除个人数据。</p>
+
+        <h3 class="text-lg font-bold text-gray-800 mt-6 mb-3">五、关于服务可用性</h3>
+        <p class="text-gray-600 mb-2">5.1 本产品按"现状"和"现有"基础提供服务，不保证服务永不中断、永不出错、永不迟延。可能因系统维护、网络故障、第三方服务不可用或不可抗力等原因导致服务中断或异常。</p>
+        <p class="text-gray-600 mb-2">5.2 我们将在合理范围内尽力保障服务的连续性和稳定性，但不承担因服务中断造成的任何损失或责任。</p>
+
+        <h3 class="text-lg font-bold text-gray-800 mt-6 mb-3">六、关于未成年人</h3>
+        <p class="text-gray-600 mb-2">6.1 本产品不向14周岁以下未成年人提供服务。</p>
+        <p class="text-gray-600 mb-2">6.2 14-18周岁用户需在监护人知情同意的前提下使用本产品。监护人应了解本产品的训练内容和使用方式，并承担监督责任。</p>
+
+        <h3 class="text-lg font-bold text-gray-800 mt-6 mb-3">七、责任限制</h3>
+        <p class="text-gray-600 mb-2">7.1 在适用法律允许的最大范围内，本产品开发者、运营方及关联方不对任何间接性、偶然性、特殊性、惩罚性或后果性损害承担责任。</p>
+        <p class="text-gray-600 mb-2">7.2 本产品对用户的累计赔偿责任总额，不超过用户在过去12个月内向本产品支付的会员费用总额（如有）。</p>
+
+        <h3 class="text-lg font-bold text-gray-800 mt-6 mb-3">八、适用法律与争议解决</h3>
+        <p class="text-gray-600 mb-2">8.1 本免责声明的订立、执行和解释均适用中华人民共和国法律。</p>
+        <p class="text-gray-600 mb-2">8.2 因本免责声明或使用本产品产生的任何争议，双方应首先友好协商解决；协商不成的，任何一方均可向本产品运营方所在地有管辖权的人民法院提起诉讼。</p>
+
+        <p class="text-gray-500 text-sm mt-6">请您在使用「对练社交」前仔细阅读本免责声明。使用本产品即表示您已阅读、理解并同意本声明的全部内容。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 服务协议 ===== -->
+  <div class="page" id="page-terms">
+    <div class="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 px-4 pt-8 pb-6 text-white">
+      <div class="flex items-center gap-3">
+        <button onclick="showView('page-login')" class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">←</button>
+        <h1 class="text-xl font-bold">服务协议</h1>
+      </div>
+    </div>
+    <div class="px-4 py-6 max-w-2xl mx-auto">
+      <div class="prose prose-sm max-w-none">
+        <p class="text-sm text-gray-500 mb-4">版本：v1.0 | 更新日期：2026年7月22日</p>
+
+        <h3 class="text-lg font-bold text-gray-800 mt-6 mb-3">一、服务条款的接受</h3>
+        <p class="text-gray-600 mb-2">1.1 用户在注册、登录或使用「对练社交」App（以下简称"本产品"）时，即表示同意接受本服务协议的全部条款和条件。</p>
+        <p class="text-gray-600 mb-2">1.2 本产品有权随时修改本协议，并在App内公示修改后的内容。用户继续使用本产品即视为接受修改后的协议。</p>
+
+        <h3 class="text-lg font-bold text-gray-800 mt-6 mb-3">二、用户账号</h3>
+        <p class="text-gray-600 mb-2">2.1 用户注册账号时应提供真实、准确的信息。用户应对其账号和密码的安全负责。</p>
+        <p class="text-gray-600 mb-2">2.2 用户不得将账号转让、出借或授权他人使用。如发现账号异常使用，本产品有权暂停或终止账号。</p>
+
+        <h3 class="text-lg font-bold text-gray-800 mt-6 mb-3">三、服务内容</h3>
+        <p class="text-gray-600 mb-2">3.1 本产品提供AI社交训练服务，包括但不限于对话模拟、技能评估、学习计划等。</p>
+        <p class="text-gray-600 mb-2">3.2 本产品有权根据业务需要调整服务内容和功能，无需提前通知用户。</p>
+
+        <h3 class="text-lg font-bold text-gray-800 mt-6 mb-3">四、用户行为规范</h3>
+        <p class="text-gray-600 mb-2">4.1 用户应遵守法律法规和公序良俗，不得利用本产品从事违法或违规活动。</p>
+        <p class="text-gray-600 mb-2">4.2 用户不得干扰本产品的正常运行，不得侵犯其他用户的合法权益。</p>
+
+        <h3 class="text-lg font-bold text-gray-800 mt-6 mb-3">五、知识产权</h3>
+        <p class="text-gray-600 mb-2">5.1 本产品的软件、界面设计、内容等知识产权归本产品所有。</p>
+        <p class="text-gray-600 mb-2">5.2 用户在本产品中生成的内容，其知识产权归用户所有，但用户授权本产品在合法范围内使用。</p>
+
+        <h3 class="text-lg font-bold text-gray-800 mt-6 mb-3">六、隐私保护</h3>
+        <p class="text-gray-600 mb-2">6.1 本产品重视用户隐私，将按照《隐私政策》保护用户数据。</p>
+
+        <h3 class="text-lg font-bold text-gray-800 mt-6 mb-3">七、免责声明</h3>
+        <p class="text-gray-600 mb-2">7.1 本产品按"现状"提供服务，不保证服务的连续性和稳定性。</p>
+        <p class="text-gray-600 mb-2">7.2 用户应自行承担使用本产品的风险。</p>
+
+        <h3 class="text-lg font-bold text-gray-800 mt-6 mb-3">八、协议终止</h3>
+        <p class="text-gray-600 mb-2">8.1 用户可随时注销账号终止协议。</p>
+        <p class="text-gray-600 mb-2">8.2 本产品有权在用户违反协议时终止服务。</p>
+
+        <p class="text-gray-500 text-sm mt-6">使用本产品即表示您已阅读并同意本服务协议。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 隐私政策 ===== -->
+  <div class="page" id="page-privacy">
+    <div class="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 px-4 pt-8 pb-6 text-white">
+      <div class="flex items-center gap-3">
+        <button onclick="showView('page-login')" class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">←</button>
+        <h1 class="text-xl font-bold">隐私政策</h1>
+      </div>
+    </div>
+    <div class="px-4 py-6 max-w-2xl mx-auto">
+      <div class="prose prose-sm max-w-none">
+        <p class="text-sm text-gray-500 mb-4">版本：v1.0 | 更新日期：2026年7月22日</p>
+
+        <h3 class="text-lg font-bold text-gray-800 mt-6 mb-3">一、我们收集的数据</h3>
+        <p class="text-gray-600 mb-2">1.1 注册信息：手机号、昵称等。</p>
+        <p class="text-gray-600 mb-2">1.2 使用数据：训练记录、对话内容、学习进度等。</p>
+        <p class="text-gray-600 mb-2">1.3 设备信息：设备型号、操作系统、IP地址等。</p>
+
+        <h3 class="text-lg font-bold text-gray-800 mt-6 mb-3">二、数据使用目的</h3>
+        <p class="text-gray-600 mb-2">2.1 提供和优化服务。</p>
+        <p class="text-gray-600 mb-2">2.2 个性化推荐和内容定制。</p>
+        <p class="text-gray-600 mb-2">2.3 安全防护和反欺诈。</p>
+
+        <h3 class="text-lg font-bold text-gray-800 mt-6 mb-3">三、数据共享</h3>
+        <p class="text-gray-600 mb-2">3.1 不会向第三方出售用户数据。</p>
+        <p class="text-gray-600 mb-2">3.2 仅在法律要求或用户授权时共享数据。</p>
+
+        <h3 class="text-lg font-bold text-gray-800 mt-6 mb-3">四、数据安全</h3>
+        <p class="text-gray-600 mb-2">4.1 采用加密技术保护数据传输和存储。</p>
+        <p class="text-gray-600 mb-2">4.2 定期进行安全审计和漏洞检测。</p>
+
+        <h3 class="text-lg font-bold text-gray-800 mt-6 mb-3">五、用户权利</h3>
+        <p class="text-gray-600 mb-2">5.1 用户可查看、导出或删除个人数据。</p>
+        <p class="text-gray-600 mb-2">5.2 用户可随时撤回授权。</p>
+
+        <p class="text-gray-500 text-sm mt-6">使用本产品即表示您已阅读并同意本隐私政策。</p>
+      </div>
     </div>
   </div>
 
@@ -2268,6 +2433,22 @@ let showRegister = false;
 let smsCountdown = 0;
 let regSmsCountdown = 0;
 const STORAGE_PREFIX = 'dl_';
+const API_BASE_URL = '/api';
+
+function apiRequest(url, options = {}) {
+  const headers = {
+    'Content-Type': 'application/json',
+    ...options.headers
+  };
+  const token = localStorage.getItem(STORAGE_PREFIX + 'token');
+  if (token) {
+    headers['Authorization'] = 'Bearer ' + token;
+  }
+  return fetch(API_BASE_URL + url, {
+    ...options,
+    headers
+  }).then(res => res.json());
+}
 
 // CBT额外状态
 let cbtSelectedEmotions = [];
@@ -2893,33 +3074,81 @@ function switchLoginMode(mode) {
   $('login-sms-group').style.display = mode==='sms' ? 'block' : 'none';
 }
 
-function sendSms() {
+function renderRegister() {
+  showRegister = true;
+  $('login-form').style.display = 'none';
+  $('register-form').style.display = 'block';
+}
+
+async function sendSms() {
   const phone = $('login-phone').value.trim();
   if (!phone || phone.length!==11) { alert('请输入正确的手机号'); return; }
-  smsCountdown = 60;
+
   const btn = $('sms-btn');
-  btn.disabled = true;
-  const timer = setInterval(() => {
-    smsCountdown--;
-    btn.textContent = smsCountdown + 's';
-    if (smsCountdown<=0) { clearInterval(timer); btn.disabled = false; btn.textContent = '获取验证码'; }
-  }, 1000);
+  if (btn.disabled) return;
+
+  try {
+    const result = await apiRequest('/auth/send-code', {
+      method: 'POST',
+      body: JSON.stringify({ phone })
+    });
+
+    if (result.success) {
+      smsCountdown = 60;
+      btn.disabled = true;
+      const timer = setInterval(() => {
+        smsCountdown--;
+        btn.textContent = smsCountdown + 's';
+        if (smsCountdown<=0) { clearInterval(timer); btn.disabled = false; btn.textContent = '获取验证码'; }
+      }, 1000);
+
+      if (result.data && result.data.code) {
+        alert('验证码已发送：' + result.data.code);
+      }
+    } else {
+      alert(result.message || '发送验证码失败');
+    }
+  } catch(e) {
+    console.error('发送验证码失败:', e);
+    alert('发送验证码失败，请重试');
+  }
 }
 
-function sendRegSms() {
+async function sendRegSms() {
   const phone = $('reg-phone').value.trim();
   if (!phone || phone.length!==11) { alert('请输入正确的手机号'); return; }
-  regSmsCountdown = 60;
+
   const btn = $('reg-sms-btn');
-  btn.disabled = true;
-  const timer = setInterval(() => {
-    regSmsCountdown--;
-    btn.textContent = regSmsCountdown + 's';
-    if (regSmsCountdown<=0) { clearInterval(timer); btn.disabled = false; btn.textContent = '获取验证码'; }
-  }, 1000);
+  if (btn.disabled) return;
+
+  try {
+    const result = await apiRequest('/auth/send-code', {
+      method: 'POST',
+      body: JSON.stringify({ phone })
+    });
+
+    if (result.success) {
+      regSmsCountdown = 60;
+      btn.disabled = true;
+      const timer = setInterval(() => {
+        regSmsCountdown--;
+        btn.textContent = regSmsCountdown + 's';
+        if (regSmsCountdown<=0) { clearInterval(timer); btn.disabled = false; btn.textContent = '获取验证码'; }
+      }, 1000);
+
+      if (result.data && result.data.code) {
+        alert('验证码已发送：' + result.data.code);
+      }
+    } else {
+      alert(result.message || '发送验证码失败');
+    }
+  } catch(e) {
+    console.error('发送验证码失败:', e);
+    alert('发送验证码失败，请重试');
+  }
 }
 
-function fillDemoAccount() {
+async function fillDemoAccount() {
   console.log('fillDemoAccount called');
   try {
     loginMode = 'password';
@@ -2927,10 +3156,11 @@ function fillDemoAccount() {
     $('login-password').value = '123456';
     switchLoginMode('password');
     $('login-error').style.display = 'none';
-    console.log('fillDemoAccount completed successfully');
+    console.log('fillDemoAccount completed, calling doLogin');
+    await doLogin();
   } catch(e) {
     console.error('fillDemoAccount error:', e);
-    alert('演示账号填充失败：' + e.message);
+    alert('演示账号登录失败：' + e.message);
   }
 }
 
@@ -2945,35 +3175,53 @@ async function doLogin() {
       return;
     }
 
-    const hashedPwd = await hashPassword($('login-password').value.trim());
-
     if (loginMode === 'password') {
       const pwd = $('login-password').value.trim();
       if (!pwd) { err.textContent='请输入密码'; err.style.display='block'; return; }
-      const saved = localStorage.getItem(STORAGE_PREFIX + 'user_' + phone);
-      if (!saved) {
-        if (phone==='13800138000' && pwd==='123456') {
-          userData = { nickname:'演示用户', phone, password:await hashPassword('123456'), points:650, streak:3, member:'free', level:'钻石学员', realNameVerified:false, realNameInfo:{name:'',idCard:''}, avatar:'👤', inviteCode:generateInviteCode() };
-        } else {
-          err.textContent='账号不存在，请先注册'; err.style.display='block'; return;
-        }
-      } else {
-        const d = JSON.parse(saved);
-        if (d.userData && d.userData.password !== hashedPwd && d.userData.password !== pwd) { err.textContent='密码错误'; err.style.display='block'; return; }
-        if (d.userData) userData = d.userData;
-        if (userData.password === pwd) { userData.password = hashedPwd; }
+      const result = await apiRequest('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ phone, password: pwd })
+      });
+      if (!result.success) {
+        err.textContent = result.message || '登录失败';
+        err.style.display = 'block';
+        return;
       }
+      localStorage.setItem(STORAGE_PREFIX + 'token', result.data.token);
+      userData = {
+        nickname: result.data.user.nickname || '用户',
+        phone,
+        points: result.data.user.points || 0,
+        streak: result.data.streak || 0,
+        member: result.data.user.member_level || 'free',
+        level: result.data.user.student_level || '青铜学员',
+        avatar: result.data.avatar || '👤',
+        realNameVerified: result.data.user.is_real_name_verified || false
+      };
     } else {
       const sms = $('login-sms').value.trim();
       if (!sms || sms.length!==6) { err.textContent='请输入6位验证码'; err.style.display='block'; return; }
-      if (sms !== '123456') { err.textContent='验证码错误'; err.style.display='block'; return; }
-      const saved = localStorage.getItem(STORAGE_PREFIX + 'user_' + phone);
-      if (saved) { try { const d = JSON.parse(saved); if (d.userData) userData = d.userData; } catch(e) {} }
-      else { userData = { nickname:'用户', phone, password:'', points:0, streak:0, member:'free', level:'青铜学员', realNameVerified:false, realNameInfo:{name:'',idCard:''} }; }
+      const result = await apiRequest('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ phone, code: sms })
+      });
+      if (!result.success) {
+        err.textContent = result.message || '登录失败';
+        err.style.display = 'block';
+        return;
+      }
+      localStorage.setItem(STORAGE_PREFIX + 'token', result.data.token);
+      userData = {
+        nickname: result.data.user.nickname || '用户',
+        phone,
+        points: result.data.user.points || 0,
+        streak: result.data.streak || 0,
+        member: result.data.user.member_level || 'free',
+        level: result.data.user.student_level || '青铜学员',
+        avatar: result.data.avatar || '👤',
+        realNameVerified: result.data.user.is_real_name_verified || false
+      };
     }
-
-    userData.phone = phone;
-    loadData(phone);
 
     localStorage.setItem(STORAGE_PREFIX + 'logged_in', phone);
 
@@ -3022,14 +3270,38 @@ async function doRegister() {
   if (!pwd || pwd.length<6) { err.textContent='密码至少6位'; err.style.display='block'; return; }
   if (pwd !== confirmPwd) { err.textContent='两次密码输入不一致'; err.style.display='block'; return; }
   if (!sms || sms.length!==6) { err.textContent='请输入6位验证码'; err.style.display='block'; return; }
-  if (sms !== '123456') { err.textContent='验证码错误'; err.style.display='block'; return; }
-  if (!agreeTerms) { err.textContent='请阅读并同意服务协议和隐私政策'; err.style.display='block'; return; }
+  if (!agreeTerms) { err.textContent='请仔细阅读并同意服务协议、隐私政策和免责声明'; err.style.display='block'; return; }
 
-  userData = { nickname:nick, phone, password:await hashPassword(pwd), points:0, streak:0, member:'free', level:'青铜学员', realNameVerified:false, realNameInfo:{name:'',idCard:''} };
-  saveData();
-  showView('page-home');
-  $('tab-bar').classList.add('show');
-  renderHome();
+  try {
+    const result = await apiRequest('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ phone, code: sms, nickname: nick, password: pwd })
+    });
+    if (!result.success) {
+      err.textContent = result.message || '注册失败';
+      err.style.display = 'block';
+      return;
+    }
+    localStorage.setItem(STORAGE_PREFIX + 'token', result.data.token);
+    userData = {
+      nickname: nick,
+      phone,
+      points: 0,
+      streak: 0,
+      member: 'free',
+      level: '青铜学员',
+      avatar: '👤',
+      realNameVerified: false
+    };
+    localStorage.setItem(STORAGE_PREFIX + 'logged_in', phone);
+    showView('page-home');
+    $('tab-bar').classList.add('show');
+    renderHome();
+  } catch(e) {
+    console.error('注册失败:', e);
+    err.textContent = '注册失败，请重试';
+    err.style.display = 'block';
+  }
 }
 
 // ===== 首页 =====
@@ -7048,18 +7320,32 @@ function finishTraining() {
 
       <!-- 现实行动建议（v2.3新增） -->
       <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4 animate-in border border-amber-100">
-        <h5 class="text-sm font-semibold text-gray-800 mb-3">💡 现实行动建议</h5>
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-amber-600">📋</span>
+          <h5 class="text-sm font-semibold text-gray-800">现实行动建议（基于本次训练）</h5>
+        </div>
+        <div class="text-xs text-gray-500 mb-3">━━━━━━━━━━━━━━━</div>
+        <div class="text-xs text-gray-600 mb-3">你本次在"${currentTraining ? currentTraining.name : '相亲模拟'}"中的表现：${trainingScore}分</div>
         <div class="space-y-3">
           ${generateActionSuggestions().map((suggestion, idx) => `
             <div class="bg-white rounded-lg p-3 border border-gray-100">
               <div class="flex items-start gap-2">
                 <span class="text-amber-500 font-bold">${idx + 1}.</span>
                 <div class="flex-1">
-                  <div class="text-sm font-medium text-gray-800 mb-1">${suggestion.title}</div>
-                  <div class="text-xs text-gray-500 space-y-1">
-                    <div>• <span class="font-medium">做什么：</span>${suggestion.what}</div>
-                    <div>• <span class="font-medium">什么时候：</span>${suggestion.when}</div>
-                    <div>• <span class="font-medium">怎么做：</span>${suggestion.how}</div>
+                  <div class="text-sm font-medium text-gray-800 mb-2">${suggestion.title}</div>
+                  <div class="space-y-2">
+                    <div class="bg-red-50 rounded-lg p-2 text-xs">
+                      <div class="text-red-600 font-medium">❌ 错误示范</div>
+                      <div class="text-red-800 mt-1">${suggestion.wrong.replace('❌ ', '')}</div>
+                    </div>
+                    <div class="bg-green-50 rounded-lg p-2 text-xs">
+                      <div class="text-green-600 font-medium">✅ 正确话术</div>
+                      <div class="text-green-800 mt-1">${suggestion.right.replace('✅ ', '')}</div>
+                    </div>
+                  </div>
+                  <div class="text-xs text-gray-500 mt-2 flex flex-wrap gap-x-3">
+                    <span>• <span class="font-medium">时间：</span>${suggestion.when}</span>
+                    <span>• <span class="font-medium">要点：</span>${suggestion.how}</span>
                   </div>
                   <button onclick="checkinActionSuggestion(${idx})" class="mt-2 px-3 py-1.5 bg-amber-100 text-amber-600 text-xs font-medium rounded-lg hover:bg-amber-200 transition-colors flex items-center gap-1">
                     ✅ 记录我的现实练习 (+5积分 +2好感度)
@@ -7100,34 +7386,34 @@ function checkSceneUnlocks() {
 function generateActionSuggestions() {
   const suggestions = {
     '相亲模拟': [
-      { title:'本周内主动和一位陌生人开启对话', what:'在日常生活中，主动与一位陌生人开启对话', when:'今天下午或明天上午', how:'可以从赞美对方的穿着或物品开始，例如："你的包很特别，在哪里买的？"' },
-      { title:'练习复述对方的话', what:'在对话中，尝试用自己的话复述对方的观点', when:'每次与人交流时都可以练习', how:'等对方说完后，先说"我理解你的意思是..."然后复述' },
-      { title:'准备3个开放式问题', what:'准备3个可以问任何人的开放式问题', when:'今天晚上花10分钟', how:'避免"是/否"类问题，多用"如何""为什么""什么"开头' }
+      { title:'用"开放式提问"代替"是/否问题"', wrong:'❌ "你喜欢看电影吗？"（是/否问题，对方只能回答是或否）', right:'✅ "你平时喜欢看什么类型的电影？最近有推荐的吗？"（开放式问题，引导对方多说）', what:'下次与人聊天时，刻意使用开放式提问', when:'今天下午或明天上午', how:'用"如何""为什么""什么"开头，避免"是/否"问题' },
+      { title:'具体赞美而非空泛夸奖', wrong:'❌ "你真棒！"（空泛，对方不知道哪里棒）', right:'✅ "你刚才做的PPT配色很舒服，图表也很清晰，是怎么做到的？"（具体+提问，让对方有回应的欲望）', what:'主动赞美一位同事或朋友的某个具体优点', when:'本周内', how:'赞美要具体到细节，最好加上一个问题' },
+      { title:'共情回应而非急于安慰', wrong:'❌ "别难过，一切都会好起来的。"（急于安慰，忽略感受）', right:'✅ "听起来你当时一定很委屈，换作是我也会觉得不公平。"（先共情，说出对方的感受）', what:'记录一次你成功运用共情回应的瞬间', when:'本周内', how:'先说出对方的感受，再提供支持' }
     ],
     '模拟面试': [
-      { title:'梳理3个STAR法则案例', what:'准备3个用STAR法则描述的工作案例', when:'明天花30分钟', how:'每个案例包含：情境(Situation)、任务(Task)、行动(Action)、结果(Result)' },
-      { title:'练习自我介绍', what:'准备一个30秒的自我介绍', when:'今天晚上', how:'包含：姓名、背景、亮点、目标，保持简洁有力' },
-      { title:'准备反问问题', what:'准备3个在面试结束时反问面试官的问题', when:'明天花10分钟', how:'例如："这个团队目前面临的最大挑战是什么？"' }
+      { title:'用STAR法则描述经历', wrong:'❌ "我负责了一个项目，最后成功完成了。"（太笼统）', right:'✅ "去年我们团队负责XX项目（情境），我负责核心模块开发（任务），优化了3个关键流程（行动），最终提前2周交付（结果）。"', what:'准备3个用STAR法则描述的工作案例', when:'明天花30分钟', how:'每个案例包含：情境(Situation)、任务(Task)、行动(Action)、结果(Result)' },
+      { title:'30秒自我介绍', wrong:'❌ "我叫张三，今年25岁，毕业于XX大学..."（流水账）', right:'✅ "我叫张三，3年产品经理经验（背景），曾负责一款DAU百万的产品（亮点），期待在贵公司继续成长（目标）。"', what:'准备一个30秒的自我介绍', when:'今天晚上', how:'包含：姓名、背景、亮点、目标，保持简洁有力' },
+      { title:'准备反问问题', wrong:'❌ "这个岗位的薪资待遇怎么样？"（太直接，显得功利）', right:'✅ "这个团队目前面临的最大挑战是什么？我可以如何帮助解决？"（体现主动性和思考）', what:'准备3个在面试结束时反问面试官的问题', when:'明天花10分钟', how:'问团队、问挑战、问成长，别问薪资' }
     ],
     '加薪谈判': [
-      { title:'收集数据证据', what:'整理过去一年的工作成果数据', when:'本周内完成', how:'列出具体项目、量化成果、对公司的贡献' },
-      { title:'练习自信表达', what:'对着镜子练习自信的表达方式', when:'今天晚上', how:'注意眼神、姿态和语气，保持坚定但友好' },
-      { title:'了解市场行情', what:'调研同行业同职位的薪资水平', when:'本周内', how:'通过招聘网站、行业报告了解市场薪资范围' }
+      { title:'用数据说话', wrong:'❌ "我觉得我应该加薪，因为我做得很好。"（主观，没有依据）', right:'✅ "去年我负责的项目为公司节省了50万元成本，超额完成了120%的业绩目标。"（用数据证明价值）', what:'整理过去一年的工作成果数据', when:'本周内完成', how:'列出具体项目、量化成果、对公司的贡献' },
+      { title:'自信表达', wrong:'❌ "老板，我想跟您谈谈，那个...可能...能不能...加点工资？"（语气犹豫，不自信）', right:'✅ "老板，我想跟您讨论一下我的薪资调整。基于过去一年的表现，我认为我的贡献值得更高的报酬。"（坚定、礼貌、直接）', what:'对着镜子练习自信的表达方式', when:'今天晚上', how:'注意眼神、姿态和语气，保持坚定但友好' },
+      { title:'了解市场行情', wrong:'❌ 不知道市场薪资水平就去谈判', right:'✅ "根据XX平台的数据，同行业同职位的薪资范围在XX-XX之间，我的期望是XX。"（有依据）', what:'调研同行业同职位的薪资水平', when:'本周内', how:'通过招聘网站、行业报告了解市场薪资范围' }
     ],
     '兴趣社群自我介绍': [
-      { title:'加入一个兴趣社群', what:'加入一个你感兴趣的线上或线下社群', when:'本周内', how:'可以是运动、读书、艺术等任何你感兴趣的领域' },
-      { title:'准备30秒社群自我介绍', what:'准备一个适合社群的简短自我介绍', when:'今天花10分钟', how:'包含：名字、兴趣、期待收获' },
-      { title:'主动发起话题', what:'在社群中主动发起一个话题讨论', when:'本周内', how:'选择大家可能感兴趣的话题，例如："最近看了一本好书，推荐给大家"' }
+      { title:'主动开启对话', wrong:'❌ "大家好。"（太简短，没人知道你是谁）', right:'✅ "大家好！我叫小李，最近迷上了摄影，尤其是人像摄影，希望能跟大家学习交流！"（包含名字、兴趣、期待）', what:'加入一个兴趣社群并自我介绍', when:'本周内', how:'可以是运动、读书、艺术等任何你感兴趣的领域' },
+      { title:'准备社群自我介绍', wrong:'❌ 想到什么说什么，没有准备', right:'✅ "大家好！我叫XXX，喜欢XXX，希望认识志同道合的朋友，一起交流学习！"（包含：名字、兴趣、期待收获）', what:'准备一个适合社群的简短自我介绍', when:'今天花10分钟', how:'包含：名字、兴趣、期待收获' },
+      { title:'主动发起话题', wrong:'❌ "有人在吗？"（无聊，没人愿意回应）', right:'✅ "最近看了一本好书《被讨厌的勇气》，里面提到的课题分离让我很有启发，大家有什么看法吗？"（有内容、有观点、有互动）', what:'在社群中主动发起一个话题讨论', when:'本周内', how:'选择大家可能感兴趣的话题，提出具体问题' }
     ],
     '被误解(NVC)': [
-      { title:'练习观察而非评论', what:'在日常中练习只描述观察，不做评论', when:'每天练习', how:'把"你总是迟到"改成"本周你迟到了3次"' },
-      { title:'表达感受而非判断', what:'练习表达自己的感受', when:'每次有情绪时', how:'把"你让我很生气"改成"我感到生气，因为..."' },
-      { title:'提出具体请求', what:'练习提出具体的请求而非命令', when:'需要他人配合时', how:'把"你应该..."改成"你可以...吗？"' }
+      { title:'观察而非评论', wrong:'❌ "你总是迟到，一点都不重视这个会议。"（评论+指责）', right:'✅ "本周你迟到了3次，我们错过了会议的开头部分。"（只描述事实）', what:'在日常中练习只描述观察，不做评论', when:'每天练习', how:'把"你总是..."改成"本周你..."，只说事实不说评价' },
+      { title:'表达感受而非判断', wrong:'❌ "你太自私了，从不考虑我的感受。"（判断+攻击）', right:'✅ "你没有跟我商量就做了决定，我感到生气，因为我觉得自己不被尊重。"（感受+原因）', what:'练习表达自己的感受', when:'每次有情绪时', how:'把"你让我..."改成"我感到...，因为..."' },
+      { title:'提出请求而非命令', wrong:'❌ "你应该早点回家陪我。"（命令，让人反感）', right:'✅ "我希望你能每周有3天早点回家，我们可以一起吃晚饭。"（具体请求）', what:'练习提出具体的请求而非命令', when:'需要他人配合时', how:'把"你应该..."改成"我希望你..."，提出具体可执行的请求' }
     ],
     '共情沟通训练': [
-      { title:'练习倾听', what:'找一个朋友练习深度倾听', when:'本周内', how:'专注听对方说话，不打断，用点头和"嗯"回应' },
-      { title:'练习表达理解', what:'练习表达对他人感受的理解', when:'每次与人交流时', how:'使用"听起来你当时一定很..."这样的句式' },
-      { title:'分享自己的感受', what:'在安全的关系中分享自己的感受', when:'本周内', how:'选择信任的人，分享一件让你有感受的事' }
+      { title:'深度倾听', wrong:'❌ 对方说话时，你在想自己该怎么回应', right:'✅ 专注听对方说话，不打断，用点头和"嗯"回应，偶尔复述确认理解', what:'找一个朋友练习深度倾听', when:'本周内', how:'专注听对方说话，不打断，用点头和"嗯"回应' },
+      { title:'表达理解', wrong:'❌ "别想太多了，开心点。"（否定对方感受）', right:'✅ "听起来你当时一定很失落，我能理解这种感受。"（承认并表达理解）', what:'练习表达对他人感受的理解', when:'每次与人交流时', how:'使用"听起来你当时一定很..."这样的句式' },
+      { title:'分享感受', wrong:'❌ 只说事实，不说感受', right:'✅ "上次开会被当众批评，我感到很尴尬，回家后难过了很久。"（分享具体事件+真实感受）', what:'在安全的关系中分享自己的感受', when:'本周内', how:'选择信任的人，分享一件让你有感受的事' }
     ]
   };
 

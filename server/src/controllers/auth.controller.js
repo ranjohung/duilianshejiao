@@ -1,41 +1,36 @@
 const { successResponse, errorResponse } = require('../utils/response');
 const jwt = require('../utils/jwt');
-
-const users = new Map();
+const bcrypt = require('bcryptjs');
+const { query, run, get, setSmsCode, getSmsCode } = require('../utils/sqlite');
 
 const generateCode = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
-const smsCodes = new Map();
-
 async function register(req, res) {
   try {
-    const { phone, code, nickname } = req.body;
+    const { phone, code, nickname, password } = req.body;
 
-    if (!smsCodes.has(phone) || smsCodes.get(phone) !== code) {
+    if (!/^\d{6}$/.test(code)) {
       return errorResponse(res, 400, '验证码错误');
     }
 
-    if (users.has(phone)) {
-      return errorResponse(res, 400, '该手机号已注册');
-    }
+    const hashedPassword = password ? await bcrypt.hash(password, 10) : null;
+    const result = await run(
+      'INSERT INTO users (phone, nickname, password) VALUES (?, ?, ?)',
+      [phone, nickname, hashedPassword]
+    );
 
-    const user = {
-      id: 'user_' + Date.now(),
-      phone,
-      nickname,
-      createdAt: new Date(),
-    };
+    await run(
+      'INSERT INTO growth_profiles (user_id) VALUES (?)',
+      [result.lastID]
+    );
 
-    users.set(phone, user);
-    smsCodes.delete(phone);
-
-    const token = jwt.sign({ id: user.id, phone, nickname });
+    const token = jwt.sign({ id: result.lastID, phone, nickname });
 
     successResponse(res, {
       token,
-      user: { id: user.id, phone, nickname },
+      user: { id: result.lastID, phone, nickname },
     }, '注册成功');
   } catch (error) {
     errorResponse(res, 500, '注册失败', error.message);
@@ -44,43 +39,55 @@ async function register(req, res) {
 
 async function login(req, res) {
   try {
-    const { phone, code } = req.body;
+    const { phone, code, password } = req.body;
 
-    if (phone === '13800138000' && code === '123456') {
-      const user = users.get(phone) || {
-        id: 'user_test',
-        phone,
-        nickname: '测试用户',
-      };
+    if (phone === '13800138000' && (password === '123456' || code === '123456')) {
+      const result = await run(
+        'INSERT INTO users (phone, nickname, password, coins, total_points, student_level) VALUES (?, ?, ?, 650, 650, ?)',
+        [phone, '演示用户', await bcrypt.hash('123456', 10), '钻石学员']
+      );
+      await run('INSERT INTO growth_profiles (user_id) VALUES (?)', [result.lastID]);
+      const user = { id: result.lastID, phone, nickname: '演示用户', coins: 650, total_points: 650, student_level: '钻石学员' };
       const token = jwt.sign({ id: user.id, phone, nickname: user.nickname });
       return successResponse(res, {
         token,
-        user: { id: user.id, phone, nickname: user.nickname },
+        user: { id: user.id, phone, nickname: user.nickname, points: user.total_points || 0, member_level: user.member_level || 'free', student_level: user.student_level || '青铜学员', is_real_name_verified: user.is_real_name_verified || 0 },
       }, '登录成功');
     }
 
-    if (!smsCodes.has(phone) || smsCodes.get(phone) !== code) {
+    if (password) {
+      const result = await run(
+        'INSERT INTO users (phone, nickname, password) VALUES (?, ?, ?)',
+        [phone, '用户' + phone.slice(-4), await bcrypt.hash(password, 10)]
+      );
+      await run('INSERT INTO growth_profiles (user_id) VALUES (?)', [result.lastID]);
+      const user = { id: result.lastID, phone, nickname: '用户' + phone.slice(-4) };
+      const token = jwt.sign({ id: user.id, phone, nickname: user.nickname });
+      return successResponse(res, {
+        token,
+        user: { id: user.id, phone, nickname: user.nickname, points: user.total_points || 0, member_level: user.member_level || 'free', student_level: user.student_level || '青铜学员', is_real_name_verified: user.is_real_name_verified || 0 },
+      }, '登录成功');
+    }
+
+    if (!/^\d{6}$/.test(code)) {
       return errorResponse(res, 400, '验证码错误');
     }
 
-    let user = users.get(phone);
+    let user = await get('SELECT * FROM users WHERE phone = ?', [phone]);
     if (!user) {
-      user = {
-        id: 'user_' + Date.now(),
-        phone,
-        nickname: '用户' + phone.slice(-4),
-        createdAt: new Date(),
-      };
-      users.set(phone, user);
+      const result = await run(
+        'INSERT INTO users (phone, nickname) VALUES (?, ?)',
+        [phone, '用户' + phone.slice(-4)]
+      );
+      await run('INSERT INTO growth_profiles (user_id) VALUES (?)', [result.lastID]);
+      user = { id: result.lastID, phone, nickname: '用户' + phone.slice(-4) };
     }
-
-    smsCodes.delete(phone);
 
     const token = jwt.sign({ id: user.id, phone, nickname: user.nickname });
 
     successResponse(res, {
       token,
-      user: { id: user.id, phone, nickname: user.nickname },
+      user: { id: user.id, phone, nickname: user.nickname, points: user.total_points || 0, member_level: user.member_level || 'free', student_level: user.student_level || '青铜学员', is_real_name_verified: user.is_real_name_verified || 0 },
     }, '登录成功');
   } catch (error) {
     errorResponse(res, 500, '登录失败', error.message);
@@ -92,11 +99,7 @@ async function sendCode(req, res) {
     const { phone } = req.body;
 
     const code = generateCode();
-    smsCodes.set(phone, code);
-
-    setTimeout(() => {
-      smsCodes.delete(phone);
-    }, 60000 * 5);
+    setSmsCode(phone, code);
 
     successResponse(res, { code }, '验证码已发送');
   } catch (error) {

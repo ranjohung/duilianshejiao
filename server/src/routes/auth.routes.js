@@ -10,12 +10,14 @@ router.post('/register', validate(Joi.object({
   phone: Joi.string().pattern(/^1[3-9]\d{9}$/).required(),
   code: Joi.string().length(6).required(),
   nickname: Joi.string().min(2).max(20).required(),
+  password: Joi.string().min(6).max(32).allow(null, ''),
 })), authController.register);
 
 // POST /api/auth/login
 router.post('/login', validate(Joi.object({
   phone: Joi.string().pattern(/^1[3-9]\d{9}$/).required(),
-  code: Joi.string().length(6).required(),
+  code: Joi.string().length(6).allow(null, ''),
+  password: Joi.string().min(6).max(32).allow(null, ''),
 })), authController.login);
 
 // POST /api/auth/send-code
