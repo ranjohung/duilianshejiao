@@ -2616,6 +2616,359 @@ let trainingScenes = [
       { type:'B', label:'平衡型', desc:'表达不同看法 + 给予信心', example:'我觉得你做得很好，别太自责了' },
       { type:'C', label:'含蓄型', desc:'简单鼓励', example:'加油' }
     ], bestAnswer:'我不这么觉得。你工作很努力，每个人都会遇到挫折，重要的是如何成长' }
+  ]},
+  { id:7, icon:'📊', name:'向上汇报被质疑', desc:'在汇报中应对领导质疑', stage:2, difficulty:4, duration:'12min', unlocked:false, completed:false, unlockLevel:'白银', unlockPoints:50, unlockTickets:1, rounds:[
+    { ai:'这个数据有问题吧？我记得上周不是这个数', thinking:[
+      { type:'A', label:'主动型', desc:'承认问题 + 解释原因 + 提出解决方案', example:'您说得对，数据确实有差异。这是因为我们调整了统计口径，我马上给您解释具体变化' },
+      { type:'B', label:'平衡型', desc:'先道歉 + 说明情况', example:'抱歉，可能我没说清楚。让我再核对一下数据来源' },
+      { type:'C', label:'含蓄型', desc:'简单回应', example:'哦，可能有变化吧' }
+    ], bestAnswer:'您说得对，数据确实有差异。这是因为我们调整了统计口径，我马上给您解释具体变化' },
+    { ai:'这个方案的可行性有多大？', thinking:[
+      { type:'A', label:'主动型', desc:'展示数据支撑 + 风险预案', example:'我们做了详细的可行性分析，成功率预估85%，同时准备了三套风险应对方案' },
+      { type:'B', label:'平衡型', desc:'说明信心 + 提及准备', example:'我们认为可行性较高，已经做了充分准备' },
+      { type:'C', label:'含蓄型', desc:'简单表态', example:'应该可行' }
+    ], bestAnswer:'我们做了详细的可行性分析，成功率预估85%，同时准备了三套风险应对方案' }
+  ]},
+  { id:8, icon:'🚫', name:'拒绝同事的不合理请求', desc:'学会礼貌地拒绝同事', stage:1, difficulty:2, duration:'10min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+    { ai:'这周末帮我加班做个PPT吧，我家里有事', thinking:[
+      { type:'A', label:'主动型', desc:'表达理解 + 说明理由 + 提供替代方案', example:'我理解你的难处，但我周末也有重要安排。要不我教你个快速做PPT的方法？' },
+      { type:'B', label:'平衡型', desc:'说明情况 + 保持友好', example:'不好意思，我周末已经有安排了，祝你周末愉快' },
+      { type:'C', label:'含蓄型', desc:'直接拒绝', example:'不行，我周末有事' }
+    ], bestAnswer:'我理解你的难处，但我周末也有重要安排。要不我教你个快速做PPT的方法？' },
+    { ai:'帮我把这个活也做了吧，反正你也没事', thinking:[
+      { type:'A', label:'主动型', desc:'表达边界 + 展示自己的工作', example:'其实我手头还有三个紧急项目在赶，但可以帮你梳理一下思路，这样你做起来更快' },
+      { type:'B', label:'平衡型', desc:'说明自己的情况', example:'我也挺忙的，你还是自己处理吧' },
+      { type:'C', label:'含蓄型', desc:'简单拒绝', example:'不行' }
+    ], bestAnswer:'其实我手头还有三个紧急项目在赶，但可以帮你梳理一下思路，这样你做起来更快' }
+  ]},
+  { id:9, icon:'❤️', name:'初次约会', desc:'第一次见面的沟通技巧', stage:1, difficulty:2, duration:'12min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+    { ai:'你好，很高兴见到你', thinking:[
+      { type:'A', label:'主动型', desc:'热情回应 + 开启话题', example:'我也是！这家餐厅看起来很有特色，你是第一次来吗？' },
+      { type:'B', label:'平衡型', desc:'礼貌回应 + 简单提问', example:'你好，很高兴见到你。你平时喜欢来这种地方吗？' },
+      { type:'C', label:'含蓄型', desc:'简单回应', example:'你好' }
+    ], bestAnswer:'我也是！这家餐厅看起来很有特色，你是第一次来吗？' },
+    { ai:'你平时周末都喜欢做什么？', thinking:[
+      { type:'A', label:'主动型', desc:'详细分享 + 邀请互动', example:'我喜欢爬山和看展，上周末去了一个很棒的摄影展。你呢？有没有特别喜欢的活动？' },
+      { type:'B', label:'平衡型', desc:'分享爱好 + 询问对方', example:'我喜欢户外运动，你呢？' },
+      { type:'C', label:'含蓄型', desc:'简单回答', example:'随便逛逛' }
+    ], bestAnswer:'我喜欢爬山和看展，上周末去了一个很棒的摄影展。你呢？有没有特别喜欢的活动？' }
+  ]},
+  { id:10, icon:'💌', name:'表白', desc:'向心仪对象表达心意', stage:2, difficulty:4, duration:'10min', unlocked:false, completed:false, unlockLevel:'白银', unlockPoints:80, unlockTickets:1, rounds:[
+    { ai:'（两人单独在公园散步，气氛有些暧昧）', thinking:[
+      { type:'A', label:'主动型', desc:'真诚表达 + 分享感受', example:'跟你在一起的时光总是很开心，我发现自己越来越喜欢你，愿意和我在一起吗？' },
+      { type:'B', label:'平衡型', desc:'表达心意 + 给对方空间', example:'我挺喜欢你的，不知道你对我是什么感觉？' },
+      { type:'C', label:'含蓄型', desc:'暗示心意', example:'和你在一起挺开心的' }
+    ], bestAnswer:'跟你在一起的时光总是很开心，我发现自己越来越喜欢你，愿意和我在一起吗？' }
+  ]},
+  { id:11, icon:'🏠', name:'见家长', desc:'第一次拜访对方父母', stage:2, difficulty:4, duration:'15min', unlocked:false, completed:false, unlockLevel:'白银', unlockPoints:100, unlockTickets:2, rounds:[
+    { ai:'叔叔阿姨好，这是一点心意', thinking:[
+      { type:'A', label:'主动型', desc:'礼貌问候 + 表达感谢', example:'叔叔阿姨好！感谢你们邀请我来家里做客，这是一点小礼物，希望你们喜欢' },
+      { type:'B', label:'平衡型', desc:'礼貌问候 + 简单介绍', example:'叔叔阿姨好，我是XXX，很高兴见到你们' },
+      { type:'C', label:'含蓄型', desc:'简单问候', example:'你好' }
+    ], bestAnswer:'叔叔阿姨好！感谢你们邀请我来家里做客，这是一点小礼物，希望你们喜欢' },
+    { ai:'你是做什么工作的？收入怎么样？', thinking:[
+      { type:'A', label:'主动型', desc:'详细介绍 + 展示规划', example:'我目前在互联网公司做产品经理，收入还不错，正在努力提升自己，希望能给XXX更好的生活' },
+      { type:'B', label:'平衡型', desc:'说明工作 + 表达态度', example:'我做互联网相关工作，收入还可以，会努力给XXX幸福的' },
+      { type:'C', label:'含蓄型', desc:'简单回答', example:'还行吧' }
+    ], bestAnswer:'我目前在互联网公司做产品经理，收入还不错，正在努力提升自己，希望能给XXX更好的生活' }
+  ]},
+  { id:12, icon:'⚔️', name:'突发状况应对', desc:'面对突发情况的沟通技巧', stage:3, difficulty:5, duration:'12min', unlocked:false, completed:false, unlockLevel:'黄金', unlockPoints:150, unlockTickets:2, rounds:[
+    { ai:'（会议中突然停电）', thinking:[
+      { type:'A', label:'主动型', desc:'保持冷静 + 安抚大家 + 提出方案', example:'大家别慌，我去看看情况。请先在座位上稍等，我马上回来告诉大家情况' },
+      { type:'B', label:'平衡型', desc:'安抚情绪 + 说明情况', example:'别担心，应该是临时停电，我去确认一下' },
+      { type:'C', label:'含蓄型', desc:'沉默或简单回应', example:'（起身去查看）' }
+    ], bestAnswer:'大家别慌，我去看看情况。请先在座位上稍等，我马上回来告诉大家情况' },
+    { ai:'客户突然取消了重要订单', thinking:[
+      { type:'A', label:'主动型', desc:'快速响应 + 了解原因 + 提出补救', example:'收到，我马上联系客户了解具体原因，同时准备备选方案来减少损失' },
+      { type:'B', label:'平衡型', desc:'确认信息 + 表达态度', example:'我知道了，会尽快处理' },
+      { type:'C', label:'含蓄型', desc:'简单回应', example:'好的' }
+    ], bestAnswer:'收到，我马上联系客户了解具体原因，同时准备备选方案来减少损失' }
+  ]},
+  { id:13, icon:'🎤', name:'公共演讲技巧', desc:'提升公开表达能力', stage:2, difficulty:4, duration:'15min', unlocked:false, completed:false, unlockLevel:'白银', unlockPoints:120, unlockTickets:2, rounds:[
+    { ai:'（面对台下数百人，主持人介绍后轮到你上台）', thinking:[
+      { type:'A', label:'主动型', desc:'自信开场 + 建立连接', example:'大家好！非常荣幸今天能站在这里和大家分享。在开始之前，我想先问大家一个问题...' },
+      { type:'B', label:'平衡型', desc:'礼貌开场 + 说明目的', example:'大家好，今天我想和大家分享一下我的一些经验' },
+      { type:'C', label:'含蓄型', desc:'简单开场', example:'大家好' }
+    ], bestAnswer:'大家好！非常荣幸今天能站在这里和大家分享。在开始之前，我想先问大家一个问题...' },
+    { ai:'（演讲中有人打断提问）', thinking:[
+      { type:'A', label:'主动型', desc:'感谢提问 + 详细解答 + 回归主题', example:'感谢这位朋友的提问！这是一个非常好的问题，我的看法是...好的，回到我们刚才的话题...' },
+      { type:'B', label:'平衡型', desc:'礼貌回应 + 简单解答', example:'谢谢你的提问，我认为...' },
+      { type:'C', label:'含蓄型', desc:'简短回答', example:'嗯，这个问题...' }
+    ], bestAnswer:'感谢这位朋友的提问！这是一个非常好的问题，我的看法是...好的，回到我们刚才的话题...' }
+  ]},
+  { id:14, icon:'💻', name:'视频会议沟通', desc:'远程会议的沟通技巧', stage:1, difficulty:2, duration:'10min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+    { ai:'（多人视频会议中，轮到你发言）', thinking:[
+      { type:'A', label:'主动型', desc:'清晰表达 + 数据支撑', example:'根据我们的数据分析，这个方案能够提升30%的效率，具体体现在以下几个方面...' },
+      { type:'B', label:'平衡型', desc:'说明要点 + 询问意见', example:'我觉得这个方案不错，大家觉得怎么样？' },
+      { type:'C', label:'含蓄型', desc:'简单表态', example:'我同意' }
+    ], bestAnswer:'根据我们的数据分析，这个方案能够提升30%的效率，具体体现在以下几个方面...' },
+    { ai:'（会议中有人网络卡顿）', thinking:[
+      { type:'A', label:'主动型', desc:'耐心等待 + 提供帮助', example:'没关系，不着急。如果网络不稳定，你可以先听，会后我把要点发给你' },
+      { type:'B', label:'平衡型', desc:'表示理解 + 继续会议', example:'没关系，我们继续，你能听到吗？' },
+      { type:'C', label:'含蓄型', desc:'等待', example:'（等待对方恢复）' }
+    ], bestAnswer:'没关系，不着急。如果网络不稳定，你可以先听，会后我把要点发给你' }
+  ]},
+  { id:15, icon:'🏥', name:'医院挂号问诊', desc:'与医生有效沟通', stage:1, difficulty:2, duration:'10min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+    { ai:'你哪里不舒服？', thinking:[
+      { type:'A', label:'主动型', desc:'详细描述症状 + 提供关键信息', example:'医生您好，我最近一周头痛，主要是左侧太阳穴位置，持续大概半小时，伴随恶心' },
+      { type:'B', label:'平衡型', desc:'说明症状 + 提及持续时间', example:'我头痛有一周了，有时候会恶心' },
+      { type:'C', label:'含蓄型', desc:'简单描述', example:'我头痛' }
+    ], bestAnswer:'医生您好，我最近一周头痛，主要是左侧太阳穴位置，持续大概半小时，伴随恶心' },
+    { ai:'你以前有过这种情况吗？', thinking:[
+      { type:'A', label:'主动型', desc:'详细说明病史 + 提及相关因素', example:'以前偶尔会有，但这次持续时间更长。最近工作压力比较大，睡眠不太好' },
+      { type:'B', label:'平衡型', desc:'回答问题 + 补充信息', example:'以前也有过，最近工作比较忙' },
+      { type:'C', label:'含蓄型', desc:'简单回答', example:'有过' }
+    ], bestAnswer:'以前偶尔会有，但这次持续时间更长。最近工作压力比较大，睡眠不太好' }
+  ]},
+  { id:16, icon:'🏪', name:'投诉客服', desc:'有效表达不满并解决问题', stage:1, difficulty:3, duration:'12min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+    { ai:'您好，有什么可以帮您？', thinking:[
+      { type:'A', label:'主动型', desc:'清晰说明问题 + 表达诉求 + 提供证据', example:'您好，我要投诉。我上周买的商品收到是破损的，我已经拍照保存了证据，希望能尽快退换' },
+      { type:'B', label:'平衡型', desc:'说明问题 + 表达要求', example:'我收到的商品有问题，想退换' },
+      { type:'C', label:'含蓄型', desc:'简单说明', example:'我要投诉' }
+    ], bestAnswer:'您好，我要投诉。我上周买的商品收到是破损的，我已经拍照保存了证据，希望能尽快退换' },
+    { ai:'实在抱歉，我们需要核实一下', thinking:[
+      { type:'A', label:'主动型', desc:'保持耐心 + 明确时间要求', example:'好的，我理解需要核实。请问大概需要多久？我希望能在3天内得到答复' },
+      { type:'B', label:'平衡型', desc:'表达理解 + 询问进展', example:'好的，请尽快处理' },
+      { type:'C', label:'含蓄型', desc:'简单回应', example:'好' }
+    ], bestAnswer:'好的，我理解需要核实。请问大概需要多久？我希望能在3天内得到答复' }
+  ]},
+  { id:17, icon:'🍽️', name:'饭局社交技巧', desc:'商务饭局中的沟通艺术', stage:2, difficulty:4, duration:'15min', unlocked:false, completed:false, unlockLevel:'白银', unlockPoints:100, unlockTickets:1, rounds:[
+    { ai:'（饭局开始，大家互相寒暄）', thinking:[
+      { type:'A', label:'主动型', desc:'主动敬酒 + 表达敬意', example:'王总，感谢您今天的招待！我敬您一杯，祝咱们合作愉快！' },
+      { type:'B', label:'平衡型', desc:'礼貌问候 + 保持友好', example:'大家好，感谢今天的聚餐' },
+      { type:'C', label:'含蓄型', desc:'简单打招呼', example:'大家好' }
+    ], bestAnswer:'王总，感谢您今天的招待！我敬您一杯，祝咱们合作愉快！' },
+    { ai:'你对这个行业未来怎么看？', thinking:[
+      { type:'A', label:'主动型', desc:'分享见解 + 询问对方', example:'我认为未来几年行业会向智能化方向发展，您作为前辈，怎么看这个趋势？' },
+      { type:'B', label:'平衡型', desc:'表达观点 + 保持开放', example:'我觉得会有更多创新，您觉得呢？' },
+      { type:'C', label:'含蓄型', desc:'简单回答', example:'挺好的' }
+    ], bestAnswer:'我认为未来几年行业会向智能化方向发展，您作为前辈，怎么看这个趋势？' }
+  ]},
+  { id:18, icon:'💬', name:'网络聊天技巧', desc:'线上聊天的沟通技巧', stage:1, difficulty:2, duration:'10min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+    { ai:'在吗？', thinking:[
+      { type:'A', label:'主动型', desc:'热情回应 + 开启话题', example:'在呀！好久不见，最近忙什么呢？' },
+      { type:'B', label:'平衡型', desc:'礼貌回应 + 询问目的', example:'在的，有什么事吗？' },
+      { type:'C', label:'含蓄型', desc:'简单回应', example:'在' }
+    ], bestAnswer:'在呀！好久不见，最近忙什么呢？' },
+    { ai:'你头像挺有意思的', thinking:[
+      { type:'A', label:'主动型', desc:'感谢赞美 + 分享背后故事', example:'谢谢！这是我旅行时拍的照片，当时觉得很有意境就用上了。你头像也很有个性呢！' },
+      { type:'B', label:'平衡型', desc:'感谢 + 简单说明', example:'谢谢，随便选的。你头像也挺好的' },
+      { type:'C', label:'含蓄型', desc:'简单感谢', example:'谢谢' }
+    ], bestAnswer:'谢谢！这是我旅行时拍的照片，当时觉得很有意境就用上了。你头像也很有个性呢！' }
+  ]},
+  { id:19, icon:'🏛️', name:'政务大厅办事', desc:'高效办理政务业务', stage:1, difficulty:3, duration:'12min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+    { ai:'您好，请问办理什么业务？', thinking:[
+      { type:'A', label:'主动型', desc:'清晰说明需求 + 准备材料', example:'您好，我来办理营业执照变更。需要的材料我都准备好了，您看还需要什么？' },
+      { type:'B', label:'平衡型', desc:'说明业务 + 询问流程', example:'我想办理营业执照变更，请问需要什么材料？' },
+      { type:'C', label:'含蓄型', desc:'简单说明', example:'办营业执照' }
+    ], bestAnswer:'您好，我来办理营业执照变更。需要的材料我都准备好了，您看还需要什么？' },
+    { ai:'这个材料不符合要求', thinking:[
+      { type:'A', label:'主动型', desc:'表示理解 + 询问具体要求 + 提出解决方案', example:'好的，麻烦您告诉我具体哪里不符合？我马上修改，或者您看有没有其他替代方案？' },
+      { type:'B', label:'平衡型', desc:'表达歉意 + 询问修改方式', example:'不好意思，请问怎么修改？' },
+      { type:'C', label:'含蓄型', desc:'简单回应', example:'哦' }
+    ], bestAnswer:'好的，麻烦您告诉我具体哪里不符合？我马上修改，或者您看有没有其他替代方案？' }
+  ]},
+  { id:20, icon:'💰', name:'4S店砍价', desc:'购车时的谈判技巧', stage:2, difficulty:4, duration:'15min', unlocked:false, completed:false, unlockLevel:'白银', unlockPoints:120, unlockTickets:2, rounds:[
+    { ai:'这款车最低多少钱？', thinking:[
+      { type:'A', label:'主动型', desc:'展示诚意 + 提出合理价格 + 提及竞品', example:'我确实很想买这款车，而且今天就能订。我了解到XX店比你们便宜5000，你们能做到多少？' },
+      { type:'B', label:'平衡型', desc:'表达购买意愿 + 询问优惠', example:'我今天想订车，能给个最低价吗？' },
+      { type:'C', label:'含蓄型', desc:'简单询问', example:'多少钱？' }
+    ], bestAnswer:'我确实很想买这款车，而且今天就能订。我了解到XX店比你们便宜5000，你们能做到多少？' },
+    { ai:'这个价格已经是底线了', thinking:[
+      { type:'A', label:'主动型', desc:'表示理解 + 提出其他福利', example:'我理解价格已经很优惠了。那能送全车贴膜、脚垫，再保养一次吗？' },
+      { type:'B', label:'平衡型', desc:'请求额外优惠', example:'能送点东西吗？' },
+      { type:'C', label:'含蓄型', desc:'沉默或简单回应', example:'哦' }
+    ], bestAnswer:'我理解价格已经很优惠了。那能送全车贴膜、脚垫，再保养一次吗？' }
+  ]},
+  { id:21, icon:'👨‍👩‍👧', name:'与父母意见分歧', desc:'化解与父母的观念冲突', stage:2, difficulty:3, duration:'12min', unlocked:false, completed:false, unlockLevel:'白银', unlockPoints:80, unlockTickets:1, rounds:[
+    { ai:'你都三十了，怎么还不结婚？', thinking:[
+      { type:'A', label:'主动型', desc:'理解父母关心 + 表达自己的想法', example:'爸妈，我知道你们是为我好，很关心我。我也希望能找到合适的人，只是现在还没遇到对的那个' },
+      { type:'B', label:'平衡型', desc:'表达理解 + 说明情况', example:'我理解你们的心情，我也在努力' },
+      { type:'C', label:'含蓄型', desc:'简单回应', example:'知道了' }
+    ], bestAnswer:'爸妈，我知道你们是为我好，很关心我。我也希望能找到合适的人，只是现在还没遇到对的那个' },
+    { ai:'女孩子做什么程序员，多累啊！', thinking:[
+      { type:'A', label:'主动型', desc:'分享工作感受 + 表达热情', example:'妈，我很喜欢编程，每天都能学到新东西，虽然有时候累但很有成就感。而且现在很多女生都做这行呢' },
+      { type:'B', label:'平衡型', desc:'表达热爱 + 说明理由', example:'我喜欢这份工作，不累的' },
+      { type:'C', label:'含蓄型', desc:'简单回应', example:'还好吧' }
+    ], bestAnswer:'妈，我很喜欢编程，每天都能学到新东西，虽然有时候累但很有成就感。而且现在很多女生都做这行呢' }
+  ]},
+  { id:22, icon:'🤝', name:'人际冲突调解', desc:'调解他人之间的矛盾', stage:3, difficulty:5, duration:'15min', unlocked:false, completed:false, unlockLevel:'黄金', unlockPoints:200, unlockTickets:3, rounds:[
+    { ai:'（两位同事在争吵）', thinking:[
+      { type:'A', label:'主动型', desc:'及时介入 + 分开双方 + 引导冷静', example:'先别激动，大家都是为了工作。来，先喝口水冷静一下，我们好好聊聊' },
+      { type:'B', label:'平衡型', desc:'劝架 + 表达理解', example:'别吵了，大家坐下来好好说' },
+      { type:'C', label:'含蓄型', desc:'简单劝架', example:'别吵了' }
+    ], bestAnswer:'先别激动，大家都是为了工作。来，先喝口水冷静一下，我们好好聊聊' },
+    { ai:'我觉得他故意针对我！', thinking:[
+      { type:'A', label:'主动型', desc:'倾听感受 + 复述确认 + 引导沟通', example:'我理解你现在很委屈，感觉被针对了。让我们一起听听对方怎么说，看看能不能找到问题所在' },
+      { type:'B', label:'平衡型', desc:'表达理解 + 建议沟通', example:'我理解你的感受，大家坐下来沟通一下吧' },
+      { type:'C', label:'含蓄型', desc:'简单回应', example:'别生气' }
+    ], bestAnswer:'我理解你现在很委屈，感觉被针对了。让我们一起听听对方怎么说，看看能不能找到问题所在' }
+  ]},
+  { id:23, icon:'🚪', name:'向领导请假', desc:'得体地申请假期', stage:1, difficulty:2, duration:'10min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+    { ai:'什么事？', thinking:[
+      { type:'A', label:'主动型', desc:'说明原因 + 展示工作安排', example:'领导，我想下周五请一天假，家里有点事。我已经把当天的工作安排好了，小王会帮我处理紧急事务' },
+      { type:'B', label:'平衡型', desc:'说明原因 + 表达歉意', example:'领导，我想请一天假，家里有事。不好意思打扰了' },
+      { type:'C', label:'含蓄型', desc:'简单说明', example:'想请假' }
+    ], bestAnswer:'领导，我想下周五请一天假，家里有点事。我已经把当天的工作安排好了，小王会帮我处理紧急事务' }
+  ]},
+  { id:24, icon:'🙇', name:'职场道歉', desc:'在职场中真诚道歉', stage:1, difficulty:3, duration:'10min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+    { ai:'这个方案怎么写成这样？', thinking:[
+      { type:'A', label:'主动型', desc:'真诚道歉 + 承认错误 + 提出补救', example:'对不起，是我考虑不周。我马上重新修改，今天下班前一定给您一个满意的版本' },
+      { type:'B', label:'平衡型', desc:'道歉 + 说明情况', example:'对不起，我会重新做的' },
+      { type:'C', label:'含蓄型', desc:'简单道歉', example:'对不起' }
+    ], bestAnswer:'对不起，是我考虑不周。我马上重新修改，今天下班前一定给您一个满意的版本' }
+  ],
+  { id:25, icon:'📦', name:'快递物流沟通', desc:'处理快递问题', stage:1, difficulty:2, duration:'10min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+    { ai:'您好，请问有什么可以帮您？', thinking:[
+      { type:'A', label:'主动型', desc:'清晰说明问题 + 提供订单号', example:'您好，我的快递已经三天没更新了，订单号是XXXXXX，麻烦帮我查一下' },
+      { type:'B', label:'平衡型', desc:'说明问题 + 询问进展', example:'我的快递好久没更新了，能帮忙查一下吗？' },
+      { type:'C', label:'含蓄型', desc:'简单说明', example:'查快递' }
+    ], bestAnswer:'您好，我的快递已经三天没更新了，订单号是XXXXXX，麻烦帮我查一下' }
+  ],
+  { id:26, icon:'🏨', name:'酒店入住沟通', desc:'与酒店服务人员沟通', stage:1, difficulty:2, duration:'10min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+    { ai:'您好，办理入住', thinking:[
+      { type:'A', label:'主动型', desc:'礼貌问候 + 提供信息 + 表达需求', example:'您好！我叫XXX，预订了今晚的房间，希望能安排一个安静一点的房间，谢谢' },
+      { type:'B', label:'平衡型', desc:'提供信息 + 简单问候', example:'您好，我预订了房间，姓名是XXX' },
+      { type:'C', label:'含蓄型', desc:'简单说明', example:'入住' }
+    ], bestAnswer:'您好！我叫XXX，预订了今晚的房间，希望能安排一个安静一点的房间，谢谢' }
+  ],
+  { id:27, icon:'👔', name:'团队合作分歧', desc:'解决团队内部矛盾', stage:2, difficulty:3, duration:'12min', unlocked:false, completed:false, unlockLevel:'白银', unlockPoints:60, unlockTickets:1, rounds:[
+    { ai:'我觉得这个方案行不通', thinking:[
+      { type:'A', label:'主动型', desc:'倾听意见 + 询问理由 + 共同探讨', example:'我想听听你的想法，为什么觉得行不通？我们一起分析一下，找到更好的方案' },
+      { type:'B', label:'平衡型', desc:'表达理解 + 建议讨论', example:'好的，我们可以讨论一下' },
+      { type:'C', label:'含蓄型', desc:'简单回应', example:'哦' }
+    ], bestAnswer:'我想听听你的想法，为什么觉得行不通？我们一起分析一下，找到更好的方案' }
+  ],
+  { id:28, icon:'💔', name:'吵架后缓和关系', desc:'修复恋爱关系', stage:2, difficulty:3, duration:'12min', unlocked:false, completed:false, unlockLevel:'白银', unlockPoints:60, unlockTickets:1, rounds:[
+    { ai:'（冷战中，对方看起来很生气）', thinking:[
+      { type:'A', label:'主动型', desc:'真诚道歉 + 表达爱意 + 请求原谅', example:'对不起，我不应该那样说。我很在乎你，我们和好吧' },
+      { type:'B', label:'平衡型', desc:'道歉 + 表达关心', example:'对不起，别生气了好吗？' },
+      { type:'C', label:'含蓄型', desc:'简单道歉', example:'对不起' }
+    ], bestAnswer:'对不起，我不应该那样说。我很在乎你，我们和好吧' }
+  ],
+  { id:29, icon:'🌹', name:'纪念日沟通', desc:'表达爱意和感谢', stage:2, difficulty:2, duration:'10min', unlocked:false, completed:false, unlockLevel:'白银', unlockPoints:50, unlockTickets:0, rounds:[
+    { ai:'今天是我们在一起一周年', thinking:[
+      { type:'A', label:'主动型', desc:'深情表达 + 回忆美好 + 展望未来', example:'一年过得真快！谢谢你陪我走过这么多美好的时光，希望我们能一直走下去' },
+      { type:'B', label:'平衡型', desc:'表达感谢 + 保持温暖', example:'谢谢你，这一年很幸福' },
+      { type:'C', label:'含蓄型', desc:'简单表达', example:'谢谢' }
+    ], bestAnswer:'一年过得真快！谢谢你陪我走过这么多美好的时光，希望我们能一直走下去' }
+  ],
+  { id:30, icon:'💸', name:'朋友借钱', desc:'处理朋友的借钱请求', stage:1, difficulty:3, duration:'10min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+    { ai:'最近手头有点紧，能借我5000块吗？', thinking:[
+      { type:'A', label:'主动型', desc:'表达理解 + 说明情况 + 提供帮助', example:'理解你的难处，但我最近也在攒钱买房。不过我可以帮你想想其他办法' },
+      { type:'B', label:'平衡型', desc:'说明情况 + 表达歉意', example:'不好意思，我最近也不宽裕' },
+      { type:'C', label:'含蓄型', desc:'直接拒绝', example:'不行' }
+    ], bestAnswer:'理解你的难处，但我最近也在攒钱买房。不过我可以帮你想想其他办法' }
+  ]},
+  { id:31, icon:'🔊', name:'与邻居沟通', desc:'处理邻里关系', stage:1, difficulty:2, duration:'10min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+    { ai:'（邻居敲门）', thinking:[
+      { type:'A', label:'主动型', desc:'热情开门 + 询问需求', example:'您好！有什么事吗？快请进' },
+      { type:'B', label:'平衡型', desc:'礼貌回应 + 询问', example:'您好，有事吗？' },
+      { type:'C', label:'含蓄型', desc:'简单询问', example:'什么事？' }
+    ], bestAnswer:'您好！有什么事吗？快请进' },
+    { ai:'你们家孩子有点吵', thinking:[
+      { type:'A', label:'主动型', desc:'真诚道歉 + 提出改进', example:'实在抱歉！我们会注意的，晚上十点后一定让孩子安静下来' },
+      { type:'B', label:'平衡型', desc:'道歉 + 表达态度', example:'不好意思，我们会注意的' },
+      { type:'C', label:'含蓄型', desc:'简单回应', example:'哦' }
+    ], bestAnswer:'实在抱歉！我们会注意的，晚上十点后一定让孩子安静下来' }
+  ],
+  { id:32, icon:'🏥', name:'银行办理业务', desc:'高效办理银行业务', stage:1, difficulty:2, duration:'10min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+    { ai:'您好，办理什么业务？', thinking:[
+      { type:'A', label:'主动型', desc:'清晰说明 + 准备材料', example:'您好，我想办一张信用卡，需要的材料我都带来了' },
+      { type:'B', label:'平衡型', desc:'说明业务 + 询问流程', example:'我想办信用卡，需要什么材料？' },
+      { type:'C', label:'含蓄型', desc:'简单说明', example:'办信用卡' }
+    ], bestAnswer:'您好，我想办一张信用卡，需要的材料我都带来了' }
+  ],
+  { id:33, icon:'🚫', name:'拒绝不合理要求', desc:'拒绝不合理的请求', stage:2, difficulty:3, duration:'10min', unlocked:false, completed:false, unlockLevel:'白银', unlockPoints:50, unlockTickets:1, rounds:[
+    { ai:'帮我把这个违规申请批了吧', thinking:[
+      { type:'A', label:'主动型', desc:'明确拒绝 + 说明原则 + 提供替代方案', example:'不好意思，这个不符合规定我不能批。不过我可以帮你看看有没有其他合规的方式' },
+      { type:'B', label:'平衡型', desc:'说明情况 + 表达歉意', example:'不好意思，这个我不能批' },
+      { type:'C', label:'含蓄型', desc:'直接拒绝', example:'不行' }
+    ], bestAnswer:'不好意思，这个不符合规定我不能批。不过我可以帮你看看有没有其他合规的方式' }
+  ],
+  { id:34, icon:'💡', name:'被误解澄清', desc:'澄清他人的误会', stage:2, difficulty:3, duration:'10min', unlocked:false, completed:false, unlockLevel:'白银', unlockPoints:50, unlockTickets:1, rounds:[
+    { ai:'我觉得你在针对我', thinking:[
+      { type:'A', label:'主动型', desc:'表达理解 + 澄清误会 + 表达真诚', example:'我理解你会这么想，但我真的没有针对你。让我解释一下当时的情况...' },
+      { type:'B', label:'平衡型', desc:'表达歉意 + 澄清', example:'对不起让你误会了，我不是那个意思' },
+      { type:'C', label:'含蓄型', desc:'简单澄清', example:'没有' }
+    ], bestAnswer:'我理解你会这么想，但我真的没有针对你。让我解释一下当时的情况...' }
+  ],
+  { id:35, icon:'🤝', name:'谈判协商技巧', desc:'提升谈判能力', stage:3, difficulty:5, duration:'15min', unlocked:false, completed:false, unlockLevel:'黄金', unlockPoints:180, unlockTickets:3, rounds:[
+    { ai:'我们只能接受这个价格', thinking:[
+      { type:'A', label:'主动型', desc:'理解立场 + 提出双赢方案', example:'我理解你们的立场，我们也有成本压力。不如这样，我们接受这个价格，但希望能延长付款期限' },
+      { type:'B', label:'平衡型', desc:'表达理解 + 提出条件', example:'这个价格有点低，能加点吗？' },
+      { type:'C', label:'含蓄型', desc:'简单回应', example:'再加点吧' }
+    ], bestAnswer:'我理解你们的立场，我们也有成本压力。不如这样，我们接受这个价格，但希望能延长付款期限' }
+  ],
+  { id:36, icon:'🎉', name:'社交聚会破冰', desc:'在聚会中主动交流', stage:1, difficulty:2, duration:'10min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+    { ai:'（聚会中独自站在角落）', thinking:[
+      { type:'A', label:'主动型', desc:'主动搭讪 + 开启话题', example:'你好！我是XXX，看你也一个人，过来打个招呼。你是怎么认识主办方的？' },
+      { type:'B', label:'平衡型', desc:'礼貌问候 + 简单交流', example:'你好，一个人吗？' },
+      { type:'C', label:'含蓄型', desc:'微笑示意', example:'（微笑）' }
+    ], bestAnswer:'你好！我是XXX，看你也一个人，过来打个招呼。你是怎么认识主办方的？' }
+  ],
+  { id:37, icon:'💼', name:'职场人际关系', desc:'处理职场中的人际关系', stage:2, difficulty:3, duration:'12min', unlocked:false, completed:false, unlockLevel:'白银', unlockPoints:60, unlockTickets:1, rounds:[
+    { ai:'（同事在背后议论你）', thinking:[
+      { type:'A', label:'主动型', desc:'保持冷静 + 主动沟通 + 澄清误会', example:'我听说你对我有些看法，我们找个时间聊聊好吗？我很重视我们的关系' },
+      { type:'B', label:'平衡型', desc:'表达关心 + 询问原因', example:'我感觉你好像对我有意见，是哪里出问题了吗？' },
+      { type:'C', label:'含蓄型', desc:'假装不知道', example:'（继续工作）' }
+    ], bestAnswer:'我听说你对我有些看法，我们找个时间聊聊好吗？我很重视我们的关系' }
+  ],
+  { id:38, icon:'💻', name:'社交媒体运营', desc:'提升社交媒体沟通', stage:1, difficulty:2, duration:'10min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+    { ai:'（收到负面评论）', thinking:[
+      { type:'A', label:'主动型', desc:'真诚回应 + 表达感谢 + 解决问题', example:'感谢你的反馈！非常抱歉给你带来不好的体验，我们会立即处理，给你一个满意的答复' },
+      { type:'B', label:'平衡型', desc:'表达歉意 + 询问详情', example:'对不起，能说说具体情况吗？' },
+      { type:'C', label:'含蓄型', desc:'简单回应', example:'抱歉' }
+    ], bestAnswer:'感谢你的反馈！非常抱歉给你带来不好的体验，我们会立即处理，给你一个满意的答复' }
+  ],
+  { id:39, icon:'📚', name:'在线学习交流', desc:'在线学习中的沟通', stage:1, difficulty:2, duration:'10min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+    { ai:'这个知识点我不太懂', thinking:[
+      { type:'A', label:'主动型', desc:'明确问题 + 寻求帮助 + 表达感谢', example:'我对这个知识点不太理解，能麻烦你再解释一下吗？非常感谢！' },
+      { type:'B', label:'平衡型', desc:'表达困惑 + 请求帮助', example:'这个不太懂，能解释一下吗？' },
+      { type:'C', label:'含蓄型', desc:'简单表达', example:'不懂' }
+    ], bestAnswer:'我对这个知识点不太理解，能麻烦你再解释一下吗？非常感谢！' }
+  ],
+  { id:40, icon:'😢', name:'安慰失落的家人朋友', desc:'安慰情绪低落的人', stage:1, difficulty:2, duration:'10min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+    { ai:'我失恋了...', thinking:[
+      { type:'A', label:'主动型', desc:'表达共情 + 给予支持 + 陪伴', example:'我知道你现在很难过，想哭就哭出来吧。我会一直陪着你，陪你度过这段时间' },
+      { type:'B', label:'平衡型', desc:'表达理解 + 提供帮助', example:'很难过吧，需要聊聊吗？' },
+      { type:'C', label:'含蓄型', desc:'简单安慰', example:'别难过了' }
+    ], bestAnswer:'我知道你现在很难过，想哭就哭出来吧。我会一直陪着你，陪你度过这段时间' }
+  ],
+  { id:41, icon:'🏠', name:'家庭聚会中的社交', desc:'家庭聚会中的沟通', stage:1, difficulty:2, duration:'10min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+    { ai:'（家庭聚会，亲戚都在）', thinking:[
+      { type:'A', label:'主动型', desc:'主动问候 + 关心长辈', example:'叔叔阿姨好！最近身体还好吗？我给你们带了点特产' },
+      { type:'B', label:'平衡型', desc:'礼貌问候 + 简单交流', example:'大家好！' },
+      { type:'C', label:'含蓄型', desc:'简单打招呼', example:'嗨' }
+    ], bestAnswer:'叔叔阿姨好！最近身体还好吗？我给你们带了点特产' }
+  ],
+  { id:42, icon:'🤐', name:'亲戚问敏感问题', desc:'应对亲戚的敏感提问', stage:1, difficulty:3, duration:'10min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+    { ai:'工资多少啊？', thinking:[
+      { type:'A', label:'主动型', desc:'幽默回应 + 转移话题', example:'够花就行啦！对了，听说表哥最近升职了，恭喜啊！' },
+      { type:'B', label:'平衡型', desc:'委婉回答 + 反问', example:'还行吧，你最近身体怎么样？' },
+      { type:'C', label:'含蓄型', desc:'简单回答', example:'还行' }
+    ], bestAnswer:'够花就行啦！对了，听说表哥最近升职了，恭喜啊！' }
+  ],
+  { id:43, icon:'🛒', name:'退换货沟通', desc:'处理商品退换货', stage:1, difficulty:2, duration:'10min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+    { ai:'您好，有什么可以帮您？', thinking:[
+      { type:'A', label:'主动型', desc:'说明问题 + 提供凭证 + 表达诉求', example:'您好，我想退货。这件衣服买了一周，穿了两次就起球了，这是购买凭证' },
+      { type:'B', label:'平衡型', desc:'说明问题 + 表达诉求', example:'我想退货，衣服有质量问题' },
+      { type:'C', label:'含蓄型', desc:'简单说明', example:'退货' }
+    ], bestAnswer:'您好，我想退货。这件衣服买了一周，穿了两次就起球了，这是购买凭证' }
+  ],
+  { id:44, icon:'🏘️', name:'投诉物业', desc:'向物业提出诉求', stage:1, difficulty:3, duration:'10min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+    { ai:'您好，物业', thinking:[
+      { type:'A', label:'主动型', desc:'说明问题 + 表达影响 + 提出要求', example:'您好，我是3栋201的业主。楼道灯坏了三天了，晚上回家很不安全，请尽快派人维修' },
+      { type:'B', label:'平衡型', desc:'说明问题 + 请求处理', example:'楼道灯坏了，请修一下' },
+      { type:'C', label:'含蓄型', desc:'简单说明', example:'灯坏了' }
+    ], bestAnswer:'您好，我是3栋201的业主。楼道灯坏了三天了，晚上回家很不安全，请尽快派人维修' }
+  ],
+  { id:45, icon:'🛒', name:'路边摊砍价', desc:'购物时的砍价技巧', stage:1, difficulty:2, duration:'10min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+    { ai:'这个多少钱？', thinking:[
+      { type:'A', label:'主动型', desc:'表达购买意愿 + 提出合理价格', example:'这个挺好看的，老板便宜点吧，我诚心买，30块怎么样？' },
+      { type:'B', label:'平衡型', desc:'询问价格 + 表达购买意愿', example:'多少钱？便宜点我就买' },
+      { type:'C', label:'含蓄型', desc:'简单询问', example:'多少钱？' }
+    ], bestAnswer:'这个挺好看的，老板便宜点吧，我诚心买，30块怎么样？' }
   ]}
 ];
 

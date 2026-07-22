@@ -1,0 +1,48 @@
+{
+  "scene_id": "演讲发言技巧",
+  "scene_name": "演讲发言技巧",
+  "version": "1.0",
+  "scripts": [
+    {
+      "id": "yj_001",
+      "round": 1,
+      "purpose": "开场问候",
+      "user_emotion": ["紧张", "期待"],
+      "coach_style": ["鼓励型", "支持型"],
+      "level": "安全型",
+      "text": "各位领导、各位同事，大家好！",
+      "tags": ["开场问候", "礼貌", "正式"],
+      "usage_count": 0,
+      "rating": 0
+    },
+    {
+      "id": "yj_002",
+      "round": 1,
+      "purpose": "开场问候",
+      "user_emotion": ["紧张"],
+      "coach_style": ["挑战型"],
+      "level": "自信型",
+      "text": "大家好！很高兴今天能在这里跟大家分享。",
+      "tags": ["开场问候", "友好", "轻松"],
+      "usage_count": 0,
+      "rating": 0
+    },
+    {
+      "id": "yj_003",
+      "round": 2,
+      "purpose": "自我介绍",
+      "user_emotion": ["期待"],
+      "coach_style": ["支持型"],
+      "level": "安全型",
+      "text": "我是XXX，来自XX部门，负责XX工作。",
+      "tags": ["自我介绍", "简洁", "信息"],
+      "usage_count": 0,
+      "rating": 0
+    },
+    {
+      "id": "yj_004",
+      "round": 2,
+      "purpose": "自我介绍",
+      "user_emotion": ["期待"],
+      "coach_style": ["分析型"],
+      "level": "理性型

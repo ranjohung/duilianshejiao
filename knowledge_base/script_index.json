@@ -1,0 +1,662 @@
+{
+  "version": "1.0",
+  "created_at": "2026-07-23",
+  "total_scripts": 900,
+  "categories": [
+    {
+      "category_id": "workplace",
+      "category_name": "职场与事业",
+      "scene_count": 8,
+      "description": "职场沟通、面试、谈判等场景"
+    },
+    {
+      "category_id": "relationship",
+      "category_name": "亲密关系与约会",
+      "scene_count": 6,
+      "description": "约会、表白、吵架和解等场景"
+    },
+    {
+      "category_id": "family",
+      "category_name": "家庭与亲友",
+      "scene_count": 6,
+      "description": "见家长、亲戚沟通、朋友交流等场景"
+    },
+    {
+      "category_id": "daily",
+      "category_name": "日常生活消费",
+      "scene_count": 6,
+      "description": "购物砍价、投诉、退换货等场景"
+    },
+    {
+      "category_id": "public",
+      "category_name": "公共服务与办事",
+      "scene_count": 5,
+      "description": "政务、医院、银行等办事场景"
+    },
+    {
+      "category_id": "conflict",
+      "category_name": "突发与冲突",
+      "scene_count": 5,
+      "description": "突发事件、冲突调解等场景"
+    },
+    {
+      "category_id": "social",
+      "category_name": "社交场合与人际交往",
+      "scene_count": 5,
+      "description": "聚会、演讲、饭局等社交场景"
+    },
+    {
+      "category_id": "digital",
+      "category_name": "数字社交",
+      "scene_count": 4,
+      "description": "网络聊天、视频会议等线上场景"
+    }
+  ],
+  "scenes": [
+    {
+      "scene_id": "向上汇报被质疑",
+      "scene_name": "向上汇报被质疑",
+      "category": "workplace",
+      "script_count": 20,
+      "file_path": "scenes/向上汇报被质疑.json",
+      "tags": ["汇报", "职场", "沟通", "应对质疑"]
+    },
+    {
+      "scene_id": "拒绝同事的不合理请求",
+      "scene_name": "拒绝同事的不合理请求",
+      "category": "workplace",
+      "script_count": 20,
+      "file_path": "scenes/拒绝同事的不合理请求.json",
+      "tags": ["拒绝", "同事", "职场", "边界"]
+    },
+    {
+      "scene_id": "向领导请假",
+      "scene_name": "向领导请假",
+      "category": "workplace",
+      "script_count": 20,
+      "file_path": "scenes/向领导请假.json",
+      "tags": ["请假", "领导", "职场", "沟通"]
+    },
+    {
+      "scene_id": "职场道歉",
+      "scene_name": "职场道歉",
+      "category": "workplace",
+      "script_count": 20,
+      "file_path": "scenes/职场道歉.json",
+      "tags": ["道歉", "职场", "沟通", "修复关系"]
+    },
+    {
+      "scene_id": "客户投诉应对",
+      "scene_name": "客户投诉应对",
+      "category": "workplace",
+      "script_count": 20,
+      "file_path": "scenes/客户投诉应对.json",
+      "tags": ["客户", "投诉", "服务", "沟通"]
+    },
+    {
+      "scene_id": "团队合作分歧",
+      "scene_name": "团队合作分歧",
+      "category": "workplace",
+      "script_count": 20,
+      "file_path": "scenes/团队合作分歧.json",
+      "tags": ["团队", "分歧", "合作", "沟通"]
+    },
+    {
+      "scene_id": "模拟面试",
+      "scene_name": "模拟面试",
+      "category": "workplace",
+      "script_count": 20,
+      "file_path": "scenes/模拟面试.json",
+      "tags": ["面试", "求职", "职场", "自我介绍"]
+    },
+    {
+      "scene_id": "加薪谈判",
+      "scene_name": "加薪谈判",
+      "category": "workplace",
+      "script_count": 20,
+      "file_path": "scenes/加薪谈判.json",
+      "tags": ["谈判", "薪资", "职场", "沟通"]
+    },
+    {
+      "scene_id": "初次约会",
+      "scene_name": "初次约会",
+      "category": "relationship",
+      "script_count": 20,
+      "file_path": "scenes/初次约会.json",
+      "tags": ["约会", "恋爱", "社交", "沟通"]
+    },
+    {
+      "scene_id": "吵架后缓和关系",
+      "scene_name": "吵架后缓和关系",
+      "category": "relationship",
+      "script_count": 20,
+      "file_path": "scenes/吵架后缓和关系.json",
+      "tags": ["吵架", "和解", "恋爱", "沟通"]
+    },
+    {
+      "scene_id": "表白",
+      "scene_name": "表白",
+      "category": "relationship",
+      "script_count": 20,
+      "file_path": "scenes/表白.json",
+      "tags": ["表白", "恋爱", "勇气", "沟通"]
+    },
+    {
+      "scene_id": "被表白后婉拒",
+      "scene_name": "被表白后婉拒",
+      "category": "relationship",
+      "script_count": 20,
+      "file_path": "scenes/被表白后婉拒.json",
+      "tags": ["拒绝", "恋爱", "委婉", "沟通"]
+    },
+    {
+      "scene_id": "纪念日沟通",
+      "scene_name": "纪念日沟通",
+      "category": "relationship",
+      "script_count": 20,
+      "file_path": "scenes/纪念日沟通.json",
+      "tags": ["纪念日", "恋爱", "浪漫", "沟通"]
+    },
+    {
+      "scene_id": "相亲模拟",
+      "scene_name": "相亲模拟",
+      "category": "relationship",
+      "script_count": 20,
+      "file_path": "scenes/相亲模拟.json",
+      "tags": ["相亲", "约会", "恋爱", "社交"]
+    },
+    {
+      "scene_id": "见家长",
+      "scene_name": "见家长",
+      "category": "family",
+      "script_count": 20,
+      "file_path": "scenes/见家长.json",
+      "tags": ["见家长", "家庭", "礼仪", "沟通"]
+    },
+    {
+      "scene_id": "家庭聚会中的社交",
+      "scene_name": "家庭聚会中的社交",
+      "category": "family",
+      "script_count": 20,
+      "file_path": "scenes/家庭聚会中的社交.json",
+      "tags": ["家庭聚会", "社交", "沟通", "礼仪"]
+    },
+    {
+      "scene_id": "与父母意见分歧",
+      "scene_name": "与父母意见分歧",
+      "category": "family",
+      "script_count": 20,
+      "file_path": "scenes/与父母意见分歧.json",
+      "tags": ["父母", "分歧", "沟通", "理解"]
+    },
+    {
+      "scene_id": "亲戚问敏感问题",
+      "scene_name": "亲戚问敏感问题",
+      "category": "family",
+      "script_count": 20,
+      "file_path": "scenes/亲戚问敏感问题.json",
+      "tags": ["亲戚", "敏感问题", "沟通", "边界"]
+    },
+    {
+      "scene_id": "朋友借钱",
+      "scene_name": "朋友借钱",
+      "category": "family",
+      "script_count": 20,
+      "file_path": "scenes/朋友借钱.json",
+      "tags": ["朋友", "借钱", "财务", "沟通"]
+    },
+    {
+      "scene_id": "安慰失落的家人朋友",
+      "scene_name": "安慰失落的家人朋友",
+      "category": "family",
+      "script_count": 20,
+      "file_path": "scenes/安慰失落的家人朋友.json",
+      "tags": ["安慰", "朋友", "家人", "共情"]
+    },
+    {
+      "scene_id": "4S店砍价",
+      "scene_name": "4S店砍价",
+      "category": "daily",
+      "script_count": 20,
+      "file_path": "scenes/4S店砍价.json",
+      "tags": ["砍价", "购车", "消费", "谈判"]
+    },
+    {
+      "scene_id": "路边摊砍价",
+      "scene_name": "路边摊砍价",
+      "category": "daily",
+      "script_count": 20,
+      "file_path": "scenes/路边摊砍价.json",
+      "tags": ["砍价", "购物", "消费", "沟通"]
+    },
+    {
+      "scene_id": "投诉物业",
+      "scene_name": "投诉物业",
+      "category": "daily",
+      "script_count": 20,
+      "file_path": "scenes/投诉物业.json",
+      "tags": ["投诉", "物业", "维权", "沟通"]
+    },
+    {
+      "scene_id": "投诉客服",
+      "scene_name": "投诉客服",
+      "category": "daily",
+      "script_count": 20,
+      "file_path": "scenes/投诉客服.json",
+      "tags": ["投诉", "客服", "维权", "沟通"]
+    },
+    {
+      "scene_id": "与邻居沟通",
+      "scene_name": "与邻居沟通",
+      "category": "daily",
+      "script_count": 20,
+      "file_path": "scenes/与邻居沟通.json",
+      "tags": ["邻居", "沟通", "生活", "协调"]
+    },
+    {
+      "scene_id": "退换货沟通",
+      "scene_name": "退换货沟通",
+      "category": "daily",
+      "script_count": 20,
+      "file_path": "scenes/退换货沟通.json",
+      "tags": ["退换货", "消费", "维权", "沟通"]
+    },
+    {
+      "scene_id": "政务大厅办事",
+      "scene_name": "政务大厅办事",
+      "category": "public",
+      "script_count": 20,
+      "file_path": "scenes/政务大厅办事.json",
+      "tags": ["政务", "办事", "公共服务", "沟通"]
+    },
+    {
+      "scene_id": "医院挂号问诊",
+      "scene_name": "医院挂号问诊",
+      "category": "public",
+      "script_count": 20,
+      "file_path": "scenes/医院挂号问诊.json",
+      "tags": ["医院", "问诊", "医疗", "沟通"]
+    },
+    {
+      "scene_id": "银行办理业务",
+      "scene_name": "银行办理业务",
+      "category": "public",
+      "script_count": 20,
+      "file_path": "scenes/银行办理业务.json",
+      "tags": ["银行", "业务", "金融", "沟通"]
+    },
+    {
+      "scene_id": "酒店入住沟通",
+      "scene_name": "酒店入住沟通",
+      "category": "public",
+      "script_count": 20,
+      "file_path": "scenes/酒店入住沟通.json",
+      "tags": ["酒店", "入住", "服务", "沟通"]
+    },
+    {
+      "scene_id": "快递物流沟通",
+      "scene_name": "快递物流沟通",
+      "category": "public",
+      "script_count": 20,
+      "file_path": "scenes/快递物流沟通.json",
+      "tags": ["快递", "物流", "服务", "沟通"]
+    },
+    {
+      "scene_id": "突发状况应对",
+      "scene_name": "突发状况应对",
+      "category": "conflict",
+      "script_count": 20,
+      "file_path": "scenes/突发状况应对.json",
+      "tags": ["突发", "应急", "沟通", "应对"]
+    },
+    {
+      "scene_id": "人际冲突调解",
+      "scene_name": "人际冲突调解",
+      "category": "conflict",
+      "script_count": 20,
+      "file_path": "scenes/人际冲突调解.json",
+      "tags": ["冲突", "调解", "沟通", "和解"]
+    },
+    {
+      "scene_id": "拒绝不合理要求",
+      "scene_name": "拒绝不合理要求",
+      "category": "conflict",
+      "script_count": 20,
+      "file_path": "scenes/拒绝不合理要求.json",
+      "tags": ["拒绝", "边界", "沟通", "坚持"]
+    },
+    {
+      "scene_id": "被误解澄清",
+      "scene_name": "被误解澄清",
+      "category": "conflict",
+      "script_count": 20,
+      "file_path": "scenes/被误解澄清.json",
+      "tags": ["误解", "澄清", "沟通", "解释"]
+    },
+    {
+      "scene_id": "谈判协商技巧",
+      "scene_name": "谈判协商技巧",
+      "category": "conflict",
+      "script_count": 20,
+      "file_path": "scenes/谈判协商技巧.json",
+      "tags": ["谈判", "协商", "技巧", "沟通"]
+    },
+    {
+      "scene_id": "社交聚会破冰",
+      "scene_name": "社交聚会破冰",
+      "category": "social",
+      "script_count": 20,
+      "file_path": "scenes/社交聚会破冰.json",
+      "tags": ["聚会", "破冰", "社交", "沟通"]
+    },
+    {
+      "scene_id": "饭局社交技巧",
+      "scene_name": "饭局社交技巧",
+      "category": "social",
+      "script_count": 20,
+      "file_path": "scenes/饭局社交技巧.json",
+      "tags": ["饭局", "社交", "礼仪", "沟通"]
+    },
+    {
+      "scene_id": "公共演讲技巧",
+      "scene_name": "公共演讲技巧",
+      "category": "social",
+      "script_count": 20,
+      "file_path": "scenes/公共演讲技巧.json",
+      "tags": ["演讲", "公开", "表达", "沟通"]
+    },
+    {
+      "scene_id": "职场人际关系",
+      "scene_name": "职场人际关系",
+      "category": "social",
+      "script_count": 20,
+      "file_path": "scenes/职场人际关系.json",
+      "tags": ["职场", "人际关系", "沟通", "相处"]
+    },
+    {
+      "scene_id": "面试技巧",
+      "scene_name": "面试技巧",
+      "category": "social",
+      "script_count": 20,
+      "file_path": "scenes/面试技巧.json",
+      "tags": ["面试", "技巧", "求职", "沟通"]
+    },
+    {
+      "scene_id": "网络聊天技巧",
+      "scene_name": "网络聊天技巧",
+      "category": "digital",
+      "script_count": 20,
+      "file_path": "scenes/网络聊天技巧.json",
+      "tags": ["网络", "聊天", "社交", "沟通"]
+    },
+    {
+      "scene_id": "社交媒体运营",
+      "scene_name": "社交媒体运营",
+      "category": "digital",
+      "script_count": 20,
+      "file_path": "scenes/社交媒体运营.json",
+      "tags": ["社交媒体", "运营", "内容", "沟通"]
+    },
+    {
+      "scene_id": "视频会议沟通",
+      "scene_name": "视频会议沟通",
+      "category": "digital",
+      "script_count": 20,
+      "file_path": "scenes/视频会议沟通.json",
+      "tags": ["视频会议", "远程", "沟通", "效率"]
+    },
+    {
+      "scene_id": "在线学习交流",
+      "scene_name": "在线学习交流",
+      "category": "digital",
+      "script_count": 20,
+      "file_path": "scenes/在线学习交流.json",
+      "tags": ["在线学习", "交流", "教育", "沟通"]
+    },
+    {
+      "scene_id": "被误解_NVC",
+      "scene_name": "被误解_NVC",
+      "category": "conflict",
+      "script_count": 20,
+      "file_path": "scenes/被误解_NVC.json",
+      "tags": ["误解", "NVC", "冲突", "澄清"]
+    },
+    {
+      "scene_id": "共情沟通训练",
+      "scene_name": "共情沟通训练",
+      "category": "social",
+      "script_count": 20,
+      "file_path": "scenes/共情沟通训练.json",
+      "tags": ["共情", "沟通", "倾听", "NVC"]
+    },
+    {
+      "scene_id": "兴趣社群自我介绍",
+      "scene_name": "兴趣社群自我介绍",
+      "category": "social",
+      "script_count": 20,
+      "file_path": "scenes/兴趣社群自我介绍.json",
+      "tags": ["自我介绍", "社群", "交友", "兴趣"]
+    },
+    {
+      "scene_id": "演讲发言技巧",
+      "scene_name": "演讲发言技巧",
+      "category": "social",
+      "script_count": 20,
+      "file_path": "scenes/演讲发言技巧.json",
+      "tags": ["演讲", "发言", "表达", "技巧"]
+    }
+  ],
+  "emotions": [
+    {
+      "emotion_id": "紧张",
+      "emotion_name": "紧张",
+      "script_count": 15,
+      "file_path": "emotions/紧张.json"
+    },
+    {
+      "emotion_id": "沮丧",
+      "emotion_name": "沮丧",
+      "script_count": 15,
+      "file_path": "emotions/沮丧.json"
+    },
+    {
+      "emotion_id": "愤怒",
+      "emotion_name": "愤怒",
+      "script_count": 15,
+      "file_path": "emotions/愤怒.json"
+    },
+    {
+      "emotion_id": "开心",
+      "emotion_name": "开心",
+      "script_count": 15,
+      "file_path": "emotions/开心.json"
+    },
+    {
+      "emotion_id": "平静",
+      "emotion_name": "平静",
+      "script_count": 15,
+      "file_path": "emotions/平静.json"
+    }
+  ],
+  "coach_styles": [
+    {
+      "coach_id": "沈清欢",
+      "coach_name": "沈清欢",
+      "style": "鼓励型",
+      "script_count": 15,
+      "file_path": "coach_styles/沈清欢_鼓励型.json"
+    },
+    {
+      "coach_id": "陆北辰",
+      "coach_name": "陆北辰",
+      "style": "支持型",
+      "script_count": 15,
+      "file_path": "coach_styles/陆北辰_支持型.json"
+    },
+    {
+      "coach_id": "顾星河",
+      "coach_name": "顾星河",
+      "style": "挑战型",
+      "script_count": 15,
+      "file_path": "coach_styles/顾星河_挑战型.json"
+    },
+    {
+      "coach_id": "苏念",
+      "coach_name": "苏念",
+      "style": "分析型",
+      "script_count": 15,
+      "file_path": "coach_styles/苏念_分析型.json"
+    }
+  ],
+  "purpose_categories": [
+    "破冰开场",
+    "展开话题",
+    "建立共鸣",
+    "深入了解",
+    "试探心意",
+    "收尾邀约",
+    "应对冷场",
+    "化解尴尬",
+    "回应赞美",
+    "表达欣赏",
+    "分享自己",
+    "自我介绍",
+    "职业规划",
+    "优缺点",
+    "项目经验",
+    "离职原因",
+    "期望薪资",
+    "反问问题",
+    "感谢收尾",
+    "开场铺垫",
+    "陈述价值",
+    "市场对比",
+    "表达诉求",
+    "应对拒绝",
+    "争取福利",
+    "设定目标",
+    "倾听回应",
+    "表达理解",
+    "确认感受",
+    "表达关心",
+    "给予支持",
+    "分享经历",
+    "鼓励表达",
+    "总结回应",
+    "非暴力沟通",
+    "表达感受",
+    "请求帮助",
+    "化解冲突",
+    "澄清误会",
+    "说明意图",
+    "请求理解",
+    "寻求共识",
+    "道歉",
+    "和解",
+    "保持冷静",
+    "复述观点",
+    "表达感谢",
+    "承诺改进",
+    "简单介绍",
+    "详细介绍",
+    "分享兴趣",
+    "表达期待",
+    "主动连接",
+    "分享作品",
+    "幽默破冰",
+    "感谢欢迎",
+    "说明目的",
+    "展示价值",
+    "发起话题",
+    "征求建议",
+    "安抚情绪",
+    "给予信心",
+    "转移注意力",
+    "提供支持",
+    "引导放松",
+    "降低压力",
+    "肯定能力",
+    "正面激励",
+    "给予空间",
+    "总结安抚",
+    "接纳情绪",
+    "寻找亮点",
+    "重新定位",
+    "给予希望",
+    "庆祝进步",
+    "表达喜悦",
+    "庆祝成就",
+    "分享快乐",
+    "鼓励保持",
+    "感恩表达",
+    "积极回应",
+    "强化自信",
+    "展望未来",
+    "传递善意",
+    "珍惜当下",
+    "建立连接",
+    "开放式提问",
+    "深度对话",
+    "确认理解",
+    "提供建议",
+    "保持陪伴",
+    "引导反思",
+    "结束对话",
+    "开场鼓励",
+    "肯定进步",
+    "激发潜能",
+    "耐心等待",
+    "期待下次",
+    "温和开场",
+    "耐心倾听",
+    "温暖收尾",
+    "直接开场",
+    "直击问题",
+    "犀利提问",
+    "设定目标",
+    "指出不足",
+    "鼓励突破",
+    "逼出潜力",
+    "理性开场",
+    "拆解问题",
+    "逻辑分析",
+    "总结复盘",
+    "设定框架",
+    "提问澄清",
+    "深度剖析",
+    "风险评估",
+    "行动计划"
+  ],
+  "style_tags": [
+    "安全型",
+    "幽默型",
+    "自信型",
+    "理性型",
+    "共情型"
+  ],
+  "emotion_tags": [
+    "紧张",
+    "沮丧",
+    "愤怒",
+    "开心",
+    "平静",
+    "期待",
+    "感兴趣",
+    "尴尬",
+    "失望",
+    "悲伤",
+    "焦虑",
+    "沉默",
+    "犹豫",
+    "困惑",
+    "委屈",
+    "自信",
+    "谦虚"
+  ],
+  "coach_style_tags": [
+    "鼓励型",
+    "支持型",
+    "挑战型",
+    "分析型"
+  ]
+}
