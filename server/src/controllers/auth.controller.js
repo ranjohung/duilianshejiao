@@ -9,11 +9,7 @@ const generateCode = () => {
 
 async function register(req, res) {
   try {
-    const { phone, code, nickname, password } = req.body;
-
-    if (!/^\d{6}$/.test(code)) {
-      return errorResponse(res, 400, '验证码错误');
-    }
+    const { phone, nickname, password } = req.body;
 
     const hashedPassword = password ? await bcrypt.hash(password, 10) : null;
     const result = await run(

@@ -8,7 +8,6 @@ const Joi = require('joi');
 // POST /api/auth/register
 router.post('/register', validate(Joi.object({
   phone: Joi.string().pattern(/^1[3-9]\d{9}$/).required(),
-  code: Joi.string().length(6).required(),
   nickname: Joi.string().min(2).max(20).required(),
   password: Joi.string().min(6).max(32).allow(null, ''),
 })), authController.register);

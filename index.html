@@ -186,15 +186,6 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
                 class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all">
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1.5">验证码</label>
-              <div class="flex gap-2">
-                <input id="reg-sms" type="text" maxlength="6" placeholder="输入验证码"
-                  class="flex-1 px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all">
-                <button onclick="sendRegSms()" id="reg-sms-btn" class="px-4 py-3 bg-indigo-50 text-indigo-600 rounded-xl text-sm font-medium hover:bg-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all whitespace-nowrap">获取验证码</button>
-              </div>
-              <p class="text-xs text-gray-400 mt-1">体验验证码：123456</p>
-            </div>
-            <div>
               <label class="block text-sm font-medium text-gray-700 mb-1.5">昵称</label>
               <input id="reg-nickname" type="text" maxlength="20" placeholder="给自己取个昵称"
                 class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all">
@@ -1066,10 +1057,11 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
             </div>
           </div>
         </div>
-        <div class="flex items-center gap-6 mt-6">
+        <div class="flex items-center gap-4 mt-6">
           <div><div class="text-2xl font-bold" id="profile-points">0</div><div class="text-xs text-white/80">训练积分</div></div>
           <div><div class="text-2xl font-bold" id="profile-streak">0</div><div class="text-xs text-white/80">连续签到</div></div>
           <div><div class="text-2xl font-bold" id="profile-scenes">0</div><div class="text-xs text-white/80">完成场景</div></div>
+          <div><div class="text-2xl font-bold" id="profile-tickets">0</div><div class="text-xs text-white/80">穿梭券</div></div>
         </div>
       </div>
 
@@ -2495,7 +2487,8 @@ let userData = {
   inviteCode: '',
   favorability: 0,
   trainingCount: 0,
-  dailyAnalysisUnlocked: 0
+  dailyAnalysisUnlocked: 0,
+  hasCompletedFirstTraining: false
 };
 
 // 训练数据
@@ -3627,7 +3620,6 @@ async function doRegister() {
   const nick = $('reg-nickname').value.trim();
   const pwd = $('reg-password').value.trim();
   const confirmPwd = $('reg-confirm-password').value.trim();
-  const sms = $('reg-sms').value.trim();
   const agreeTerms = $('agree-terms').checked;
   const err = $('register-error');
 
@@ -3635,13 +3627,12 @@ async function doRegister() {
   if (!nick) { err.textContent='请输入昵称'; err.style.display='block'; return; }
   if (!pwd || pwd.length<6) { err.textContent='密码至少6位'; err.style.display='block'; return; }
   if (pwd !== confirmPwd) { err.textContent='两次密码输入不一致'; err.style.display='block'; return; }
-  if (!sms || sms.length!==6) { err.textContent='请输入6位验证码'; err.style.display='block'; return; }
   if (!agreeTerms) { err.textContent='请仔细阅读并同意服务协议、隐私政策和免责声明'; err.style.display='block'; return; }
 
   try {
     const result = await apiRequest('/auth/register', {
       method: 'POST',
-      body: JSON.stringify({ phone, code: sms, nickname: nick, password: pwd })
+      body: JSON.stringify({ phone, nickname: nick, password: pwd })
     });
     if (!result.success) {
       err.textContent = result.message || '注册失败';
@@ -5766,6 +5757,10 @@ function startTraining(sceneId) {
     }
   }
 
+  if (userData.hasCompletedFirstTraining) {
+    showTrainingReminderModal();
+  }
+
   currentTraining = scene;
   trainingMessages = [];
   trainingRoundIdx = 0;
@@ -5998,6 +5993,44 @@ function confirmBeautyMatch() {
 function skipDressAndStart() {
   closeModal('prepare');
   startTrainingSession();
+}
+
+// 训练提醒弹窗（PRD §提示功能）
+function showTrainingReminderModal() {
+  if ($('training-reminder-modal')) return;
+
+  const modal = document.createElement('div');
+  modal.id = 'training-reminder-modal';
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal-content p-6">
+      <div class="text-center">
+        <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">💡</div>
+        <h3 class="text-lg font-bold text-gray-800 mb-2">训练小贴士</h3>
+        <p class="text-sm text-gray-600 mb-4">
+          每次训练都是成长的机会！记得关注评分变化，及时调整沟通策略。
+        </p>
+        <div class="bg-amber-50 rounded-lg p-3 mb-4 text-left">
+          <div class="flex items-start gap-2">
+            <span class="text-amber-600 mt-0.5">✨</span>
+            <div class="text-xs text-amber-700">
+              <div class="font-medium">沟通小技巧</div>
+              <div>积极倾听对方的需求，比急于表达自己更重要</div>
+            </div>
+          </div>
+        </div>
+        <button onclick="closeTrainingReminder()" class="w-full py-2.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-medium rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all">
+          知道了
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+function closeTrainingReminder() {
+  const modal = $('training-reminder-modal');
+  if (modal) modal.remove();
 }
 
 // 开始训练会话
@@ -7451,6 +7484,7 @@ function finishTraining() {
   currentTraining.completed = true;
 
   userData.trainingCount = (userData.trainingCount || 0) + 1;
+  userData.hasCompletedFirstTraining = true;
 
   // 生成情绪日记
   const total = trainingChoices.length || currentTraining.rounds.length;
@@ -8132,6 +8166,7 @@ function renderProfile() {
   $('profile-points').textContent = userData.points;
   $('profile-streak').textContent = userData.streak;
   $('profile-scenes').textContent = trainingScenes.filter(s => s.completed).length;
+  $('profile-tickets').textContent = timeRewindTickets;
 
   const now = new Date();
   const currentMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
