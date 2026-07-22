@@ -3523,6 +3523,68 @@ async function fillDemoAccount() {
   }
 }
 
+function performLocalLogin(phone, nickname, points = 650, level = '钻石学员') {
+  const savedKey = STORAGE_PREFIX + 'user_' + phone;
+  const savedData = localStorage.getItem(savedKey);
+
+  if (savedData) {
+    try {
+      const data = JSON.parse(savedData);
+      if (data.userData && typeof data.userData === 'object') {
+        userData = { ...data.userData, isLocalUser: true };
+      }
+      if (data.trainingScenes && Array.isArray(data.trainingScenes)) trainingScenes = data.trainingScenes;
+      if (data.abilityStats && typeof data.abilityStats === 'object') abilityStats = data.abilityStats;
+      if (typeof data.weeklyTrainingDays === 'number') weeklyTrainingDays = data.weeklyTrainingDays;
+      if (typeof data.checkedInToday === 'boolean') checkedInToday = data.checkedInToday;
+      if (data.checkInDates && Array.isArray(data.checkInDates)) checkInDates = data.checkInDates;
+      if (data.diaries && Array.isArray(data.diaries)) diaries = data.diaries;
+      if (data.collectedCards && Array.isArray(data.collectedCards)) collectedCards = data.collectedCards;
+      if (data.cbtRecords && Array.isArray(data.cbtRecords)) cbtRecords = data.cbtRecords;
+      if (data.nvcRecords && Array.isArray(data.nvcRecords)) nvcRecords = data.nvcRecords;
+      if (data.coachMoments && Array.isArray(data.coachMoments)) coachMoments = data.coachMoments;
+      if (typeof data.timeRewindTickets === 'number') timeRewindTickets = data.timeRewindTickets;
+      if (typeof data.hintCards === 'number') hintCards = data.hintCards;
+      if (typeof data.shieldCards === 'number') shieldCards = data.shieldCards;
+      if (typeof data.doublePointCards === 'number') doublePointCards = data.doublePointCards;
+      if (data.coachEmotions && typeof data.coachEmotions === 'object') coachEmotions = data.coachEmotions;
+      if (data.coachMemory && typeof data.coachMemory === 'object') coachMemory = data.coachMemory;
+    } catch(e) {
+      console.error('加载本地数据失败:', e);
+    }
+  } else {
+    userData = {
+      nickname: nickname || '演示用户',
+      phone,
+      points: points || 650,
+      streak: 0,
+      member: 'free',
+      level: level || '钻石学员',
+      realNameVerified: false,
+      realNameInfo: { name: '', idCard: '' },
+      avatar: '👤',
+      inviteCode: '',
+      favorability: 0,
+      trainingCount: 0,
+      dailyAnalysisUnlocked: 0,
+      hasCompletedFirstTraining: false,
+      isLocalUser: true
+    };
+  }
+
+  localStorage.setItem(STORAGE_PREFIX + 'logged_in', phone);
+  localStorage.setItem(STORAGE_PREFIX + 'local_user', 'true');
+  showView('page-home');
+  $('tab-bar').classList.add('show');
+  renderHome();
+  if (!userData.hasSeenOnboarding) {
+    setTimeout(() => {
+      $('modal-onboarding').style.display = 'flex';
+    }, 500);
+  }
+  showGuideHint('点击底部导航切换页面');
+}
+
 async function doLogin() {
   try {
     const phone = $('login-phone').value.trim();
@@ -3537,6 +3599,12 @@ async function doLogin() {
     if (loginMode === 'password') {
       const pwd = $('login-password').value.trim();
       if (!pwd) { err.textContent='请输入密码'; err.style.display='block'; return; }
+
+      if (phone === '13800138000' && pwd === '123456') {
+        performLocalLogin('13800138000', '演示用户', 650, '钻石学员');
+        return;
+      }
+
       const result = await apiRequest('/auth/login', {
         method: 'POST',
         body: JSON.stringify({ phone, password: pwd })
@@ -3547,6 +3615,7 @@ async function doLogin() {
         return;
       }
       localStorage.setItem(STORAGE_PREFIX + 'token', result.data.token);
+      localStorage.removeItem(STORAGE_PREFIX + 'local_user');
       userData = {
         nickname: result.data.user.nickname || '用户',
         phone,
@@ -3555,7 +3624,8 @@ async function doLogin() {
         member: result.data.user.member_level || 'free',
         level: result.data.user.student_level || '青铜学员',
         avatar: result.data.avatar || '👤',
-        realNameVerified: result.data.user.is_real_name_verified || false
+        realNameVerified: result.data.user.is_real_name_verified || false,
+        isLocalUser: false
       };
     } else {
       const sms = $('login-sms').value.trim();
@@ -3570,6 +3640,7 @@ async function doLogin() {
         return;
       }
       localStorage.setItem(STORAGE_PREFIX + 'token', result.data.token);
+      localStorage.removeItem(STORAGE_PREFIX + 'local_user');
       userData = {
         nickname: result.data.user.nickname || '用户',
         phone,
@@ -3578,7 +3649,8 @@ async function doLogin() {
         member: result.data.user.member_level || 'free',
         level: result.data.user.student_level || '青铜学员',
         avatar: result.data.avatar || '👤',
-        realNameVerified: result.data.user.is_real_name_verified || false
+        realNameVerified: result.data.user.is_real_name_verified || false,
+        isLocalUser: false
       };
     }
 
@@ -3640,6 +3712,7 @@ async function doRegister() {
       return;
     }
     localStorage.setItem(STORAGE_PREFIX + 'token', result.data.token);
+    localStorage.removeItem(STORAGE_PREFIX + 'local_user');
     userData = {
       nickname: nick,
       phone,
@@ -3648,12 +3721,20 @@ async function doRegister() {
       member: 'free',
       level: '青铜学员',
       avatar: '👤',
-      realNameVerified: false
+      realNameVerified: false,
+      realNameInfo: { name: '', idCard: '' },
+      inviteCode: '',
+      favorability: 0,
+      trainingCount: 0,
+      dailyAnalysisUnlocked: 0,
+      hasCompletedFirstTraining: false,
+      isLocalUser: false
     };
     localStorage.setItem(STORAGE_PREFIX + 'logged_in', phone);
     showView('page-home');
     $('tab-bar').classList.add('show');
     renderHome();
+    showGuideHint('点击底部导航切换页面');
   } catch(e) {
     console.error('注册失败:', e);
     err.textContent = '注册失败，请重试';
@@ -11166,14 +11247,25 @@ function initApp() {
   setupPwdMatchCheck();
 
   const loggedInPhone = localStorage.getItem(STORAGE_PREFIX + 'logged_in');
+  const isLocalUser = localStorage.getItem(STORAGE_PREFIX + 'local_user') === 'true';
+
   if (loggedInPhone) {
     try {
       loadData(loggedInPhone);
+      if (!userData.isLocalUser && !isLocalUser) {
+        const token = localStorage.getItem(STORAGE_PREFIX + 'token');
+        if (!token) {
+          showView('page-login');
+          return;
+        }
+      }
+      userData.isLocalUser = isLocalUser;
       showView('page-home');
       $('tab-bar').classList.add('show');
       renderHome();
     } catch(e) {
       console.error('自动登录失败:', e);
+      showView('page-login');
     }
   }
 }

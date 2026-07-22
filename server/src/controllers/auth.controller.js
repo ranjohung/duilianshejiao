@@ -37,27 +37,18 @@ async function login(req, res) {
   try {
     const { phone, code, password } = req.body;
 
-    if (phone === '13800138000' && (password === '123456' || code === '123456')) {
-      const result = await run(
-        'INSERT INTO users (phone, nickname, password, coins, total_points, student_level) VALUES (?, ?, ?, 650, 650, ?)',
-        [phone, '演示用户', await bcrypt.hash('123456', 10), '钻石学员']
-      );
-      await run('INSERT INTO growth_profiles (user_id) VALUES (?)', [result.lastID]);
-      const user = { id: result.lastID, phone, nickname: '演示用户', coins: 650, total_points: 650, student_level: '钻石学员' };
-      const token = jwt.sign({ id: user.id, phone, nickname: user.nickname });
-      return successResponse(res, {
-        token,
-        user: { id: user.id, phone, nickname: user.nickname, points: user.total_points || 0, member_level: user.member_level || 'free', student_level: user.student_level || '青铜学员', is_real_name_verified: user.is_real_name_verified || 0 },
-      }, '登录成功');
-    }
-
     if (password) {
-      const result = await run(
-        'INSERT INTO users (phone, nickname, password) VALUES (?, ?, ?)',
-        [phone, '用户' + phone.slice(-4), await bcrypt.hash(password, 10)]
-      );
-      await run('INSERT INTO growth_profiles (user_id) VALUES (?)', [result.lastID]);
-      const user = { id: result.lastID, phone, nickname: '用户' + phone.slice(-4) };
+      const user = await get('SELECT * FROM users WHERE phone = ?', [phone]);
+      if (!user) {
+        return errorResponse(res, 400, '账号或密码错误');
+      }
+      if (!user.password) {
+        return errorResponse(res, 400, '该账号未设置密码，请使用验证码登录');
+      }
+      const isValid = await bcrypt.compare(password, user.password);
+      if (!isValid) {
+        return errorResponse(res, 400, '账号或密码错误');
+      }
       const token = jwt.sign({ id: user.id, phone, nickname: user.nickname });
       return successResponse(res, {
         token,
