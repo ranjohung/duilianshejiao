@@ -11093,11 +11093,26 @@ function closeLevelLearningModal() {
 
   const level = levelSystem.find(l => l.id === window.currentLevelId);
   if (level) {
-    const firstChallengeTitle = level.challenges[0];
-    const challengeScene = templateScenes.find(s =>
-      s.name.includes(firstChallengeTitle) ||
-      s.desc.includes(firstChallengeTitle)
-    ) || templateScenes.find(s => s.unlocked && !s.completed) || templateScenes[0];
+    let challengeScene = null;
+
+    const levelSceneMap = {
+      1: [1, 2],
+      2: [6, 9],
+      3: [3, 4, 7],
+      4: [5, 8, 12],
+      5: [4, 20, 16],
+      6: [11, 17],
+      7: [12, 22, 13]
+    };
+
+    const sceneIds = levelSceneMap[level.id];
+    if (sceneIds) {
+      challengeScene = trainingScenes.find(s => sceneIds.includes(s.id)) || trainingScenes[0];
+    }
+
+    if (!challengeScene) {
+      challengeScene = trainingScenes.find(s => s.unlocked && !s.completed) || trainingScenes[0];
+    }
 
     if (challengeScene) {
       startTraining(challengeScene.id);
