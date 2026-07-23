@@ -6082,37 +6082,109 @@ function skipDressAndStart() {
   startTrainingSession();
 }
 
-// 训练提醒弹窗（PRD §提示功能）
+// 训练提醒弹窗（PRD §提示功能 - 好感度等级与权益提示）
 function showTrainingReminderModal() {
   if ($('training-reminder-modal')) return;
+
+  const favorability = userData.favorability || 0;
+  const level = getFavorabilityLevel(favorability);
+  const config = getFavorabilityConfig(level);
+  const nextThreshold = getNextFavorabilityThreshold(favorability);
 
   const modal = document.createElement('div');
   modal.id = 'training-reminder-modal';
   modal.className = 'modal-overlay';
   modal.innerHTML = `
-    <div class="modal-content p-6">
+    <div class="modal-content p-6 max-w-md">
       <div class="text-center">
-        <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">💡</div>
-        <h3 class="text-lg font-bold text-gray-800 mb-2">训练小贴士</h3>
-        <p class="text-sm text-gray-600 mb-4">
-          每次训练都是成长的机会！记得关注评分变化，及时调整沟通策略。
-        </p>
-        <div class="bg-amber-50 rounded-lg p-3 mb-4 text-left">
+        <div class="w-16 h-16 ${config.bgClass} rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">❤️</div>
+        <h3 class="text-lg font-bold text-gray-800 mb-1">训练小贴士</h3>
+        <p class="text-xs text-gray-400 mb-4">每次开始训练前，了解你的教练好感度权益</p>
+
+        <div class="${config.bgLight} rounded-xl p-4 mb-4 text-left border ${config.borderClass}">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span class="text-2xl">${config.icon}</span>
+              <div>
+                <div class="text-xs text-gray-500">当前好感度</div>
+                <div class="font-bold text-gray-800">Lv.${level} ${config.name}</div>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-xs text-gray-500">好感度分数</div>
+              <div class="font-bold ${config.textColor}">${favorability}</div>
+            </div>
+          </div>
+
+          <div class="bg-white/60 rounded-lg p-3 mb-3">
+            <div class="text-xs font-medium ${config.textColor} mb-2">🎯 你当前享受的权益：</div>
+            <div class="space-y-1.5">
+              ${config.features.map(f => `<div class="flex items-start gap-2 text-xs text-gray-700"><span class="${config.textColor} mt-0.5">✅</span><span>${f}</span></div>`).join('')}
+            </div>
+          </div>
+
+          <div class="text-xs text-gray-500 bg-amber-50/60 rounded-lg p-2.5">
+            ${level >= 4
+              ? '🎉 已解锁全部教学功能！继续保持训练~'
+              : `💡 下一级 Lv.${level + 1} 将解锁：${config.nextFeature}<br/><span class="text-gray-400">还差 ${nextThreshold - favorability} 好感度升级</span>`
+            }
+          </div>
+        </div>
+
+        <div class="bg-indigo-50 rounded-lg p-3 mb-4 text-left">
           <div class="flex items-start gap-2">
-            <span class="text-amber-600 mt-0.5">✨</span>
-            <div class="text-xs text-amber-700">
+            <span class="text-indigo-600 mt-0.5">✨</span>
+            <div class="text-xs text-indigo-700">
               <div class="font-medium">沟通小技巧</div>
-              <div>积极倾听对方的需求，比急于表达自己更重要</div>
+              <div>积极倾听对方的需求，比急于表达自己更重要。完成训练可获得好感度+积分奖励</div>
             </div>
           </div>
         </div>
+
         <button onclick="closeTrainingReminder()" class="w-full py-2.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-medium rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all">
-          知道了
+          开始训练
         </button>
       </div>
     </div>
   `;
   document.body.appendChild(modal);
+}
+
+// 好感度等级配置（PRD §好感度等级与权益对应表）
+function getFavorabilityConfig(level) {
+  const configs = {
+    0: {
+      name: '初识', icon: '🌱',
+      bgClass: 'bg-gray-100', bgLight: 'bg-gray-50', borderClass: 'border-gray-200', textColor: 'text-gray-600',
+      features: ['基础对话训练'],
+      nextFeature: '示范回答（教练给出最优回答参考）'
+    },
+    1: {
+      name: '熟悉', icon: '💚',
+      bgClass: 'bg-green-100', bgLight: 'bg-green-50', borderClass: 'border-green-200', textColor: 'text-green-600',
+      features: ['基础对话训练', '示范回答（教练给出最优回答参考）'],
+      nextFeature: '完整分析（为什么错/为什么对）'
+    },
+    2: {
+      name: '信任', icon: '💙',
+      bgClass: 'bg-blue-100', bgLight: 'bg-blue-50', borderClass: 'border-blue-200', textColor: 'text-blue-600',
+      features: ['基础对话训练', '示范回答（教练给出最优回答参考）', '完整分析（为什么错/为什么对）'],
+      nextFeature: '个性化教学建议'
+    },
+    3: {
+      name: '默契', icon: '🧡',
+      bgClass: 'bg-orange-100', bgLight: 'bg-orange-50', borderClass: 'border-orange-200', textColor: 'text-orange-600',
+      features: ['基础对话训练', '示范回答', '完整分析', '个性化教学建议'],
+      nextFeature: '复习挑战（巩固学习成果）'
+    },
+    4: {
+      name: '知己', icon: '💖',
+      bgClass: 'bg-pink-100', bgLight: 'bg-pink-50', borderClass: 'border-pink-200', textColor: 'text-pink-600',
+      features: ['全部教学功能', '示范回答', '完整分析', '个性化教学建议', '复习挑战'],
+      nextFeature: ''
+    }
+  };
+  return configs[level] || configs[0];
 }
 
 function closeTrainingReminder() {

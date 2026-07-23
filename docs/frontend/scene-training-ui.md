@@ -67,6 +67,45 @@
 结束（返回场景页）
 ```
 
+### 训练弹窗提示流程（v2.3新增）
+
+```
+用户点击"开始训练"
+  │
+  ▼
+判断 hasStartedTrainingBefore
+  │
+  ├─ false（首次）→ 不弹窗，直接进入训练准备页
+  │                   │
+  │                   ▼
+  │              userData.hasStartedTrainingBefore = true
+  │
+  └─ true（非首次）→ 显示好感度等级+权益弹窗
+                       │
+                       ▼
+                   用户点击"开始训练"关闭弹窗
+                       │
+                       ▼
+                   进入训练准备页
+```
+
+**好感度等级与权益对应表：**
+
+| 等级 | 名称 | 图标 | 配色 | 已解锁权益 |
+|---|---|---|---|---|
+| Lv.0 | 初识 | 🌱 | 灰色 | 基础对话训练 |
+| Lv.1 | 熟悉 | 💚 | 绿色 | 基础对话训练 + 示范回答 |
+| Lv.2 | 信任 | 💙 | 蓝色 | 基础对话训练 + 示范回答 + 完整分析 |
+| Lv.3 | 默契 | 🧡 | 橙色 | 基础对话训练 + 示范回答 + 完整分析 + 个性化教学 |
+| Lv.4 | 知己 | 💖 | 粉色 | 全部教学功能 |
+
+**弹窗组件：**
+
+- 函数：`showTrainingReminderModal()`
+- 配置函数：`getFavorabilityConfig(level)` 返回 `{name, icon, bgClass, bgLight, borderClass, textColor, features[], nextFeature}`
+- 触发位置：`startTraining()` 函数中，检查 `userData.hasStartedTrainingBefore`
+- 关闭方式：用户点击"开始训练"按钮，调用 `closeTrainingReminder()`
+
 **选项设计规则：**
 
 - A选项：直接/主动型——效果通常最积极，但需考虑场合
