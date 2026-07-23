@@ -6135,72 +6135,46 @@ function skipDressAndStart() {
   startTrainingSession();
 }
 
-// 训练提醒弹窗（PRD §提示功能 - 好感度等级与权益提示）
+// 训练提醒横幅（PRD §提示功能 - 好感度等级与权益提示）
 function showTrainingReminderModal() {
-  if ($('training-reminder-modal')) return;
+  const existingBanner = $('favorability-banner');
+  if (existingBanner) {
+    existingBanner.remove();
+  }
 
   const favorability = userData.favorability || 0;
   const level = getFavorabilityLevel(favorability);
   const config = getFavorabilityConfig(level);
-  const nextThreshold = getNextFavorabilityThreshold(favorability);
 
-  const modal = document.createElement('div');
-  modal.id = 'training-reminder-modal';
-  modal.className = 'modal-overlay';
-  modal.innerHTML = `
-    <div class="modal-content p-6 max-w-md">
-      <div class="text-center">
-        <div class="w-16 h-16 ${config.bgClass} rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">❤️</div>
-        <h3 class="text-lg font-bold text-gray-800 mb-1">训练小贴士</h3>
-        <p class="text-xs text-gray-400 mb-4">每次开始训练前，了解你的教练好感度权益</p>
-
-        <div class="${config.bgLight} rounded-xl p-4 mb-4 text-left border ${config.borderClass}">
-          <div class="flex items-center justify-between mb-3">
-            <div class="flex items-center gap-2">
-              <span class="text-2xl">${config.icon}</span>
-              <div>
-                <div class="text-xs text-gray-500">当前好感度</div>
-                <div class="font-bold text-gray-800">Lv.${level} ${config.name}</div>
-              </div>
-            </div>
-            <div class="text-right">
-              <div class="text-xs text-gray-500">好感度分数</div>
-              <div class="font-bold ${config.textColor}">${favorability}</div>
-            </div>
-          </div>
-
-          <div class="bg-white/60 rounded-lg p-3 mb-3">
-            <div class="text-xs font-medium ${config.textColor} mb-2">🎯 你当前享受的权益：</div>
-            <div class="space-y-1.5">
-              ${config.features.map(f => `<div class="flex items-start gap-2 text-xs text-gray-700"><span class="${config.textColor} mt-0.5">✅</span><span>${f}</span></div>`).join('')}
-            </div>
-          </div>
-
-          <div class="text-xs text-gray-500 bg-amber-50/60 rounded-lg p-2.5">
-            ${level >= 4
-              ? '🎉 已解锁全部教学功能！继续保持训练~'
-              : `💡 下一级 Lv.${level + 1} 将解锁：${config.nextFeature}<br/><span class="text-gray-400">还差 ${nextThreshold - favorability} 好感度升级</span>`
-            }
-          </div>
-        </div>
-
-        <div class="bg-indigo-50 rounded-lg p-3 mb-4 text-left">
-          <div class="flex items-start gap-2">
-            <span class="text-indigo-600 mt-0.5">✨</span>
-            <div class="text-xs text-indigo-700">
-              <div class="font-medium">沟通小技巧</div>
-              <div>积极倾听对方的需求，比急于表达自己更重要。完成训练可获得好感度+积分奖励</div>
-            </div>
-          </div>
-        </div>
-
-        <button onclick="closeTrainingReminder()" class="w-full py-2.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-medium rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all">
-          开始训练
-        </button>
+  const banner = document.createElement('div');
+  banner.id = 'favorability-banner';
+  banner.className = 'fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-pink-500 to-red-500 text-white px-4 py-3 shadow-lg transform transition-all duration-300';
+  banner.innerHTML = `
+    <div class="max-w-md mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-xl">❤️</span>
+        <span class="text-sm font-medium">${config.bannerText}</span>
       </div>
+      <button onclick="closeFavorabilityBanner()" class="text-white/70 hover:text-white text-xs">×</button>
     </div>
   `;
-  document.body.appendChild(modal);
+  document.body.appendChild(banner);
+
+  setTimeout(() => {
+    const b = $('favorability-banner');
+    if (b) {
+      b.style.transform = 'translateY(-100%)';
+      setTimeout(() => b.remove(), 300);
+    }
+  }, 3000);
+}
+
+function closeFavorabilityBanner() {
+  const banner = $('favorability-banner');
+  if (banner) {
+    banner.style.transform = 'translateY(-100%)';
+    setTimeout(() => banner.remove(), 300);
+  }
 }
 
 // 好感度等级配置（PRD §好感度等级与权益对应表）
@@ -6210,39 +6184,46 @@ function getFavorabilityConfig(level) {
       name: '初识', icon: '🌱',
       bgClass: 'bg-gray-100', bgLight: 'bg-gray-50', borderClass: 'border-gray-200', textColor: 'text-gray-600',
       features: ['基础对话训练'],
-      nextFeature: '示范回答（教练给出最优回答参考）'
+      nextFeature: '示范回答',
+      bannerText: '当前 Lv.0 初识 · 下一级：示范回答'
     },
     1: {
       name: '熟悉', icon: '💚',
       bgClass: 'bg-green-100', bgLight: 'bg-green-50', borderClass: 'border-green-200', textColor: 'text-green-600',
-      features: ['基础对话训练', '示范回答（教练给出最优回答参考）'],
-      nextFeature: '完整分析（为什么错/为什么对）'
+      features: ['基础对话训练', '示范回答'],
+      nextFeature: '完整分析',
+      bannerText: '当前 Lv.1 熟悉 ✅ 示范回答已解锁 · 下一级：完整分析'
     },
     2: {
       name: '信任', icon: '💙',
       bgClass: 'bg-blue-100', bgLight: 'bg-blue-50', borderClass: 'border-blue-200', textColor: 'text-blue-600',
-      features: ['基础对话训练', '示范回答（教练给出最优回答参考）', '完整分析（为什么错/为什么对）'],
-      nextFeature: '个性化教学建议'
+      features: ['基础对话训练', '示范回答', '完整分析'],
+      nextFeature: '个性化教学',
+      bannerText: '当前 Lv.2 信任 ✅ 完整分析已解锁 · 下一级：个性化教学'
     },
     3: {
       name: '默契', icon: '🧡',
       bgClass: 'bg-orange-100', bgLight: 'bg-orange-50', borderClass: 'border-orange-200', textColor: 'text-orange-600',
       features: ['基础对话训练', '示范回答', '完整分析', '个性化教学建议'],
-      nextFeature: '复习挑战（巩固学习成果）'
+      nextFeature: '复习挑战',
+      bannerText: '当前 Lv.3 默契 ✅ 个性化教学已解锁 · 下一级：复习挑战'
     },
     4: {
+      name: '师徒', icon: '💜',
+      bgClass: 'bg-purple-100', bgLight: 'bg-purple-50', borderClass: 'border-purple-200', textColor: 'text-purple-600',
+      features: ['基础对话训练', '示范回答', '完整分析', '个性化教学建议', '复习挑战'],
+      nextFeature: '专属教练',
+      bannerText: '当前 Lv.4 师徒 ✅ 复习挑战已解锁 · 下一级：专属教练'
+    },
+    5: {
       name: '知己', icon: '💖',
       bgClass: 'bg-pink-100', bgLight: 'bg-pink-50', borderClass: 'border-pink-200', textColor: 'text-pink-600',
-      features: ['全部教学功能', '示范回答', '完整分析', '个性化教学建议', '复习挑战'],
-      nextFeature: ''
+      features: ['全部教学功能', '示范回答', '完整分析', '个性化教学建议', '复习挑战', '专属教练'],
+      nextFeature: '',
+      bannerText: '当前 Lv.5 知己 ✅ 全部教学功能已解锁'
     }
   };
   return configs[level] || configs[0];
-}
-
-function closeTrainingReminder() {
-  const modal = $('training-reminder-modal');
-  if (modal) modal.remove();
 }
 
 // 开始训练会话
@@ -6522,19 +6503,21 @@ function sendUserMessage() {
 }
 
 function getFavorabilityLevel(favorability) {
-  if (favorability >= 120) return 4;
-  if (favorability >= 80) return 3;
-  if (favorability >= 50) return 2;
+  if (favorability >= 200) return 5;
+  if (favorability >= 150) return 4;
+  if (favorability >= 100) return 3;
+  if (favorability >= 60) return 2;
   if (favorability >= 20) return 1;
   return 0;
 }
 
 function getNextFavorabilityThreshold(favorability) {
   if (favorability < 20) return 20;
-  if (favorability < 50) return 50;
-  if (favorability < 80) return 80;
-  if (favorability < 120) return 120;
-  return 120;
+  if (favorability < 60) return 60;
+  if (favorability < 100) return 100;
+  if (favorability < 150) return 150;
+  if (favorability < 200) return 200;
+  return 200;
 }
 
 function getNextSceneUnlockInfo() {
