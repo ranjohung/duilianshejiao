@@ -2533,7 +2533,7 @@ let trainingScenes = [
       { type:'C', label:'含蓄型', desc:'简单回答', example:'风景吧' }
     ], bestAnswer:'我喜欢拍人物，尤其是街头抓拍，能捕捉到很多真实的瞬间' }
   ]},
-  { id:3, icon:'💼', name:'模拟面试', desc:'模拟求职面试场景', stage:2, difficulty:3, duration:'15min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+  { id:3, icon:'💼', name:'模拟面试', desc:'模拟求职面试场景', stage:2, difficulty:3, duration:'15min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, userStarts:true, rounds:[
     { ai:'请先做个自我介绍', thinking:[
       { type:'A', label:'主动型', desc:'完整介绍背景和优势', example:'面试官您好，我叫张三，有两年产品经理经验，主导过多个用户增长项目' },
       { type:'B', label:'平衡型', desc:'简要介绍 + 表达求职意愿', example:'我叫张三，毕业两年，对贵公司的产品很感兴趣' },
@@ -2560,7 +2560,7 @@ let trainingScenes = [
       { type:'C', label:'含蓄型', desc:'礼貌表示没有问题', example:'没有了，谢谢' }
     ], bestAnswer:'团队目前的主要挑战是什么？未来的发展方向是怎样的？' }
   ]},
-  { id:4, icon:'💰', name:'加薪谈判', desc:'向老板提出加薪请求', stage:2, difficulty:4, duration:'15min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+  { id:4, icon:'💰', name:'加薪谈判', desc:'向老板提出加薪请求', stage:2, difficulty:4, duration:'15min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, userStarts:true, rounds:[
     { ai:'请坐，你说有重要的事要和我谈？', thinking:[
       { type:'A', label:'主动型', desc:'开门见山但礼貌表达', example:'老板，感谢公司的培养，我想和您聊聊我的职业发展和薪资调整' },
       { type:'B', label:'平衡型', desc:'先表达感谢再谈主题', example:'老板，感谢您的时间，我想和您聊聊我的工作情况' },
@@ -2647,14 +2647,14 @@ let trainingScenes = [
       { type:'C', label:'含蓄型', desc:'简单回答', example:'随便逛逛' }
     ], bestAnswer:'我喜欢爬山和看展，上周末去了一个很棒的摄影展。你呢？有没有特别喜欢的活动？' }
   ]},
-  { id:10, icon:'💌', name:'表白', desc:'向心仪对象表达心意', stage:2, difficulty:4, duration:'10min', unlocked:false, completed:false, unlockLevel:'白银', unlockPoints:80, unlockTickets:1, rounds:[
+  { id:10, icon:'💌', name:'表白', desc:'向心仪对象表达心意', stage:2, difficulty:4, duration:'10min', unlocked:false, completed:false, unlockLevel:'白银', unlockPoints:80, unlockTickets:1, userStarts:true, rounds:[
     { ai:'（两人单独在公园散步，气氛有些暧昧）', thinking:[
       { type:'A', label:'主动型', desc:'真诚表达 + 分享感受', example:'跟你在一起的时光总是很开心，我发现自己越来越喜欢你，愿意和我在一起吗？' },
       { type:'B', label:'平衡型', desc:'表达心意 + 给对方空间', example:'我挺喜欢你的，不知道你对我是什么感觉？' },
       { type:'C', label:'含蓄型', desc:'暗示心意', example:'和你在一起挺开心的' }
     ], bestAnswer:'跟你在一起的时光总是很开心，我发现自己越来越喜欢你，愿意和我在一起吗？' }
   ]},
-  { id:11, icon:'🏠', name:'见家长', desc:'第一次拜访对方父母', stage:2, difficulty:4, duration:'15min', unlocked:false, completed:false, unlockLevel:'白银', unlockPoints:100, unlockTickets:2, rounds:[
+  { id:11, icon:'🏠', name:'见家长', desc:'第一次拜访对方父母', stage:2, difficulty:4, duration:'15min', unlocked:false, completed:false, unlockLevel:'白银', unlockPoints:100, unlockTickets:2, userStarts:true, rounds:[
     { ai:'叔叔阿姨好，这是一点心意', thinking:[
       { type:'A', label:'主动型', desc:'礼貌问候 + 表达感谢', example:'叔叔阿姨好！感谢你们邀请我来家里做客，这是一点小礼物，希望你们喜欢' },
       { type:'B', label:'平衡型', desc:'礼貌问候 + 简单介绍', example:'叔叔阿姨好，我是XXX，很高兴见到你们' },
@@ -2678,7 +2678,7 @@ let trainingScenes = [
       { type:'C', label:'含蓄型', desc:'简单回应', example:'好的' }
     ], bestAnswer:'收到，我马上联系客户了解具体原因，同时准备备选方案来减少损失' }
   ]},
-  { id:13, icon:'🎤', name:'公共演讲技巧', desc:'提升公开表达能力', stage:2, difficulty:4, duration:'15min', unlocked:false, completed:false, unlockLevel:'白银', unlockPoints:120, unlockTickets:2, rounds:[
+  { id:13, icon:'🎤', name:'公共演讲技巧', desc:'提升公开表达能力', stage:2, difficulty:4, duration:'15min', unlocked:false, completed:false, unlockLevel:'白银', unlockPoints:120, unlockTickets:2, userStarts:true, rounds:[
     { ai:'（面对台下数百人，主持人介绍后轮到你上台）', thinking:[
       { type:'A', label:'主动型', desc:'自信开场 + 建立连接', example:'大家好！非常荣幸今天能站在这里和大家分享。在开始之前，我想先问大家一个问题...' },
       { type:'B', label:'平衡型', desc:'礼貌开场 + 说明目的', example:'大家好，今天我想和大家分享一下我的一些经验' },
@@ -2714,7 +2714,7 @@ let trainingScenes = [
       { type:'C', label:'含蓄型', desc:'简单回答', example:'有过' }
     ], bestAnswer:'以前偶尔会有，但这次持续时间更长。最近工作压力比较大，睡眠不太好' }
   ]},
-  { id:16, icon:'🏪', name:'投诉客服', desc:'有效表达不满并解决问题', stage:1, difficulty:3, duration:'12min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+  { id:16, icon:'🏪', name:'投诉客服', desc:'有效表达不满并解决问题', stage:1, difficulty:3, duration:'12min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, userStarts:true, rounds:[
     { ai:'您好，有什么可以帮您？', thinking:[
       { type:'A', label:'主动型', desc:'清晰说明问题 + 表达诉求 + 提供证据', example:'您好，我要投诉。我上周买的商品收到是破损的，我已经拍照保存了证据，希望能尽快退换' },
       { type:'B', label:'平衡型', desc:'说明问题 + 表达要求', example:'我收到的商品有问题，想退换' },
@@ -2726,7 +2726,7 @@ let trainingScenes = [
       { type:'C', label:'含蓄型', desc:'简单回应', example:'好' }
     ], bestAnswer:'好的，我理解需要核实。请问大概需要多久？我希望能在3天内得到答复' }
   ]},
-  { id:17, icon:'🍽️', name:'饭局社交技巧', desc:'商务饭局中的沟通艺术', stage:2, difficulty:4, duration:'15min', unlocked:false, completed:false, unlockLevel:'白银', unlockPoints:100, unlockTickets:1, rounds:[
+  { id:17, icon:'🍽️', name:'饭局社交技巧', desc:'商务饭局中的沟通艺术', stage:2, difficulty:4, duration:'15min', unlocked:false, completed:false, unlockLevel:'白银', unlockPoints:100, unlockTickets:1, userStarts:true, rounds:[
     { ai:'（饭局开始，大家互相寒暄）', thinking:[
       { type:'A', label:'主动型', desc:'主动敬酒 + 表达敬意', example:'王总，感谢您今天的招待！我敬您一杯，祝咱们合作愉快！' },
       { type:'B', label:'平衡型', desc:'礼貌问候 + 保持友好', example:'大家好，感谢今天的聚餐' },
@@ -2750,7 +2750,7 @@ let trainingScenes = [
       { type:'C', label:'含蓄型', desc:'简单感谢', example:'谢谢' }
     ], bestAnswer:'谢谢！这是我旅行时拍的照片，当时觉得很有意境就用上了。你头像也很有个性呢！' }
   ]},
-  { id:19, icon:'🏛️', name:'政务大厅办事', desc:'高效办理政务业务', stage:1, difficulty:3, duration:'12min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
+  { id:19, icon:'🏛️', name:'政务大厅办事', desc:'高效办理政务业务', stage:1, difficulty:3, duration:'12min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, userStarts:true, rounds:[
     { ai:'您好，请问办理什么业务？', thinking:[
       { type:'A', label:'主动型', desc:'清晰说明需求 + 准备材料', example:'您好，我来办理营业执照变更。需要的材料我都准备好了，您看还需要什么？' },
       { type:'B', label:'平衡型', desc:'说明业务 + 询问流程', example:'我想办理营业执照变更，请问需要什么材料？' },
@@ -2762,7 +2762,7 @@ let trainingScenes = [
       { type:'C', label:'含蓄型', desc:'简单回应', example:'哦' }
     ], bestAnswer:'好的，麻烦您告诉我具体哪里不符合？我马上修改，或者您看有没有其他替代方案？' }
   ]},
-  { id:20, icon:'💰', name:'4S店砍价', desc:'购车时的谈判技巧', stage:2, difficulty:4, duration:'15min', unlocked:false, completed:false, unlockLevel:'白银', unlockPoints:120, unlockTickets:2, rounds:[
+  { id:20, icon:'💰', name:'4S店砍价', desc:'购车时的谈判技巧', stage:2, difficulty:4, duration:'15min', unlocked:false, completed:false, unlockLevel:'白银', unlockPoints:120, unlockTickets:2, userStarts:true, rounds:[
     { ai:'这款车最低多少钱？', thinking:[
       { type:'A', label:'主动型', desc:'展示诚意 + 提出合理价格 + 提及竞品', example:'我确实很想买这款车，而且今天就能订。我了解到XX店比你们便宜5000，你们能做到多少？' },
       { type:'B', label:'平衡型', desc:'表达购买意愿 + 询问优惠', example:'我今天想订车，能给个最低价吗？' },
@@ -6274,16 +6274,6 @@ function showRound() {
   const round = currentTraining.rounds[trainingRoundIdx];
   if (!round) { finishTraining(); return; }
 
-  const personalityEffects = {
-    '友好型': { prefix:'', suffix:'~', emoji:'😊' },
-    '内向型': { prefix:'嗯...', suffix:'...', emoji:'😌' },
-    '挑剔型': { prefix:'哼，', suffix:'！', emoji:'😒' },
-    '理性型': { prefix:'从客观角度看，', suffix:'.', emoji:'🤔' }
-  };
-  const effect = personalityEffects[currentPersonality];
-  let aiMsg = effect.prefix + round.ai + effect.suffix;
-
-  addTrainingMessage(aiMsg, false);
   showTrainingOptions = true;
   showTrainingReport = false;
   useHintCard = false;
@@ -6291,19 +6281,41 @@ function showRound() {
   $('rewind-btn').style.display = 'none';
   updatePropButtons();
 
-  setTimeout(() => {
-    showTrainingInput();
+  if (trainingRoundIdx === 0 && currentTraining.userStarts) {
+    setTimeout(() => {
+      showTrainingInput();
+      if (round.tips && round.tips.length > 0 && !useHintCard) {
+        setTimeout(() => {
+          addTrainingMessage('💡 小贴士：' + round.tips[0], false, true);
+        }, 500);
+      }
+    }, 500);
+  } else {
+    const personalityEffects = {
+      '友好型': { prefix:'', suffix:'~', emoji:'😊' },
+      '内向型': { prefix:'嗯...', suffix:'...', emoji:'😌' },
+      '挑剔型': { prefix:'哼，', suffix:'！', emoji:'😒' },
+      '理性型': { prefix:'从客观角度看，', suffix:'.', emoji:'🤔' }
+    };
+    const effect = personalityEffects[currentPersonality];
+    let aiMsg = effect.prefix + round.ai + effect.suffix;
 
-    if (round.tips && round.tips.length > 0 && !useHintCard) {
-      setTimeout(() => {
-        addTrainingMessage('💡 小贴士：' + round.tips[0], false, true);
-      }, 500);
-    }
+    addTrainingMessage(aiMsg, false);
 
-    if (trainingRoundIdx > 0 && Math.random() < 0.2) {
-      triggerRandomEvent();
-    }
-  }, 500);
+    setTimeout(() => {
+      showTrainingInput();
+
+      if (round.tips && round.tips.length > 0 && !useHintCard) {
+        setTimeout(() => {
+          addTrainingMessage('💡 小贴士：' + round.tips[0], false, true);
+        }, 500);
+      }
+
+      if (trainingRoundIdx > 0 && Math.random() < 0.2) {
+        triggerRandomEvent();
+      }
+    }, 500);
+  }
 }
 
 function showTrainingInput() {
