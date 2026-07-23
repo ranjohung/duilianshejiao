@@ -11001,18 +11001,125 @@ function startLevelChallenge(levelId) {
     return;
   }
 
-  closeModal('challenge');
+  showLevelLearningContent(level);
+}
 
-  window.currentLevelId = levelId;
-  window.levelChallengesCompleted = 0;
-  window.levelScore = 0;
+function showLevelLearningContent(level) {
+  const existingModal = $('level-learning-modal');
+  if (existingModal) existingModal.remove();
 
-  const firstChallengeTitle = level.challenges[0];
-  const challenge = challenges.find(c => c.title === firstChallengeTitle);
+  const learningContent = getLevelLearningContent(level.id);
 
-  if (challenge) {
-    startChallenge(challenge.id);
-  }
+  const modal = document.createElement('div');
+  modal.id = 'level-learning-modal';
+  modal.className = 'modal-overlay';
+  modal.innerHTML = `
+    <div class="modal-content p-5 max-w-lg max-h-[85vh] overflow-y-auto">
+      <div class="text-center mb-4">
+        <div class="w-16 h-16 bg-gradient-to-br from-amber-100 to-orange-100 rounded-full flex items-center justify-center mx-auto mb-3 text-3xl">${level.icon}</div>
+        <h3 class="text-lg font-bold text-gray-800">第${level.id}关 ${level.name}</h3>
+        <p class="text-xs text-gray-400 mt-1">${level.description}</p>
+      </div>
+
+      <div class="bg-amber-50 rounded-xl p-3 mb-4">
+        <div class="flex items-center gap-2 text-amber-600">
+          <span>📚</span>
+          <span class="text-sm font-medium">学习要点</span>
+        </div>
+      </div>
+
+      <div class="space-y-3 mb-4">
+        ${learningContent.map((item, idx) => `
+          <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 rounded-lg ${item.bgColor} flex items-center justify-center text-sm font-bold flex-shrink-0">${idx + 1}</div>
+              <div>
+                <h4 class="font-medium text-gray-800 text-sm mb-1">${item.title}</h4>
+                <p class="text-xs text-gray-500 leading-relaxed">${item.desc}</p>
+                ${item.tips ? `
+                  <div class="mt-2 bg-gray-50 rounded-lg p-2">
+                    <div class="flex items-center gap-1 text-xs text-gray-400 mb-1">
+                      <span>💡</span>
+                      <span>技巧提示</span>
+                    </div>
+                    <p class="text-xs text-gray-600">${item.tips}</p>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="bg-gray-50 rounded-xl p-3 mb-4">
+        <div class="flex items-center gap-2 text-gray-600 mb-2">
+          <span>🎯</span>
+          <span class="text-sm font-medium">本关挑战任务</span>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          ${level.challenges.map(c => `<span class="text-xs px-2 py-1 bg-white border border-gray-200 rounded-full text-gray-600">${c}</span>`).join('')}
+        </div>
+      </div>
+
+      <button onclick="closeLevelLearningModal()" class="w-full py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white text-sm font-medium rounded-xl hover:opacity-90 transition-opacity">
+        开始挑战
+      </button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+function closeLevelLearningModal() {
+  const modal = $('level-learning-modal');
+  if (modal) modal.remove();
+}
+
+function getLevelLearningContent(levelId) {
+  const content = {
+    1: [
+      { title: '主动打招呼', desc: '打招呼是开启对话的第一步，一个温暖的问候可以迅速拉近彼此距离。', tips: '眼神交流+微笑+简短问候，如"你好！很高兴认识你"', bgColor: 'bg-green-100 text-green-600' },
+      { title: '赞美练习', desc: '真诚的赞美能让对方感到被认可和重视，是建立良好关系的催化剂。', tips: '赞美要具体而非笼统，如"你今天的穿搭很有品味"比"你很棒"更有效', bgColor: 'bg-blue-100 text-blue-600' },
+      { title: '自我介绍技巧', desc: '清晰简洁的自我介绍能让对方快速了解你，留下深刻印象。', tips: '姓名+身份+兴趣，控制在30秒内，如"我叫张三，是一名产品经理，平时喜欢跑步"', bgColor: 'bg-purple-100 text-purple-600' },
+      { title: '倾听的艺术', desc: '倾听是沟通的基础，认真倾听能让对方感到被尊重。', tips: '不要打断对方说话，适时点头回应，保持眼神交流', bgColor: 'bg-indigo-100 text-indigo-600' }
+    ],
+    2: [
+      { title: '深度倾听', desc: '不仅听对方说什么，还要理解对方背后的情感和需求。', tips: '使用"嗯"、"我理解"等回应词，复述对方的话确认理解', bgColor: 'bg-teal-100 text-teal-600' },
+      { title: '共情能力', desc: '站在对方角度感受和理解对方的情绪，建立情感连接。', tips: '表达理解和支持，如"我明白你现在的感受"', bgColor: 'bg-pink-100 text-pink-600' },
+      { title: '深度对话', desc: '从表面话题深入到更有意义的交流，建立更深层次的关系。', tips: '多问开放式问题，如"你觉得这件事对你有什么影响？"', bgColor: 'bg-orange-100 text-orange-600' },
+      { title: '非语言沟通', desc: '身体语言、表情、手势等非语言信号同样重要。', tips: '保持开放的姿态，避免交叉双臂，适当使用手势增强表达', bgColor: 'bg-cyan-100 text-cyan-600' }
+    ],
+    3: [
+      { title: '公开表达', desc: '在众人面前清晰表达自己的观点，克服紧张情绪。', tips: '提前准备要点，深呼吸放松，眼神与听众交流', bgColor: 'bg-red-100 text-red-600' },
+      { title: '职场道歉', desc: '犯错后真诚道歉，承担责任，修复信任。', tips: '直接承认错误+解释原因+补救措施，如"对不起，是我的失误，我会马上处理"', bgColor: 'bg-amber-100 text-amber-600' },
+      { title: '向上汇报', desc: '清晰、有条理地向领导汇报工作进展和成果。', tips: '先说结论，再讲细节，用数据支撑，控制时间', bgColor: 'bg-gray-100 text-gray-600' },
+      { title: '职场沟通礼仪', desc: '了解职场沟通的基本规则和礼节。', tips: '邮件标题清晰，及时回复消息，注意称呼和语气', bgColor: 'bg-indigo-100 text-indigo-600' }
+    ],
+    4: [
+      { title: '冲突处理', desc: '面对冲突时保持冷静，寻找双赢解决方案。', tips: '先处理情绪再处理问题，倾听对方立场，寻求共同利益', bgColor: 'bg-red-100 text-red-600' },
+      { title: '关系维护', desc: '定期联系，保持良好的人际关系网络。', tips: '节日问候，分享有用信息，真诚关心对方', bgColor: 'bg-green-100 text-green-600' },
+      { title: '被误解后澄清', desc: '及时澄清误解，避免误会加深。', tips: '保持平和心态，陈述事实，表达自己的真实意图', bgColor: 'bg-blue-100 text-blue-600' },
+      { title: '面对挑衅', desc: '保持冷静，不被激怒，巧妙应对。', tips: '深呼吸，微笑回应，转移话题或坚定表明立场', bgColor: 'bg-purple-100 text-purple-600' }
+    ],
+    5: [
+      { title: '加薪谈判', desc: '自信地展示自己的价值，争取合理的薪酬。', tips: '准备数据证明自己的贡献，设定合理目标，灵活谈判', bgColor: 'bg-yellow-100 text-yellow-600' },
+      { title: '说服技巧', desc: '用逻辑和情感说服他人接受你的观点。', tips: '了解对方需求，用数据支持，讲述故事', bgColor: 'bg-orange-100 text-orange-600' },
+      { title: '投诉应对', desc: '处理客户或他人的投诉，保持专业和耐心。', tips: '先道歉安抚情绪，倾听问题，提供解决方案', bgColor: 'bg-red-100 text-red-600' },
+      { title: '谈判策略', desc: '掌握基本的谈判技巧和策略。', tips: '了解对方底线，设定BATNA，保持弹性', bgColor: 'bg-indigo-100 text-indigo-600' }
+    ],
+    6: [
+      { title: '见家长', desc: '第一次见对方家长时的沟通技巧。', tips: '礼貌问候，谦虚大方，主动帮忙，注意言行举止', bgColor: 'bg-pink-100 text-pink-600' },
+      { title: '家庭聚会社交', desc: '在家庭聚会中得体地与亲戚朋友交流。', tips: '主动问候长辈，倾听他人话题，避免敏感话题', bgColor: 'bg-green-100 text-green-600' },
+      { title: '应对敏感问题', desc: '巧妙回应亲戚的敏感或尴尬问题。', tips: '幽默化解，委婉转移话题，坚定表明边界', bgColor: 'bg-blue-100 text-blue-600' },
+      { title: '跨文化沟通', desc: '与不同文化背景的人交流时的注意事项。', tips: '尊重文化差异，避免刻板印象，多了解对方文化', bgColor: 'bg-purple-100 text-purple-600' }
+    ],
+    7: [
+      { title: '紧急情况求助', desc: '在紧急情况下清晰有效地求助。', tips: '冷静描述情况，明确求助内容，提供关键信息', bgColor: 'bg-red-100 text-red-600' },
+      { title: '团队协作', desc: '在团队中有效沟通，达成共识。', tips: '明确分工，定期同步进度，积极参与讨论', bgColor: 'bg-teal-100 text-teal-600' },
+      { title: '客户管理', desc: '维护良好的客户关系，提升客户满意度。', tips: '定期回访，及时响应需求，提供优质服务', bgColor: 'bg-amber-100 text-amber-600' },
+      { title: '危机沟通', desc: '在危机事件中妥善处理，保护声誉。', tips: '及时回应，透明诚实，承担责任', bgColor: 'bg-gray-100 text-gray-600' }
+    ]
+  };
+  return content[levelId] || content[1];
 }
 
 function completeLevelChallenge() {
