@@ -387,5 +387,6 @@ router.use('/membership', require('./membership.routes'));
 router.use('/talents', require('./talent.routes'));
 router.use('/real-challenges', require('./challenge.routes'));
 router.use('/llm', require('./llm.routes'));
+router.use('/scripts', require('./script.routes'));
 
 module.exports = router;
