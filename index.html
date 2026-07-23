@@ -2488,7 +2488,8 @@ let userData = {
   favorability: 0,
   trainingCount: 0,
   dailyAnalysisUnlocked: 0,
-  hasCompletedFirstTraining: false
+  hasCompletedFirstTraining: false,
+  hasStartedTrainingBefore: false
 };
 
 // 训练数据
@@ -3568,6 +3569,7 @@ function performLocalLogin(phone, nickname, points = 650, level = '钻石学员'
       trainingCount: 0,
       dailyAnalysisUnlocked: 0,
       hasCompletedFirstTraining: false,
+      hasStartedTrainingBefore: false,
       isLocalUser: true
     };
   }
@@ -3625,6 +3627,7 @@ async function doLogin() {
         level: result.data.user.student_level || '青铜学员',
         avatar: result.data.avatar || '👤',
         realNameVerified: result.data.user.is_real_name_verified || false,
+        hasStartedTrainingBefore: false,
         isLocalUser: false
       };
     } else {
@@ -3650,6 +3653,7 @@ async function doLogin() {
         level: result.data.user.student_level || '青铜学员',
         avatar: result.data.avatar || '👤',
         realNameVerified: result.data.user.is_real_name_verified || false,
+        hasStartedTrainingBefore: false,
         isLocalUser: false
       };
     }
@@ -3728,6 +3732,7 @@ async function doRegister() {
       trainingCount: 0,
       dailyAnalysisUnlocked: 0,
       hasCompletedFirstTraining: false,
+      hasStartedTrainingBefore: false,
       isLocalUser: false
     };
     localStorage.setItem(STORAGE_PREFIX + 'logged_in', phone);
@@ -5838,10 +5843,11 @@ function startTraining(sceneId) {
     }
   }
 
-  if (userData.hasCompletedFirstTraining) {
+  if (userData.hasStartedTrainingBefore) {
     showTrainingReminderModal();
   }
 
+  userData.hasStartedTrainingBefore = true;
   currentTraining = scene;
   trainingMessages = [];
   trainingRoundIdx = 0;
