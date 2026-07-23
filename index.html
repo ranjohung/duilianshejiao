@@ -11001,6 +11001,10 @@ function startLevelChallenge(levelId) {
     return;
   }
 
+  window.currentLevelId = levelId;
+  window.levelChallengesCompleted = 0;
+  window.levelScore = 0;
+
   showLevelLearningContent(level);
 }
 
@@ -11072,6 +11076,21 @@ function showLevelLearningContent(level) {
 function closeLevelLearningModal() {
   const modal = $('level-learning-modal');
   if (modal) modal.remove();
+
+  closeModal('challenge');
+
+  const level = levelSystem.find(l => l.id === window.currentLevelId);
+  if (level) {
+    const firstChallengeTitle = level.challenges[0];
+    const challengeScene = templateScenes.find(s =>
+      s.name.includes(firstChallengeTitle) ||
+      s.desc.includes(firstChallengeTitle)
+    ) || templateScenes.find(s => s.unlocked && !s.completed) || templateScenes[0];
+
+    if (challengeScene) {
+      startTraining(challengeScene.id);
+    }
+  }
 }
 
 function getLevelLearningContent(levelId) {
