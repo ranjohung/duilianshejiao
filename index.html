@@ -5859,6 +5859,57 @@ const realSceneDialogs = {
     { ai: '我感觉自己快要撑不住了...',
       followUps: ['不知道该怎么办才好', '有时候真的很想辞职', '但是又不知道未来该做什么'],
       tips: ['给予支持', '认可对方的感受', '鼓励对方'] }
+  ],
+  '初次约会': [
+    { ai: '终于见面了！网上聊了这么久，感觉你本人比照片还好看',
+      followUps: ['你比我想象中更有趣呢', '这家餐厅你选的吗？眼光不错啊', '今天天气真适合出来走走'],
+      tips: ['热情回应', '赞美对方', '开启话题'] },
+    { ai: '（坐下后）你平时除了工作，周末都喜欢做什么？',
+      followUps: ['喜欢一个人待着还是和朋友一起？', '最近有什么特别想做的事吗？', '对什么类型的活动比较感兴趣？'],
+      tips: ['详细分享', '邀请互动', '反问对方'] },
+    { ai: '听你说喜欢旅行，有没有特别想去的地方？',
+      followUps: ['为什么想去那里？', '之前去过最难忘的地方是哪里？', '喜欢自由行还是跟团？'],
+      tips: ['分享梦想', '表达热情', '可以暗示想一起去'] },
+    { ai: '（聊得很开心）时间过得真快，不知不觉已经聊了两个小时了',
+      followUps: ['跟你聊天真的很愉快', '感觉还有好多话没说', '下次可以继续聊'],
+      tips: ['表达感受', '提出下次见面', '保持联系'] },
+    { ai: '今天真的很开心，希望以后还能再见面',
+      followUps: [],
+      tips: ['表达感谢', '主动约下次', '保持礼貌'] }
+  ],
+  '见家长': [
+    { ai: '（开门看到你）哎呀，你就是XX吧？快进来快进来！',
+      followUps: ['路上累不累啊？', '快坐快坐，别客气', '来就来呗，还带什么礼物'],
+      tips: ['礼貌问候', '表达感谢', '送上礼物'] },
+    { ai: '你是做什么工作的？收入怎么样？',
+      followUps: ['工作忙不忙？', '以后有什么职业规划？', '在公司担任什么职位？'],
+      tips: ['详细介绍', '展示规划', '表达上进心'] },
+    { ai: '你们打算什么时候结婚啊？XX都不小了',
+      followUps: ['房子买了吗？', '以后打算在哪里发展？', '对未来有什么计划？'],
+      tips: ['表达诚意', '说明规划', '让家长放心'] },
+    { ai: '我家XX脾气不好，你多担待点',
+      followUps: ['他/她有时候确实有点任性', '你们平时吵架多吗？', '你觉得你们合适吗？'],
+      tips: ['表达包容', '展示感情', '让家长放心'] },
+    { ai: '常来家里吃饭啊，以后就当自己家一样',
+      followUps: [],
+      tips: ['表达感谢', '保持礼貌', '留下好印象'] }
+  ],
+  '4S店砍价': [
+    { ai: '您好，欢迎光临！想看哪款车？我来给您介绍一下',
+      followUps: ['这款车是我们的热门车型', '现在订车有优惠活动', '您是家用还是上班用？'],
+      tips: ['表达诚意', '提出需求', '询问价格'] },
+    { ai: '这款车原价25万，现在搞活动最低23万8',
+      followUps: ['这个价格已经很优惠了', '今天订车还送大礼包', '您觉得价格怎么样？'],
+      tips: ['展示购买诚意', '提及竞品', '争取更多优惠'] },
+    { ai: '这个价格已经是底线了，我们送您全车贴膜和脚垫',
+      followUps: ['真的不能再便宜了', '赠品都是原厂的', '您看还需要什么？'],
+      tips: ['表示理解', '提出其他福利', '争取更多赠品'] },
+    { ai: '保养是厂家规定的，我们确实送不了。不过可以送您一套行车记录仪',
+      followUps: ['行车记录仪也是品牌的', '价值好几百呢', '您看这样可以吗？'],
+      tips: ['接受让步', '提出最终要求', '确认细节'] },
+    { ai: '好的，那就这样定了，我给您办手续',
+      followUps: [],
+      tips: ['确认价格和赠品', '了解提车时间', '保持友好'] }
   ]
 };
 
@@ -5882,6 +5933,30 @@ function deleteCustomScene(id) {
 function useTemplateScene(id) {
   const template = templateScenes.find(t => t.id === id);
   if (!template) return;
+
+  const existingScene = trainingScenes.find(s => s.name === template.name);
+  if (existingScene && existingScene.unlocked) {
+    startTraining(existingScene.id);
+    return;
+  }
+
+  if (!template.unlocked) {
+    const currentLevel = getLevel(userData.points).name;
+    const unlockScore = template.unlockScore || 0;
+
+    if (userData.points < unlockScore) {
+      showToast(`需要${unlockScore}积分才能解锁（当前：${userData.points}分）`);
+      return;
+    }
+
+    const confirmUnlock = confirm(`确定要消耗${unlockScore}积分解锁该场景吗？\n\n当前积分：${userData.points}`);
+    if (!confirmUnlock) return;
+
+    userData.points -= unlockScore;
+    template.unlocked = true;
+    saveUserData();
+    renderTemplateScenes();
+  }
 
   const newScene = {
     id: Date.now(),
