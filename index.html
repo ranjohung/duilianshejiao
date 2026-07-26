@@ -5911,7 +5911,7 @@ function startTraining(sceneId) {
   if (!scene) {
     scene = customScenes.find(s => s.id === (typeof sceneId==='number' ? sceneId : sceneId.id));
   }
-  if (!scene || !scene.unlocked) return;
+  if (!scene) return;
 
   if (userData.member === 'free') {
     const dailyTrainingCount = userData.dailyTrainingCount || 0;
@@ -5919,6 +5919,31 @@ function startTraining(sceneId) {
       showToast('今日训练次数已达上限，请明天再来');
       return;
     }
+  }
+
+  if (!scene.unlocked) {
+    const currentLevel = getLevel(userData.points).name;
+    const levelName = scene.unlockLevel + '学员';
+
+    if (currentLevel !== levelName) {
+      showToast(`需要${levelName}才能解锁（当前：${currentLevel}）`);
+      return;
+    }
+
+    if (userData.points < scene.unlockPoints || timeRewindTickets < scene.unlockTickets) {
+      showToast('积分或穿梭券不足，无法解锁');
+      return;
+    }
+
+    const confirmUnlock = confirm(`确定要消耗${scene.unlockPoints}积分和${scene.unlockTickets}张穿梭券解锁该场景吗？\n\n当前积分：${userData.points}\n当前穿梭券：${timeRewindTickets}`);
+    if (!confirmUnlock) return;
+
+    userData.points -= scene.unlockPoints;
+    timeRewindTickets -= scene.unlockTickets;
+    scene.unlocked = true;
+    saveUserData();
+    saveItems();
+    renderTrainingPage();
   }
 
   if (userData.hasStartedTrainingBefore) {
@@ -5946,9 +5971,8 @@ function startTraining(sceneId) {
   currentRewindRound = -1;
   currentImageFit = 0;
 
-  // 防记忆变体系统（PRD §5.1）
-  currentPersonality = ['友好型', '内向型', '挑剔型', '理性型'][Math.floor(Math.random() * 4)];
   const personalityLabels = { '友好型':'😊', '内向型':'😌', '挑剔型':'😒', '理性型':'🤔' };
+  currentPersonality = ['友好型', '内向型', '挑剔型', '理性型'][Math.floor(Math.random() * 4)];
   currentPersonalityLabel = personalityLabels[currentPersonality] + ' ' + currentPersonality;
 
   const avatarSeeds = {
@@ -5983,7 +6007,7 @@ function startTraining(sceneId) {
   $('image-fit-bar').style.width = '0%';
   $('image-fit-percent').textContent = '0%';
 
-  $('modal-prepare').style.display = 'flex';
+  startTrainingSession();
 }
 
 // 去悦己颜值社（模拟，PRD §1.2）
