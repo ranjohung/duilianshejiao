@@ -2636,16 +2636,26 @@ let trainingScenes = [
     ], bestAnswer:'其实我手头还有三个紧急项目在赶，但可以帮你梳理一下思路，这样你做起来更快' }
   ]},
   { id:9, icon:'❤️', name:'初次约会', desc:'第一次见面的沟通技巧', stage:1, difficulty:2, duration:'12min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
-    { ai:'你好，很高兴见到你', thinking:[
-      { type:'A', label:'主动型', desc:'热情回应 + 开启话题', example:'我也是！这家餐厅看起来很有特色，你是第一次来吗？' },
-      { type:'B', label:'平衡型', desc:'礼貌回应 + 简单提问', example:'你好，很高兴见到你。你平时喜欢来这种地方吗？' },
-      { type:'C', label:'含蓄型', desc:'简单回应', example:'你好' }
-    ], bestAnswer:'我也是！这家餐厅看起来很有特色，你是第一次来吗？' },
-    { ai:'你平时周末都喜欢做什么？', thinking:[
+    { ai:'终于见面了！网上聊了这么久，感觉你本人比照片还好看', thinking:[
+      { type:'A', label:'主动型', desc:'热情回应 + 赞美对方 + 开启话题', example:'哈哈，你也是！这家餐厅是你选的吗？看起来很有品味' },
+      { type:'B', label:'平衡型', desc:'礼貌回应 + 简单提问', example:'谢谢！你也很帅。我们先坐下聊聊吧？' },
+      { type:'C', label:'含蓄型', desc:'简单回应', example:'谢谢' }
+    ], bestAnswer:'哈哈，你也是！这家餐厅是你选的吗？看起来很有品味' },
+    { ai:'（坐下后）你平时除了工作，周末都喜欢做什么？', thinking:[
       { type:'A', label:'主动型', desc:'详细分享 + 邀请互动', example:'我喜欢爬山和看展，上周末去了一个很棒的摄影展。你呢？有没有特别喜欢的活动？' },
       { type:'B', label:'平衡型', desc:'分享爱好 + 询问对方', example:'我喜欢户外运动，你呢？' },
       { type:'C', label:'含蓄型', desc:'简单回答', example:'随便逛逛' }
-    ], bestAnswer:'我喜欢爬山和看展，上周末去了一个很棒的摄影展。你呢？有没有特别喜欢的活动？' }
+    ], bestAnswer:'我喜欢爬山和看展，上周末去了一个很棒的摄影展。你呢？有没有特别喜欢的活动？' },
+    { ai:'听你说喜欢旅行，有没有特别想去的地方？', thinking:[
+      { type:'A', label:'主动型', desc:'分享梦想 + 邀请同行', example:'我一直想去冰岛看极光！听说冬天去最美，要是能有人一起就好了' },
+      { type:'B', label:'平衡型', desc:'分享想法 + 保持开放', example:'我想去云南，听说那边风景特别美' },
+      { type:'C', label:'含蓄型', desc:'简单回答', example:'还没想好' }
+    ], bestAnswer:'我一直想去冰岛看极光！听说冬天去最美，要是能有人一起就好了' },
+    { ai:'（聊得很开心）时间过得真快，不知不觉已经聊了两个小时了', thinking:[
+      { type:'A', label:'主动型', desc:'表达感受 + 提出下次见面', example:'是啊，跟你聊天特别开心！下次我们可以去看电影，我知道有一部不错的片子' },
+      { type:'B', label:'平衡型', desc:'表达感谢 + 保持开放', example:'是啊，今天很开心，希望以后还有机会见面' },
+      { type:'C', label:'含蓄型', desc:'礼貌道别', example:'嗯，再见' }
+    ], bestAnswer:'是啊，跟你聊天特别开心！下次我们可以去看电影，我知道有一部不错的片子' }
   ]},
   { id:10, icon:'💌', name:'表白', desc:'向心仪对象表达心意', stage:2, difficulty:4, duration:'10min', unlocked:false, completed:false, unlockLevel:'白银', unlockPoints:80, unlockTickets:1, userStarts:true, rounds:[
     { ai:'（两人单独在公园散步，气氛有些暧昧）', thinking:[
@@ -2655,16 +2665,21 @@ let trainingScenes = [
     ], bestAnswer:'跟你在一起的时光总是很开心，我发现自己越来越喜欢你，愿意和我在一起吗？' }
   ]},
   { id:11, icon:'🏠', name:'见家长', desc:'第一次拜访对方父母', stage:2, difficulty:4, duration:'15min', unlocked:false, completed:false, unlockLevel:'白银', unlockPoints:100, unlockTickets:2, userStarts:true, rounds:[
-    { ai:'叔叔阿姨好，这是一点心意', thinking:[
-      { type:'A', label:'主动型', desc:'礼貌问候 + 表达感谢', example:'叔叔阿姨好！感谢你们邀请我来家里做客，这是一点小礼物，希望你们喜欢' },
-      { type:'B', label:'平衡型', desc:'礼貌问候 + 简单介绍', example:'叔叔阿姨好，我是XXX，很高兴见到你们' },
+    { ai:'（开门看到你）哎呀，你就是XX吧？快进来快进来！', thinking:[
+      { type:'A', label:'主动型', desc:'礼貌问候 + 表达感谢 + 送上礼物', example:'叔叔阿姨好！感谢你们邀请我来家里做客，这是一点小礼物，希望你们喜欢' },
+      { type:'B', label:'平衡型', desc:'礼貌问候 + 简单介绍', example:'叔叔阿姨好，我是XX，很高兴见到你们' },
       { type:'C', label:'含蓄型', desc:'简单问候', example:'你好' }
     ], bestAnswer:'叔叔阿姨好！感谢你们邀请我来家里做客，这是一点小礼物，希望你们喜欢' },
-    { ai:'你是做什么工作的？收入怎么样？', thinking:[
-      { type:'A', label:'主动型', desc:'详细介绍 + 展示规划', example:'我目前在互联网公司做产品经理，收入还不错，正在努力提升自己，希望能给XXX更好的生活' },
-      { type:'B', label:'平衡型', desc:'说明工作 + 表达态度', example:'我做互联网相关工作，收入还可以，会努力给XXX幸福的' },
+    { ai:'（接过礼物）这么客气干什么，人来就好。你是做什么工作的？收入怎么样？', thinking:[
+      { type:'A', label:'主动型', desc:'详细介绍 + 展示规划', example:'我目前在互联网公司做产品经理，收入还不错，正在努力提升自己，希望能给XX更好的生活' },
+      { type:'B', label:'平衡型', desc:'说明工作 + 表达态度', example:'我做互联网相关工作，收入还可以，会努力给XX幸福的' },
       { type:'C', label:'含蓄型', desc:'简单回答', example:'还行吧' }
-    ], bestAnswer:'我目前在互联网公司做产品经理，收入还不错，正在努力提升自己，希望能给XXX更好的生活' }
+    ], bestAnswer:'我目前在互联网公司做产品经理，收入还不错，正在努力提升自己，希望能给XX更好的生活' },
+    { ai:'你们打算什么时候结婚啊？XX都不小了', thinking:[
+      { type:'A', label:'主动型', desc:'表达诚意 + 说明规划', example:'叔叔阿姨放心，我对XX是认真的。我们打算先稳定下来，明年争取买房，结婚的事也在计划中' },
+      { type:'B', label:'平衡型', desc:'表达态度 + 保持开放', example:'我们正在计划中，希望能得到你们的祝福' },
+      { type:'C', label:'含蓄型', desc:'简单回应', example:'看情况吧' }
+    ], bestAnswer:'叔叔阿姨放心，我对XX是认真的。我们打算先稳定下来，明年争取买房，结婚的事也在计划中' }
   ]},
   { id:12, icon:'⚔️', name:'突发状况应对', desc:'面对突发情况的沟通技巧', stage:3, difficulty:5, duration:'12min', unlocked:false, completed:false, unlockLevel:'黄金', unlockPoints:150, unlockTickets:2, rounds:[
     { ai:'（会议中突然停电）', thinking:[
@@ -2763,16 +2778,26 @@ let trainingScenes = [
     ], bestAnswer:'好的，麻烦您告诉我具体哪里不符合？我马上修改，或者您看有没有其他替代方案？' }
   ]},
   { id:20, icon:'💰', name:'4S店砍价', desc:'购车时的谈判技巧', stage:2, difficulty:4, duration:'15min', unlocked:false, completed:false, unlockLevel:'白银', unlockPoints:120, unlockTickets:2, userStarts:true, rounds:[
-    { ai:'这款车最低多少钱？', thinking:[
-      { type:'A', label:'主动型', desc:'展示诚意 + 提出合理价格 + 提及竞品', example:'我确实很想买这款车，而且今天就能订。我了解到XX店比你们便宜5000，你们能做到多少？' },
+    { ai:'您好，欢迎光临！想看哪款车？我来给您介绍一下', thinking:[
+      { type:'A', label:'主动型', desc:'表达诚意 + 提出需求 + 询问价格', example:'您好！我看这款车很久了，今天诚心想买，能给个最低价吗？' },
       { type:'B', label:'平衡型', desc:'表达购买意愿 + 询问优惠', example:'我今天想订车，能给个最低价吗？' },
-      { type:'C', label:'含蓄型', desc:'简单询问', example:'多少钱？' }
+      { type:'C', label:'含蓄型', desc:'简单询问', example:'这款车多少钱？' }
+    ], bestAnswer:'您好！我看这款车很久了，今天诚心想买，能给个最低价吗？' },
+    { ai:'这款车原价25万，现在搞活动最低23万8', thinking:[
+      { type:'A', label:'主动型', desc:'展示诚意 + 提出合理价格 + 提及竞品', example:'我确实很想买这款车，而且今天就能订。我了解到XX店比你们便宜5000，你们能做到多少？' },
+      { type:'B', label:'平衡型', desc:'表达购买意愿 + 提出优惠要求', example:'能再优惠点吗？我今天就能订' },
+      { type:'C', label:'含蓄型', desc:'沉默或简单回应', example:'太贵了' }
     ], bestAnswer:'我确实很想买这款车，而且今天就能订。我了解到XX店比你们便宜5000，你们能做到多少？' },
-    { ai:'这个价格已经是底线了', thinking:[
-      { type:'A', label:'主动型', desc:'表示理解 + 提出其他福利', example:'我理解价格已经很优惠了。那能送全车贴膜、脚垫，再保养一次吗？' },
-      { type:'B', label:'平衡型', desc:'请求额外优惠', example:'能送点东西吗？' },
+    { ai:'这个价格已经是底线了，我们送您全车贴膜和脚垫', thinking:[
+      { type:'A', label:'主动型', desc:'表示理解 + 提出其他福利', example:'我理解价格已经很优惠了。那能送全车贴膜、脚垫，再送一次保养吗？' },
+      { type:'B', label:'平衡型', desc:'请求额外优惠', example:'能再送点东西吗？比如保养？' },
       { type:'C', label:'含蓄型', desc:'沉默或简单回应', example:'哦' }
-    ], bestAnswer:'我理解价格已经很优惠了。那能送全车贴膜、脚垫，再保养一次吗？' }
+    ], bestAnswer:'我理解价格已经很优惠了。那能送全车贴膜、脚垫，再送一次保养吗？' },
+    { ai:'保养是厂家规定的，我们确实送不了。不过可以送您一套行车记录仪', thinking:[
+      { type:'A', label:'主动型', desc:'接受让步 + 提出最终要求', example:'好的，那就这样吧。但我希望能送一次基础保养，这是我的底线了' },
+      { type:'B', label:'平衡型', desc:'接受条件 + 确认细节', example:'行，那我们什么时候能提车？' },
+      { type:'C', label:'含蓄型', desc:'简单回应', example:'好吧' }
+    ], bestAnswer:'好的，那就这样吧。但我希望能送一次基础保养，这是我的底线了' }
   ]},
   { id:21, icon:'👨‍👩‍👧', name:'与父母意见分歧', desc:'化解与父母的观念冲突', stage:2, difficulty:3, duration:'12min', unlocked:false, completed:false, unlockLevel:'白银', unlockPoints:80, unlockTickets:1, rounds:[
     { ai:'你都三十了，怎么还不结婚？', thinking:[
