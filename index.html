@@ -6414,8 +6414,14 @@ function updatePropButtons() {
 function showRound() {
   if (!currentTraining) return;
 
+  const fixedOrderScenes = ['模拟面试', '加薪谈判', '见家长'];
+
   if (!currentTraining.shuffledRounds) {
-    currentTraining.shuffledRounds = [...currentTraining.rounds].sort(() => Math.random() - 0.5);
+    if (fixedOrderScenes.includes(currentTraining.name)) {
+      currentTraining.shuffledRounds = [...currentTraining.rounds];
+    } else {
+      currentTraining.shuffledRounds = [...currentTraining.rounds].sort(() => Math.random() - 0.5);
+    }
   }
 
   const round = currentTraining.shuffledRounds[trainingRoundIdx];
@@ -6470,7 +6476,8 @@ function showTrainingInput() {
   let inputDiv = $('training-input-area');
   if (inputDiv) inputDiv.remove();
 
-  const round = currentTraining.rounds[trainingRoundIdx];
+  const rounds = currentTraining.shuffledRounds || currentTraining.rounds;
+  const round = rounds[trainingRoundIdx];
   let thinkingHints = [];
   if (round && round.thinking && round.thinking.length > 0) {
     thinkingHints = round.thinking;
