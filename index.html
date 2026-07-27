@@ -2495,12 +2495,12 @@ let userData = {
 // 训练数据
 let trainingScenes = [
   { id:1, icon:'💑', name:'相亲模拟', desc:'朋友介绍的第一次见面', stage:1, difficulty:2, duration:'12min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
-    { ai:'你好，我是XXX介绍的小雨', thinking:[
-      { type:'A', label:'主动型', desc:'具体描述你的工作内容，展现热情', example:'我是做互联网产品的，主要负责用户增长方向，挺有意思的！' },
-      { type:'B', label:'平衡型', desc:'简要回答 + 反问对方的工作情况', example:'我做互联网相关的工作，你呢？' },
-      { type:'C', label:'含蓄型', desc:'简单回应，看对方反应再说', example:'还行吧' }
-    ], bestAnswer:'我是做互联网产品的，主要负责用户增长方向，挺有意思的！你呢？' },
-    { ai:'我听XXX说你是个工程师，平时工作忙吗？', thinking:[
+    { ai:'你好，我是小雨，是XXX介绍的', thinking:[
+      { type:'A', label:'主动型', desc:'热情回应 + 开启话题', example:'你好！我是XXX，很高兴见到你。XXX之前跟我提过你，说你挺有意思的' },
+      { type:'B', label:'平衡型', desc:'礼貌回应 + 简单交流', example:'你好！我是XXX，听说你也是通过XXX介绍来的' },
+      { type:'C', label:'含蓄型', desc:'简单回应，看对方反应', example:'你好' }
+    ], bestAnswer:'你好！我是XXX，很高兴见到你。XXX之前跟我提过你，说你挺有意思的' },
+    { ai:'我听XXX说你是做互联网产品的，平时工作忙吗？', thinking:[
       { type:'A', label:'主动型', desc:'具体描述工作状态，展现生活态度', example:'是有点忙，但工作再忙也要有自己的生活。你平时下班喜欢做什么？' },
       { type:'B', label:'平衡型', desc:'回答工作情况 + 反问对方爱好', example:'还好，偶尔加班。你平时喜欢做什么？' },
       { type:'C', label:'含蓄型', desc:'简单回应，不展开', example:'还好吧' }
@@ -2535,57 +2535,57 @@ let trainingScenes = [
   ]},
   { id:3, icon:'💼', name:'模拟面试', desc:'模拟求职面试场景', stage:2, difficulty:3, duration:'15min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, userStarts:true, rounds:[
     { ai:'请先做个自我介绍', thinking:[
-      { type:'A', label:'主动型', desc:'完整介绍背景和优势', example:'面试官您好，我叫张三，有两年产品经理经验，主导过多个用户增长项目' },
-      { type:'B', label:'平衡型', desc:'简要介绍 + 表达求职意愿', example:'我叫张三，毕业两年，对贵公司的产品很感兴趣' },
-      { type:'C', label:'含蓄型', desc:'简单陈述基本信息', example:'我叫张三，毕业两年' }
-    ], bestAnswer:'面试官您好，我叫张三，有两年产品经理经验，主导过多个用户增长项目' },
+      { type:'A', label:'主动型', desc:'完整介绍背景和优势，突出与岗位匹配', example:'面试官您好，我叫张三，有两年产品经理经验，主导过多个用户增长项目，对贵公司的产品非常感兴趣' },
+      { type:'B', label:'平衡型', desc:'简要介绍 + 表达求职意愿', example:'我叫张三，毕业两年，对贵公司的产品很感兴趣，希望能加入团队' },
+      { type:'C', label:'含蓄型', desc:'简单陈述基本信息', example:'我叫张三，毕业两年，应聘产品经理岗位' }
+    ], bestAnswer:'面试官您好，我叫张三，有两年产品经理经验，主导过多个用户增长项目，对贵公司的产品非常感兴趣' },
     { ai:'为什么从上一家公司离职？', thinking:[
-      { type:'A', label:'主动型', desc:'正面说明原因，展示职业规划', example:'业务方向调整，希望找到更符合职业发展的机会' },
-      { type:'B', label:'平衡型', desc:'客观说明 + 表达对新机会的期待', example:'想寻找更有挑战性的工作机会' },
-      { type:'C', label:'含蓄型', desc:'简单回答', example:'想换个环境' }
-    ], bestAnswer:'业务方向调整，希望找到更符合职业发展的机会' },
+      { type:'A', label:'主动型', desc:'正面说明原因，展示职业规划', example:'业务方向调整，希望找到更符合职业发展的机会，贵公司的产品方向正好和我的兴趣匹配' },
+      { type:'B', label:'平衡型', desc:'客观说明 + 表达对新机会的期待', example:'想寻找更有挑战性的工作机会，希望能在更大的平台发挥价值' },
+      { type:'C', label:'含蓄型', desc:'简单回答', example:'想换个环境，寻找更好的发展机会' }
+    ], bestAnswer:'业务方向调整，希望找到更符合职业发展的机会，贵公司的产品方向正好和我的兴趣匹配' },
     { ai:'你的缺点是什么？', thinking:[
-      { type:'A', label:'主动型', desc:'诚实说明 + 展示改进行动', example:'我有时候会追求完美，正在学习平衡质量与效率' },
-      { type:'B', label:'平衡型', desc:'客观说明 + 表达改进意愿', example:'我需要更果断一些，正在锻炼这方面的能力' },
-      { type:'C', label:'含蓄型', desc:'简单回答', example:'我比较内向' }
-    ], bestAnswer:'我有时候会追求完美，正在学习平衡质量与效率' },
+      { type:'A', label:'主动型', desc:'诚实说明 + 展示改进行动', example:'我有时候会追求完美，正在学习平衡质量与效率，现在已经养成了先完成再优化的习惯' },
+      { type:'B', label:'平衡型', desc:'客观说明 + 表达改进意愿', example:'我需要更果断一些，正在锻炼这方面的能力，争取做出更快的决策' },
+      { type:'C', label:'含蓄型', desc:'简单回答', example:'我比较内向，但正在努力提升沟通能力' }
+    ], bestAnswer:'我有时候会追求完美，正在学习平衡质量与效率，现在已经养成了先完成再优化的习惯' },
     { ai:'你做过最有成就感的项目是什么？', thinking:[
-      { type:'A', label:'主动型', desc:'详细描述项目成果', example:'我主导了一个用户增长项目，3个月内DAU增长50%' },
-      { type:'B', label:'平衡型', desc:'描述项目 + 说明收获', example:'做过一个电商项目，学到了很多' },
-      { type:'C', label:'含蓄型', desc:'简单提及', example:'一个电商项目' }
-    ], bestAnswer:'我主导了一个用户增长项目，3个月内DAU增长50%' },
+      { type:'A', label:'主动型', desc:'详细描述项目成果，用数据说话', example:'我主导了一个用户增长项目，3个月内DAU增长50%，用户留存提升20%，为公司带来了显著收益' },
+      { type:'B', label:'平衡型', desc:'描述项目 + 说明收获', example:'做过一个电商项目，学到了很多，也取得了不错的成绩' },
+      { type:'C', label:'含蓄型', desc:'简单提及', example:'一个电商项目，效果还不错' }
+    ], bestAnswer:'我主导了一个用户增长项目，3个月内DAU增长50%，用户留存提升20%，为公司带来了显著收益' },
     { ai:'你还有什么想问我的？', thinking:[
-      { type:'A', label:'主动型', desc:'深入询问团队情况', example:'团队目前的主要挑战是什么？未来的发展方向是怎样的？' },
-      { type:'B', label:'平衡型', desc:'询问关键信息', example:'团队目前的主要挑战是什么？' },
+      { type:'A', label:'主动型', desc:'深入询问团队情况', example:'团队目前的主要挑战是什么？未来的发展方向是怎样的？我能为团队带来什么价值？' },
+      { type:'B', label:'平衡型', desc:'询问关键信息', example:'团队目前的主要挑战是什么？项目的发展前景如何？' },
       { type:'C', label:'含蓄型', desc:'礼貌表示没有问题', example:'没有了，谢谢' }
-    ], bestAnswer:'团队目前的主要挑战是什么？未来的发展方向是怎样的？' }
+    ], bestAnswer:'团队目前的主要挑战是什么？未来的发展方向是怎样的？我能为团队带来什么价值？' }
   ]},
   { id:4, icon:'💰', name:'加薪谈判', desc:'向老板提出加薪请求', stage:2, difficulty:4, duration:'15min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, userStarts:true, rounds:[
     { ai:'请坐，你说有重要的事要和我谈？', thinking:[
-      { type:'A', label:'主动型', desc:'开门见山但礼貌表达', example:'老板，感谢公司的培养，我想和您聊聊我的职业发展和薪资调整' },
-      { type:'B', label:'平衡型', desc:'先表达感谢再谈主题', example:'老板，感谢您的时间，我想和您聊聊我的工作情况' },
-      { type:'C', label:'含蓄型', desc:'试探性提及', example:'老板，我想和您聊聊' }
-    ], bestAnswer:'老板，感谢公司的培养，我想和您聊聊我的职业发展和薪资调整' },
+      { type:'A', label:'主动型', desc:'开门见山但礼貌表达，直接谈加薪', example:'老板，感谢公司的培养。过去一年我负责的项目表现不错，想和您聊聊薪资调整的可能性' },
+      { type:'B', label:'平衡型', desc:'先表达感谢再谈主题', example:'老板，感谢您的时间，我想和您聊聊我的职业发展' },
+      { type:'C', label:'含蓄型', desc:'试探性提及', example:'老板，我想和您聊聊薪资的事' }
+    ], bestAnswer:'老板，感谢公司的培养。过去一年我负责的项目表现不错，想和您聊聊薪资调整的可能性' },
     { ai:'说说你的理由', thinking:[
-      { type:'A', label:'主动型', desc:'具体展示业绩成果', example:'过去一年我负责的项目带来了200万营收，还培养了3名新人' },
-      { type:'B', label:'平衡型', desc:'说明贡献 + 表达价值', example:'我觉得自己的能力和贡献值得更高的薪资' },
-      { type:'C', label:'含蓄型', desc:'简单说明', example:'我觉得自己能力提升了' }
-    ], bestAnswer:'过去一年我负责的项目带来了200万营收，还培养了3名新人' },
+      { type:'A', label:'主动型', desc:'具体展示业绩成果，用数据说话', example:'过去一年我负责的项目带来了200万营收，客户满意度提升30%，还培养了3名新人独立承接项目' },
+      { type:'B', label:'平衡型', desc:'说明贡献 + 表达价值', example:'我觉得自己的能力和贡献值得更高的薪资，也希望能长期为公司服务' },
+      { type:'C', label:'含蓄型', desc:'简单说明', example:'我觉得自己能力提升了，应该加薪' }
+    ], bestAnswer:'过去一年我负责的项目带来了200万营收，客户满意度提升30%，还培养了3名新人独立承接项目' },
     { ai:'公司今年业绩不太好，加薪可能比较困难', thinking:[
-      { type:'A', label:'主动型', desc:'理解公司 + 提出替代方案', example:'我理解公司的困难，能否考虑绩效奖金或期权激励？' },
-      { type:'B', label:'平衡型', desc:'表达理解 + 重申价值', example:'我理解，但希望公司能考虑我的贡献' },
-      { type:'C', label:'含蓄型', desc:'接受现实', example:'那没办法了' }
-    ], bestAnswer:'我理解公司的困难，能否考虑绩效奖金或期权激励？' },
+      { type:'A', label:'主动型', desc:'理解公司 + 提出替代方案', example:'我理解公司的困难，能否考虑绩效奖金、期权激励或者半年后再评估？' },
+      { type:'B', label:'平衡型', desc:'表达理解 + 重申价值', example:'我理解，但希望公司能考虑我的贡献，给我一个合理的涨幅' },
+      { type:'C', label:'含蓄型', desc:'接受现实', example:'那好吧，我再等等' }
+    ], bestAnswer:'我理解公司的困难，能否考虑绩效奖金、期权激励或者半年后再评估？' },
     { ai:'你觉得你值多少钱？', thinking:[
-      { type:'A', label:'主动型', desc:'基于市场和贡献提出具体期望', example:'根据市场行情和我的贡献，希望能有20%-30%的涨幅' },
-      { type:'B', label:'平衡型', desc:'提出合理范围', example:'希望能有一定的涨幅，具体看公司安排' },
-      { type:'C', label:'含蓄型', desc:'让老板决定', example:'您看着办吧' }
-    ], bestAnswer:'根据市场行情和我的贡献，希望能有20%-30%的涨幅' },
+      { type:'A', label:'主动型', desc:'基于市场和贡献提出具体期望', example:'根据市场行情和我的贡献，希望能有20%-30%的涨幅，大概在XX到XX之间' },
+      { type:'B', label:'平衡型', desc:'提出合理范围', example:'希望能有一定的涨幅，具体看公司安排，我相信公司会公平对待' },
+      { type:'C', label:'含蓄型', desc:'让老板决定', example:'您看着办吧，我相信公司会给我合理的待遇' }
+    ], bestAnswer:'根据市场行情和我的贡献，希望能有20%-30%的涨幅，大概在XX到XX之间' },
     { ai:'好，我考虑一下，下周给你答复', thinking:[
-      { type:'A', label:'主动型', desc:'表达感谢 + 重申承诺', example:'感谢您的考虑！我会继续努力工作，为公司创造更大价值' },
-      { type:'B', label:'平衡型', desc:'表达感谢 + 保持开放', example:'感谢您的考虑，期待好消息' },
-      { type:'C', label:'含蓄型', desc:'简单回应', example:'行' }
-    ], bestAnswer:'感谢您的考虑！我会继续努力工作，为公司创造更大价值' }
+      { type:'A', label:'主动型', desc:'表达感谢 + 重申承诺', example:'感谢您的考虑！无论结果如何，我都会继续努力工作，为公司创造更大价值' },
+      { type:'B', label:'平衡型', desc:'表达感谢 + 保持开放', example:'感谢您的考虑，期待好消息，也请您多考虑我的实际情况' },
+      { type:'C', label:'含蓄型', desc:'简单回应', example:'好的，谢谢' }
+    ], bestAnswer:'感谢您的考虑！无论结果如何，我都会继续努力工作，为公司创造更大价值' }
   ]},
   { id:5, icon:'💔', name:'被朋友误解(NVC)', desc:'用非暴力沟通化解误会', stage:3, difficulty:3, duration:'10min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
     { ai:'你上次为什么没来聚会？大家都很失望', thinking:[
@@ -2655,7 +2655,12 @@ let trainingScenes = [
       { type:'A', label:'主动型', desc:'表达感受 + 提出下次见面', example:'是啊，跟你聊天特别开心！下次我们可以去看电影，我知道有一部不错的片子' },
       { type:'B', label:'平衡型', desc:'表达感谢 + 保持开放', example:'是啊，今天很开心，希望以后还有机会见面' },
       { type:'C', label:'含蓄型', desc:'礼貌道别', example:'嗯，再见' }
-    ], bestAnswer:'是啊，跟你聊天特别开心！下次我们可以去看电影，我知道有一部不错的片子' }
+    ], bestAnswer:'是啊，跟你聊天特别开心！下次我们可以去看电影，我知道有一部不错的片子' },
+    { ai:'（吃完饭后）今天真的很开心，希望以后还能再见面', thinking:[
+      { type:'A', label:'主动型', desc:'主动提出下次见面 + 具体计划', example:'我也是！这周六有空吗？我知道有个不错的咖啡馆，我们可以去坐坐' },
+      { type:'B', label:'平衡型', desc:'表达好感 + 保持联系', example:'今天很开心，加个微信吧，改天再约' },
+      { type:'C', label:'含蓄型', desc:'简单回应', example:'好的，再见' }
+    ], bestAnswer:'我也是！这周六有空吗？我知道有个不错的咖啡馆，我们可以去坐坐' }
   ]},
   { id:10, icon:'💌', name:'表白', desc:'向心仪对象表达心意', stage:2, difficulty:4, duration:'10min', unlocked:false, completed:false, unlockLevel:'白银', unlockPoints:80, unlockTickets:1, userStarts:true, rounds:[
     { ai:'（两人单独在公园散步，气氛有些暧昧）', thinking:[
@@ -5915,12 +5920,24 @@ const realSceneDialogs = {
 
 function generateMockRounds(sceneName, personality) {
   const dialogs = realSceneDialogs[sceneName] || realSceneDialogs['相亲模拟'];
-  const rounds = dialogs.slice(0, 5).map((d, idx) => ({
-    ai: d.ai,
+
+  const shuffled = [...dialogs].sort(() => Math.random() - 0.5);
+
+  const personalityEffects = {
+    '友好型': { prefix:'', suffix:'~', emoji:'😊' },
+    '内向型': { prefix:'嗯...', suffix:'...', emoji:'😌' },
+    '挑剔型': { prefix:'哼，', suffix:'！', emoji:'😒' },
+    '理性型': { prefix:'从客观角度看，', suffix:'.', emoji:'🤔' }
+  };
+  const effect = personalityEffects[personality] || personalityEffects['友好型'];
+
+  const rounds = shuffled.slice(0, Math.min(5, shuffled.length)).map((d, idx) => ({
+    ai: effect.prefix + d.ai + effect.suffix,
     followUps: d.followUps,
     tips: d.tips,
     roundIndex: idx + 1
   }));
+
   return rounds;
 }
 
@@ -6045,6 +6062,7 @@ function startTraining(sceneId) {
   useHintCard = false;
   currentRewindRound = -1;
   currentImageFit = 0;
+  delete currentTraining.shuffledRounds;
 
   const personalityLabels = { '友好型':'😊', '内向型':'😌', '挑剔型':'😒', '理性型':'🤔' };
   currentPersonality = ['友好型', '内向型', '挑剔型', '理性型'][Math.floor(Math.random() * 4)];
@@ -6395,7 +6413,12 @@ function updatePropButtons() {
 
 function showRound() {
   if (!currentTraining) return;
-  const round = currentTraining.rounds[trainingRoundIdx];
+
+  if (!currentTraining.shuffledRounds) {
+    currentTraining.shuffledRounds = [...currentTraining.rounds].sort(() => Math.random() - 0.5);
+  }
+
+  const round = currentTraining.shuffledRounds[trainingRoundIdx];
   if (!round) { finishTraining(); return; }
 
   showTrainingOptions = true;
