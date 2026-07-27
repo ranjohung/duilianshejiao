@@ -7867,7 +7867,6 @@ function finishTraining() {
   userData.hasCompletedFirstTraining = true;
 
   // 生成情绪日记
-  const rounds = currentTraining.shuffledRounds || currentTraining.rounds;
   const total = trainingChoices.length || rounds.length;
   const emotionTag = goodCount >= total*0.7 ? '😊' : goodCount >= total*0.4 ? '😐' : '😟';
   diaries.unshift({
