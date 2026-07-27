@@ -6594,7 +6594,8 @@ function sendUserMessage() {
 
   addTrainingMessage(userAnswer, true);
 
-  const round = currentTraining.rounds[trainingRoundIdx];
+  const rounds = currentTraining.shuffledRounds || currentTraining.rounds;
+  const round = rounds[trainingRoundIdx];
   const analysis = analyzeUserAnswer(userAnswer, round);
 
   trainingScore = Math.max(-100, Math.min(100, trainingScore + analysis.scoreDelta));
@@ -6797,7 +6798,8 @@ function continueTrainingFlow(userAnswer, analysis) {
   $('rewind-btn').style.display = timeRewindTickets > 0 ? 'inline-flex' : 'none';
   $('rewind-btn').disabled = timeRewindTickets <= 0;
   updatePropButtons();
-  if (trainingRoundIdx < currentTraining.rounds.length) {
+  const rounds = currentTraining.shuffledRounds || currentTraining.rounds;
+  if (trainingRoundIdx < rounds.length) {
     setTimeout(() => showRound(), 1500);
   } else {
     trainingEndReason = 'complete';
@@ -7775,7 +7777,8 @@ function finishTraining() {
     else coldCount++;
   });
 
-  const totalRounds = currentTraining.rounds.length;
+  const rounds = currentTraining.shuffledRounds || currentTraining.rounds;
+  const totalRounds = rounds.length;
   const completedRounds = trainingRoundIdx + 1;
   const completionRate = completedRounds / totalRounds;
 
@@ -7848,7 +7851,8 @@ function finishTraining() {
   userData.hasCompletedFirstTraining = true;
 
   // 生成情绪日记
-  const total = trainingChoices.length || currentTraining.rounds.length;
+  const rounds = currentTraining.shuffledRounds || currentTraining.rounds;
+  const total = trainingChoices.length || rounds.length;
   const emotionTag = goodCount >= total*0.7 ? '😊' : goodCount >= total*0.4 ? '😐' : '😟';
   diaries.unshift({
     id: Date.now(), date: new Date().toLocaleDateString(),
@@ -10127,7 +10131,8 @@ function useHintCardNow() {
   updatePropButtons();
   saveData();
 
-  const round = currentTraining.rounds[trainingRoundIdx];
+  const rounds = currentTraining.shuffledRounds || currentTraining.rounds;
+  const round = rounds[trainingRoundIdx];
   if (round && round.tips && round.tips.length > 0) {
     addTrainingMessage('💡 提示：' + round.tips.join('；'), false, true);
   } else {
