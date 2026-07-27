@@ -3432,7 +3432,23 @@ function loadData(phone) {
     if (saved) {
       const data = JSON.parse(saved);
       if (data.userData && typeof data.userData === 'object') userData = data.userData;
-      if (data.trainingScenes && Array.isArray(data.trainingScenes)) trainingScenes = data.trainingScenes;
+      if (data.trainingScenes && Array.isArray(data.trainingScenes)) {
+        const savedScenes = data.trainingScenes;
+        savedScenes.forEach(savedScene => {
+          const defaultScene = trainingScenes.find(s => s.id === savedScene.id);
+          if (defaultScene && defaultScene.rounds) {
+            const mergedRounds = savedScene.rounds.map((savedRound, idx) => {
+              const defaultRound = defaultScene.rounds[idx];
+              if (defaultRound && (!savedRound.thinking || savedRound.thinking.length === 0)) {
+                return { ...savedRound, thinking: defaultRound.thinking, tips: defaultRound.tips };
+              }
+              return savedRound;
+            });
+            savedScene.rounds = mergedRounds;
+          }
+        });
+        trainingScenes = savedScenes;
+      }
       if (data.abilityStats && typeof data.abilityStats === 'object') abilityStats = data.abilityStats;
       if (typeof data.weeklyTrainingDays === 'number') weeklyTrainingDays = data.weeklyTrainingDays;
       if (typeof data.checkedInToday === 'boolean') checkedInToday = data.checkedInToday;
