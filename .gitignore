@@ -1,0 +1,9 @@
+.vercel
+.env*
+node_modules/
+playwright-report/
+test-results/
+test_screenshots/
+.dart_tool/
+parsed_output/
+__pycache__/

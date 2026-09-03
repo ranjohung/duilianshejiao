@@ -1,48 +1,27 @@
 {
   "scene_id": "演讲发言技巧",
   "scene_name": "演讲发言技巧",
-  "version": "1.0",
+  "version": "2.0",
   "scripts": [
-    {
-      "id": "yj_001",
-      "round": 1,
-      "purpose": "开场问候",
-      "user_emotion": ["紧张", "期待"],
-      "coach_style": ["鼓励型", "支持型"],
-      "level": "安全型",
-      "text": "各位领导、各位同事，大家好！",
-      "tags": ["开场问候", "礼貌", "正式"],
-      "usage_count": 0,
-      "rating": 0
-    },
-    {
-      "id": "yj_002",
-      "round": 1,
-      "purpose": "开场问候",
-      "user_emotion": ["紧张"],
-      "coach_style": ["挑战型"],
-      "level": "自信型",
-      "text": "大家好！很高兴今天能在这里跟大家分享。",
-      "tags": ["开场问候", "友好", "轻松"],
-      "usage_count": 0,
-      "rating": 0
-    },
-    {
-      "id": "yj_003",
-      "round": 2,
-      "purpose": "自我介绍",
-      "user_emotion": ["期待"],
-      "coach_style": ["支持型"],
-      "level": "安全型",
-      "text": "我是XXX，来自XX部门，负责XX工作。",
-      "tags": ["自我介绍", "简洁", "信息"],
-      "usage_count": 0,
-      "rating": 0
-    },
-    {
-      "id": "yj_004",
-      "round": 2,
-      "purpose": "自我介绍",
-      "user_emotion": ["期待"],
-      "coach_style": ["分析型"],
-      "level": "理性型
+    {"id":"yj_001","round":1,"purpose":"开场问候","user_emotion":["紧张"],"coach_style":["鼓励型"],"level":"安全型","text":"大家好，我是[姓名]。今天想和大家分享[主题]，重点谈三个问题。","tags":["开场","主题","结构"],"usage_count":0,"rating":0},
+    {"id":"yj_002","round":1,"purpose":"吸引注意","user_emotion":["期待"],"coach_style":["挑战型"],"level":"互动型","text":"开始前想请大家想一想：在[具体情境]中，你最常遇到的困难是什么？","tags":["提问开场","听众关联"],"usage_count":0,"rating":0},
+    {"id":"yj_003","round":2,"purpose":"说明价值","user_emotion":["平静"],"coach_style":["分析型"],"level":"清晰型","text":"接下来的[时长]分钟，我会说明[要点一]、[要点二]和[要点三]，希望能帮大家解决[具体问题]。","tags":["价值说明","时间预期"],"usage_count":0,"rating":0},
+    {"id":"yj_004","round":2,"purpose":"建立可信度","user_emotion":["平静"],"coach_style":["支持型"],"level":"事实型","text":"我参与过[相关项目或经历]，今天分享的是其中可复用的方法和踩过的坑。","tags":["可信度","真实经历"],"usage_count":0,"rating":0},
+    {"id":"yj_005","round":3,"purpose":"提出观点","user_emotion":["自信"],"coach_style":["分析型"],"level":"结论先行","text":"我的核心观点是：[一句话结论]。原因主要有两点。","tags":["结论先行","结构"],"usage_count":0,"rating":0},
+    {"id":"yj_006","round":3,"purpose":"解释论据","user_emotion":["平静"],"coach_style":["分析型"],"level":"证据型","text":"这里引用的数据来自[可核验来源]，统计口径是[口径]，它说明的是[有限结论]。","tags":["可核验","避免夸大"],"usage_count":0,"rating":0},
+    {"id":"yj_007","round":4,"purpose":"讲述案例","user_emotion":["期待"],"coach_style":["鼓励型"],"level":"故事型","text":"举个具体例子：当时的情况是[背景]，我们采取了[行动]，最后得到[结果]。","tags":["案例","具体"],"usage_count":0,"rating":0},
+    {"id":"yj_008","round":4,"purpose":"过渡衔接","user_emotion":["平静"],"coach_style":["支持型"],"level":"自然型","text":"了解了为什么之后，我们再看具体怎么做。","tags":["过渡","逻辑"],"usage_count":0,"rating":0},
+    {"id":"yj_009","round":5,"purpose":"邀请互动","user_emotion":["期待"],"coach_style":["鼓励型"],"level":"互动型","text":"到这里有没有需要我再解释的地方？也欢迎大家举一个自己的例子。","tags":["互动","确认理解"],"usage_count":0,"rating":0},
+    {"id":"yj_010","round":5,"purpose":"回应问题","user_emotion":["紧张"],"coach_style":["支持型"],"level":"坦诚型","text":"这个问题很关键。我目前能确认的是[已知部分]；[未知部分]我不想凭印象回答，会后核实再回复。","tags":["回应提问","承认未知"],"usage_count":0,"rating":0},
+    {"id":"yj_011","round":6,"purpose":"处理质疑","user_emotion":["紧张"],"coach_style":["分析型"],"level":"尊重型","text":"谢谢你提出不同看法。你关注的是[复述对方观点]，对吗？我的依据是[依据]，我们可以比较一下两种判断的适用条件。","tags":["处理质疑","复述","证据"],"usage_count":0,"rating":0},
+    {"id":"yj_012","round":6,"purpose":"纠正口误","user_emotion":["尴尬"],"coach_style":["鼓励型"],"level":"镇定型","text":"抱歉，刚才我说错了，准确的表述是[正确内容]。谢谢大家理解，我们继续。","tags":["口误","纠正"],"usage_count":0,"rating":0},
+    {"id":"yj_013","round":7,"purpose":"忘词恢复","user_emotion":["紧张"],"coach_style":["支持型"],"level":"镇定型","text":"我看一下提纲。我们刚讲完[上一点]，下一部分是[下一点]。","tags":["忘词","恢复节奏"],"usage_count":0,"rating":0},
+    {"id":"yj_014","round":7,"purpose":"控制时间","user_emotion":["平静"],"coach_style":["分析型"],"level":"简洁型","text":"时间有限，后面的细节我放在资料里，这里只强调最重要的一点：[结论]。","tags":["时间管理","突出重点"],"usage_count":0,"rating":0},
+    {"id":"yj_015","round":8,"purpose":"照顾听众","user_emotion":["平静"],"coach_style":["支持型"],"level":"体贴型","text":"如果刚才信息量有些大，可以先记住这三个关键词：[词一]、[词二]、[词三]。","tags":["听众体验","记忆点"],"usage_count":0,"rating":0},
+    {"id":"yj_016","round":8,"purpose":"表达不确定性","user_emotion":["平静"],"coach_style":["分析型"],"level":"严谨型","text":"这个判断适用于[条件]，如果情境不同，结论可能需要调整。","tags":["边界条件","严谨"],"usage_count":0,"rating":0},
+    {"id":"yj_017","round":9,"purpose":"行动建议","user_emotion":["期待"],"coach_style":["挑战型"],"level":"行动型","text":"如果大家今天只做一件事，我建议从[小而具体的行动]开始，并在[时间]检查结果。","tags":["行动建议","可执行"],"usage_count":0,"rating":0},
+    {"id":"yj_018","round":9,"purpose":"总结要点","user_emotion":["平静"],"coach_style":["分析型"],"level":"总结型","text":"总结一下：我们先看了[问题]，再分析了[原因]，最后得到[行动建议]。","tags":["总结","结构回顾"],"usage_count":0,"rating":0},
+    {"id":"yj_019","round":10,"purpose":"结束提问","user_emotion":["期待"],"coach_style":["支持型"],"level":"开放型","text":"我的分享先到这里。还有问题的话，我很愿意继续交流。","tags":["问答","开放"],"usage_count":0,"rating":0},
+    {"id":"yj_020","round":10,"purpose":"致谢收尾","user_emotion":["开心"],"coach_style":["鼓励型"],"level":"得体型","text":"感谢大家的时间和反馈，希望今天的内容能带来一个具体的帮助。","tags":["致谢","收尾"],"usage_count":0,"rating":0}
+  ]
+}

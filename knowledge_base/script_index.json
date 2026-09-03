@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "created_at": "2026-07-23",
-  "total_scripts": 900,
+  "total_scripts": 928,
   "categories": [
     {
       "category_id": "workplace",
@@ -36,13 +36,13 @@
     {
       "category_id": "conflict",
       "category_name": "突发与冲突",
-      "scene_count": 5,
+      "scene_count": 6,
       "description": "突发事件、冲突调解等场景"
     },
     {
       "category_id": "social",
       "category_name": "社交场合与人际交往",
-      "scene_count": 5,
+      "scene_count": 8,
       "description": "聚会、演讲、饭局等社交场景"
     },
     {
@@ -105,7 +105,7 @@
       "scene_id": "模拟面试",
       "scene_name": "模拟面试",
       "category": "workplace",
-      "script_count": 20,
+      "script_count": 8,
       "file_path": "scenes/模拟面试.json",
       "tags": ["面试", "求职", "职场", "自我介绍"]
     },
@@ -113,7 +113,7 @@
       "scene_id": "加薪谈判",
       "scene_name": "加薪谈判",
       "category": "workplace",
-      "script_count": 20,
+      "script_count": 6,
       "file_path": "scenes/加薪谈判.json",
       "tags": ["谈判", "薪资", "职场", "沟通"]
     },
@@ -169,7 +169,7 @@
       "scene_id": "见家长",
       "scene_name": "见家长",
       "category": "family",
-      "script_count": 20,
+      "script_count": 6,
       "file_path": "scenes/见家长.json",
       "tags": ["见家长", "家庭", "礼仪", "沟通"]
     },
@@ -377,7 +377,7 @@
       "scene_id": "面试技巧",
       "scene_name": "面试技巧",
       "category": "social",
-      "script_count": 20,
+      "script_count": 8,
       "file_path": "scenes/面试技巧.json",
       "tags": ["面试", "技巧", "求职", "沟通"]
     },

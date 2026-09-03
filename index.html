@@ -535,48 +535,34 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
     </div>
 
     <div class="page-content" id="home-content">
-      <div class="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-4 text-white shadow-lg mb-4">
+      <section id="last-training-card" class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-4 text-white shadow-lg mb-5">
         <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-medium bg-white/20 px-2 py-0.5 rounded-full">📌 今日推荐训练</span>
-          <span class="text-xs" id="recommend-duration">8min</span>
+          <span class="text-xs font-medium bg-white/20 px-2 py-1 rounded-full">🕘 上次训练</span>
+          <span class="text-xs opacity-80" id="last-training-date">暂无记录</span>
         </div>
-        <div class="flex items-center justify-between">
-          <div>
-            <h3 class="font-bold text-lg" id="recommend-name">💑 相亲模拟</h3>
-            <p class="text-sm opacity-80 mt-0.5" id="recommend-desc">朋友介绍的第一次见面</p>
+        <div class="flex items-center justify-between gap-3">
+          <div class="min-w-0">
+            <h3 class="font-bold text-lg truncate" id="last-training-name">还没有进行过训练</h3>
+            <p class="text-sm opacity-80 mt-1 line-clamp-2" id="last-training-desc">从下面选择一个项目，开始第一次练习。</p>
           </div>
-          <button onclick="startTraining(getRecommendedScene())" class="px-4 py-2 bg-white text-orange-500 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">开始训练</button>
+          <button id="continue-training-btn" onclick="continueLastTraining()" class="flex-shrink-0 px-4 py-2 bg-white text-indigo-600 rounded-xl text-sm font-semibold hover:bg-indigo-50 transition-colors">开始训练</button>
         </div>
-        <div class="flex items-center gap-2 mt-3">
-          <span id="recommend-stars">⭐⭐⭐⭐☆</span>
-        </div>
-      </div>
+      </section>
 
-      <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl shadow-sm mb-4 overflow-hidden">
-        <button onclick="toggleSection('goodnight')" class="w-full flex items-center justify-between p-4 text-white hover:bg-white/10 transition-colors">
+      <section class="mb-5" aria-labelledby="home-projects-title">
+        <div class="flex items-end justify-between mb-3">
           <div>
-            <h3 class="font-bold">🌙 今晚晚安计划</h3>
-            <p class="text-sm opacity-80 mt-0.5">"今天辛苦了，睡前想听点什么？"</p>
+            <h2 class="text-lg font-bold text-gray-800" id="home-projects-title">选择训练项目</h2>
+            <p class="text-xs text-gray-500 mt-1">根据你想提升的沟通场景开始练习</p>
           </div>
-          <span class="text-white/80 text-sm transition-transform" id="goodnight-icon">▼</span>
-        </button>
-        <div id="goodnight-content" class="hidden px-4 pb-4">
-          <button onclick="showGoodnight()" class="w-full px-4 py-2 bg-white/20 rounded-lg text-sm font-medium hover:bg-white/30 transition-colors">听TA说晚安 →</button>
+          <button onclick="switchTab('training')" class="text-xs text-indigo-600 font-medium">全部项目 →</button>
         </div>
-      </div>
+        <div id="home-training-projects" class="grid grid-cols-2 gap-3"></div>
+      </section>
 
-      <div class="bg-gradient-to-r from-pink-400 to-rose-500 rounded-2xl shadow-sm mb-4 overflow-hidden">
-        <button onclick="showBeautyModal()" class="w-full flex items-center justify-between p-4 text-white hover:bg-white/10 transition-colors">
-          <div>
-            <h3 class="font-bold">💄 变美联动</h3>
-            <p class="text-sm opacity-80 mt-0.5">社交形象管理，内外兼修</p>
-          </div>
-          <span class="text-white/80 text-sm">→</span>
-        </button>
-      </div>
-      <div class="bg-white rounded-2xl p-4 shadow-sm">
+      <section class="bg-white rounded-2xl p-4 shadow-sm">
         <div class="flex items-center justify-between mb-3">
-          <h3 class="text-sm font-semibold text-gray-800">💡 今日小贴士</h3>
+          <h3 class="text-sm font-semibold text-gray-800">💡 训练小贴士</h3>
           <div class="flex items-center gap-2">
             <span class="text-xs px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded-full" id="tip-source">📚 预设技巧</span>
             <span class="text-xs text-gray-400" id="tips-date">7月17日</span>
@@ -597,7 +583,7 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
             <span>📌</span><span>收藏</span>
           </button>
         </div>
-      </div>
+      </section>
     </div>
   </div>
 
@@ -683,76 +669,81 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
   <!-- ===== 训练页 ===== -->
   <div class="page" id="page-training">
     <div class="page-content">
-      <h1 class="text-xl font-bold text-gray-800 mb-4">社交场景训练</h1>
+      <div id="training-module-hub">
+        <h1 class="text-xl font-bold text-gray-800">训练中心</h1>
+        <p class="text-sm text-gray-500 mt-1 mb-5">选择一个功能，进入专项训练</p>
 
-      <!-- 自定义场景入口（PRD §2.1） -->
-      <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-4 text-white mb-6">
-        <div class="flex items-center justify-between">
-          <div>
-            <h3 class="font-semibold text-lg">🎨 自定义场景</h3>
-            <p class="text-xs opacity-80 mt-1">创建专属你的训练场景</p>
-          </div>
-          <button onclick="showCustomSceneModal()" class="px-4 py-2 bg-white/20 rounded-lg text-sm font-medium hover:bg-white/30 transition-colors">
-            + 创建场景
+        <div class="space-y-3">
+          <button onclick="showTrainingModule('market')" class="w-full text-left bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3"><span class="text-2xl">📦</span><div><h3 class="font-semibold text-lg">场景模板市场</h3><p class="text-xs opacity-80 mt-1">按场景选择不同的对话训练内容</p></div></div>
+              <span class="text-sm opacity-80">进入 →</span>
+            </div>
+          </button>
+
+          <button onclick="showTrainingModule('custom')" class="w-full text-left bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3"><span class="text-2xl">🎨</span><div><h3 class="font-semibold text-lg">自定义场景</h3><p class="text-xs opacity-80 mt-1">创建并管理专属训练场景</p></div></div>
+              <span class="text-sm opacity-80">进入 →</span>
+            </div>
+          </button>
+
+          <button onclick="showChallenge()" class="w-full text-left bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3"><span class="text-2xl">🎯</span><div><h3 class="font-semibold text-lg">真实挑战</h3><p class="text-xs opacity-80 mt-1">完成挑战，检验现实沟通能力</p></div></div>
+              <span class="text-sm opacity-80">进行中 <span id="challenge-count">0</span> 个 →</span>
+            </div>
+          </button>
+
+          <button onclick="showHomework()" class="w-full text-left bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3"><span class="text-2xl">📝</span><div><h3 class="font-semibold text-lg">我的作业</h3><p class="text-xs opacity-80 mt-1">查看教练布置的专项练习</p></div></div>
+              <span class="text-sm opacity-80">进入 →</span>
+            </div>
+          </button>
+
+          <button onclick="showComingSoon('社交礼仪训练')" class="w-full text-left bg-gradient-to-r from-amber-400 to-orange-500 rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3"><span class="text-2xl">🤝</span><div><div class="flex items-center gap-2"><h3 class="font-semibold text-lg">社交礼仪训练</h3><span class="text-[11px] bg-white/20 px-2 py-0.5 rounded-full">即将上线</span></div><p class="text-xs opacity-80 mt-1">仪态、称呼、赴约和公共场合礼仪</p></div></div>
+              <span class="text-sm opacity-80">查看 →</span>
+            </div>
+          </button>
+
+          <button onclick="showComingSoon('语音训练')" class="w-full text-left bg-gradient-to-r from-rose-400 to-pink-500 rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3"><span class="text-2xl">🎙️</span><div><div class="flex items-center gap-2"><h3 class="font-semibold text-lg">语音训练</h3><span class="text-[11px] bg-white/20 px-2 py-0.5 rounded-full">即将上线</span></div><p class="text-xs opacity-80 mt-1">语速、语气和口语表达训练</p></div></div>
+              <span class="text-sm opacity-80">查看 →</span>
+            </div>
           </button>
         </div>
-        <div class="mt-3 flex items-center gap-4 text-xs opacity-80">
-          <span>免费用户：可创建1个</span>
-          <span>会员用户：无限创建</span>
-        </div>
       </div>
 
-      <!-- 我的自定义场景（PRD §2.1） -->
-      <div id="my-custom-scenes" class="mb-6" style="display:none">
-        <h3 class="text-sm font-semibold text-gray-800 mb-3">我的自定义场景</h3>
-        <div class="grid grid-cols-1 gap-3" id="custom-scene-list"></div>
-      </div>
-
-      <!-- 真实挑战入口 -->
-      <div onclick="showChallenge()" class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-4 text-white mb-6 cursor-pointer hover:opacity-90 transition-all">
-        <div class="flex items-center justify-between">
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="text-lg">🎯</span>
-              <h3 class="font-semibold text-lg">真实挑战</h3>
+      <div id="training-market-module" style="display:none">
+        <div class="flex items-center gap-3 mb-4"><button onclick="showTrainingModule('hub')" class="w-9 h-9 bg-white rounded-full shadow-sm text-gray-600">←</button><div><h1 class="text-xl font-bold text-gray-800">场景模板市场</h1><p class="text-xs text-gray-500">选择具体场景开始训练</p></div></div>
+        <div class="bg-gray-50 rounded-2xl p-4 mb-6">
+          <div class="mb-3"><h3 class="text-sm font-semibold text-gray-800">精选训练</h3></div>
+          <div class="grid grid-cols-2 gap-3" id="template-scene-list"></div>
+          <button onclick="showMoreScenes()" class="mt-3 w-full text-left bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all">
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <span class="text-2xl">🗂️</span>
+                <div>
+                  <h3 class="font-semibold">更多训练场景</h3>
+                  <p class="text-xs opacity-80 mt-1">按职场、关系、生活等分类选择训练</p>
+                </div>
+              </div>
+              <span class="text-sm opacity-80 flex-shrink-0">进入 →</span>
             </div>
-            <p class="text-xs opacity-80 mt-1">完成挑战获得积分奖励</p>
-          </div>
-          <span class="text-xs opacity-80">查看全部 →</span>
+          </button>
         </div>
-        <div class="mt-3 flex gap-2">
-          <div class="text-xs px-2 py-1 bg-white/20 rounded-full">进行中 <span id="challenge-count">0</span> 个</div>
-        </div>
+        <div id="scene-list"></div>
       </div>
 
-      <!-- 场景模板市场（PRD §2.4） -->
-      <div class="bg-gray-50 rounded-2xl p-4 mb-6">
-        <div class="flex items-center justify-between mb-3">
-          <h3 class="text-sm font-semibold text-gray-800">📦 场景模板市场</h3>
-          <div class="flex items-center gap-3">
-            <span class="text-xs text-gray-400">精选优质场景</span>
-            <button onclick="showMoreScenes()" class="text-xs text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1">
-              查看更多 →
-            </button>
-          </div>
-        </div>
-        <div class="grid grid-cols-2 gap-3" id="template-scene-list"></div>
-      </div>
-
-      <div id="scene-list"></div>
-
-      <!-- 语音训练入口（PRD §7.2） -->
-      <div onclick="showVoiceTraining()" class="bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl p-4 text-white mb-6 cursor-pointer hover:opacity-90 transition-all">
-        <div class="flex items-center justify-between">
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="text-lg">🎙️</span>
-              <h3 class="font-semibold text-lg">语音训练</h3>
-            </div>
-            <p class="text-xs opacity-80 mt-1">真实语音对话，提升口语表达能力</p>
-          </div>
-          <span class="text-gray-300">→</span>
-        </div>
+      <div id="training-custom-module" style="display:none">
+        <div class="flex items-center justify-between mb-4"><div class="flex items-center gap-3"><button onclick="showTrainingModule('hub')" class="w-9 h-9 bg-white rounded-full shadow-sm text-gray-600">←</button><div><h1 class="text-xl font-bold text-gray-800">自定义场景</h1><p class="text-xs text-gray-500">管理你的专属训练</p></div></div><button onclick="showCustomSceneModal()" class="px-3 py-2 bg-purple-500 text-white rounded-lg text-sm">+ 创建</button></div>
+        <div class="bg-purple-50 rounded-xl p-3 text-xs text-purple-700 mb-4">免费用户可创建 1 个，会员用户可无限创建。</div>
+        <div id="my-custom-scenes" style="display:none"><div class="grid grid-cols-1 gap-3" id="custom-scene-list"></div></div>
+        <div id="custom-scene-empty" class="bg-white rounded-2xl p-8 text-center text-sm text-gray-500">还没有自定义场景，点击右上角创建。</div>
       </div>
     </div>
   </div>
@@ -948,12 +939,7 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
         </div>
       </div>
 
-      <div class="grid grid-cols-2 gap-3 mb-4">
-        <div onclick="showHomework()" class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 cursor-pointer hover:shadow-md transition-all">
-          <div class="text-2xl mb-2">📝</div>
-          <h3 class="text-sm font-semibold text-gray-800">我的作业</h3>
-          <p class="text-xs text-gray-500 mt-1">教练布置的专项练习</p>
-        </div>
+      <div class="mb-4">
         <div onclick="showSkillProgress()" class="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl p-4 cursor-pointer hover:shadow-md transition-all">
           <div class="text-2xl mb-2">🎯</div>
           <h3 class="text-sm font-semibold text-gray-800">技能点进度</h3>
@@ -1305,7 +1291,7 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
           <button onclick="toggleDoublePoints()" id="double-btn" class="px-2 py-1 bg-amber-100 text-amber-600 text-xs rounded-full flex items-center gap-1 hover:bg-amber-200 disabled:opacity-50 disabled:cursor-not-allowed" style="display:none" disabled>
             ✨ <span id="double-count">0</span>
           </button>
-          <button onclick="closeModal('training')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+          <button onclick="requestTrainingExit()" aria-label="退出训练" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
         </div>
       </div>
       <div class="flex-1 overflow-auto p-4 space-y-3" id="training-messages"></div>
@@ -2636,7 +2622,7 @@ let trainingScenes = [
     ], bestAnswer:'其实我手头还有三个紧急项目在赶，但可以帮你梳理一下思路，这样你做起来更快' }
   ]},
   { id:9, icon:'❤️', name:'初次约会', desc:'第一次见面的沟通技巧', stage:1, difficulty:2, duration:'12min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, rounds:[
-    { ai:'终于见面了！网上聊了这么久，感觉你本人比照片还好看', thinking:[
+    { ai:'终于见面了！路上还顺利吗？我们看看坐哪里比较舒服', thinking:[
       { type:'A', label:'主动型', desc:'热情回应 + 赞美对方 + 开启话题', example:'哈哈，你也是！这家餐厅是你选的吗？看起来很有品味' },
       { type:'B', label:'平衡型', desc:'礼貌回应 + 简单提问', example:'谢谢！你也很帅。我们先坐下聊聊吧？' },
       { type:'C', label:'含蓄型', desc:'简单回应', example:'谢谢' }
@@ -3357,6 +3343,7 @@ function switchTab(tab) {
   });
   if (tab === 'growth') renderGrowth();
   if (tab === 'training') {
+    showTrainingModule('hub');
     renderScenes();
     loadChallenges();
   }
@@ -3423,6 +3410,11 @@ function saveData() {
     console.error('保存数据失败:', e);
     alert('保存数据失败，请检查浏览器存储权限');
   }
+}
+
+// 兼容各功能模块的历史调用，统一写入当前账号数据。
+function saveUserData() {
+  saveData();
 }
 
 function loadData(phone) {
@@ -4012,6 +4004,7 @@ function saveTip() {
 function renderHome() {
   $('home-skeleton').style.display = 'none';
   $('home-content').style.display = 'block';
+  if (ensurePostInitialUnlockCosts()) saveData();
 
   $('greeting-text').textContent = getGreeting();
   $('user-name').textContent = userData.nickname;
@@ -4050,18 +4043,12 @@ function renderHome() {
   $('home-coach-avatar').src = coachAvatar;
   $('home-coach-name').textContent = currentCoach.name;
   $('home-coach-type').textContent = currentCoach.title;
-  $('home-coach-progress').style.width = currentCoach.points + '%';
-  $('home-coach-affection').textContent = currentCoach.points + '/1000';
+  const currentFavorability = userData.favorability || 0;
+  $('home-coach-progress').style.width = getFavorabilityProgress(currentFavorability) + '%';
+  $('home-coach-affection').textContent = `Lv.${getFavorabilityLevel(currentFavorability)} · ${currentFavorability}`;
 
-  // 推荐场景
-  const unlocked = trainingScenes.filter(s => s.unlocked && !s.completed);
-  const rec = unlocked.length > 0 ? unlocked[0] : trainingScenes.find(s => s.unlocked) || trainingScenes[0];
-  if (rec) {
-    $('recommend-name').textContent = rec.icon + ' ' + rec.name;
-    $('recommend-desc').textContent = rec.desc;
-    $('recommend-duration').textContent = rec.duration;
-    $('recommend-stars').innerHTML = '⭐'.repeat(rec.difficulty) + '☆'.repeat(5-rec.difficulty);
-  }
+  renderLastTraining();
+  renderHomeTrainingProjects();
 
   // 最近训练
   const completed = trainingScenes.filter(s => s.completed);
@@ -4080,6 +4067,107 @@ function renderHome() {
   const h = new Date().getHours();
   const nightCard = $('goodnight-card');
   if (nightCard) nightCard.style.display = h >= 21 ? 'block' : 'none';
+}
+
+function getLastTrainingScene() {
+  if (!coachMemory.lastTrainingScene) return null;
+  return trainingScenes.find(s => s.name === coachMemory.lastTrainingScene)
+    || customScenes.find(s => s.name === coachMemory.lastTrainingScene)
+    || null;
+}
+
+function renderLastTraining() {
+  const scene = getLastTrainingScene();
+  const nameEl = $('last-training-name');
+  const descEl = $('last-training-desc');
+  const dateEl = $('last-training-date');
+  const btn = $('continue-training-btn');
+  if (!nameEl || !descEl || !dateEl || !btn) return;
+
+  if (!scene) {
+    nameEl.textContent = '还没有进行过训练';
+    descEl.textContent = '从下面选择一个项目，开始第一次练习。';
+    dateEl.textContent = '暂无记录';
+    btn.textContent = '选择项目';
+    btn.onclick = () => {
+      const projects = $('home-training-projects');
+      if (projects) projects.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    return;
+  }
+
+  nameEl.textContent = scene.icon + ' ' + scene.name;
+  descEl.textContent = scene.desc + ' · ' + scene.duration;
+  dateEl.textContent = coachMemory.lastTrainingDate || '最近一次';
+  btn.textContent = scene.completed ? '再次训练' : '继续训练';
+  btn.onclick = () => startTraining(scene.id);
+}
+
+function continueLastTraining() {
+  const scene = getLastTrainingScene();
+  if (scene) startTraining(scene.id);
+  else {
+    const firstScene = trainingScenes.find(s => s.unlocked) || trainingScenes[0];
+    if (firstScene) startTraining(firstScene.id);
+  }
+}
+
+function hasInitialFreeChoice() {
+  return userData.member === 'free' && !userData.hasSelectedInitial;
+}
+
+function ensurePostInitialUnlockCosts() {
+  if (userData.member !== 'free' || !userData.hasSelectedInitial) return false;
+  let changed = false;
+  trainingScenes.forEach(scene => {
+    if (!scene.unlocked && (scene.unlockPoints || 0) === 0 && (scene.unlockTickets || 0) === 0) {
+      scene.unlockPoints = Math.max(50, (scene.difficulty || 1) * 50);
+      scene.unlockTickets = 1;
+      changed = true;
+    }
+  });
+  return changed;
+}
+
+function chooseTrainingScene(sceneId) {
+  const scene = trainingScenes.find(s => s.id === sceneId)
+    || customScenes.find(s => s.id === sceneId);
+  if (!scene) return;
+
+  if (hasInitialFreeChoice() && trainingScenes.includes(scene)) {
+    scene.unlocked = true;
+    userData.hasSelectedInitial = true;
+    ensurePostInitialUnlockCosts();
+    saveData();
+    renderHome();
+    showToast(`🎁 已免费解锁「${scene.name}」`);
+  }
+  startTraining(scene.id);
+}
+
+function renderHomeTrainingProjects() {
+  const container = $('home-training-projects');
+  if (!container) return;
+  const available = [...customScenes, ...trainingScenes].sort((a, b) => Number(b.unlocked) - Number(a.unlocked));
+  const unique = available.filter((scene, index, list) => list.findIndex(item => item.name === scene.name) === index);
+  container.innerHTML = unique.slice(0, 6).map(scene => `
+    <button onclick="chooseTrainingScene(${scene.id})" class="text-left bg-white rounded-2xl p-3.5 shadow-sm border ${hasInitialFreeChoice() ? 'border-amber-200' : 'border-gray-100'} hover:border-indigo-200 hover:shadow-md transition-all">
+      <div class="flex items-start justify-between gap-2">
+        <span class="text-2xl" aria-hidden="true">${scene.icon}</span>
+        <span class="text-[11px] text-gray-400">${scene.duration}</span>
+      </div>
+      <div class="font-semibold text-sm text-gray-800 mt-2">${scene.name}</div>
+      <div class="text-xs text-gray-500 mt-1 line-clamp-2 min-h-[2rem]">${scene.desc}</div>
+      <div class="flex items-center justify-between mt-3">
+        <span class="text-[11px] text-amber-500">${'★'.repeat(Math.min(5, scene.difficulty || 1))}${'☆'.repeat(Math.max(0, 5 - (scene.difficulty || 1)))}</span>
+        <span class="text-xs ${hasInitialFreeChoice() || scene.unlocked ? 'text-indigo-600' : 'text-gray-400'} font-medium">${hasInitialFreeChoice() ? '免费选择 →' : scene.unlocked ? '开始 →' : `🔒 ${scene.unlockPoints || 0}积分+${scene.unlockTickets || 0}券`}</span>
+      </div>
+    </button>
+  `).join('');
+
+  if (unique.length === 0) {
+    container.innerHTML = '<div class="col-span-2 bg-white rounded-2xl p-5 text-center text-sm text-gray-500">暂无可用项目，请到训练页查看解锁条件。</div>';
+  }
 }
 
 function doCheckin() {
@@ -4322,27 +4410,27 @@ function selectCoach(index) {
   if (homeName) homeName.textContent = currentCoach.name;
   const homeType = $('home-coach-type');
   if (homeType) homeType.textContent = currentCoach.title;
-  const homeProgress = $('home-coach-progress');
-  if (homeProgress) homeProgress.style.width = currentCoach.points + '%';
-  const homeAffection = $('home-coach-affection');
-  if (homeAffection) homeAffection.textContent = currentCoach.points + '/1000';
-
   userData.lastCoachSwitchTime = now;
   if (!userData.coachSwitchCount) userData.coachSwitchCount = {};
   const currentMonth = new Date().toISOString().slice(0, 7);
   userData.coachSwitchCount[currentMonth] = (userData.coachSwitchCount[currentMonth] || 0) + 1;
 
   if (!userData.coachFavorability) userData.coachFavorability = {};
-  if (!userData.coachFavorability[oldCoachId]) userData.coachFavorability[oldCoachId] = userData.favorability || 0;
+  userData.coachFavorability[oldCoachId] = userData.favorability || 0;
 
-  if (userData.member !== 'free') {
-    const inheritedFavorability = Math.floor((userData.favorability || 0) * 0.8);
-    currentCoach.points = Math.max(currentCoach.points, inheritedFavorability);
-    userData.favorability = currentCoach.points;
+  if (userData.coachFavorability[newCoach.id] !== undefined) {
+    userData.favorability = userData.coachFavorability[newCoach.id];
+  } else if (userData.member !== 'free') {
+    userData.favorability = Math.floor((userData.coachFavorability[oldCoachId] || 0) * 0.8);
   } else {
     userData.favorability = 0;
-    currentCoach.points = 0;
   }
+  userData.coachFavorability[newCoach.id] = userData.favorability;
+
+  const homeProgress = $('home-coach-progress');
+  if (homeProgress) homeProgress.style.width = getFavorabilityProgress(userData.favorability) + '%';
+  const homeAffection = $('home-coach-affection');
+  if (homeAffection) homeAffection.textContent = `Lv.${getFavorabilityLevel(userData.favorability)} · ${userData.favorability}`;
 
   saveData();
   renderCoach();
@@ -4529,8 +4617,9 @@ function checkCoachContact() {
 
 function renderCoach() {
   const level = getLevel(userData.points);
-  $('coach-points').textContent = currentCoach.points + '/1000';
-  $('coach-points-bar').style.width = currentCoach.points + '%';
+  const currentFavorability = userData.favorability || 0;
+  $('coach-points').textContent = `Lv.${getFavorabilityLevel(currentFavorability)} · ${currentFavorability}`;
+  $('coach-points-bar').style.width = getFavorabilityProgress(currentFavorability) + '%';
   $('coach-level-label').textContent = '⭐ ' + currentCoach.level;
   $('coach-big-avatar').src = coachAvatar;
   $('coach-big-name').textContent = currentCoach.name;
@@ -5220,6 +5309,7 @@ function selectInitialScene(sceneId) {
   if (scene) {
     scene.unlocked = true;
     userData.hasSelectedInitial = true;
+    ensurePostInitialUnlockCosts();
     saveData();
   }
 
@@ -5288,9 +5378,6 @@ function confirmUnlock(sceneId) {
   const scene = trainingScenes.find(s => s.id === sceneId);
   if (!scene) return;
 
-  const prevPoints = userData.points;
-  const prevTickets = timeRewindTickets;
-
   userData.points -= scene.unlockPoints;
   timeRewindTickets -= scene.unlockTickets;
   scene.unlocked = true;
@@ -5300,7 +5387,10 @@ function confirmUnlock(sceneId) {
   const dialog = $('unlock-confirm-dialog');
   if (dialog) dialog.remove();
 
-  showUnlockSuccess(scene, prevPoints, prevTickets);
+  showToast(`🎉 解锁成功！正在启动「${scene.name}」训练...`);
+  setTimeout(() => {
+    startTraining(scene.id);
+  }, 800);
 }
 
 function showUnlockSuccess(scene, prevPoints, prevTickets) {
@@ -5367,12 +5457,36 @@ function goToMember() {
 function renderScenes() {
   renderCustomScenes();
   renderTemplateScenes();
-  renderSceneList();
+  const market = $('training-market-module');
+  if (market && market.style.display !== 'none') renderSceneList();
+}
+
+function showTrainingModule(moduleName) {
+  const hub = $('training-module-hub');
+  const market = $('training-market-module');
+  const custom = $('training-custom-module');
+  if (!hub || !market || !custom) return;
+
+  hub.style.display = moduleName === 'hub' ? 'block' : 'none';
+  market.style.display = moduleName === 'market' ? 'block' : 'none';
+  custom.style.display = moduleName === 'custom' ? 'block' : 'none';
+
+  if (moduleName === 'market') {
+    renderTemplateScenes();
+    renderSceneList();
+  } else if (moduleName === 'custom') {
+    renderCustomScenes();
+  }
+
+  const trainingPage = $('page-training');
+  if (trainingPage) trainingPage.scrollTop = 0;
+}
+
+function showComingSoon(featureName) {
+  showToast(`🛠️ ${featureName}正在开发中，敬请期待后续更新`);
 }
 
 function renderSceneList() {
-  checkInitialSceneSelection();
-
   const stages = [
     { id:1, name:'破冰期', desc:'基础社交场景' },
     { id:2, name:'接触期', desc:'进阶社交场景' },
@@ -5396,8 +5510,16 @@ function renderSceneList() {
           let buttonHtml = '';
           let lockInfo = '';
           let iconClass = s.unlocked ? 'bg-indigo-100' : 'bg-gray-100';
+          const initialFreeChoice = hasInitialFreeChoice();
 
-          if (status === 'unlocked') {
+          if (initialFreeChoice) {
+            buttonHtml = `<button onclick="chooseTrainingScene(${s.id})"
+              class="mt-3 w-full py-2 text-sm font-medium rounded-lg transition-all bg-gradient-to-r from-amber-400 to-orange-500 text-white hover:from-amber-500 hover:to-orange-600">
+              首次免费选择
+            </button>`;
+            lockInfo = '<span class="text-xs text-amber-600">🎁 首次登录可任选一项免费解锁</span>';
+            iconClass = 'bg-amber-100';
+          } else if (status === 'unlocked') {
             buttonHtml = `<button onclick="startTraining(${s.id})"
               class="mt-3 w-full py-2 text-sm font-medium rounded-lg transition-all bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:from-indigo-600 hover:to-purple-700">
               ${s.completed ? '再次训练' : '开始训练'}
@@ -5436,7 +5558,7 @@ function renderSceneList() {
             👀 预览场景
           </button>`;
 
-          const unlockInfo = s.unlockPoints > 0 || s.unlockTickets > 0 ? `
+          const unlockInfo = initialFreeChoice ? '' : (s.unlockPoints > 0 || s.unlockTickets > 0 ? `
             <div class="flex items-center gap-2 mt-2 text-xs">
               ${s.unlockLevel !== '青铜' ? `<span class="flex items-center gap-1 ${userData.points >= getLevelPoints(s.unlockLevel) ? 'text-green-500' : 'text-orange-500'}">
                 <span>🏆</span>${s.unlockLevel}学员
@@ -5449,7 +5571,7 @@ function renderSceneList() {
               </span>` : ''}
               ${s.unlocked ? '<span class="text-green-500">✓ 已解锁</span>' : ''}
             </div>
-          ` : (s.unlocked ? '<div class="mt-2 text-xs text-green-500">✓ 已解锁</div>' : '');
+          ` : (s.unlocked ? '<div class="mt-2 text-xs text-green-500">✓ 已解锁</div>' : ''));
 
           return `<div class="bg-white rounded-xl p-4 shadow-sm">
             <div class="flex items-start gap-3">
@@ -5568,11 +5690,14 @@ function getSceneTrainingGoal(sceneName) {
 
 // 渲染自定义场景列表（PRD §2.1）
 function renderCustomScenes() {
+  const emptyState = $('custom-scene-empty');
   if (customScenes.length === 0) {
     $('my-custom-scenes').style.display = 'none';
+    if (emptyState) emptyState.style.display = 'block';
     return;
   }
   $('my-custom-scenes').style.display = 'block';
+  if (emptyState) emptyState.style.display = 'none';
   $('custom-scene-list').innerHTML = customScenes.map(s => `
     <div class="bg-white rounded-xl p-4 shadow-sm">
       <div class="flex items-start gap-3">
@@ -5986,13 +6111,13 @@ const realSceneDialogs = {
       tips: ['给予支持', '认可对方的感受', '鼓励对方'] }
   ],
   '初次约会': [
-    { ai: '终于见面了！网上聊了这么久，感觉你本人比照片还好看',
+    { ai: '终于见面了！路上还顺利吗？我们看看坐哪里比较舒服。',
       followUps: ['你比我想象中更有趣呢', '这家餐厅你选的吗？眼光不错啊', '今天天气真适合出来走走'],
       tips: ['自然回应，不要过度谦虚', '适当回赞对方', '主动开启轻松话题'],
       thinking: [
-        { type:'A', label:'主动型', desc:'回赞+主动引导话题', example:'哈哈谢谢！你本人也比照片还帅/漂亮！对了，你说的那家甜品店我之前路过，要不要吃完饭后去试试？' },
-        { type:'B', label:'平衡型', desc:'礼貌回应+反问', example:'谢谢夸奖！你今天也很帅/漂亮。对了，你是怎么找到这家餐厅的？味道真不错。' },
-        { type:'C', label:'含蓄型', desc:'害羞回应+简洁', example:'谢谢...你也很好看啊。' }
+        { type:'A', label:'主动型', desc:'回应关心+共同决定', example:'挺顺利的，谢谢你关心。靠窗和里面你更喜欢哪边？我们一起选。' },
+        { type:'B', label:'平衡型', desc:'自然回应+表达感受', example:'挺顺利的，见到你很开心。我们坐里面可以吗？' },
+        { type:'C', label:'简洁型', desc:'简短但有回应', example:'挺顺利的，谢谢。你想坐哪边？' }
       ] },
     { ai: '（坐下后）你平时除了工作，周末都喜欢做什么？',
       followUps: ['喜欢一个人待着还是和朋友一起？', '最近有什么特别想做的事吗？', '对什么类型的活动比较感兴趣？'],
@@ -6004,9 +6129,9 @@ const realSceneDialogs = {
       ] },
     { ai: '听你说喜欢旅行，有没有特别想去的地方？',
       followUps: ['为什么想去那里？', '之前去过最难忘的地方是哪里？', '喜欢自由行还是跟团？'],
-      tips: ['分享梦想+表达感性', '可以暗示未来一起', '营造情感连接'],
+      tips: ['分享真实想法和原因', '先了解彼此，不急于共同出行', '给对方表达空间'],
       thinking: [
-        { type:'A', label:'主动型', desc:'分享梦想+发出邀约', example:'我特别想去冰岛看极光！之前查了好多攻略，一直没找到合适的伴。你有没有兴趣一起规划一次？' },
+        { type:'A', label:'主动型', desc:'分享梦想+邀请对方表达', example:'我特别想去冰岛看极光，主要是很喜欢那种辽阔安静的感觉。你呢，有没有一直想去的地方？' },
         { type:'B', label:'平衡型', desc:'分享想法+询问', example:'我一直很想去云南大理，感觉那里很放松，想在洱海边发呆几天。你有什么特别想去的地方吗？' },
         { type:'C', label:'含蓄型', desc:'简单表达', example:'我挺想去西藏的，感觉那里很神圣。' }
       ] },
@@ -6085,26 +6210,1014 @@ const realSceneDialogs = {
     { ai: '好的，那就这样定了，我给您办手续',
       followUps: [],
       tips: ['确认价格和赠品', '了解提车时间', '保持友好'] }
+  ],
+  '向上汇报被质疑': [
+    { ai: '你这份报告的数据来源可靠吗？我觉得这个数字不太对。',
+      followUps: ['这个数据怎么来的？', '有没有经过核实？', '能不能再确认一下？'],
+      tips: ['保持冷静，不要防御', '解释数据来源', '主动提出核实方案'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'承认问题+解释原因+提出解决方案', example:'领导您说得对，这个数据我需要再确认一下。这是从XX系统导出的原始数据，可能存在统计口径差异，我马上去核实并在1小时内给您准确数据' },
+        { type:'B', label:'平衡型', desc:'先回应+说明情况', example:'好的领导，这个数据来源于XX系统，我马上和数据部门核实一下，尽快给您答复' },
+        { type:'C', label:'含蓄型', desc:'简洁回应+行动', example:'好的领导，我马上去核实' }
+      ] },
+    { ai: '这个方案风险太大了，万一失败怎么办？',
+      followUps: ['你考虑过风险吗？', '有什么应对措施？', '成功率有多少？'],
+      tips: ['展示风险预案', '给出成功率数据', '展示决策依据'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'展示风险分析+应对方案', example:'领导，我们做了详细的风险分析，成功率预估85%。同时准备了三套应对预案：第一...第二...第三...，即使最坏情况发生也有退路' },
+        { type:'B', label:'平衡型', desc:'说明信心+提及准备', example:'领导放心，我们已经做了充分准备，风险可控。主要预案有两个...' },
+        { type:'C', label:'含蓄型', desc:'简洁表态', example:'我们考虑过风险，有应对方案' }
+      ] },
+    { ai: '为什么不按我上次说的方案做？',
+      followUps: ['你有什么想法？', '我的方案哪里不好？', '能解释一下吗？'],
+      tips: ['尊重领导意见', '说明决策依据', '展示对比分析'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'展示对比+数据支撑', example:'领导，我对比了两个方案：您的方案优点是XX，但我的方案在XX方面效果更好，数据显示能提升30%效率。不过最终决策权在您' },
+        { type:'B', label:'平衡型', desc:'说明考虑+尊重决定', example:'我综合考虑了您的方案和实际情况，觉得XX方面需要调整。但最终按您的意思来' },
+        { type:'C', label:'含蓄型', desc:'简洁说明', example:'我觉得效果会更好' }
+      ] },
+    { ai: '这个项目进展太慢了，什么时候能完成？',
+      followUps: ['卡在哪里了？', '需要什么支持？', '能加快吗？'],
+      tips: ['说明当前进度', '展示问题和需求', '给出明确时间节点'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'汇报进度+说明问题+请求支持', example:'领导，目前项目完成了60%，主要卡在XX环节。如果能得到XX部门的支持，预计还需要2周完成。我已经在跟进了' },
+        { type:'B', label:'平衡型', desc:'说明情况+给出时间', example:'进度比预期慢了一些，主要是XX原因。预计下周五能完成' },
+        { type:'C', label:'含蓄型', desc:'给出时间', example:'预计下周五完成' }
+      ] },
+    { ai: '你的汇报重点不突出，我没听明白。',
+      followUps: ['你想说什么？', '能不能简洁点？', '重新组织一下'],
+      tips: ['用金字塔原理重述', '先说结论再展开', '控制在3分钟内'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'用金字塔原理重述', example:'领导，我重新汇报：结论是XX。支撑这个结论有三个数据：第一...第二...第三。建议的行动方案是...' },
+        { type:'B', label:'平衡型', desc:'重新组织+确认', example:'好的领导，我重新组织一下：主要想汇报三点...' },
+        { type:'C', label:'含蓄型', desc:'简洁重述', example:'好的，我重新说：结论是XX' }
+      ] }
+  ],
+  '拒绝同事的不合理请求': [
+    { ai: '周末帮我加个班做PPT吧，我家里有事实在走不开。',
+      followUps: ['就一天，拜托了', '请你喝奶茶', '下次我帮你'],
+      tips: ['表达理解+说明理由+提供替代方案', '保持友好但坚定', '不要被道德绑架'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'表达理解+说明+提供替代', example:'我理解你的难处，但我周末已经有重要安排了。要不我教你个快速做PPT的方法，或者帮你梳理一下思路？' },
+        { type:'B', label:'平衡型', desc:'说明情况+保持友好', example:'不好意思，我周末已经有安排了，实在帮不了。祝你周末愉快' },
+        { type:'C', label:'含蓄型', desc:'直接拒绝', example:'不行，我周末有事' }
+      ] },
+    { ai: '这个活你顺便帮我做了吧，你反正也不忙。',
+      followUps: ['很快的，就10分钟', '你平时不是效率很高吗', '就这么定了'],
+      tips: ['明确表达边界', '展示自己的工作负荷', '不要被PUA'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'表达边界+展示工作+提供思路', example:'其实我手头还有三个紧急项目在赶，确实抽不开。不过我可以帮你梳理一下思路，这样你做起来更快' },
+        { type:'B', label:'平衡型', desc:'说明情况+婉拒', example:'我也挺忙的，手头还有好多活没做完，你还是自己处理吧' },
+        { type:'C', label:'含蓄型', desc:'简洁拒绝', example:'忙，没空' }
+      ] },
+    { ai: '这个项目你帮我扛一下吧，我最近状态不好。',
+      followUps: ['就这一次', '领导那边我去说', '好处分你一半'],
+      tips: ['评估是否合理', '设定清晰的边界', '保护自身利益'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'表达关心+说明难处+提供替代', example:'你没事吧？但这个项目确实是你的职责范围，我帮你做了会影响我的工作。要不我帮你看看问题出在哪？' },
+        { type:'B', label:'平衡型', desc:'表达理解+拒绝', example:'理解你状态不好，但这个确实帮不了，你还是得自己扛' },
+        { type:'C', label:'含蓄型', desc:'简洁拒绝', example:'帮不了' }
+      ] },
+    { ai: '那个方案你借我参考一下，我改改就能用了。',
+      followUps: ['都是同事，别这么小气', '我会改很多的', '下次我帮你'],
+      tips: ['保护自己的知识产权', '可以分享思路但不直接给成品', '保持合作态度'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'展示成果+分享思路+保护', example:'这个方案确实花了我很多心思，不太方便直接给你。不过我可以分享下我的思路框架，你可以参考着做' },
+        { type:'B', label:'平衡型', desc:'委婉拒绝+建议', example:'不太方便直接给你，不过你有什么具体问题我可以帮你解答' },
+        { type:'C', label:'含蓄型', desc:'简洁拒绝', example:'不好意思，不方便' }
+      ] },
+    { ai: '帮我在领导面前美言几句呗。',
+      followUps: ['就说我很努力', '提一下我那个项目', '下次请你吃饭'],
+      tips: ['保持原则', '不做越界的事', '建议用实际行动证明'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'表明立场+给出建议', example:'这种事不太合适，领导看人是看实际表现的。你在XX项目上的成绩大家有目共睹，做好本职就好' },
+        { type:'B', label:'平衡型', desc:'委婉拒绝', example:'这种事我不太擅长，你还是自己努力吧' },
+        { type:'C', label:'含蓄型', desc:'简洁拒绝', example:'做不了' }
+      ] }
+  ],
+  '向领导请假': [
+    { ai: '你找我有什么事？',
+      followUps: ['说吧，什么事？', '有空吗？', '直接说'],
+      tips: ['选合适的时机', '先铺垫再提请求', '态度诚恳'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'铺垫工作+提出请假', example:'领导，想跟您同步一下本周工作进展，另外想请假X天处理个人事务，工作已经安排好了' },
+        { type:'B', label:'平衡型', desc:'礼貌请求', example:'领导您好，想跟您请个假，X天，工作已经安排妥当' },
+        { type:'C', label:'含蓄型', desc:'简洁请求', example:'领导，我想请假X天' }
+      ] },
+    { ai: '这个时间点请假，工作能交接好吗？',
+      followUps: ['有人接手吗？', '工作怎么办？', '能远程工作吗？'],
+      tips: ['展示详细交接计划', '确保不留隐患', '表达随时可联系'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'展示交接+承诺', example:'领导放心，我已经做好了详细的交接文档，XX会接手我的工作。请假期间我也会保持手机畅通，有问题随时可以联系我' },
+        { type:'B', label:'平衡型', desc:'说明安排', example:'工作已经交接给XX了，文档也准备好了，有问题随时可以联系我' },
+        { type:'C', label:'含蓄型', desc:'简洁说明', example:'都安排好了' }
+      ] },
+    { ai: '为什么非要现在请假？项目这么忙。',
+      followUps: ['不能等项目结束吗？', '你走了我们怎么办？', '有没有其他办法？'],
+      tips: ['理解公司难处', '展示个人必要性', '提供折中方案'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'理解+说明必要性+提供方案', example:'我理解项目很忙，但这个事情确实很重要且无法推迟。我已经做好了万全准备，不会影响项目进度。如果有紧急情况我可以远程协助' },
+        { type:'B', label:'平衡型', desc:'表达理解+坚持', example:'我理解公司的难处，但这个事情确实很紧急，工作已经安排好了' },
+        { type:'C', label:'含蓄型', desc:'简洁说明', example:'事情确实重要' }
+      ] },
+    { ai: '好吧，批准了。有什么需要帮忙的吗？',
+      followUps: [],
+      tips: ['表达感谢', '再次确认交接', '保持联系'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'感谢+确认+承诺', example:'谢谢领导批准！我再跟XX确认一下交接细节，请假期间有问题随时联系我' },
+        { type:'B', label:'平衡型', desc:'感谢+承诺', example:'谢谢领导，我会保持联系的' },
+        { type:'C', label:'含蓄型', desc:'简洁感谢', example:'谢谢领导' }
+      ] }
+  ],
+  '职场道歉': [
+    { ai: '你过来一下，关于昨天的事我想跟你谈谈。',
+      followUps: ['你知道错了吗？', '说吧，怎么回事？', '你还有什么好说的？'],
+      tips: ['主动认错不辩解', '分析原因', '给出改进措施'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'主动认错+分析+改进', example:'领导，这件事是我的错。主要原因是我在XX方面考虑不周，导致了XX后果。我已经想好了改进措施：第一...第二...，保证不再犯' },
+        { type:'B', label:'平衡型', desc:'诚恳认错+说明', example:'领导，这件事确实是我的问题，我会认真整改的' },
+        { type:'C', label:'含蓄型', desc:'认错', example:'领导，是我的错' }
+      ] },
+    { ai: '你知道这个错误给公司造成多大损失吗？',
+      followUps: ['你怎么赔？', '你打算怎么办？', '写检讨吧'],
+      tips: ['不推卸责任', '提出补救方案', '展示担当'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'承担责任+补救方案', example:'领导，责任在我。我已经想好了补救方案：第一...第二...，预计可以挽回80%的损失。后续我会加强XX方面的检查' },
+        { type:'B', label:'平衡型', desc:'承担+补救', example:'责任在我，我会尽力挽回损失，已经在想办法了' },
+        { type:'C', label:'含蓄型', desc:'承担', example:'是我的责任' }
+      ] },
+    { ai: '行了，这次就算了，下次注意。',
+      followUps: [],
+      tips: ['表达感谢', '展示改进决心', '用行动证明'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'感谢+承诺+行动', example:'谢谢领导的宽容！我一定吸取教训，下次绝不再犯。接下来我会马上落实改进措施' },
+        { type:'B', label:'平衡型', desc:'感谢+承诺', example:'谢谢领导，我会注意的' },
+        { type:'C', label:'含蓄型', desc:'感谢', example:'谢谢领导' }
+      ] }
+  ],
+  '客户投诉应对': [
+    { ai: '你们的产品有问题！我要退货！',
+      followUps: ['质量太差了', '跟描述的不一样', '骗子公司！'],
+      tips: ['先倾听不反驳', '表达共情', '给出解决方案'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'倾听+共情+解决方案', example:'非常抱歉给您带来不好的体验！请问具体是什么问题？我马上为您处理，支持7天无理由退换' },
+        { type:'B', label:'平衡型', desc:'共情+询问', example:'抱歉，请问具体遇到什么问题了？我们一定会妥善处理' },
+        { type:'C', label:'含蓄型', desc:'简洁回应', example:'抱歉，可以退' }
+      ] },
+    { ai: '我要找你们领导！你解决不了！',
+      followUps: ['叫你们经理来', '我要投诉你', '跟你没法沟通'],
+      tips: ['保持冷静', '不与客户争辩', '请上级介入'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'安抚+转接', example:'非常抱歉让您不满意！我马上请我们主管来为您服务，请稍等' },
+        { type:'B', label:'平衡型', desc:'请求稍等+转接', example:'好的，我马上帮您转接主管，请稍等' },
+        { type:'C', label:'含蓄型', desc:'简洁转接', example:'请稍等' }
+      ] },
+    { ai: '你们耽误了我这么久，怎么赔偿？',
+      followUps: ['我要精神损失费', '给我个说法', '不能就这么算了'],
+      tips: ['表达歉意', '给出具体补偿方案', '不要承诺超出权限的事'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'道歉+具体方案', example:'非常抱歉给您带来不便！我们可以为您提供：1）全额退款；2）额外赠送XX优惠券；3）优先处理您的后续订单。您看哪个方案合适？' },
+        { type:'B', label:'平衡型', desc:'道歉+询问', example:'非常抱歉，我们可以为您提供XX补偿，您看可以吗？' },
+        { type:'C', label:'含蓄型', desc:'简洁回应', example:'抱歉，可以退' }
+      ] }
+  ],
+  '团队合作分歧': [
+    { ai: '我觉得这个方案不行，应该按我的思路来。',
+      followUps: ['你的方案有漏洞', '我的更好', '听我的'],
+      tips: ['先肯定再表达不同', '用数据说话', '寻求共识'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'肯定+数据+提议', example:'你的方案在XX方面确实很有想法，但我注意到XX数据显示可能存在风险。我提议我们结合两个方案的优点，这样可能效果更好' },
+        { type:'B', label:'平衡型', desc:'表达不同+询问', example:'我有一些不同的想法，主要是关于XX方面，你觉得我们能不能讨论一下？' },
+        { type:'C', label:'含蓄型', desc:'简洁表达', example:'我觉得可以再讨论一下' }
+      ] },
+    { ai: '你这是质疑我的专业判断？',
+      followUps: ['你什么意思？', '你不信任我？', '我们谁更懂？'],
+      tips: ['避免个人攻击', '聚焦问题本身', '强调合作而非对抗'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'澄清+合作', example:'绝对没有质疑你的意思！我只是想从不同角度看看问题，确保方案更完善。我们的目标都是为了项目好' },
+        { type:'B', label:'平衡型', desc:'澄清+说明', example:'我不是质疑你，只是觉得可以再探讨一下，确保万无一失' },
+        { type:'C', label:'含蓄型', desc:'澄清', example:'不是那个意思' }
+      ] },
+    { ai: '投票吧，少数服从多数。',
+      followUps: ['同意的举手', '就这么定了', '别磨蹭了'],
+      tips: ['尊重决策流程', '表达保留意见', '承诺执行'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'尊重决策+表达+承诺', example:'好的，尊重团队的决定。虽然我保留一些不同意见，但我会全力配合执行' },
+        { type:'B', label:'平衡型', desc:'尊重+执行', example:'好的，就按大家说的办' },
+        { type:'C', label:'含蓄型', desc:'同意', example:'好的' }
+      ] }
+  ],
+  '表白': [
+    { ai: '（两人单独相处，气氛有些暧昧）你今天约我出来，有什么事吗？',
+      followUps: ['直接说吧', '我感觉到了', '别卖关子了'],
+      tips: ['选择合适的时机和环境', '真诚表达不做作', '给对方安全感'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'真诚表白+表达心意', example:'跟你在一起的这段时间，我越来越确定自己的心意。我喜欢你，想跟你在一起，不是因为一时冲动，而是认真考虑过的' },
+        { type:'B', label:'平衡型', desc:'表达心意+给空间', example:'我挺喜欢你的，想跟你在一起，你觉得我们合适吗？' },
+        { type:'C', label:'含蓄型', desc:'暗示心意', example:'跟你在一起挺开心的' }
+      ] },
+    { ai: '我一直把你当朋友的...',
+      followUps: ['对不起', '我不想伤害你', '我们还是做朋友吧'],
+      tips: ['尊重对方的决定', '保持体面', '不要纠缠'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'尊重+体面+保持', example:'没关系，能认识你我已经很开心了。不管做不做恋人，都希望你过得好' },
+        { type:'B', label:'平衡型', desc:'尊重+体面', example:'好的，我理解。我们还是做好朋友吧' },
+        { type:'C', label:'含蓄型', desc:'简洁回应', example:'好的' }
+      ] },
+    { ai: '其实我也喜欢你很久了。',
+      followUps: [],
+      tips: ['表达珍惜', '规划未来', '保持真诚'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'表达珍惜+规划', example:'真的吗？太好了！我一定会好好对你的。我们一起好好规划未来，一步一步走好' },
+        { type:'B', label:'平衡型', desc:'表达开心+珍惜', example:'太好了！我一定会珍惜你的' },
+        { type:'C', label:'含蓄型', desc:'简洁表达', example:'太好了' }
+      ] }
+  ],
+  '被朋友误解(NVC)': [
+    { ai: '你昨天为什么不回我消息？我很担心你！',
+      followUps: ['你知道我有多担心吗？', '一整天都没消息', '你是不是不在乎我了？'],
+      tips: ['表达歉意', '说明原因', '承诺改进'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'道歉+说明+承诺', example:'对不起让你担心了！昨天手机没电了，忙忘了回消息。我以后一定注意，不会再发生了' },
+        { type:'B', label:'平衡型', desc:'道歉+说明', example:'抱歉让你担心了，昨天确实忙忘了回消息' },
+        { type:'C', label:'含蓄型', desc:'道歉', example:'对不起' }
+      ] },
+    { ai: '你太不重视我了！我在你心里根本不重要！',
+      followUps: ['你知不知道我有多难过？', '原来我在你心里是这样的', '我们的关系就这样吗？'],
+      tips: ['表达重视和在乎', '真诚道歉', '展示改变的决心'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'共情+道歉+承诺', example:'我知道你现在很伤心，对不起。是我做得不好，让你觉得不被重视。我以后会多注意的，真的很在乎你这个朋友' },
+        { type:'B', label:'平衡型', desc:'道歉+说明', example:'对不起，让你有这种感觉。我其实很重视你的' },
+        { type:'C', label:'含蓄型', desc:'道歉', example:'对不起' }
+      ] },
+    { ai: '好吧，我原谅你了，但你下次不能这样了。',
+      followUps: [],
+      tips: ['表达感谢', '承诺改进', '重建信任'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'感谢+承诺+行动', example:'谢谢你原谅我！我保证下次不会这样了。为了表示歉意，周末请你吃饭赔罪' },
+        { type:'B', label:'平衡型', desc:'感谢+承诺', example:'谢谢你，我会注意的' },
+        { type:'C', label:'含蓄型', desc:'感谢', example:'谢谢' }
+      ] }
+  ],
+  '共情沟通训练': [
+    { ai: '最近工作压力好大，感觉好累啊...',
+      followUps: ['每天加班到很晚', '领导还不断加需求', '感觉快要崩溃了'],
+      tips: ['表达理解不急于给建议', '倾听比解决更重要', '让对方感受到被支持'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'共情+支持', example:'听起来真的很累，我完全能体会这种感受。你已经很努力了，要不要找个时间好好休息一下？' },
+        { type:'B', label:'平衡型', desc:'共情+陪伴', example:'听起来确实不容易，你已经很棒了。需要我做什么吗？' },
+        { type:'C', label:'含蓄型', desc:'简洁共情', example:'真的辛苦了' }
+      ] },
+    { ai: '感觉自己快要撑不住了...',
+      followUps: ['有时候真的很想辞职', '但又不知道未来该做什么', '感觉没方向了'],
+      tips: ['给予情感支持', '不做评判', '鼓励对方寻求帮助'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'支持+鼓励', example:'你已经很不容易了，能坚持到现在已经很棒了。要不要考虑休息一下？或者我陪你聊聊？' },
+        { type:'B', label:'平衡型', desc:'支持+陪伴', example:'我在这儿，你想说什么都可以。' },
+        { type:'C', label:'含蓄型', desc:'简洁支持', example:'我在' }
+      ] },
+    { ai: '谢谢你愿意听我说。',
+      followUps: [],
+      tips: ['表达理解和支持', '保持联系', '展示关心'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'支持+邀请', example:'随时可以找我聊。下次如果想出来走走，我陪你' },
+        { type:'B', label:'平衡型', desc:'支持', example:'不用谢，随时可以找我' },
+        { type:'C', label:'含蓄型', desc:'简洁', example:'嗯' }
+      ] }
+  ],
+  '兴趣社群自我介绍': [
+    { ai: '欢迎加入我们摄影群！请做个自我介绍吧。',
+      followUps: ['简单介绍一下自己吧', '喜欢拍什么类型？', '有什么作品可以分享吗？'],
+      tips: ['热情友好', '清晰介绍', '展现兴趣和热情'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'热情介绍+邀请交流', example:'大家好！我叫XX，是一名摄影爱好者，主要拍人像和街拍。很高兴加入群聊，期待和大家交流心得！' },
+        { type:'B', label:'平衡型', desc:'简洁介绍+互动', example:'大家好！我叫XX，喜欢摄影，主要拍风景。请多指教！' },
+        { type:'C', label:'含蓄型', desc:'简洁介绍', example:'大家好，我是XX，喜欢摄影' }
+      ] },
+    { ai: '你主要用什么设备？',
+      followUps: ['新手还是老手？', '学了多久了？', '最喜欢的摄影师是谁？'],
+      tips: ['分享具体情况', '表达热情', '可以交流心得'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'详细分享+提问', example:'我用的是XX相机，已经拍了2年了。最喜欢的摄影师是XX。你们呢？都用什么设备？' },
+        { type:'B', label:'平衡型', desc:'简要分享', example:'我用XX相机，拍了2年了' },
+        { type:'C', label:'含蓄型', desc:'简洁回答', example:'用XX相机' }
+      ] },
+    { ai: '期待你分享作品哦！',
+      followUps: [],
+      tips: ['大方答应', '主动分享', '接受反馈'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'答应+分享', example:'好的！下次把我最近拍的XX分享给大家，请多提意见' },
+        { type:'B', label:'平衡型', desc:'答应', example:'好的，有空分享' },
+        { type:'C', label:'含蓄型', desc:'简洁答应', example:'好的' }
+      ] }
+  ],
+  '4S店砍价': [
+    { ai: '您好！欢迎光临！想看哪款车？我来给您介绍一下。',
+      followUps: ['这款是我们的热门车型', '现在订车有优惠活动', '您是家用还是上班用？'],
+      tips: ['表达诚意', '提出需求', '询问价格和优惠'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'表明需求+问价', example:'你好，我对XX车型很感兴趣，能介绍一下吗？现在的优惠活动是什么？最低多少钱能拿下？' },
+        { type:'B', label:'平衡型', desc:'表明兴趣+询问', example:'你好，这款车不错，现在优惠多少？' },
+        { type:'C', label:'含蓄型', desc:'简洁询问', example:'这车多少钱？' }
+      ] },
+    { ai: '这款车原价25万，现在搞活动最低23万8。',
+      followUps: ['这个价格已经很优惠了', '今天订车还送大礼包', '您觉得价格怎么样？'],
+      tips: ['展示诚意', '提及竞品', '争取更多优惠'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'比价+施压+争取', example:'我看了XX家店，同款车型报价23万。你这价格还有下降空间吗？今天能给我个实价吗？' },
+        { type:'B', label:'平衡型', desc:'表达不满+争取', example:'这个价格比我预期的高不少，能不能再优惠点？' },
+        { type:'C', label:'含蓄型', desc:'简洁表达', example:'太贵了' }
+      ] },
+    { ai: '这个价格已经是底线了，我们送您全车贴膜和脚垫。',
+      followUps: ['真的不能再便宜了', '赠品都是原厂的', '您看还需要什么？'],
+      tips: ['表示理解', '提出其他福利', '争取更多赠品'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'接受+提额外要求', example:'好的，那赠品能多送点吗？比如行车记录仪和保养券？这样我就考虑订车了' },
+        { type:'B', label:'平衡型', desc:'表达理解+争取赠品', example:'好的吧，那能不能多送点东西？' },
+        { type:'C', label:'含蓄型', desc:'简洁表达', example:'好吧' }
+      ] },
+    { ai: '好的，那就这样定了，我给您办手续。',
+      followUps: [],
+      tips: ['确认价格和赠品', '了解提车时间', '保持友好'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'确认细节+提要求', example:'好的！确认一下：车价23万8，赠品包括贴膜、脚垫、行车记录仪。提车时间多久？' },
+        { type:'B', label:'平衡型', desc:'确认细节', example:'好的，提车需要等多久？' },
+        { type:'C', label:'含蓄型', desc:'简洁确认', example:'好的' }
+      ] }
+  ],
+  '视频会议沟通': [
+    { ai: '大家好，我们今天讨论一下下个季度的规划。',
+      followUps: ['先看PPT', '有问题随时打断', '请大家积极发言'],
+      tips: ['测试设备', '提前准备资料', '保持专注和参与感'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'积极参与+发言', example:'好的领导，我补充一下：关于XX方面，我们团队已经做了初步调研，数据显示...' },
+        { type:'B', label:'平衡型', desc:'倾听+适当发言', example:'好的，我了解了。关于XX我有一些想法，稍后分享' },
+        { type:'C', label:'含蓄型', desc:'简洁回应', example:'好的' }
+      ] },
+    { ai: '你那边画面怎么回事？能听到我说话吗？',
+      followUps: ['网络不好？', '调整一下摄像头', '换个位置试试'],
+      tips: ['快速排查问题', '切换到语音模式', '尽快恢复参与'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'说明情况+快速解决', example:'抱歉领导，网络有点问题，我马上调整。如果不行我切换到音频模式继续参与' },
+        { type:'B', label:'平衡型', desc:'说明+调整', example:'稍等，我调整一下网络' },
+        { type:'C', label:'含蓄型', desc:'简洁回应', example:'抱歉，马上调整' }
+      ] }
+  ],
+  '投诉客服': [
+    { ai: '您好，请问有什么可以帮您？',
+      followUps: ['请描述您的问题', '我们会为您处理', '请稍等'],
+      tips: ['清晰描述问题', '提供订单号等信息', '保持冷静和礼貌'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'清晰描述+提供信息', example:'你好，我要投诉。订单号是XX，问题是XX，已经3天了没有解决，请尽快处理' },
+        { type:'B', label:'平衡型', desc:'描述问题+询问', example:'你好，我的订单XX有问题，想请您帮忙解决' },
+        { type:'C', label:'含蓄型', desc:'简洁说明', example:'你好，我要投诉XX' }
+      ] },
+    { ai: '非常抱歉给您带来不便，请问具体是什么问题？',
+      followUps: ['我们会记录的', '请详细描述', '会尽快处理'],
+      tips: ['详细描述问题', '提供证据', '明确诉求'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'详细描述+提供证据+明确诉求', example:'问题是XX，我有照片为证。我的诉求是XX，请在24小时内给我回复' },
+        { type:'B', label:'平衡型', desc:'描述+询问', example:'具体问题是XX，我希望能得到XX处理' },
+        { type:'C', label:'含蓄型', desc:'简洁描述', example:'XX有问题' }
+      ] }
+  ],
+  '饭局社交技巧': [
+    { ai: '来，我敬大家一杯！感谢大家一年的辛苦！',
+      followUps: ['干杯！', '新年快乐！', '身体健康！'],
+      tips: ['起身回应', '举杯示意', '说得体的祝酒词'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'起身+祝酒词', example:'来，大家举杯！感谢这一年的互相支持，祝大家新年快乐，事业顺利！干杯！' },
+        { type:'B', label:'平衡型', desc:'举杯+简短祝酒', example:'干杯！祝大家新年快乐！' },
+        { type:'C', label:'含蓄型', desc:'举杯', example:'干杯' }
+      ] },
+    { ai: '小王，你也说两句！',
+      followUps: ['来一个来一个', '说两句祝酒词', '别害羞嘛'],
+      tips: ['站起来说', '简洁得体', '符合场合'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'站起来+祝酒', example:'好的！感谢领导的关心和同事的帮助，祝大家身体健康，工作顺利！我干了，大家随意！' },
+        { type:'B', label:'平衡型', desc:'简洁祝酒', example:'祝大家新年快乐，身体健康！' },
+        { type:'C', label:'含蓄型', desc:'简洁回应', example:'干杯' }
+      ] }
+  ],
+  '与父母意见分歧': [
+    { ai: '你怎么还不结婚？隔壁家小孩都上幼儿园了！',
+      followUps: ['你都多大了', '我们为你操碎了心', '条件差不多就行了'],
+      tips: ['理解父母的关心', '表达自己的想法', '不要激化矛盾'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'理解+说明+安抚', example:'爸/妈，我知道你们是为我好。但我想找的是真正合适的人，而不是随便将就。请你们放心，我会认真考虑的' },
+        { type:'B', label:'平衡型', desc:'表达想法+安抚', example:'我知道你们担心我，我会认真考虑的，但不想随便将就' },
+        { type:'C', label:'含蓄型', desc:'简洁回应', example:'知道了' }
+      ] },
+    { ai: '你这个工作不稳定，赶紧换一个！',
+      followUps: ['这个公司不靠谱', '听听亲戚的话', '赶紧考公务员'],
+      tips: ['理解父母的担忧', '展示自己的规划', '用实际行动证明'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'理解+展示规划', example:'爸/妈，我知道你们担心我。但这份工作我做得挺好的，也有发展空间。我已经在规划自己的职业路径了，请你们放心' },
+        { type:'B', label:'平衡型', desc:'说明情况+安抚', example:'我在这边挺好的，会考虑自己的职业规划的' },
+        { type:'C', label:'含蓄型', desc:'简洁回应', example:'我知道了' }
+      ] }
+  ],
+  '朋友借钱': [
+    { ai: '兄弟，能不能借我点钱？最近手头紧。',
+      followUps: ['就借一点', '很快就还你', '利息照算'],
+      tips: ['评估风险', '明确表态', '保护友谊'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'表达关心+说明情况', example:'兄弟你怎么了？遇到什么事了？我看看能帮上多少，不过我最近也在攒钱，可能帮不了太多' },
+        { type:'B', label:'平衡型', desc:'委婉拒绝+建议', example:'不好意思，我最近也需要用钱，暂时帮不了你。你问问其他人？' },
+        { type:'C', label:'含蓄型', desc:'简洁拒绝', example:'没钱' }
+      ] },
+    { ai: '你到底借不借？是不是不把我当朋友？',
+      followUps: ['这点钱都不借', '太不够意思了', '以前我可是帮过你的'],
+      tips: ['坚守底线', '不被道德绑架', '保持礼貌'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'坚守底线+表达关心', example:'我真的很在乎我们的友谊，但我确实帮不了。如果你有困难我可以帮你想想其他办法' },
+        { type:'B', label:'平衡型', desc:'坚定+礼貌', example:'我确实帮不了，不是钱的问题，是原则问题' },
+        { type:'C', label:'含蓄型', desc:'简洁拒绝', example:'帮不了' }
+      ] }
+  ],
+  '医院挂号问诊': [
+    { ai: '您好，请问哪里不舒服？',
+      followUps: ['疼了多久了？', '有没有其他症状？', '之前看过吗？'],
+      tips: ['清晰描述症状', '提供病史', '配合医生检查'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'清晰描述+提供病史', example:'医生您好，我这两天头疼得厉害，主要在太阳穴位置，阵发性的。之前没有看过，也没有外伤史' },
+        { type:'B', label:'平衡型', desc:'描述症状+询问', example:'医生您好，我头疼了2天，请问需要做什么检查吗？' },
+        { type:'C', label:'含蓄型', desc:'简洁描述', example:'头疼2天了' }
+      ] },
+    { ai: '需要做个检查，先去缴费。',
+      followUps: ['检查前需要注意什么？', '什么时候能出结果？', '检查疼不疼？'],
+      tips: ['确认注意事项', '了解检查流程', '放松心态'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'确认+询问', example:'好的医生，请问检查前需要注意什么？多久能出结果？' },
+        { type:'B', label:'平衡型', desc:'确认', example:'好的，请问有什么需要注意的吗？' },
+        { type:'C', label:'含蓄型', desc:'简洁回应', example:'好的' }
+      ] }
+  ],
+  '快递物流沟通': [
+    { ai: '您好，请问是XX快递吗？我的包裹显示签收但我没收到。',
+      followUps: ['单号多少？', '什么时候签收的？', '派件员电话是多少？'],
+      tips: ['提供订单号', '说明情况', '要求处理'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'清晰说明+要求', example:'你好，我的包裹单号是XX，显示昨天已签收，但我没有收到。请帮我核实派件信息并尽快处理' },
+        { type:'B', label:'平衡型', desc:'说明+询问', example:'你好，我的包裹显示签收但没收到，帮我查一下' },
+        { type:'C', label:'含蓄型', desc:'简洁说明', example:'我包裹没收到' }
+      ] },
+    { ai: '抱歉给您带来不便，我们会尽快核实。',
+      followUps: [],
+      tips: ['确认处理时间', '保留凭证', '关注进度'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'确认+施压', example:'好的，请在2小时内给我回复。如果找不到，请安排赔偿或补发' },
+        { type:'B', label:'平衡型', desc:'确认', example:'好的，麻烦尽快处理' },
+        { type:'C', label:'含蓄型', desc:'简洁回应', example:'好的' }
+      ] }
+  ],
+  '酒店入住沟通': [
+    { ai: '您好，请问有预订吗？',
+      followUps: ['姓名是什么？', '几点到店？', '需要什么房型？'],
+      tips: ['提供预订信息', '确认房型和价格', '询问附加服务'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'提供信息+询问', example:'您好，我叫XX，有预订。请问还有没有大床房？含早餐吗？' },
+        { type:'B', label:'平衡型', desc:'提供信息', example:'您好，我叫XX，有预订' },
+        { type:'C', label:'含蓄型', desc:'简洁说明', example:'我叫XX，有预订' }
+      ] },
+    { ai: '您的房间在502，早餐在一楼。',
+      followUps: [],
+      tips: ['确认房间信息', '询问WiFi密码', '了解酒店设施'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'确认+询问', example:'好的，请问WiFi密码是多少？酒店有健身房吗？' },
+        { type:'B', label:'平衡型', desc:'确认', example:'好的，谢谢' },
+        { type:'C', label:'含蓄型', desc:'简洁回应', example:'谢谢' }
+      ] }
+  ],
+  '网络聊天技巧': [
+    { ai: '在吗？在干嘛呢？',
+      followUps: ['怎么不回消息？', '在忙吗？', '聊聊呗'],
+      tips: ['及时回复', '选择合适的话题', '保持轻松有趣'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'热情回应+开启话题', example:'在呢在呢！刚看完一部电影，你呢？在干嘛？要不要聊聊电影？' },
+        { type:'B', label:'平衡型', desc:'简单回应+反问', example:'在呢，怎么了？' },
+        { type:'C', label:'含蓄型', desc:'简洁回应', example:'在' }
+      ] },
+    { ai: '发了张照片，你觉得怎么样？',
+      followUps: ['好看吗？', '评价一下', '说实话'],
+      tips: ['真诚赞美', '可以提小建议', '保持积极态度'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'真诚赞美+细节', example:'很好看！这个角度选得特别好，光线也很棒。构图再调整一下可能更完美' },
+        { type:'B', label:'平衡型', desc:'赞美', example:'挺好看的' },
+        { type:'C', label:'含蓄型', desc:'简洁评价', example:'不错' }
+      ] }
+  ],
+  '家庭聚会中的社交': [
+    { ai: '来，大家举杯！祝新年快乐！',
+      followUps: ['干杯！', '新年快乐！', '身体健康！'],
+      tips: ['主动敬酒', '说祝福的话', '照顾长辈'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'举杯+祝福', example:'来，敬爷爷奶奶/叔叔阿姨一杯！祝你们身体健康，万事如意！' },
+        { type:'B', label:'平衡型', desc:'举杯+简短祝福', example:'干杯！祝大家新年快乐！' },
+        { type:'C', label:'含蓄型', desc:'举杯', example:'干杯' }
+      ] },
+    { ai: '小辈们来给长辈敬杯酒！',
+      followUps: [],
+      tips: ['主动起身', '说得体的祝福', '表现尊敬'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'敬酒+祝福', example:'爷爷/奶奶，我敬您一杯！祝您身体健康，长命百岁！' },
+        { type:'B', label:'平衡型', desc:'敬酒+祝福', example:'敬您一杯，身体健康' },
+        { type:'C', label:'含蓄型', desc:'简洁敬酒', example:'敬您' }
+      ] }
+  ],
+  '亲戚问敏感问题': [
+    { ai: '你一个月赚多少钱啊？',
+      followUps: ['工资不低吧？', '什么时候买房？', '存了多少钱？'],
+      tips: ['模糊回答', '转移话题', '保持礼貌'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'模糊回答+转移', example:'还行吧，够自己用。您最近身体怎么样？我看您气色特别好' },
+        { type:'B', label:'平衡型', desc:'模糊回答', example:'一般般吧，混口饭吃' },
+        { type:'C', label:'含蓄型', desc:'简洁回避', example:'还行' }
+      ] },
+    { ai: '怎么还不结婚？要求别太高了！',
+      followUps: ['你都多大了', '差不多就行了', '我给你介绍一个'],
+      tips: ['礼貌回避', '转移话题', '不要正面冲突'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'礼貌回避+转移', example:'谢谢关心！感情的事讲究缘分，不急不急。您喝茶喝茶' },
+        { type:'B', label:'平衡型', desc:'礼貌回避', example:'谢谢关心，我自己会考虑的' },
+        { type:'C', label:'含蓄型', desc:'简洁回避', example:'嗯' }
+      ] }
+  ],
+  '突发状况应对': [
+    { ai: '不好了！出事故了！怎么办？',
+      followUps: ['报警了吗？', '有没有人受伤？', '在哪里？'],
+      tips: ['保持冷静', '先报警和叫救护车', '确保人员安全'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'冷静指挥+行动', example:'大家冷静！先打120叫救护车！有人受伤的不要乱动！我已经报警了' },
+        { type:'B', label:'平衡型', desc:'冷静+行动', example:'别慌，大家先确保自身安全，我来处理' },
+        { type:'C', label:'含蓄型', desc:'冷静回应', example:'别慌' }
+      ] }
+  ],
+  '公共演讲技巧': [
+    { ai: '下一个是你上台，准备好了吗？',
+      followUps: ['紧张吗？', '深呼吸', '别忘词'],
+      tips: ['深呼吸放松', '与观众眼神交流', '控制语速'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'自信开场+互动', example:'各位好！今天我要分享的主题是XX。先问大家一个问题：你们有没有遇到过XX的情况？' },
+        { type:'B', label:'平衡型', desc:'稳健开场', example:'大家好，我是XX。今天我要分享的是XX' },
+        { type:'C', label:'含蓄型', desc:'简洁开场', example:'大家好' }
+      ] }
+  ],
+  '人际冲突调解': [
+    { ai: '你必须站我这边！不然我们绝交！',
+      followUps: ['你选哪边？', '不帮我就是不把我当朋友', '你看着办吧'],
+      tips: ['保持中立', '不被拉站队', '寻求双方理解'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'中立+调解', example:'你们都是我的好朋友，我谁都不想得罪。不如我们一起坐下来聊聊，看看问题出在哪' },
+        { type:'B', label:'平衡型', desc:'中立+劝说', example:'你们冷静一下，有什么事好好说' },
+        { type:'C', label:'含蓄型', desc:'简洁回应', example:'冷静' }
+      ] }
+  ],
+  '吵架后缓和关系': [
+    { ai: '你到底想怎么样？我们分手吧！',
+      followUps: ['我受够了', '我们不合适', '别再联系了'],
+      tips: ['冷静不争辩', '表达关心', '寻求沟通机会'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'冷静+关心+请求', example:'我知道你现在很激动，我先不跟你争。但我真的很在乎你，等你冷静下来我们好好谈谈好吗？' },
+        { type:'B', label:'平衡型', desc:'冷静+表达', example:'你现在情绪不好，我先不跟你说，等你冷静了我们再谈' },
+        { type:'C', label:'含蓄型', desc:'简洁回应', example:'好' }
+      ] }
+  ],
+  '纪念日沟通': [
+    { ai: '你知道今天是什么日子吗？',
+      followUps: ['想想看', '真的忘了吗？', '提示一下'],
+      tips: ['主动准备惊喜', '表达重视', '创造仪式感'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'惊喜+表达', example:'当然记得！这是我们相识1000天纪念日。我准备了小礼物，想给你一个惊喜' },
+        { type:'B', label:'平衡型', desc:'记得+表达', example:'当然记得！我订了你喜欢的餐厅，晚上一起庆祝' },
+        { type:'C', label:'含蓄型', desc:'简洁回应', example:'记得' }
+      ] }
+  ],
+  '政务大厅办事': [
+    { ai: '您好，请问您要办理什么业务？',
+      followUps: ['请取号排队', '需要什么材料？', '到几号窗口办理？'],
+      tips: ['了解办理流程', '准备所需材料', '礼貌沟通'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'清晰说明+询问', example:'您好，我想办理XX业务，请问需要准备什么材料？到哪个窗口办理？' },
+        { type:'B', label:'平衡型', desc:'说明+询问', example:'您好，我要办理XX业务' },
+        { type:'C', label:'含蓄型', desc:'简洁说明', example:'办XX业务' }
+      ] }
+  ],
+  '被表白后婉拒': [
+    { ai: '我喜欢你很久了，能不能做我的女朋友？',
+      followUps: ['我是认真的', '你考虑一下', '我对你很好的'],
+      tips: ['表达感谢', '清晰拒绝', '给台阶'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'感谢+清晰拒绝+祝福', example:'谢谢你喜欢我，我很感动。但我真的不能接受，你是一个很好的人，会遇到更适合你的' },
+        { type:'B', label:'平衡型', desc:'感谢+拒绝', example:'谢谢你的喜欢，但我不能接受' },
+        { type:'C', label:'含蓄型', desc:'简洁拒绝', example:'对不起' }
+      ] },
+    { ai: '你是不是有喜欢的人了？',
+      followUps: ['为什么不同意？', '给我一个理由', '我哪里不好？'],
+      tips: ['不要给虚假希望', '保持礼貌', '转移话题'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'礼貌+转移', example:'不是你的问题，是我自己还不想谈恋爱。我们还是先做朋友吧' },
+        { type:'B', label:'平衡型', desc:'礼貌回应', example:'不是你的问题，我现在不想谈恋爱' },
+        { type:'C', label:'含蓄型', desc:'简洁回避', example:'我不想' }
+      ] }
+  ],
+  '安慰失落的家人朋友': [
+    { ai: '我真的好难过，为什么事情会变成这样...',
+      followUps: ['都是我的错', '我真的不知道该怎么办', '没人能理解我'],
+      tips: ['倾听为先', '共情回应', '不要急于给建议'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'共情+倾听', example:'我能感觉到你真的很伤心。先不说别的，我在你身边，想说什么都可以' },
+        { type:'B', label:'平衡型', desc:'共情', example:'我理解你的感受，确实很让人难过' },
+        { type:'C', label:'含蓄型', desc:'陪伴', example:'我在' }
+      ] },
+    { ai: '你说我是不是真的很没用？',
+      followUps: ['我是不是很失败？', '我真的什么都做不好', '没人会在乎我'],
+      tips: ['肯定对方价值', '不要否定情绪', '给予支持'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'肯定+支持', example:'你绝对不是没用的。你有很多优点，只是现在你看不到。不管发生什么，我都在你身边' },
+        { type:'B', label:'平衡型', desc:'安慰', example:'你别这么说，你有很多优点的' },
+        { type:'C', label:'含蓄型', desc:'简洁支持', example:'你很好' }
+      ] }
+  ],
+  '退换货沟通': [
+    { ai: '您好，请问有什么可以帮您？',
+      followUps: ['商品有问题吗？', '什么时候买的？', '有小票吗？'],
+      tips: ['说明问题', '提供凭证', '明确诉求'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'说明问题+要求', example:'您好，我昨天在这里买的这件衣服，今天穿了一次就开线了。我要求退货或者换货' },
+        { type:'B', label:'平衡型', desc:'说明+询问', example:'您好，这件衣服有质量问题，能退吗？' },
+        { type:'C', label:'含蓄型', desc:'简洁说明', example:'我要退货' }
+      ] },
+    { ai: '超过7天不能退了，只能修。',
+      followUps: ['这是规定', '我们没办法', '只能帮你修'],
+      tips: ['了解消费者权益', '坚持合理诉求', '找经理沟通'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'坚持+施压', example:'根据消保法，质量问题不受7天限制。请帮我解决，不行的话我找经理' },
+        { type:'B', label:'平衡型', desc:'坚持', example:'这是质量问题，应该可以退的' },
+        { type:'C', label:'含蓄型', desc:'简洁坚持', example:'我要退货' }
+      ] }
+  ],
+  '银行办理业务': [
+    { ai: '您好，请问办理什么业务？',
+      followUps: ['开户吗？', '存取款？', '请取号排队'],
+      tips: ['说明业务需求', '准备身份证件', '了解流程'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'清晰说明+询问', example:'您好，我想办理一张储蓄卡，请问需要什么材料？在哪个窗口办理？' },
+        { type:'B', label:'平衡型', desc:'说明需求', example:'您好，我要开户' },
+        { type:'C', label:'含蓄型', desc:'简洁说明', example:'开户' }
+      ] }
+  ],
+  '社交聚会破冰': [
+    { ai: '你好，你是第一次来这个活动吗？',
+      followUps: ['你认识这里的人吗？', '在做什么工作？', '怎么过来的？'],
+      tips: ['主动自我介绍', '寻找共同点', '保持轻松'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'自我介绍+提问', example:'你好！我是XX，在XX公司做XX。你是做什么的？怎么知道这个活动的？' },
+        { type:'B', label:'平衡型', desc:'自我介绍', example:'你好，我叫XX' },
+        { type:'C', label:'含蓄型', desc:'简洁回应', example:'你好' }
+      ] },
+    { ai: '你觉得这个活动怎么样？',
+      followUps: ['有意思吗？', '认识人了吗？', '下次还来吗？'],
+      tips: ['积极评价', '分享感受', '邀约后续'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'分享+邀约', example:'挺有意思的，认识了不少朋友。要不要加个微信，下次有活动一起？' },
+        { type:'B', label:'平衡型', desc:'简单评价', example:'挺好的' },
+        { type:'C', label:'含蓄型', desc:'简洁评价', example:'不错' }
+      ] }
+  ],
+  '路边摊砍价': [
+    { ai: '老板，这个多少钱？',
+      followUps: ['太贵了', '便宜点吧', '别家都没这么贵'],
+      tips: ['先了解价格和品质', '基于预算礼貌还价', '不虚构其他摊位报价'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'说明预算+礼貌询价', example:'老板，我挺喜欢这个，预算是30元左右。这个价格能卖吗？不方便也没关系。' },
+        { type:'B', label:'平衡型', desc:'礼貌询问优惠', example:'老板，这个还有优惠吗？' },
+        { type:'C', label:'简洁型', desc:'给出预算', example:'30元可以吗？' }
+      ] }
+  ],
+  '在线学习交流': [
+    { ai: '这个问题大家还有什么想法吗？',
+      followUps: ['谁来分享一下？', '说说你的思路', '有什么疑问？'],
+      tips: ['主动发言', '有逻辑地表达', '尊重他人观点'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'清晰表达+补充', example:'我觉得这个问题可以从三个角度分析：第一...第二...第三...请大家指正' },
+        { type:'B', label:'平衡型', desc:'表达观点', example:'我觉得可以试试XX方法' },
+        { type:'C', label:'含蓄型', desc:'简洁回应', example:'我同意' }
+      ] }
+  ],
+  '与邻居沟通': [
+    { ai: '你好，我是隔壁的邻居。',
+      followUps: ['刚搬来的？', '有什么事吗？', '需要帮忙吗？'],
+      tips: ['主动打招呼', '保持礼貌', '建立良好关系'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'打招呼+介绍', example:'你好！我是新搬来的，我叫XX。以后多关照' },
+        { type:'B', label:'平衡型', desc:'打招呼', example:'你好，邻居' },
+        { type:'C', label:'含蓄型', desc:'简洁打招呼', example:'你好' }
+      ] },
+    { ai: '你家噪音太大了，影响我休息。',
+      followUps: ['能不能小点声？', '已经很晚了', '太吵了'],
+      tips: ['礼貌表达', '给出具体问题', '寻求解决方案'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'礼貌表达+建议', example:'不好意思打扰了，能不能麻烦你们小声一点？家里孩子在睡觉' },
+        { type:'B', label:'平衡型', desc:'礼貌表达', example:'请你们小声一点，谢谢' },
+        { type:'C', label:'含蓄型', desc:'简洁表达', example:'太吵了' }
+      ] }
+  ],
+  '谈判协商技巧': [
+    { ai: '这个价格我们不能接受，太高了。',
+      followUps: ['最低能给到多少？', '再降5%怎么样？', '我们预算有限'],
+      tips: ['确认报价包含内容', '说明预算与依据', '寻找可交换条件'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'预算+可核验依据', example:'目前报价比我们的预算高10%。如果数量增加到XX，或调整交付范围，价格还有协商空间吗？' },
+        { type:'B', label:'平衡型', desc:'表达立场', example:'这个价格我们确实接受不了' },
+        { type:'C', label:'含蓄型', desc:'简洁表达', example:'太贵了' }
+      ] }
+  ],
+  '社交媒体运营': [
+    { ai: '这条评论怎么回复比较好？',
+      followUps: ['用户很生气', '要道歉吗？', '怎么挽回？'],
+      tips: ['及时回复', '真诚道歉', '给出解决方案'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'道歉+方案', example:'非常抱歉给您带来不好的体验！我们已经关注到这个问题，将会立即处理，请您私信我们联系方式' },
+        { type:'B', label:'平衡型', desc:'道歉', example:'抱歉给您带来不便，我们会尽快处理' },
+        { type:'C', label:'含蓄型', desc:'简洁回应', example:'抱歉' }
+      ] }
+  ],
+  '职场人际关系': [
+    { ai: '帮我带个饭呗？顺便的事。',
+      followUps: ['就楼下那家', '很快的', '举手之劳'],
+      tips: ['区分边界', '合理拒绝', '不影响关系'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'拒绝+建议', example:'不好意思，我今天不下楼。你可以用XX外卖APP，很快的' },
+        { type:'B', label:'平衡型', desc:'礼貌拒绝', example:'不好意思，我今天不方便' },
+        { type:'C', label:'含蓄型', desc:'简洁拒绝', example:'不方便' }
+      ] }
+  ],
+  '被误解澄清': [
+    { ai: '你昨天说的话是什么意思？是不是针对我？',
+      followUps: ['你什么意思？', '给我解释清楚', '别装了'],
+      tips: ['先确认对方理解', '说明原话与真实意图', '必要时共同核对上下文'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'确认+澄清+倾听', example:'听起来那句话让你觉得我在针对你。我的原意是针对这件事，不是评价你。你愿意告诉我具体是哪句话让你不舒服吗？' },
+        { type:'B', label:'平衡型', desc:'澄清', example:'你可能误解了，我不是那个意思' },
+        { type:'C', label:'含蓄型', desc:'简洁澄清', example:'你误会了' }
+      ] }
+  ],
+  '演讲发言技巧': [
+    { ai: '下一个是你，准备好了吗？',
+      followUps: ['别紧张', '深呼吸', '加油'],
+      tips: ['调整心态', '结构化表达', '与听众互动'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'自信开场+结构', example:'各位好！今天我分享的主题是XX。我会从三个方面来讲：第一...第二...第三...' },
+        { type:'B', label:'平衡型', desc:'稳健开场', example:'大家好，我是XX。今天分享的是XX' },
+        { type:'C', label:'含蓄型', desc:'简洁开场', example:'大家好' }
+      ] }
+  ],
+  '拒绝不合理要求': [
+    { ai: '这个忙你必须帮我，不然我们绝交！',
+      followUps: ['不帮就是看不起我', '这点小事都不肯', '逼你了怎么样'],
+      tips: ['坚守底线', '不被威胁', '保持冷静'],
+      thinking: [
+        { type:'A', label:'坚定型', desc:'表达重视+清晰边界', example:'我重视我们的友谊，但这件事我不能答应。你可以失望，不过请不要用绝交来逼我决定。' },
+        { type:'B', label:'平衡型', desc:'拒绝+停止争执', example:'这件事我不能帮。如果你现在很生气，我们可以晚点再聊。' },
+        { type:'C', label:'简洁型', desc:'清晰拒绝', example:'抱歉，这件事我不能答应。' }
+      ] }
+  ],
+  '投诉物业': [
+    { ai: '你好，请问有什么可以帮您？',
+      followUps: ['是哪个业主？', '什么问题？', '请详细说明'],
+      tips: ['清晰描述问题', '提供时间和地点', '要求解决时间'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'清晰描述+要求', example:'你好，我是XX栋XX的业主。我家楼下的路灯坏了一周了，没人修。请尽快处理' },
+        { type:'B', label:'平衡型', desc:'描述问题', example:'路灯坏了，没人修' },
+        { type:'C', label:'含蓄型', desc:'简洁说明', example:'路灯坏了' }
+      ] }
+  ],
+  '安慰失落的家人/朋友': [
+    { ai: '我真的好难过，为什么事情会变成这样...',
+      followUps: ['都是我的错', '我真的不知道该怎么办', '没人能理解我'],
+      tips: ['倾听为先', '共情回应', '不要急于给建议'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'共情+倾听', example:'我能感觉到你真的很伤心。先不说别的，我在你身边，想说什么都可以' },
+        { type:'B', label:'平衡型', desc:'共情', example:'我理解你的感受，确实很让人难过' },
+        { type:'C', label:'含蓄型', desc:'陪伴', example:'我在' }
+      ] }
+  ],
+  '去医院看病与医生沟通': [
+    { ai: '您好，请问哪里不舒服？',
+      followUps: ['疼了多久了？', '有没有其他症状？', '之前看过吗？'],
+      tips: ['清晰描述症状', '提供病史', '配合医生检查'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'清晰描述+提供病史', example:'医生您好，我这两天头疼得厉害，主要在太阳穴位置，阵发性的。之前没有看过，也没有外伤史' },
+        { type:'B', label:'平衡型', desc:'描述症状+询问', example:'医生您好，我头疼了2天，请问需要做什么检查吗？' },
+        { type:'C', label:'含蓄型', desc:'简洁描述', example:'头疼2天了' }
+      ] }
+  ],
+  '去银行/政务大厅办事': [
+    { ai: '您好，请问您要办理什么业务？',
+      followUps: ['请取号排队', '需要什么材料？', '到几号窗口办理？'],
+      tips: ['了解办理流程', '准备所需材料', '礼貌沟通'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'清晰说明+询问', example:'您好，我想办理XX业务，请问需要准备什么材料？到哪个窗口办理？' },
+        { type:'B', label:'平衡型', desc:'说明+询问', example:'您好，我要办理XX业务' },
+        { type:'C', label:'含蓄型', desc:'简洁说明', example:'办XX业务' }
+      ] }
+  ],
+  '与老师/班主任沟通': [
+    { ai: '你好，我是XX的班主任。想跟你聊聊孩子的情况。',
+      followUps: ['孩子最近怎么样？', '学习状态如何？', '有没有调皮？'],
+      tips: ['尊重老师', '主动了解', '配合学校'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'礼貌+主动', example:'老师您好！谢谢您关心XX。他在家也挺懂事的，不知道在学校表现怎么样？有什么需要我们配合的吗？' },
+        { type:'B', label:'平衡型', desc:'礼貌回应', example:'老师您好，XX在家挺好的，麻烦您多费心了' },
+        { type:'C', label:'含蓄型', desc:'简洁回应', example:'老师好' }
+      ] }
+  ],
+  '租房与房东沟通': [
+    { ai: '你好，有什么事吗？',
+      followUps: ['房租什么时候交？', '房子有问题？', '要退房吗？'],
+      tips: ['礼貌沟通', '明确诉求', '保持友好'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'礼貌+明确', example:'房东您好，房子的水管有点漏水，能不能帮忙修一下？下个月的房租我会按时交的' },
+        { type:'B', label:'平衡型', desc:'礼貌说明', example:'房东您好，水管漏水了，能修一下吗？' },
+        { type:'C', label:'含蓄型', desc:'简洁说明', example:'水管漏了' }
+      ] }
+  ],
+  '面试后的感谢信': [
+    { ai: '你好，请问有什么事？',
+      followUps: [],
+      tips: ['表达感谢', '重申兴趣', '展示热情'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'感谢+重申', example:'您好！我是今天下午面试XX岗位的XX。非常感谢您的时间，我对这个岗位非常感兴趣，期待能有进一步沟通的机会' },
+        { type:'B', label:'平衡型', desc:'感谢', example:'您好，我是今天面试的XX，感谢您的时间' },
+        { type:'C', label:'含蓄型', desc:'简洁感谢', example:'感谢' }
+      ] }
+  ],
+  '面对挑衅/侮辱': [
+    { ai: '你这人怎么这样？真恶心！',
+      followUps: ['你再说一遍', '信不信我打你', '别让我再看见你'],
+      tips: ['保持冷静', '不被激怒', '得体回应'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'冷静+坚定', example:'我不想跟你吵架，请你礼貌一点。如果有问题可以好好说' },
+        { type:'B', label:'平衡型', desc:'冷静回应', example:'你这样说很不合适，请你道歉' },
+        { type:'C', label:'含蓄型', desc:'简洁回应', example:'请你道歉' }
+      ] }
+  ],
+  '处理不公平对待': [
+    { ai: '这个方案就这么定了，你有意见吗？',
+      followUps: ['不服也得服', '这是领导决定', '有意见找领导去'],
+      tips: ['冷静收集证据', '向上级反馈', '维护自身权益'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'理性+坚定', example:'这个决定我不认同，因为它不符合规定。我会整理相关证据向更高层反映' },
+        { type:'B', label:'平衡型', desc:'表达不满', example:'这个决定不公平，我会向上反映' },
+        { type:'C', label:'含蓄型', desc:'简洁回应', example:'我不同意' }
+      ] }
+  ],
+  '被拒绝后如何回应': [
+    { ai: '抱歉，我们决定录用其他人。',
+      followUps: ['下次有机会再合作', '你很优秀但...', '不好意思'],
+      tips: ['表达感谢', '保持风度', '不纠缠'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'感谢+保持联系', example:'好的，感谢您的时间。能有面试的机会我已经很感激了，希望以后能有合作的可能' },
+        { type:'B', label:'平衡型', desc:'感谢', example:'好的，感谢您的时间' },
+        { type:'C', label:'含蓄型', desc:'简洁回应', example:'好的' }
+      ] }
+  ],
+  '婚礼/酒席中的社交': [
+    { ai: '来，新人敬酒！大家举杯！',
+      followUps: ['干杯！', '祝福新人！', '百年好合！'],
+      tips: ['得体祝福', '配合氛围', '照顾新人'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'祝福+得体', example:'恭喜恭喜！祝你们百年好合，幸福美满！' },
+        { type:'B', label:'平衡型', desc:'祝福', example:'恭喜！百年好合' },
+        { type:'C', label:'含蓄型', desc:'简洁祝福', example:'恭喜' }
+      ] }
+  ],
+  '主动加微信/建立联系': [
+    { ai: '今天聊得很开心，我们加个微信吧？',
+      followUps: ['好啊', '扫这个', '回头联系'],
+      tips: ['自然不刻意', '表达真诚', '后续维护'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'自然+真诚', example:'今天跟你聊得很开心，加个微信吧，以后多交流' },
+        { type:'B', label:'平衡型', desc:'自然提出', example:'加个微信吧？' },
+        { type:'C', label:'含蓄型', desc:'简洁提出', example:'加个微信' }
+      ] }
+  ],
+  '重新联系老朋友': [
+    { ai: '嘿，好久不见！最近怎么样？',
+      followUps: ['在哪里呢？', '最近忙什么？', '有空聚聚？'],
+      tips: ['自然开场', '表达想念', '提议见面'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'热情+提议', example:'好久不见！看到你朋友圈更新了，特别想找你聊聊。最近有空吗？出来喝一杯？' },
+        { type:'B', label:'平衡型', desc:'热情问候', example:'好久不见！最近怎么样？' },
+        { type:'C', label:'含蓄型', desc:'简洁问候', example:'好久不见' }
+      ] }
+  ],
+  '回复负面评价/攻击': [
+    { ai: '你发的东西真垃圾！完全没水平！',
+      followUps: ['就是', '同意楼上', '垃圾作者'],
+      tips: ['冷静不回怼', '理性回应', '删除或举报'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'理性+专业', example:'感谢你的反馈，如果你有具体的建议欢迎私信讨论。无意义的攻击我会忽略' },
+        { type:'B', label:'平衡型', desc:'理性回应', example:'感谢反馈，有建议可以提' },
+        { type:'C', label:'含蓄型', desc:'简洁回应', example:'谢谢' }
+      ] }
+  ],
+  '线上会议发言': [
+    { ai: '下一个轮到你发言了，准备好了吗？',
+      followUps: ['你来说说', '准备一下', '别急'],
+      tips: ['结构化表达', '控制时间', '眼神交流'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'结构化+简洁', example:'好的，关于这个问题我有三点看法：第一...第二...第三...' },
+        { type:'B', label:'平衡型', desc:'简洁表达', example:'我觉得可以试试XX方案' },
+        { type:'C', label:'含蓄型', desc:'简洁回应', example:'我同意' }
+      ] }
+  ],
+  '聚会/派对的社交': [
+    { ai: '嗨，你也是一个人来的吗？',
+      followUps: ['你认识这里的人吗？', '玩得开心吗？', '要不要一起？'],
+      tips: ['主动社交', '寻找共同点', '保持轻松'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'自我介绍+互动', example:'你好！我叫XX，是朋友带我来的。你呢？认识这里的人吗？' },
+        { type:'B', label:'平衡型', desc:'简单回应', example:'对，我朋友还没来' },
+        { type:'C', label:'含蓄型', desc:'简洁回应', example:'嗯' }
+      ] }
+  ],
+  '紧急情况求助': [
+    { ai: '这里有人晕倒了！快来帮忙！',
+      followUps: ['快打120！', '有没有人是医生？', '让一让！'],
+      tips: ['保持冷静', '分工合作', '拨打急救电话'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'冷静+指挥', example:'大家冷静！有人打120了吗？让开空气流通！看看他有没有呼吸' },
+        { type:'B', label:'平衡型', desc:'冷静行动', example:'别慌，已经有人打120了' },
+        { type:'C', label:'含蓄型', desc:'冷静回应', example:'别慌' }
+      ] }
+  ],
+  '被误解后澄清': [
+    { ai: '你昨天说的话是什么意思？是不是针对我？',
+      followUps: ['你什么意思？', '给我解释清楚', '别装了'],
+      tips: ['先确认对方理解', '说明原话与真实意图', '必要时共同核对上下文'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'确认+澄清+倾听', example:'听起来那句话让你觉得我在针对你。我的原意是针对这件事，不是评价你。你愿意告诉我具体是哪句话让你不舒服吗？' },
+        { type:'B', label:'平衡型', desc:'澄清', example:'你可能误解了，我不是那个意思' },
+        { type:'C', label:'含蓄型', desc:'简洁澄清', example:'你误会了' }
+      ] }
+  ],
+  '微信/短信的文字沟通': [
+    { ai: '在吗？有件事想跟你说。',
+      followUps: ['怎么不回消息？', '在忙吗？', '看到回复'],
+      tips: ['及时回复', '文字要清晰', '避免误解'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'及时+清晰', example:'在的！你说，我听着' },
+        { type:'B', label:'平衡型', desc:'简洁回应', example:'在的' },
+        { type:'C', label:'含蓄型', desc:'简洁回应', example:'在' }
+      ] }
+  ],
+  '线上社群的互动': [
+    { ai: '@所有人 今晚8点线上分享，欢迎参加！',
+      followUps: ['谁来分享？', '主题是什么？', '期待分享'],
+      tips: ['积极参与', '尊重他人', '建立形象'],
+      thinking: [
+        { type:'A', label:'主动型', desc:'积极+互动', example:'期待！正好对这个话题很感兴趣，到时见' },
+        { type:'B', label:'平衡型', desc:'简单回应', example:'期待' },
+        { type:'C', label:'含蓄型', desc:'简洁回应', example:'👍' }
+      ] }
   ]
 };
 
-function generateMockRounds(sceneName, personality) {
-  const dialogs = realSceneDialogs[sceneName] || realSceneDialogs['相亲模拟'];
+const noPersonalityScenes = ['模拟面试','加薪谈判','向上汇报被质疑','拒绝同事的不合理请求','向领导请假','职场道歉','客户投诉应对','团队合作分歧','视频会议沟通','投诉客服','饭局社交技巧','政务大厅办事','突发状况应对','公共演讲技巧','与父母意见分歧','人际冲突调解','吵架后缓和关系','纪念日沟通','朋友借钱','表白','见家长','医院挂号问诊','快递物流沟通','酒店入住沟通','4S店砍价','网络聊天技巧','家庭聚会中的社交','亲戚问敏感问题','被表白后婉拒','安慰失落的家人朋友','退换货沟通','银行办理业务','社交聚会破冰','路边摊砍价','在线学习交流','与邻居沟通','谈判协商技巧','社交媒体运营','职场人际关系','被误解澄清','演讲发言技巧','拒绝不合理要求','投诉物业','安慰失落的家人/朋友','去医院看病与医生沟通','去银行/政务大厅办事','与老师/班主任沟通','租房与房东沟通','面试后的感谢信','面对挑衅/侮辱','处理不公平对待','被拒绝后如何回应','婚礼/酒席中的社交','主动加微信/建立联系','重新联系老朋友','回复负面评价/攻击','线上会议发言','聚会/派对的社交','紧急情况求助','被误解后澄清','微信/短信的文字沟通','线上社群的互动','相亲模拟','兴趣社群自我介绍','被朋友误解(NVC)','共情沟通训练','初次约会'];
 
-  const shuffled = [...dialogs].sort(() => Math.random() - 0.5);
+const fixedOrderScenes = ['模拟面试','加薪谈判','向上汇报被质疑','拒绝同事的不合理请求','向领导请假','职场道歉','客户投诉应对','团队合作分歧','视频会议沟通','投诉客服','饭局社交技巧','政务大厅办事','突发状况应对','公共演讲技巧','与父母意见分歧','人际冲突调解','吵架后缓和关系','纪念日沟通','朋友借钱','表白','见家长','医院挂号问诊','快递物流沟通','酒店入住沟通','4S店砍价','网络聊天技巧','家庭聚会中的社交','亲戚问敏感问题','被表白后婉拒','安慰失落的家人朋友','退换货沟通','银行办理业务','社交聚会破冰','路边摊砍价','在线学习交流','与邻居沟通','谈判协商技巧','社交媒体运营','职场人际关系','被误解澄清','演讲发言技巧','拒绝不合理要求','投诉物业','安慰失落的家人/朋友','去医院看病与医生沟通','去银行/政务大厅办事','与老师/班主任沟通','租房与房东沟通','面试后的感谢信','面对挑衅/侮辱','处理不公平对待','被拒绝后如何回应','婚礼/酒席中的社交','主动加微信/建立联系','重新联系老朋友','回复负面评价/攻击','线上会议发言','聚会/派对的社交','紧急情况求助','被误解后澄清','微信/短信的文字沟通','线上社群的互动','相亲模拟','兴趣社群自我介绍','被朋友误解(NVC)','共情沟通训练','初次约会'];
+
+function generateMockRounds(sceneName, personality) {
+  let dialogs = realSceneDialogs[sceneName];
+  if (!dialogs || dialogs.length === 0) {
+    dialogs = realSceneDialogs['相亲模拟'];
+  }
+
+  const isFixedOrder = fixedOrderScenes.includes(sceneName);
+  const selected = isFixedOrder
+    ? [...dialogs].slice(0, Math.min(5, dialogs.length))
+    : [...dialogs].sort(() => Math.random() - 0.5).slice(0, Math.min(5, dialogs.length));
+
+  const isNoPersonality = noPersonalityScenes.includes(sceneName);
 
   const personalityEffects = {
     '友好型': { prefix:'', suffix:'~', emoji:'😊' },
     '内向型': { prefix:'嗯...', suffix:'...', emoji:'😌' },
     '挑剔型': { prefix:'哼，', suffix:'！', emoji:'😒' },
-    '理性型': { prefix:'从客观角度看，', suffix:'.', emoji:'🤔' }
+    '理性型': { prefix:'', suffix:'', emoji:'🤔' }
   };
-  const effect = personalityEffects[personality] || personalityEffects['友好型'];
+  const effect = isNoPersonality
+    ? { prefix:'', suffix:'', emoji:'📢' }
+    : (personalityEffects[personality] || personalityEffects['友好型']);
 
-  const rounds = shuffled.slice(0, Math.min(5, shuffled.length)).map((d, idx) => ({
+  const rounds = selected.map((d, idx) => ({
     ai: effect.prefix + d.ai + effect.suffix,
     followUps: d.followUps,
     tips: d.tips,
+    thinking: d.thinking,
+    bestAnswer: d.bestAnswer,
     roundIndex: idx + 1
   }));
 
@@ -6214,6 +7327,12 @@ function startTraining(sceneId) {
 
   userData.hasStartedTrainingBefore = true;
   currentTraining = scene;
+  coachMemory.lastTrainingScene = scene.name;
+  coachMemory.lastTrainingDate = new Date().toLocaleDateString('zh-CN');
+  if (!coachMemory.trainingHistory) coachMemory.trainingHistory = [];
+  coachMemory.trainingHistory.push({ date: coachMemory.lastTrainingDate, scene: scene.name, type: 'started' });
+  if (coachMemory.trainingHistory.length > 20) coachMemory.trainingHistory.shift();
+  saveUserData();
   trainingMessages = [];
   trainingRoundIdx = 0;
   trainingChoices = [];
@@ -6489,6 +7608,58 @@ function closeFavorabilityBanner() {
   }
 }
 
+function requestTrainingExit() {
+  if (!$('modal-training') || $('modal-training').style.display === 'none') return;
+  if (showTrainingReport) {
+    closeModal('training');
+    return;
+  }
+
+  const existing = $('training-exit-dialog');
+  if (existing) existing.remove();
+  const rounds = currentTraining ? (currentTraining.shuffledRounds || currentTraining.rounds || []) : [];
+  const completed = Math.min(trainingRoundIdx, rounds.length);
+  const isFirstExperience = (userData.trainingCount || 0) === 0;
+  const dialog = document.createElement('div');
+  dialog.id = 'training-exit-dialog';
+  dialog.className = 'fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-[60] p-4';
+  dialog.style.zIndex = '9999';
+  dialog.setAttribute('role', 'dialog');
+  dialog.setAttribute('aria-modal', 'true');
+  dialog.setAttribute('aria-labelledby', 'training-exit-title');
+  dialog.innerHTML = `
+    <div class="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-sm p-5 animate-in">
+      <h2 id="training-exit-title" class="text-lg font-bold text-gray-800">⚠️ 退出训练</h2>
+      <p class="text-sm text-gray-600 mt-3">当前训练${isFirstExperience ? '尚未完成' : `已完成 ${completed}/${rounds.length} 轮`}，确定退出吗？</p>
+      <div class="bg-amber-50 text-amber-800 rounded-xl p-3 text-xs mt-3 space-y-1">
+        <div>• 本次未完成的训练进度不会保存</div>
+        <div>• 本次不会获得训练积分或好感度</div>
+        <div>• 下次可重新开始这个场景</div>
+      </div>
+      ${isFirstExperience ? '<p class="text-xs text-gray-500 mt-3">完成训练后可获得第一份社交能力报告。</p>' : ''}
+      <div class="grid grid-cols-2 gap-3 mt-5">
+        <button onclick="cancelTrainingExit()" class="py-2.5 bg-indigo-500 text-white rounded-xl text-sm font-semibold">继续训练</button>
+        <button onclick="confirmTrainingExit()" class="py-2.5 bg-gray-100 text-gray-600 rounded-xl text-sm font-medium">确认退出</button>
+      </div>
+    </div>`;
+  document.body.appendChild(dialog);
+}
+
+function cancelTrainingExit() {
+  const dialog = $('training-exit-dialog');
+  if (dialog) dialog.remove();
+}
+
+function confirmTrainingExit() {
+  cancelTrainingExit();
+  closeFavorabilityBanner();
+  closeModal('training');
+  trainingMessages = [];
+  trainingChoices = [];
+  trainingRoundIdx = 0;
+  showTrainingReport = false;
+}
+
 // 好感度等级配置（PRD §好感度等级与权益对应表）
 function getFavorabilityConfig(level) {
   const configs = {
@@ -6584,8 +7755,6 @@ function updatePropButtons() {
 function showRound() {
   if (!currentTraining) return;
 
-  const fixedOrderScenes = ['模拟面试', '加薪谈判', '见家长'];
-
   if (!currentTraining.shuffledRounds) {
     if (fixedOrderScenes.includes(currentTraining.name)) {
       currentTraining.shuffledRounds = [...currentTraining.rounds];
@@ -6614,13 +7783,18 @@ function showRound() {
       }
     }, 500);
   } else {
+    const sceneName = currentTraining.name || '';
+    const skipPersonality = noPersonalityScenes.includes(sceneName);
+
     const personalityEffects = {
       '友好型': { prefix:'', suffix:'~', emoji:'😊' },
       '内向型': { prefix:'嗯...', suffix:'...', emoji:'😌' },
       '挑剔型': { prefix:'哼，', suffix:'！', emoji:'😒' },
-      '理性型': { prefix:'从客观角度看，', suffix:'.', emoji:'🤔' }
+      '理性型': { prefix:'', suffix:'', emoji:'🤔' }
     };
-    const effect = personalityEffects[currentPersonality];
+    const effect = skipPersonality
+      ? { prefix:'', suffix:'', emoji:'📢' }
+      : personalityEffects[currentPersonality];
     let aiMsg = effect.prefix + round.ai + effect.suffix;
 
     addTrainingMessage(aiMsg, false);
@@ -6652,11 +7826,45 @@ function showTrainingInput() {
   if (round && round.thinking && round.thinking.length > 0) {
     thinkingHints = round.thinking;
   } else {
-    thinkingHints = [
-      { type:'A', label:'主动型', desc:'具体描述，展现热情和自信', example:'大家好！我叫小雨，喜欢摄影和旅行，很高兴认识大家' },
-      { type:'B', label:'平衡型', desc:'回答+反问对方，保持互动', example:'我是做互联网产品的，你呢？' },
-      { type:'C', label:'含蓄型', desc:'简单回应，观察对方反应', example:'嗨，请多指教' }
-    ];
+    const sceneName = (currentTraining && currentTraining.name) || '';
+    const workplaceScenes = ['模拟面试','加薪谈判','向上汇报被质疑','拒绝同事的不合理请求','向领导请假','职场道歉','客户投诉应对','团队合作分歧','视频会议沟通','投诉客服','饭局社交技巧','政务大厅办事','突发状况应对','公共演讲技巧','谈判协商技巧','职场人际关系','演讲发言技巧','与老师/班主任沟通','面试后的感谢信','面对挑衅/侮辱','处理不公平对待','被拒绝后如何回应'];
+    const lifeScenes = ['相亲模拟','初次约会','表白','见家长','被朋友误解(NVC)','共情沟通训练','吵架后缓和关系','纪念日沟通','兴趣社群自我介绍','网络聊天技巧','被表白后婉拒','社交聚会破冰','路边摊砍价','被误解澄清','聚会/派对的社交','主动加微信/建立联系','重新联系老朋友','回复负面评价/攻击','线上会议发言','被误解后澄清','微信/短信的文字沟通','线上社群的互动'];
+    const familyScenes = ['与父母意见分歧','朋友借钱','亲戚问敏感问题','家庭聚会中的社交','人际冲突调解','安慰失落的家人朋友','与邻居沟通','安慰失落的家人/朋友','婚礼/酒席中的社交'];
+    const serviceScenes = ['医院挂号问诊','快递物流沟通','酒店入住沟通','4S店砍价','退换货沟通','银行办理业务','投诉物业','在线学习交流','社交媒体运营','拒绝不合理要求','去医院看病与医生沟通','去银行/政务大厅办事','租房与房东沟通','紧急情况求助','投诉客服'];
+
+    let sceneHint = '';
+    if (workplaceScenes.includes(sceneName)) {
+      sceneHint = [
+        { type:'A', label:'主动型', desc:'结构化回应，数据支撑，展现专业性', example:'领导，关于这个问题，我整理了三点：第一...第二...第三...' },
+        { type:'B', label:'平衡型', desc:'客观陈述+请求沟通', example:'这个问题我需要确认一下数据来源，稍后给您详细回复' },
+        { type:'C', label:'含蓄型', desc:'简洁回应，展示态度', example:'好的，我马上处理' }
+      ];
+    } else if (lifeScenes.includes(sceneName)) {
+      sceneHint = [
+        { type:'A', label:'主动型', desc:'热情回应+主动引导话题', example:'你好！我叫XX，很高兴认识你。你平时喜欢做什么？' },
+        { type:'B', label:'平衡型', desc:'礼貌回应+反问', example:'你好！我叫XX，很高兴认识你。你是做什么的？' },
+        { type:'C', label:'含蓄型', desc:'简洁回应', example:'你好，我叫XX' }
+      ];
+    } else if (familyScenes.includes(sceneName)) {
+      sceneHint = [
+        { type:'A', label:'主动型', desc:'真诚表达+寻求理解', example:'爸/妈，我知道你们担心我，但这件事我想按自己的想法试试' },
+        { type:'B', label:'平衡型', desc:'尊重表达+沟通', example:'我理解你们的想法，我会好好考虑的' },
+        { type:'C', label:'含蓄型', desc:'简洁回应', example:'嗯，我知道了' }
+      ];
+    } else if (serviceScenes.includes(sceneName)) {
+      sceneHint = [
+        { type:'A', label:'主动型', desc:'清晰表达需求+礼貌', example:'您好，我想咨询一下XX，请问需要什么手续？' },
+        { type:'B', label:'平衡型', desc:'说明情况+询问', example:'您好，我遇到了XX问题，想请您帮忙解决一下' },
+        { type:'C', label:'含蓄型', desc:'简洁询问', example:'您好，请问XX怎么走？' }
+      ];
+    } else {
+      sceneHint = [
+        { type:'A', label:'主动型', desc:'具体描述，展现热情和自信', example:'大家好！我叫XX，喜欢XX，很高兴认识大家' },
+        { type:'B', label:'平衡型', desc:'回答+反问对方，保持互动', example:'我是做XX的，你呢？' },
+        { type:'C', label:'含蓄型', desc:'简单回应，观察对方反应', example:'嗨，请多指教' }
+      ];
+    }
+    thinkingHints = sceneHint;
   }
 
   const hintsHtml = `
@@ -6816,7 +8024,7 @@ function sendUserMessage() {
       delay += 200;
     }
 
-    if (analysis.correctAnswer) {
+    if (analysis.correctAnswer && (isFirstTraining || favorabilityLevel >= 1)) {
       setTimeout(() => {
         addAnswerHint(analysis.correctAnswer, shouldExpandAnswer, depthLevel);
       }, delay);
@@ -6840,21 +8048,30 @@ function sendUserMessage() {
 }
 
 function getFavorabilityLevel(favorability) {
-  if (favorability >= 200) return 5;
-  if (favorability >= 150) return 4;
-  if (favorability >= 100) return 3;
-  if (favorability >= 60) return 2;
+  if (favorability >= 180) return 5;
+  if (favorability >= 120) return 4;
+  if (favorability >= 80) return 3;
+  if (favorability >= 50) return 2;
   if (favorability >= 20) return 1;
   return 0;
 }
 
 function getNextFavorabilityThreshold(favorability) {
   if (favorability < 20) return 20;
-  if (favorability < 60) return 60;
-  if (favorability < 100) return 100;
-  if (favorability < 150) return 150;
-  if (favorability < 200) return 200;
-  return 200;
+  if (favorability < 50) return 50;
+  if (favorability < 80) return 80;
+  if (favorability < 120) return 120;
+  if (favorability < 180) return 180;
+  return 180;
+}
+
+function getFavorabilityProgress(favorability) {
+  const thresholds = [0, 20, 50, 80, 120, 180];
+  const level = getFavorabilityLevel(favorability);
+  if (level >= 5) return 100;
+  const start = thresholds[level];
+  const end = thresholds[level + 1];
+  return Math.max(0, Math.min(100, ((favorability - start) / (end - start)) * 100));
 }
 
 function getNextSceneUnlockInfo() {
@@ -7158,8 +8375,8 @@ function getScenarioAnalysis(scenario, question, answer, len) {
     return result;
   }
 
-  // 检查是否包含负面关键词
-  const negativeWords = ['烦', '累', '压力', '加班', '累死了', '没意思', '无聊', '随便', '都行', '算了', '不知道'];
+  // 只识别明显的敌意或敷衍；谈到“累、压力、加班”可能是诚实表达，不应自动扣分
+  const negativeWords = ['滚', '闭嘴', '懒得理', '关我什么事', '爱咋咋地', '随便', '算了'];
   const hasNegative = negativeWords.some(w => answer.includes(w));
 
   // 检查是否包含反问
@@ -7238,10 +8455,10 @@ function analyzeDatingScenario(question, answer, len, hasNegative, hasQuestion, 
     if (hasNegative) {
       return {
         scoreDelta: -5, isGood: false,
-        comment: '初次见面就抱怨工作，印象分会降低',
-        suggestion: '第一次约会聊工作要保持积极，重点放在"充实"而非"累"，再自然过渡到对方的生活。',
-        correctAnswer: '是有点忙，但工作再忙也要有自己的生活。你平时下班喜欢做什么？',
-        correctReason: '先承认忙但补充积极态度，再用反问把话题引向对方，体现关心和平衡生活的态度。'
+        comment: '表达了工作感受，但语气可能让话题停在抱怨上',
+        suggestion: '可以诚实说忙或累，再补充具体原因；是否反问取决于你是否想继续这个话题。',
+        correctAnswer: '最近确实有点忙，主要在赶一个月底项目，不过周末我会留时间休息。你最近的工作节奏怎么样？',
+        correctReason: '诚实表达并说明背景，比强装积极更自然；给对方一个可选择回答的问题即可。'
       };
     }
     if (hasQuestion) {
@@ -7265,7 +8482,7 @@ function analyzeDatingScenario(question, answer, len, hasNegative, hasQuestion, 
     return {
       scoreDelta: -2, isGood: false,
       comment: '回答太简短，没有延续话题',
-      suggestion: '相亲场景中，对方问工作是在试探你的生活状态，除了回答还要反问对方。',
+      suggestion: '可以补一个具体信息，或在想继续交流时问问对方；不必每句话都反问。',
       correctAnswer: '是有点忙，但工作再忙也要有自己的生活。你平时下班喜欢做什么？',
       correctReason: '简短回答"还好吧"会让对方觉得你不想聊，展开回答+反问才能让对话继续。'
     };
@@ -7285,9 +8502,9 @@ function analyzeDatingScenario(question, answer, len, hasNegative, hasQuestion, 
       return {
         scoreDelta: -3, isGood: false,
         comment: '用"还行/不爱看"回答兴趣爱好，会终结话题',
-        suggestion: '就算不喜欢，也可以说"看得不多，但最近有部很火的，你看了吗？"',
-        correctAnswer: '喜欢啊！最近看了一部很不错的，你平时喜欢什么类型的电影？',
-        correctReason: '兴趣爱好是相亲中最好的聊天素材，否定回答会让对方觉得你难相处，先肯定再反问最稳妥。'
+        suggestion: '不喜欢也可以坦诚表达，再分享一个你真正感兴趣的话题。',
+        correctAnswer: '我电影看得不多，平时更喜欢听播客。你最近有没有特别喜欢的一部？',
+        correctReason: '真实偏好比假装喜欢更容易建立连接，同时也给对方继续分享的空间。'
       };
     }
     return {
@@ -7303,8 +8520,8 @@ function analyzeDatingScenario(question, answer, len, hasNegative, hasQuestion, 
     if (hasQuestion || hasDetail) {
       return {
         scoreDelta: 8, isGood: true,
-        comment: '约会结尾主动约下次，加分',
-        suggestion: '约会结束时，主动提具体的下次计划比"下次再约"更有诚意，让约会落地。',
+        comment: '表达清楚，也给出了继续联系的可能',
+        suggestion: '提出下次计划时留意对方意愿，使用“如果你也愿意”会更尊重边界。',
         correctAnswer: '',
         correctReason: ''
       };
@@ -7312,9 +8529,9 @@ function analyzeDatingScenario(question, answer, len, hasNegative, hasQuestion, 
     return {
       scoreDelta: 2, isGood: true,
       comment: '礼貌结束',
-      suggestion: '结尾可以主动制造下次见面的契机，比如"下次可以去那家新开的书店看看"',
-      correctAnswer: '我也是！下次可以去那家新开的书店看看',
-      correctReason: '只说"再见"太普通，主动提出具体下次计划会让对方感到你认真对待这段关系。'
+      suggestion: '礼貌结束已经合适；若确实想再见，可以表达意愿并让对方自由选择。',
+      correctAnswer: '我也聊得很开心。如果你也愿意，下次我们可以去那家新开的书店看看。',
+      correctReason: '清楚表达好感，同时给对方选择空间，比默认对方会再次赴约更得体。'
     };
   }
 
@@ -7325,7 +8542,7 @@ function analyzeDatingScenario(question, answer, len, hasNegative, hasQuestion, 
       comment: '回答太简短，显得不太热情',
       suggestion: '相亲最重要的是营造轻松愉快的交流氛围，尽量展开回答，让对方感受到你的诚意。',
       correctAnswer: getScenarioCorrectAnswer('相亲模拟', question, ''),
-      correctReason: '简短回答会让对方觉得你心不在焉，相亲要主动展示自己，才能找到合适的对象。'
+      correctReason: '过短且没有信息的回复可能难以承接话题，但简洁本身不是问题，关键是回应是否真实、相关。'
     };
   }
   if (hasQuestion && hasDetail) {
@@ -7337,7 +8554,7 @@ function analyzeDatingScenario(question, answer, len, hasNegative, hasQuestion, 
   if (hasDetail) {
     return { scoreDelta: 4, isGood: true, comment: '回答有细节，不错', suggestion: '可以加一句反问，让对方也有机会说话。', correctAnswer: '', correctReason: '' };
   }
-  return { scoreDelta: -1, isGood: false, comment: '回答中规中矩', suggestion: '相亲时尽量加入反问和具体细节，让对话更有温度。', correctAnswer: getScenarioCorrectAnswer('相亲模拟', question, ''), correctReason: '中规中矩的回答不会出错，但也不会加分，适当展开才能让关系更进一步。' };
+  return { scoreDelta: 1, isGood: true, comment: '回答自然、基本贴合情境', suggestion: '如果你愿意继续这个话题，可以补一个真实细节或提出一个相关问题。', correctAnswer: '', correctReason: '' };
 }
 
 // ===== 模拟面试场景分析 =====
@@ -7375,7 +8592,7 @@ function analyzeInterviewScenario(question, answer, len, hasNegative, hasQuestio
       return {
         scoreDelta: -6, isGood: false,
         comment: '吐槽前公司是面试大忌',
-        suggestion: '面试中永远不要说前公司坏话，要聚焦在"职业发展"和"个人成长"上。',
+        suggestion: '避免人身攻击或泄露前公司机密；可以客观说明真实困难，并把重点放在你希望寻找的工作条件上。',
         correctAnswer: '业务方向调整，希望找到更符合职业发展的机会',
         correctReason: '吐槽前公司会让面试官担心你未来也会这样评价他们，从职业发展角度回答更专业。'
       };
@@ -7461,7 +8678,7 @@ function analyzeInterviewScenario(question, answer, len, hasNegative, hasQuestio
         comment: '不问问题会让面试官觉得你不够主动',
         suggestion: '面试最后问问题是展示你对公司和岗位的思考，建议问"团队目前的主要挑战是什么？"',
         correctAnswer: '团队目前的主要挑战是什么？',
-        correctReason: '面试官通过你问的问题判断你的思考深度，问薪资太功利，问团队挑战才显得有格局。'
+        correctReason: '反问应围绕你真正需要了解的信息。岗位目标、团队挑战、薪资结构和工作安排都可以礼貌询问。'
       };
     }
     if (hasDetail) {
@@ -8017,6 +9234,17 @@ function finishTraining() {
 
   currentTraining.completed = true;
 
+  let favorabilityGain = 0;
+  if (completionRate >= 0.7) {
+    favorabilityGain = 2;
+    if (netScore >= 90) favorabilityGain += 5;
+    else if (netScore >= 80) favorabilityGain += 3;
+    userData.favorability = (userData.favorability || 0) + favorabilityGain;
+    if (!userData.coachFavorability) userData.coachFavorability = {};
+    if (currentCoach && currentCoach.id !== undefined) userData.coachFavorability[currentCoach.id] = userData.favorability;
+  }
+  userData.lastFavorabilityGain = favorabilityGain;
+
   userData.trainingCount = (userData.trainingCount || 0) + 1;
   userData.hasCompletedFirstTraining = true;
 
@@ -8085,6 +9313,9 @@ function finishTraining() {
     } else if (trainingCount >= 2 && trainingCount <= 3) {
       analysisLevel = 'preview';
       analysisLabel = '预览模式 - 部分分析';
+    } else if (getFavorabilityLevel(userData.favorability || 0) >= 2) {
+      analysisLevel = 'full';
+      analysisLabel = '好感度权益 - 完整分析';
     } else {
       analysisLevel = 'basic';
       analysisLabel = '基础分析';
@@ -8187,7 +9418,7 @@ function finishTraining() {
     const transitionGuide = trainingCount === 3 && userData.member === 'free' ? `
       <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-4 text-white animate-in mt-3">
         <h4 class="font-semibold text-center mb-2">🌟 体验结束</h4>
-        <p class="text-sm text-center mb-3 opacity-90">你已经体验了3次高质量分析</p>
+        <p class="text-sm text-center mb-3 opacity-90">新人分析体验已结束；继续训练提升好感度，或通过会员权益获得完整分析</p>
         <div class="grid grid-cols-2 gap-2">
           <button onclick="closeModal('training')" class="py-2 bg-white/20 text-white text-sm font-medium rounded-lg hover:bg-white/30 transition-colors">继续免费训练</button>
           <button onclick="showModal('member')" class="py-2 bg-white text-indigo-600 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors">升级会员</button>
@@ -8216,20 +9447,26 @@ function finishTraining() {
           <div class="flex items-center justify-between text-xs"><span class="text-gray-500">情绪控制</span><span class="text-indigo-600">+${Math.floor(inc/2)}</span></div>
         </div>
       </div>
-      <div class="bg-gradient-to-r from-pink-50 to-rose-50 rounded-xl p-4 animate-in border border-pink-100">
-        <h5 class="text-sm font-semibold text-gray-800 mb-3">❤️ 好感度与积分进度</h5>
+      <div class="${trainingCount === 1 ? '' : 'hidden'} bg-gradient-to-r from-pink-50 to-rose-50 rounded-xl p-4 animate-in border border-pink-100">
+        <h5 class="text-sm font-semibold text-gray-800 mb-1">❤️ 首次训练权益说明</h5>
+        <p class="text-xs text-gray-500 mb-3">好感度表示教练对你学习习惯的了解程度，不是对人格或能力的评价。</p>
         <div class="space-y-3">
           <div>
             <div class="flex justify-between text-xs mb-1">
               <span class="text-gray-500">当前好感度</span>
-              <span class="font-medium text-pink-600">Lv.${getFavorabilityLevel(userData.favorability || 0)} (${userData.favorability || 0}分)</span>
+              <span class="font-medium text-pink-600">Lv.${getFavorabilityLevel(userData.favorability || 0)} ${getFavorabilityConfig(getFavorabilityLevel(userData.favorability || 0)).name} · ${userData.favorability || 0}</span>
             </div>
             <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
-              <div class="h-full bg-pink-500 rounded-full transition-all" style="width:${Math.min(100, ((userData.favorability || 0) % 40) / 40 * 100)}%"></div>
+              <div class="h-full bg-pink-500 rounded-full transition-all" style="width:${getFavorabilityProgress(userData.favorability || 0)}%"></div>
             </div>
             <div class="text-xs text-gray-400 mt-1">
-              ${getFavorabilityLevel(userData.favorability || 0) >= 4 ? '🎉 已达到最高好感度！' : `还差 ${getNextFavorabilityThreshold(userData.favorability || 0) - (userData.favorability || 0)} 好感度升级到 Lv.${getFavorabilityLevel(userData.favorability || 0) + 1}`}
+              ${getFavorabilityLevel(userData.favorability || 0) >= 5 ? '🎉 已达到最高好感度等级' : `本次 +${userData.lastFavorabilityGain || 0} · 还差 ${getNextFavorabilityThreshold(userData.favorability || 0) - (userData.favorability || 0)} 好感度升级到 Lv.${getFavorabilityLevel(userData.favorability || 0) + 1}`}
             </div>
+          </div>
+          <div class="bg-white/70 rounded-lg p-3 text-xs">
+            <div class="font-medium text-gray-700 mb-2">当前教学权益</div>
+            <div class="space-y-1 text-gray-600">${getFavorabilityConfig(getFavorabilityLevel(userData.favorability || 0)).features.map(feature => `<div>✅ ${feature}</div>`).join('')}</div>
+            ${getFavorabilityLevel(userData.favorability || 0) < 5 ? `<div class="text-pink-600 mt-2">下一级：${getFavorabilityConfig(getFavorabilityLevel(userData.favorability || 0)).nextFeature}</div>` : ''}
           </div>
           <div>
             <div class="flex justify-between text-xs mb-1">
@@ -10829,7 +12066,7 @@ function analyzeGreetingChallenge(answer, len, hasNegative, hasQuestion, hasDeta
       scoreDelta: -3, comment: '语气不太友好',
       suggestion: '打招呼要保持积极友好，即使你心情不太好，也要给对方一个微笑。',
       correctAnswer: '你好！今天天气不错啊，你也坐这趟电梯？',
-      correctReason: '负面情绪会传染，主动打招呼时保持积极，能给对方留下好印象。'
+      correctReason: '问候不需要强装开心；保持基本礼貌、避免把情绪发泄给对方即可。'
     };
   }
   if (hasQuestion) {
@@ -10880,9 +12117,9 @@ function analyzeDeepTalkChallenge(answer, len, hasNegative, hasQuestion, hasEmpa
   if (hasNegative) {
     return {
       scoreDelta: -3, comment: '有点消极，试着换个角度',
-      suggestion: '深度对话中保持积极态度，即使对方抱怨，你也要引导到解决方案上。',
-      correctAnswer: '虽然压力大，但我相信你一定能找到解决办法的。能具体说说是什么让你觉得难吗？',
-      correctReason: '消极回应会让对话陷入负面情绪，积极引导才能让对方看到希望。'
+      suggestion: '先承接对方的感受，不必急着把话题转向积极或解决方案。',
+      correctAnswer: '听起来你已经撑了很久。现在你更希望我听你说，还是一起想想办法？',
+      correctReason: '先确认对方需要倾听还是建议，能避免“强行积极”让人感到被否定。'
     };
   }
   return {
