@@ -15,3 +15,6 @@ __pycache__/
 .flutter_tool_state
 .idea/
 .workbuddy/
+
+# 本地模型/资产（不提交）
+libs/u2net.onnx

@@ -2,8 +2,11 @@
 # -*- coding: utf-8 -*-
 """把教练全身照 + 用户头像抠成透明背景 PNG，供照片合成舞台使用。"""
 import os, sys
-from rembg import remove
+from rembg import remove, new_session
 from PIL import Image
+
+# 强制使用已下载的 u2net 模型，避免 rembg 2.0 默认去下载 1GB 的 bria-rmbg
+SESS = new_session("u2net")
 
 ROOT = "F:/开发软件项目文件/对练社交"
 IN_COACH = ROOT + "/assets/images/coaches"
@@ -24,9 +27,12 @@ jobs = [
 for src, name in jobs:
     try:
         im = Image.open(src).convert("RGBA")
-        out = remove(im)
+        # 缩图加速 + 减少 CPU 负担（720px 足够页面展示）
+        if max(im.size) > 720:
+            im.thumbnail((720, 720), Image.LANCZOS)
+        out = remove(im, session=SESS)
         out.save(OUT + "/" + name)
-        print("OK", name, out.size)
+        print("OK", name, out.size, flush=True)
     except Exception as e:
-        print("ERR", name, repr(e))
+        print("ERR", name, repr(e), flush=True)
 print("done")
