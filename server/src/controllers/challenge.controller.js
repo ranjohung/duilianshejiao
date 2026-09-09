@@ -62,6 +62,9 @@ async function startChallenge(req, res) {
     if (existingStatus && existingStatus.status === 'in_progress') {
       return errorResponse(res, 400, '该挑战正在进行中');
     }
+    if (existingStatus && existingStatus.status === 'completed') {
+      return errorResponse(res, 400, '该挑战已完成并领取过奖励');
+    }
 
     const userChallengeId = await RealChallenge.startChallenge(userId, challengeId);
 
@@ -97,15 +100,19 @@ async function updateChallengeProgress(req, res) {
 
     if (isCompleted) {
       const result = await RealChallenge.completeChallenge(userId, challengeId);
+      let pointResult = null;
       if (result) {
-        await User.updatePoints(userId, result.reward_points);
+        pointResult = await User.updatePoints(userId, result.reward_points);
       }
+      const actualReward = pointResult?.appliedDelta ?? 0;
 
       successResponse(res, {
         challengeId,
         progress: challenge.target_count,
         completed: true,
-        reward_points: result?.reward_points || 0,
+        reward_points: actualReward,
+        total_points: pointResult?.newPoints,
+        lifetime_points: pointResult?.totalPoints,
       }, '挑战完成！获得奖励');
     } else {
       successResponse(res, {
@@ -143,12 +150,15 @@ async function completeChallenge(req, res) {
       return errorResponse(res, 500, '完成挑战失败');
     }
 
-    await User.updatePoints(userId, result.reward_points);
+    const pointResult = await User.updatePoints(userId, result.reward_points);
+    const actualReward = pointResult?.appliedDelta ?? 0;
 
     successResponse(res, {
       challengeId,
       completed: true,
-      reward_points: result.reward_points,
+      reward_points: actualReward,
+      total_points: pointResult?.newPoints,
+      lifetime_points: pointResult?.totalPoints,
     }, '挑战完成！获得奖励');
   } catch (error) {
     errorResponse(res, 500, '完成失败', error.message);

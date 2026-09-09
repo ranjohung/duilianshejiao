@@ -8,7 +8,7 @@ test('训练流程测试 - 场景模板市场点击开始训练', async ({ page 
 
   // 1. Navigate to the page
   console.log('1. 打开页面...');
-  await page.goto(BASE_URL, { waitUntil: 'networkidle', timeout: 15000 });
+  await page.goto(BASE_URL, { waitUntil: 'domcontentloaded', timeout: 15000 });
   await page.screenshot({ path: `${SCREENSHOT_DIR}/01_initial_page.png` });
   console.log('   页面已加载');
 
@@ -29,6 +29,16 @@ test('训练流程测试 - 场景模板市场点击开始训练', async ({ page 
     const startBtn = onboardingModal.getByRole('button', { name: '开始训练' });
     await startBtn.click();
     await page.waitForTimeout(500);
+  }
+  const initialSelection = page.locator('#initial-selection-dialog');
+  if (await initialSelection.isVisible().catch(() => false)) {
+    await page.evaluate(() => selectInitialScene(4));
+    await expect(page.locator('#initial-selection-confirm-dialog')).toBeVisible();
+    await expect(page.locator('#initial-selection-confirm-dialog')).toContainText('唯一一次免费选择机会');
+    await page.getByRole('button', { name: '确认选择' }).click();
+    await expect(page.locator('#initial-selection-success-dialog')).toBeVisible();
+    await expect(page.locator('#initial-selection-success-dialog')).toContainText('已免费解锁「加薪谈判」');
+    await page.getByRole('button', { name: '稍后再练' }).click();
   }
   await page.screenshot({ path: `${SCREENSHOT_DIR}/03_after_onboarding.png` });
 
@@ -95,7 +105,7 @@ test('训练流程测试 - 场景模板市场点击开始训练', async ({ page 
   console.log('8. 点击"开始训练"按钮...');
   await page.screenshot({ path: `${SCREENSHOT_DIR}/07_before_click.png` });
 
-  // Scene id 4 is "加薪谈判"；首次登录通过统一选择入口免费解锁
+  // Scene id 4 is "加薪谈判"；首次选择完成后可直接开始
   await page.evaluate(() => {
     chooseTrainingScene(4);
   });
@@ -210,4 +220,41 @@ test('训练流程测试 - 场景模板市场点击开始训练', async ({ page 
   console.log('\n===== 测试完成 =====');
   console.log(`可见弹窗: ${visibleModals.length > 0 ? visibleModals.join(', ') : '无'}`);
   console.log('截图已保存到 test_screenshots/ 目录');
+});
+
+test('新注册账号提示链路完整', async ({ page }) => {
+  await page.setViewportSize({ width: 430, height: 932 });
+  await page.goto(BASE_URL, { waitUntil: 'domcontentloaded' });
+
+  await page.getByRole('button', { name: '立即注册' }).click();
+  await page.locator('#reg-phone').fill('13900000001');
+  await page.locator('#reg-nickname').fill('新用户测试');
+  await page.locator('#reg-password').fill('123456');
+  await page.locator('#reg-confirm-password').fill('123456');
+  await page.locator('#agree-terms').check();
+  await page.locator('#register-form').getByRole('button', { name: '注 册' }).click();
+
+  const onboarding = page.locator('#modal-onboarding');
+  await expect(onboarding).toBeVisible();
+  await expect(onboarding).toContainText('欢迎来到对练社交');
+  await onboarding.getByRole('button', { name: '开始训练' }).click();
+
+  const selection = page.locator('#initial-selection-dialog');
+  await expect(selection).toBeVisible();
+  await selection.getByRole('button', { name: /相亲模拟/ }).click();
+
+  const confirm = page.locator('#initial-selection-confirm-dialog');
+  await expect(confirm).toBeVisible();
+  await expect(confirm).toContainText('唯一一次免费选择机会');
+  await confirm.getByRole('button', { name: '确认选择' }).click();
+
+  const success = page.locator('#initial-selection-success-dialog');
+  await expect(success).toBeVisible();
+  await success.getByRole('button', { name: '开始训练' }).click();
+
+  await expect(page.locator('#modal-training')).toBeVisible();
+  await page.getByRole('button', { name: '退出训练' }).click();
+  const exitDialog = page.locator('#training-exit-dialog');
+  await expect(exitDialog).toBeVisible();
+  await expect(exitDialog).toContainText('本次不会获得训练积分或好感度');
 });

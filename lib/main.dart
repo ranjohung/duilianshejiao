@@ -1,7 +1,10 @@
 
 import 'package:flutter/material.dart';
 import 'app.dart';
+import 'network/services/auth_service.dart';
 
-void main() {
-  runApp(const DuiLianApp(initialRoute: '/login'));
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final isLoggedIn = await AuthService().isLoggedIn();
+  runApp(DuiLianApp(initialRoute: isLoggedIn ? '/home' : '/login'));
 }

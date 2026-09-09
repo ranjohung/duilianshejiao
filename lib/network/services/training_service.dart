@@ -1,17 +1,26 @@
 import '../api_client.dart';
 import '../api_routes.dart';
 import '../api_response.dart';
+import '../../config/api_config.dart';
+import '../../demo/demo_data.dart';
 import '../../models/training_model.dart';
 
 /// 训练服务
 class TrainingService {
   final _client = ApiClient.instance;
+  final Map<String, int> _demoRounds = <String, int>{};
 
   /// 开始训练
   Future<Map<String, dynamic>> startTraining({
     required String coachId,
     required String sceneId,
   }) async {
+    if (ApiConfig.demoMode) {
+      final result = DemoData.startTraining(sceneId);
+      final sessionId = result['sessionId'] as String;
+      _demoRounds[sessionId] = 1;
+      return result;
+    }
     final res = await _client.post(
       ApiRoutes.trainingStart,
       data: {
@@ -37,6 +46,16 @@ class TrainingService {
     int? choiceIndex,
     String? audioUrl,
   }) async {
+    if (ApiConfig.demoMode) {
+      final round = _demoRounds[sessionId] ?? 1;
+      final result = DemoData.sendMessage(round: round, message: message);
+      if (result['isFinished'] == true) {
+        _demoRounds.remove(sessionId);
+      } else {
+        _demoRounds[sessionId] = (result['currentRound'] as int?) ?? round + 1;
+      }
+      return result;
+    }
     final res = await _client.post(
       ApiRoutes.trainingMessage,
       data: {
@@ -62,6 +81,9 @@ class TrainingService {
     required String message,
     String? audioUrl,
   }) {
+    if (ApiConfig.demoMode) {
+      return Stream<String>.value('data: demo\n\n');
+    }
     return _client.postSSE(
       ApiRoutes.trainingMessage,
       data: {
@@ -74,6 +96,9 @@ class TrainingService {
 
   /// 结束训练
   Future<Map<String, dynamic>> endTraining(String sessionId) async {
+    if (ApiConfig.demoMode) {
+      return DemoData.endTraining();
+    }
     final res = await _client.post(
       ApiRoutes.trainingEnd,
       data: {'sessionId': sessionId},

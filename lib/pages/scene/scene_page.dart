@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../config/api_config.dart';
 import '../../config/app_config.dart';
 import '../../constants/scene_constants.dart';
 import '../../models/scene_model.dart';
@@ -34,6 +35,13 @@ class _ScenePageState extends State<ScenePage> {
       _error = null;
     });
     try {
+      if (ApiConfig.demoMode) {
+        setState(() {
+          _scenes = [];
+          _isLoading = false;
+        });
+        return;
+      }
       // 将阶段名转为 stage 数字
       int? stageNum;
       if (_selectedStage.isNotEmpty) {
@@ -64,7 +72,7 @@ class _ScenePageState extends State<ScenePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('场景'),
+        title: const Text('训练'),
         backgroundColor: AppConfig.primaryColor,
         foregroundColor: Colors.white,
       ),
@@ -399,13 +407,13 @@ class _ScenePageState extends State<ScenePage> {
                               color: AppConfig.primaryColor.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(4),
                             ),
-                            child: Text(scene.stageDisplayName,
+                            child: Text(scene.stageDisplay,
                                 style: TextStyle(
                                     fontSize: 9,
                                     color: AppConfig.primaryColor)),
                           ),
                           const SizedBox(width: 8),
-                          Text(scene.difficultyText,
+                          Text(scene.difficultyDisplay,
                               style: const TextStyle(fontSize: 10)),
                           const SizedBox(width: 8),
                           Text('约${scene.estimatedDuration}分钟',
@@ -421,7 +429,7 @@ class _ScenePageState extends State<ScenePage> {
             const SizedBox(height: 8),
             // 描述
             Text(
-              scene.description ?? scene.teachingPoint,
+              scene.description,
               style: TextStyle(fontSize: 12, color: Colors.grey[600]),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

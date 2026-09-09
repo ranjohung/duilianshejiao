@@ -1,49 +1,81 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
-import '../config/api_config.dart';
-import 'api_response.dart';
 
+import 'package:dio/dio.dart';
+import '../config/api_config.dart';
+import 'api_interceptor.dart';
+
+/// 统一 API 客户端。所有业务 Service 均使用 Dio Response 的 data 字段解析响应。
 class ApiClient {
   static final ApiClient _instance = ApiClient._internal();
   factory ApiClient() => _instance;
   static ApiClient get instance => _instance;
 
-  ApiClient._internal();
+  late final Dio _dio;
 
-  final http.Client _client = http.Client();
+  ApiClient._internal() {
+    _dio = Dio(BaseOptions(
+      baseUrl: ApiConfig.apiBaseUrl,
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 30),
+      sendTimeout: const Duration(seconds: 10),
+      headers: const {'Content-Type': 'application/json'},
+    ));
+    _dio.interceptors.add(ApiInterceptor());
+  }
 
-  Future<Map<String, dynamic>> get(String path, {Map<String, String>? queryParameters}) async {
-    var url = Uri.parse('${ApiConfig.baseUrl}$path');
-    if (queryParameters != null) {
-      url = url.replace(queryParameters: queryParameters);
+  Future<Response<dynamic>> get(
+    String path, {
+    Map<String, dynamic>? queryParameters,
+  }) {
+    return _dio.get(path, queryParameters: queryParameters);
+  }
+
+  Future<Response<dynamic>> post(
+    String path, {
+    Map<String, String>? headers,
+    dynamic data,
+  }) {
+    return _dio.post(path, data: data, options: Options(headers: headers));
+  }
+
+  Future<Response<dynamic>> put(
+    String path, {
+    Map<String, String>? headers,
+    dynamic data,
+  }) {
+    return _dio.put(path, data: data, options: Options(headers: headers));
+  }
+
+  Future<Response<dynamic>> delete(
+    String path, {
+    Map<String, String>? headers,
+  }) {
+    return _dio.delete(path, options: Options(headers: headers));
+  }
+
+  /// 以 SSE 方式提交训练消息。
+  /// 当前客户端只负责把服务端文本块逐段转发给上层；若服务端尚未启用
+  /// text/event-stream，调用方仍可回退到普通 post 接口。
+  Stream<String> postSSE(
+    String path, {
+    Map<String, String>? headers,
+    dynamic data,
+  }) async* {
+    final response = await _dio.post<ResponseBody>(
+      path,
+      data: data,
+      options: Options(
+        headers: {
+          ...?headers,
+          'Accept': 'text/event-stream',
+        },
+        responseType: ResponseType.stream,
+      ),
+    );
+    final body = response.data;
+    if (body == null) return;
+    await for (final chunk in body.stream) {
+      if (chunk.isNotEmpty) yield utf8.decode(chunk, allowMalformed: true);
     }
-    final response = await _client.get(url);
-    return json.decode(response.body);
-  }
-
-  Future<Map<String, dynamic>> post(String path, {Map<String, String>? headers, dynamic data}) async {
-    final url = Uri.parse('${ApiConfig.baseUrl}$path');
-    final response = await _client.post(
-      url,
-      headers: headers ?? {'Content-Type': 'application/json'},
-      body: data != null ? json.encode(data) : null,
-    );
-    return json.decode(response.body);
-  }
-
-  Future<Map<String, dynamic>> put(String path, {Map<String, String>? headers, dynamic data}) async {
-    final url = Uri.parse('${ApiConfig.baseUrl}$path');
-    final response = await _client.put(
-      url,
-      headers: headers ?? {'Content-Type': 'application/json'},
-      body: data != null ? json.encode(data) : null,
-    );
-    return json.decode(response.body);
-  }
-
-  Future<Map<String, dynamic>> delete(String path, {Map<String, String>? headers}) async {
-    final url = Uri.parse('${ApiConfig.baseUrl}$path');
-    final response = await _client.delete(url, headers: headers);
-    return json.decode(response.body);
   }
 }

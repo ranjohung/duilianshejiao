@@ -198,6 +198,12 @@ async function useInviteCode(req, res) {
     const userId = req.user?.id;
     const { code } = req.body;
 
+    // 邀请奖励涉及新设备/新账号、首次有效训练、支付退款观察期和反刷审核。
+    // 完整权益账本上线前默认关闭，避免旧版固定 50/20 积分和道具奖励被直接刷取。
+    if (process.env.INVITE_REWARDS_ENABLED !== 'true') {
+      return errorResponse(res, 503, '邀请奖励正在开发中，当前仅支持邀请码记录');
+    }
+
     if (!code) {
       return errorResponse(res, 400, '邀请码不能为空');
     }
@@ -217,37 +223,36 @@ async function useInviteCode(req, res) {
       return errorResponse(res, 400, '不能使用自己的邀请码');
     }
 
-    const [existingRows] = await User.pool.execute(
-      `SELECT COUNT(*) as cnt FROM users WHERE id = ? AND invited_by = ?`,
-      [userId, inviterId]
-    );
-
-    if (existingRows[0].cnt > 0) {
-      return errorResponse(res, 400, '已经使用过该邀请码');
-    }
-
-    await User.pool.execute(
-      `UPDATE users SET invited_by = ? WHERE id = ?`,
+    // 原子占用邀请关系，避免两个并发请求同时通过检查后重复发奖。
+    const [claimResult] = await User.pool.execute(
+      `UPDATE users SET invited_by = ? WHERE id = ? AND invited_by IS NULL`,
       [inviterId, userId]
     );
+    if (claimResult.affectedRows !== 1) {
+      return errorResponse(res, 400, '已经使用过邀请码');
+    }
 
-    await User.updatePoints(inviterId, 50);
+    const inviterPointResult = await User.updatePoints(inviterId, 50);
+    const inviterRewardPoints = Math.max(0, inviterPointResult?.appliedDelta || 0);
     await Item.addItem(inviterId, 'time_shuttle', 1);
 
     await User.pool.execute(
-      `INSERT INTO invite_rewards (inviter_id, invitee_id, reward_points, reward_item_type, reward_item_quantity, created_at) VALUES (?, ?, 50, 'time_shuttle', 1, NOW())`,
-      [inviterId, userId]
+      `INSERT INTO invite_rewards (inviter_id, invitee_id, reward_points, reward_item_type, reward_item_quantity, created_at) VALUES (?, ?, ?, 'time_shuttle', 1, NOW())`,
+      [inviterId, userId, inviterRewardPoints]
     );
 
-    await User.updatePoints(userId, 20);
+    const inviteePointResult = await User.updatePoints(userId, 20);
+    const inviteeRewardPoints = Math.max(0, inviteePointResult?.appliedDelta || 0);
     await Item.addItem(userId, 'hint_card', 1);
 
     successResponse(res, {
       inviterId,
       rewards: {
-        points: 20,
+        points: inviteeRewardPoints,
         items: [{ type: 'hint_card', quantity: 1 }],
       },
+      totalPoints: inviteePointResult?.newPoints,
+      lifetimePoints: inviteePointResult?.totalPoints,
     }, '使用邀请码成功，获得奖励');
   } catch (error) {
     errorResponse(res, 500, '使用失败', error.message);

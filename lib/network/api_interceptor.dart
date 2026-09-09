@@ -80,11 +80,12 @@ class ApiInterceptor extends Interceptor {
       final refreshToken = prefs.getString('refresh_token');
       if (refreshToken == null) return false;
 
-      // TODO: 调用刷新Token接口
+      // 刷新接口尚未完成接入。返回 true 会拿旧 Token 无限重试 401；
+      // 在真正取得并保存新 Token 前必须返回 false，让上层回到登录态。
       // final res = await Dio().post('${ApiConfig.apiBasePath}/auth/refresh',
       //     data: {'refreshToken': refreshToken});
       // await prefs.setString('auth_token', res.data['data']['token']);
-      return true;
+      return false;
     } catch (_) {
       return false;
     }

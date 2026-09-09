@@ -21,9 +21,9 @@ class ApiResponse<T> {
     return ApiResponse(
       code: json['code'] as int? ?? -1,
       message: json['message'] as String? ?? '',
-      data: json['data'] != null && fromJsonT != null
-          ? fromJsonT(json['data'])
-          : null,
+      data: json['data'] == null
+          ? null
+          : (fromJsonT != null ? fromJsonT(json['data']) : json['data'] as T),
     );
   }
 

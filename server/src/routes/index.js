@@ -175,10 +175,28 @@ const SQL_STATEMENTS = [
     start_date TEXT NOT NULL,
     end_date TEXT NOT NULL,
     is_active INTEGER DEFAULT 1,
+    payment_order_id TEXT UNIQUE,
+    auto_renew INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
   )`,
   `CREATE INDEX IF NOT EXISTS idx_memberships_user_id ON memberships(user_id)`,
+  `CREATE TABLE IF NOT EXISTS membership_orders (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    order_no TEXT NOT NULL UNIQUE,
+    plan_level TEXT NOT NULL,
+    amount_fen INTEGER NOT NULL,
+    payment_method TEXT NOT NULL,
+    provider_transaction_id TEXT UNIQUE,
+    status TEXT NOT NULL DEFAULT 'pending',
+    idempotency_key TEXT NOT NULL UNIQUE,
+    paid_at TEXT,
+    refunded_at TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  )`,
+  `CREATE INDEX IF NOT EXISTS idx_membership_orders_user_id ON membership_orders(user_id)`,
   `CREATE TABLE IF NOT EXISTS social_posts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
@@ -228,6 +246,7 @@ const SQL_STATEMENTS = [
     progress INTEGER DEFAULT 0,
     status TEXT DEFAULT 'in_progress',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    completed_at TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (challenge_id) REFERENCES real_challenges(id) ON DELETE CASCADE
@@ -343,7 +362,7 @@ router.post('/init-db', async (req, res) => {
         INSERT INTO items (name, item_type, description, icon, category, price_coins) VALUES
         ('时空穿梭券', 'time_shuttle', '重新选择对话分支，回到上一个决策点', '🕐', 'utility', 50),
         ('提示卡', 'hint_card', '获取教练对当前场景的额外提示', '💡', 'utility', 30),
-        ('护盾', 'shield', '保护一次训练评分不受扣分影响', '🛡️', 'protection', 40),
+        ('情绪护盾', 'emotion_shield', '保护一次训练评分不受扣分影响', '🛡️', 'protection', 40),
         ('双倍积分卡', 'double_points', '下次训练获得双倍积分', '✨', 'boost', 60)
       `);
     }
@@ -360,7 +379,7 @@ router.post('/init-db', async (req, res) => {
         ('情商高手', '情绪智力达到60', '🧠', 'dimension', 'emotional_intelligence', 60, 20, NULL, 0, 6),
         ('共情之星', '共情能力达到60', '❤️', 'dimension', 'empathy_score', 60, 20, NULL, 0, 7),
         ('青铜之路', '总积分达到100', '🥉', 'points', 'total_points', 100, 15, NULL, 0, 8),
-        ('白银之辉', '总积分达到300', '🥈', 'points', 'total_points', 300, 30, 'shield', 1, 9),
+        ('白银之辉', '总积分达到300', '🥈', 'points', 'total_points', 300, 30, 'emotion_shield', 1, 9),
         ('黄金之光', '总积分达到600', '🥇', 'points', 'total_points', 600, 60, 'double_points', 1, 10),
         ('连续签到3天', '连续签到3天', '🔥', 'checkin', 'streak_days', 3, 10, 'time_shuttle', 1, 11),
         ('连续签到7天', '连续签到7天', '🌟', 'checkin', 'streak_days', 7, 30, 'double_points', 1, 12)

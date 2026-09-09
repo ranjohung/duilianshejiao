@@ -30,8 +30,8 @@ dependencies:
   # Spine动画（如pub.dev上不存在flutter_spine包，请替换为spine_flutter或使用其他方案）
   # flutter_spine: ^0.3.0
 
-  # 声网RTC（实时音视频）
-  agora_rtc_engine: ^6.3.0
+  # 声网 RTC（实时音视频）属于语音训练后期功能；当前版本仅保留文字训练入口，
+  # 待语音训练立项并完成权限、隐私和弱网方案后再引入，避免首发客户端被未使用的原生依赖阻断构建。
 
   # 图片缓存
   cached_network_image: ^3.3.0

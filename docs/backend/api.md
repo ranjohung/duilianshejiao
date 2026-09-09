@@ -2,6 +2,8 @@
 
 > 来源：PRD v2.0 第21章
 
+> **v2.4.2 实现校准（2026-09-05）：** 本文包含目标契约示例。当前 Web 原型已实现并明确标注“原型预览·未上线”的好感度负向规则和场景积分折扣；Node 原型统一 `training_points`（可消费余额）与 `total_points`（等级累计进度），有效训练/签到奖励按服务端实际入账值返回。好感度审核/流水、折后场景原子扣费、才艺经验、分享/邀请固定奖励和真实支付仍为生产待实现。未标记“✅ 已验证”的示例不得视为已上线能力。
+
 ## 21.1 通用规范
 
 | 项目 | 规格 |
@@ -217,10 +219,10 @@
     "comprehensive_score": 54.0,
     "student_level": "白银",
     "training_points": 120,
-    "next_level_points": 300,
+    "next_level_points": 200,
     "talents": [
-      {"type": "empathy", "level": 3, "experience": 280, "title": "进阶"},
-      {"type": "speech", "level": 2, "experience": 80, "title": "初学"}
+      {"type": "empathy", "level": null, "experience": null, "title": "待才艺账本上线"},
+      {"type": "speech", "level": null, "experience": null, "title": "待才艺账本上线"}
     ],
     "score_history": [
       {"week": "2026-W27", "communication": 52, "expression": 48, "empathy": 60}
@@ -470,9 +472,14 @@
     "is_unlocked": true,
     "best_score": 85,
     "completion_rate": 75,
-    "unlock_condition": {
-      "min_points": 0,
-      "description": "默认解锁"
+      "unlock_condition": {
+        "min_points": 0,
+        "base_min_points": 0,
+        "discount_rate": 0,
+        "discounted_min_points": 0,
+        "min_level": "bronze",
+      "min_tickets": 0,
+       "description": "首个场景由新账号免费选择；其余场景按等级、好感度折后可用积分和穿梭券校验"
     }
   }
 }
@@ -510,18 +517,22 @@
       "teaching_style": "encouraging"
     },
     "items_applied": ["double_points"],
-    "remaining_weekly_uses": 14,
+    "remaining_daily_uses": 14,
     "started_at": "2026-07-15T10:00:00Z"
   }
 }
 ```
 
 **业务规则：**
-- 检查场景是否已解锁
-- 检查本周训练次数是否用完
+- 检查场景是否已解锁；生产端必须根据服务端好感度重新计算折后积分，不能信任客户端传入成本
+- 按会员方案检查当日训练额度（免费5次、体验日卡20次、其他会员不限但受安全限频）
 - 检查防沉迷时间限制
 - 消耗1次训练次数
 - 记录使用的道具
+
+> 以上是目标契约；当前 Node 演示路由已完成鉴权、场景条件读取和训练会话创建，但每日额度的持久化扣减、场景永久解锁账本和道具事务仍需生产 API 联调，不能仅凭此示例宣称已上线。
+
+**好感度与折扣规则（目标接口必须保持一致）：** 好感度等级 Lv.0–Lv.5 对场景 `base_min_points` 提供 0/10/20/30/40/50% 折扣，`discounted_min_points = ceil(base_min_points × (1-discount_rate))`；只扣 `training_points`，不改变 `total_points`、券成本或会员访问。训练内连续3次明确敷衍回答扣3点、明确不当/攻击性内容扣5点，登录时连续3个未登录日后按每天1点衰减（单次最多7点），每类事件每次训练最多一次。当前 Node 尚未持久化好感度事件、服务端审核和场景永久解锁/原子扣费，Web 折扣仅为本地原型展示。
 
 ---
 
@@ -567,19 +578,21 @@
     },
     "points_earned": 25,
     "total_points": 375,
+    "lifetime_points": 375,
     "learning_card": {
       "id": 3001,
       "title": "如何在咖啡厅自然破冰",
       "key_point": "观察对方兴趣→真诚表达好奇→开放式问题延续"
     },
-    "talent_exp_gained": {
-      "empathy": 30,
-      "communication": 20
-    },
+    "talent_exp_gained": null,
     "ended_at": "2026-07-15T10:12:00Z"
   }
 }
 ```
+
+**结算规则：** 服务端按完成度≥70%且净得分≥30判定有效训练，返回实际入账积分（约20–50分，含表现/三星加成，受账号额度与幂等约束）；未达标只返回反馈，不发本次积分/好感度。客户端不得自行决定最终奖励。
+
+> 当前可运行 Node 结算入口为 `POST /api/training/end`；`/api/scenes/:id/complete` 是目标接口示例，尚未形成独立实现。
 
 ---
 
@@ -623,9 +636,9 @@
     "round": 3,
     "total_rounds": 5,
     "items_remaining": {
-      "time_travel": 2,
+      "time_shuttle": 2,
       "hint_card": 3,
-      "shield": 2
+      "emotion_shield": 2
     },
     "llm_provider": "deepseek"
   }
@@ -861,15 +874,17 @@
   "code": 0,
   "data": {
     "consecutive_days": 5,
-    "points_earned": 9,
-    "total_points": 379,
+    "points_earned": 10,
+    "total_points": 380,
+    "lifetime_points": 380,
     "today_reward": {
       "type": "points",
-      "value": 9
+      "value": 10,
+      "items": ["time_shuttle x1"]
     },
     "week_bonus": {
       "days_remaining": 2,
-      "bonus_description": "连续7天额外20积分+时空穿梭券+双倍积分卡"
+      "bonus_description": "连续7天额外3张时空穿梭券"
     }
   }
 }
@@ -877,7 +892,7 @@
 
 **业务规则：**
 - 每日只能签到1次
-- 连续天数递增积分：5,6,7,8,9,10,11...
+- 基础奖励为10积分+1张时空穿梭券；连续第7天当天共4张（额外3张），均以服务端实际入账值为准并受免费用户累计积分上限和券持有上限约束
 - 断签归零重计
 
 ---
@@ -896,8 +911,8 @@
     "consecutive_days": 5,
     "this_week_progress": [true, true, true, true, true, false, false],
     "next_reward_preview": {
-      "day_6": {"type": "emotion_shield", "value": 1},
-      "day_7": {"type": "bonus", "points": 20, "items": ["time_travel", "double_points"]}
+      "day_6": {"type": "daily", "points": 10, "items": ["time_shuttle"]},
+      "day_7": {"type": "streak_bonus", "points": 10, "items": ["time_shuttle x4"]}
     }
   }
 }
@@ -1066,10 +1081,9 @@
   "message": "邀请已发送",
   "data": {
     "invite_id": 1,
-    "rewards_preview": {
-      "inviter": "各类道具×1 + 10积分",
-      "invitee": "体验卡(1次DeepSeek对话)"
-    }
+    "rewards_preview": null,
+    "reward_status": "pending",
+    "reward_message": "邀请奖励正在开发中，当前仅支持邀请码记录"
   }
 }
 ```
@@ -1126,7 +1140,7 @@
   "data": {
     "items": [
       {
-        "item_type": "time_travel",
+        "item_type": "time_shuttle",
         "name": "时空穿梭券",
         "description": "回到训练中的关键分支点重新选择",
         "quantity": 3,
@@ -1200,7 +1214,7 @@
 
 ### GET /api/membership/plans
 
-**描述：** 获取会员方案
+**描述：** 获取可购买会员方案（当前环境仅返回展示配置，支付通道未配置时不会创建订单）
 
 **响应体：**
 
@@ -1208,91 +1222,66 @@
 {
   "code": 0,
   "data": {
+    "currency": "CNY",
+    "payment_status": "not_configured",
     "plans": [
-      {
-        "level": "daily",
-        "name": "日卡",
-        "price": 3.9,
-        "duration_days": 1,
-        "features": ["DeepSeek对话", "每周20次训练", "2D Spine教练"]
-      },
-      {
-        "level": "weekly",
-        "name": "周卡",
-        "price": 18,
-        "duration_days": 7,
-        "features": ["DeepSeek对话", "无限训练次数", "2.5D Live2D教练", "每周道具包"]
-      },
-      {
-        "level": "monthly",
-        "name": "月卡",
-        "price": 58,
-        "duration_days": 30,
-        "features": ["DeepSeek对话", "无限训练次数", "3D教练", "每月道具包", "语音训练"]
-      },
-      {
-        "level": "yearly",
-        "name": "年卡",
-        "price": 398,
-        "duration_days": 365,
-        "features": ["DeepSeek高优先级", "无限训练次数", "3D+真人教练", "年道具包", "语音训练", "专属皮肤"]
-      }
-    ],
-    "current_plan": {
-      "level": "free",
-      "expire_at": null
-    }
+      { "level": "daily", "name": "体验日卡", "price": 3.9, "duration_days": 1, "features": { "daily_trainings": 20, "voice_training": false, "unlimited_scenes": true } },
+      { "level": "weekly", "name": "周卡", "price": 19.9, "duration_days": 7, "features": { "daily_trainings": null, "voice_training": true, "unlimited_scenes": true } },
+      { "level": "monthly", "name": "月卡", "price": 69, "duration_days": 30, "features": { "daily_trainings": null, "voice_training": true, "unlimited_scenes": true } },
+      { "level": "yearly", "name": "年卡", "price": 499, "duration_days": 365, "features": { "daily_trainings": null, "voice_training": true, "unlimited_scenes": true } }
+    ]
   }
 }
 ```
 
 ---
 
-### POST /api/membership/purchase
+### POST /api/membership/purchase（兼容路径：/api/membership/subscribe）
 
-**描述：** 购买会员
+**描述：** 创建会员支付意向。支付回调、验签和权益账本完成前不得直接开通会员。
 
 **请求体：**
 
 ```json
 {
   "level": "monthly",
-  "payment_method": "wechat"
+  "payment_method": "wechat",
+  "idempotency_key": "client-generated-uuid"
 }
 ```
 
-**响应体：**
+**当前演示环境响应：**
 
 ```json
 {
-  "code": 0,
-  "message": "购买成功",
-  "data": {
-    "order_id": "ORD20260715001",
-    "level": "monthly",
-    "expire_at": "2026-08-14T23:59:59Z",
-    "payment_amount": 58.00
-  }
+  "code": 50503,
+  "message": "支付服务尚未配置，本次未创建订单、未扣款、未开通会员",
+  "success": false
 }
 ```
 
-**业务规则：**
-- 已有会员时，新购买时长叠加
-- 升级会员时，计算剩余时长差价
-- 14-18岁用户单笔消费上限50元
-- 14-18岁用户月累计消费上限200元
+**正式接入必须满足：**
+
+1. 服务端只接受 `plan_id/level`，按服务端价格表计算金额，客户端金额只用于展示。
+2. 创建唯一订单（`idempotency_key` + 用户 + 方案），状态为 `pending`；返回支付参数，不在此步骤发放权益。
+3. 仅在支付平台回调验签成功、金额与订单一致且订单未处理时，原子地将订单置为 `paid` 并写入会员权益账本。
+4. 客户端通过订单状态接口查询结果；不能依据客户端回调、跳转参数或本地存储直接开通。
+5. 退款、拒付、过期和重复回调必须可幂等处理，并撤销或重算对应权益；订单、支付流水、会员记录和道具发放需可对账。
+6. 14–18岁用户的单笔/月累计限额、实名与监护人要求应由服务端和支付平台共同校验，不能只靠前端提示。
+
+**推荐的订单状态：** `pending` → `paid` → `entitled`；失败为 `failed`，退款为 `refunded`，争议为 `disputed`。
+
+**会员价格基线（2026-09-05）：** 体验日卡 ¥3.9/1天、周卡 ¥19.9/7天、月卡 ¥69/30天、年卡 ¥499/365天。价格变更必须同时更新前端、Flutter、后端配置和隐私/支付说明，并保留版本号。
 
 **会员权益对比表：**
 
-| 权益 | 体验 | 免费 | 日卡 | 周卡 | 月卡 | 年卡 |
-|------|------|------|------|------|------|------|
-| LLM引擎 | DeepSeek(1次) | Ollama+10%偶遇 | DeepSeek | DeepSeek | DeepSeek | DeepSeek高优 |
-| 每周训练次数 | 1次 | 15次 | 20次 | 无限 | 无限 | 无限 |
-| 教练渲染 | 2D Spine | 2D Spine | 2D Spine | 2.5D Live2D | 3D | 3D+真人 |
-| 语音训练 | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
-| 高难度关卡 | ❌ | 积分≥300解锁 | 积分≥300解锁 | ✅直接解锁 | ✅直接解锁 | ✅直接解锁 |
+| 权益 | 免费版 | 体验日卡 | 周卡 | 月卡 | 年卡 |
+|------|------|------|------|------|------|
+| AI对话引擎 | 基础额度 | DeepSeek | DeepSeek | DeepSeek高优 | DeepSeek高优 |
+| 每日训练次数 | 5次 | 20次 | 不限日常次数* | 不限日常次数* | 不限日常次数* |
+| 语音训练 | ❌ | ❌ | ✅ | ✅ | ✅ |
+| 高难度关卡 | 按等级/积分/券 | 会员期内访问 | 会员期内访问 | 会员期内访问 | 会员期内访问 |
+| 全部场景访问 | 逐项解锁 | 会员期内访问 | 会员期内访问 | 会员期内访问 | 会员期内访问 |
+| 价格 | 免费 | ¥3.9/日 | ¥19.9/周 | ¥69/月 | ¥499/年 |
 
-**说明：** 所有用户训练积分≥300均可解锁高难度关卡，周卡/月卡/年卡会员无积分限制直接解锁。
-| 时空穿梭券 | 0 | 签到获取 | 签到获取 | 3张/周 | 10张/月 | 15张/月 |
-| 双倍积分卡 | 0 | 签到获取 | 签到获取 | 1张/周 | 3张/月 | 3张/月 |
-| 价格 | 免费 | 免费 | ¥3.9/日 | ¥18/周 | ¥58/月 | ¥398/年 |
+说明：会员直接访问仅在会员有效期内成立，不把场景永久写入用户解锁记录；所有会员仍受服务端安全限频。

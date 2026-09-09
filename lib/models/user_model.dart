@@ -50,18 +50,22 @@ class UserModel {
   /// 是否付费会员
   bool get isPaidMember => !isFreeUser;
 
-  /// 每周训练次数上限
-  int get weeklyTrainingLimit {
+  /// 每日训练次数上限
+  int get dailyTrainingLimit {
     switch (memberLevel) {
       case 'free':
       case 'experience':
-        return 15;
+        return 5;
       case 'daily':
         return 20;
       default:
         return -1; // 无限制
     }
   }
+
+  /// 兼容旧页面字段；新页面应使用 dailyTrainingLimit。
+  @Deprecated('Use dailyTrainingLimit')
+  int get weeklyTrainingLimit => dailyTrainingLimit;
 
   // ============ 学员等级体系 ============
 

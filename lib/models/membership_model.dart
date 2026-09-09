@@ -27,7 +27,7 @@ class MembershipPlan {
       duration: 0,
       features: MembershipFeatures(
         llmEngine: 'deepseek',
-        weeklyTrainings: 1,
+        weeklyTrainings: 5,
         renderType: '2d',
         voiceTraining: false,
         highDifficulty: false,
@@ -42,7 +42,7 @@ class MembershipPlan {
       duration: 0,
       features: MembershipFeatures(
         llmEngine: 'ollama',
-        weeklyTrainings: 15,
+        weeklyTrainings: 5,
         renderType: '2d',
         voiceTraining: false,
         highDifficulty: false,
@@ -68,7 +68,7 @@ class MembershipPlan {
     MembershipPlan(
       level: 'weekly',
       label: '周卡',
-      price: 18.0,
+      price: 19.9,
       duration: 7,
       features: MembershipFeatures(
         llmEngine: 'deepseek',
@@ -83,7 +83,7 @@ class MembershipPlan {
     MembershipPlan(
       level: 'monthly',
       label: '月卡',
-      price: 58.0,
+      price: 69.0,
       duration: 30,
       features: MembershipFeatures(
         llmEngine: 'deepseek',
@@ -98,7 +98,7 @@ class MembershipPlan {
     MembershipPlan(
       level: 'yearly',
       label: '年卡',
-      price: 398.0,
+      price: 499.0,
       duration: 365,
       features: MembershipFeatures(
         llmEngine: 'deepseek_high',
@@ -151,7 +151,7 @@ class MembershipFeatures {
     required this.weeklyDoublePoints,
   });
 
-  /// 每周训练次数显示文本
+  /// 训练次数显示文本（原型按每日额度展示）
   String get weeklyTrainingsText {
     if (weeklyTrainings == -1) return '无限';
     return '$weeklyTrainings次';
@@ -230,12 +230,12 @@ class MembershipComparison {
 
   static const List<MembershipComparisonRow> rows = [
     MembershipComparisonRow(feature: 'LLM引擎', values: ['DeepSeek(1次)', 'Ollama+10%偶遇', 'DeepSeek', 'DeepSeek', 'DeepSeek', 'DeepSeek高优']),
-    MembershipComparisonRow(feature: '每周训练', values: ['1次', '15次', '20次', '无限', '无限', '无限']),
+    MembershipComparisonRow(feature: '每日训练次数', values: ['5次', '5次', '20次', '无限*', '无限*', '无限*']),
     MembershipComparisonRow(feature: '教练渲染', values: ['2D', '2D', '2D', '2.5D', '3D', '3D+真人']),
     MembershipComparisonRow(feature: '语音训练', values: ['❌', '❌', '❌', '✅', '✅', '✅']),
     MembershipComparisonRow(feature: '高难度关卡', values: ['❌', '❌', '❌', '✅', '✅', '✅']),
     MembershipComparisonRow(feature: '穿梭券', values: ['0', '签到获取', '签到获取', '3张/周', '10张/月', '15张/月']),
     MembershipComparisonRow(feature: '双倍积分卡', values: ['0', '签到获取', '签到获取', '1张/周', '3张/月', '3张/月']),
-    MembershipComparisonRow(feature: '价格', values: ['免费', '免费', '¥3.9/日', '¥18/周', '¥58/月', '¥398/年']),
+    MembershipComparisonRow(feature: '价格', values: ['免费', '免费', '¥3.9/日', '¥19.9/周', '¥69/月', '¥499/年']),
   ];
 }

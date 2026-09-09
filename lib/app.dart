@@ -100,7 +100,7 @@ class _MainNavigationState extends State<MainNavigation> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: '首页'),
           BottomNavigationBarItem(icon: Icon(Icons.school), label: '教练'),
-          BottomNavigationBarItem(icon: Icon(Icons.theater_comedy), label: '场景'),
+          BottomNavigationBarItem(icon: Icon(Icons.theater_comedy), label: '训练'),
           BottomNavigationBarItem(icon: Icon(Icons.trending_up), label: '成长'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: '我的'),
         ],

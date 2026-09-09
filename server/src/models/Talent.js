@@ -75,6 +75,91 @@ module.exports = {
     return { id: talentId, ...selected, level: 1 };
   },
 
+  // 解锁天赋与扣除可用积分必须在同一事务内完成，避免并发请求出现“天赋已创建但积分扣除失败”。
+  async unlockRandomTalentWithCost(userId, cost = 100) {
+    const connection = await pool.getConnection();
+    try {
+      await connection.beginTransaction();
+      const [userRows] = await connection.execute(
+        'SELECT training_points FROM users WHERE id = ? FOR UPDATE',
+        [userId]
+      );
+      if (!userRows.length || Number(userRows[0].training_points) < cost) {
+        await connection.rollback();
+        return { success: false, reason: '积分不足' };
+      }
+      const [existingRows] = await connection.execute(`SELECT name FROM ${TABLE} WHERE user_id = ? FOR UPDATE`, [userId]);
+      const existingNames = existingRows.map(row => row.name);
+      const available = PRESET_TALENTS.filter(t => !existingNames.includes(t.name));
+      if (available.length === 0) {
+        await connection.rollback();
+        return { success: false, reason: '已解锁所有天赋' };
+      }
+      const selected = available[Math.floor(Math.random() * available.length)];
+      await connection.execute('UPDATE users SET training_points = training_points - ? WHERE id = ?', [cost, userId]);
+      const [insertResult] = await connection.execute(
+        `INSERT INTO ${TABLE} (user_id, name, description, level, created_at) VALUES (?, ?, ?, 1, NOW())`,
+        [userId, selected.name, selected.description]
+      );
+      const [balanceRows] = await connection.execute(
+        'SELECT training_points, total_points FROM users WHERE id = ?',
+        [userId]
+      );
+      await connection.commit();
+      return {
+        success: true,
+        talent: { id: insertResult.insertId, ...selected, level: 1 },
+        pointsConsumed: cost,
+        remainingPoints: Number(balanceRows[0]?.training_points) || 0,
+        remainingLifetimePoints: Number(balanceRows[0]?.total_points) || 0,
+      };
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
+  },
+
+  // 升级天赋与扣费同事务，不能先升级后发现余额不足。
+  async upgradeWithCost(userId, talentId, cost) {
+    const connection = await pool.getConnection();
+    try {
+      await connection.beginTransaction();
+      const [talentRows] = await connection.execute(
+        `SELECT id, level FROM ${TABLE} WHERE id = ? AND user_id = ? FOR UPDATE`,
+        [talentId, userId]
+      );
+      if (!talentRows.length) {
+        await connection.rollback();
+        return { success: false, reason: '天赋不存在' };
+      }
+      const [userRows] = await connection.execute('SELECT training_points FROM users WHERE id = ? FOR UPDATE', [userId]);
+      if (!userRows.length || Number(userRows[0].training_points) < cost) {
+        await connection.rollback();
+        return { success: false, reason: '积分不足' };
+      }
+      await connection.execute('UPDATE users SET training_points = training_points - ? WHERE id = ?', [cost, userId]);
+      await connection.execute(`UPDATE ${TABLE} SET level = level + 1 WHERE id = ? AND user_id = ?`, [talentId, userId]);
+      const [balanceRows] = await connection.execute(
+        'SELECT training_points, total_points FROM users WHERE id = ?',
+        [userId]
+      );
+      await connection.commit();
+      return {
+        success: true,
+        pointsConsumed: cost,
+        remainingPoints: Number(balanceRows[0]?.training_points) || 0,
+        remainingLifetimePoints: Number(balanceRows[0]?.total_points) || 0,
+      };
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
+  },
+
   async getTalentEffects(userId) {
     const [rows] = await pool.execute(`SELECT name, level FROM ${TABLE} WHERE user_id = ?`, [userId]);
 

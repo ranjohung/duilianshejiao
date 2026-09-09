@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../config/app_config.dart';
+import '../../config/api_config.dart';
+import '../../demo/demo_data.dart';
 import '../../models/scene_model.dart';
 import '../../models/coach_model.dart';
 import '../../network/services/scene_service.dart';
@@ -26,7 +28,7 @@ class SceneSelectPage extends StatefulWidget {
 class _SceneSelectPageState extends State<SceneSelectPage> {
   final _sceneService = SceneService();
   final _coachService = CoachService();
-  List<_StageGroup> _stageGroups = [];
+  List<StageGroup> _stageGroups = [];
   bool _isLoading = true;
   String? _error;
 
@@ -42,6 +44,13 @@ class _SceneSelectPageState extends State<SceneSelectPage> {
       _error = null;
     });
     try {
+      if (ApiConfig.demoMode) {
+        setState(() {
+          _stageGroups = DemoData.groupedScenes;
+          _isLoading = false;
+        });
+        return;
+      }
       final result = await _sceneService.getGroupedScenes();
       if (result.isSuccess && result.data != null) {
         setState(() {
@@ -86,7 +95,7 @@ class _SceneSelectPageState extends State<SceneSelectPage> {
     );
   }
 
-  Widget _buildStageSection(_StageGroup group) {
+  Widget _buildStageSection(StageGroup group) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -134,12 +143,12 @@ class _SceneSelectPageState extends State<SceneSelectPage> {
       decoration: BoxDecoration(
         color: Colors.grey[50],
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[100]),
+        border: Border.all(color: Colors.grey.shade100),
       ),
-      child: const Center(
+      child: Center(
         child: Column(
           children: [
-            Icon(Icons.lock_outline, size: 32, color: Colors.grey[300]),
+            Icon(Icons.lock_outline, size: 32, color: Colors.grey),
             SizedBox(height: 8),
             Text(
               '该阶段尚未解锁',
@@ -218,7 +227,7 @@ class _SceneSelectPageState extends State<SceneSelectPage> {
           children: [
             const SizedBox(height: 4),
             Text(
-              scene.description ?? scene.teachingPoint ?? '',
+              scene.description,
               style: TextStyle(fontSize: 12, color: Colors.grey[600]),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -266,6 +275,18 @@ class _SceneSelectPageState extends State<SceneSelectPage> {
   }
 
   void _onSceneTap(SceneModel scene) async {
+    if (ApiConfig.demoMode) {
+      if (!mounted) return;
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => TrainingPage(
+            coach: DemoData.defaultCoach,
+            scene: scene,
+          ),
+        ),
+      );
+      return;
+    }
     if (widget.coachId == null) return;
     try {
       final coachResult =
@@ -286,26 +307,5 @@ class _SceneSelectPageState extends State<SceneSelectPage> {
             .showSnackBar(SnackBar(content: Text('加载教练数据失败: $e')));
       }
     }
-  }
-}
-
-class _StageGroup {
-  final String stage;
-  final bool unlocked;
-  final List<SceneModel> scenes;
-
-  _StageGroup({
-    required this.stage,
-    required this.unlocked,
-    required this.scenes,
-  });
-
-  factory _StageGroup.fromJson(Map<String, dynamic> json) {
-    final scenes = (json['scenes'] as List<dynamic>?) ?? [];
-    return _StageGroup(
-      stage: json['stage'] as String,
-      unlocked: json['unlocked'] as bool,
-      scenes: scenes.map((e) => SceneModel.fromJson(e)).toList(),
-    );
   }
 }

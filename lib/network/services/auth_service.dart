@@ -8,6 +8,14 @@ import '../api_response.dart';
 class AuthService {
   final _client = ApiClient.instance;
 
+  /// 本地演示登录只写入隔离的演示 token，不请求后端、不授予生产权益。
+  /// 调用方必须先检查 ApiConfig.demoMode，避免生产环境静默降级。
+  Future<void> loginDemo() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('auth_token', 'demo-local-token');
+    await prefs.setString('refresh_token', 'demo-local-refresh-token');
+  }
+
   /// 注册（同时触发实名认证）
   /// 新用户通过登录接口自动注册，此方法用于需要额外信息的场景
   Future<ApiResponse> register({
@@ -27,17 +35,24 @@ class AuthService {
     return result;
   }
 
-  /// 手机号+验证码登录（新用户自动注册）
+  /// 手机号+验证码或密码登录（新用户验证码登录时自动注册）
   /// 后端接口：POST /api/auth/login
-  /// 请求参数：{ phone, code }
+  /// 请求参数：{ phone, code } 或 { phone, password }
   /// 响应数据：{ token, refreshToken, needRealNameVerify, user }
   Future<ApiResponse> login({
     required String phone,
-    required String code,
+    String? code,
+    String? password,
   }) async {
+    final data = <String, dynamic>{'phone': phone};
+    if (password != null && password.isNotEmpty) {
+      data['password'] = password;
+    } else if (code != null && code.isNotEmpty) {
+      data['code'] = code;
+    }
     final res = await _client.post(
       ApiRoutes.login,
-      data: {'phone': phone, 'code': code},
+      data: data,
     );
     final result = ApiResponse.fromJson(res.data, null);
     // 登录成功后自动保存token

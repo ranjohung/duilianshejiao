@@ -33,19 +33,15 @@ async function unlockTalent(req, res) {
       return errorResponse(res, 404, '用户不存在');
     }
 
-    if (user.total_points < 100) {
-      return errorResponse(res, 400, '积分不足，需要100积分解锁天赋');
-    }
+    const result = await Talent.unlockRandomTalentWithCost(userId, 100);
+    if (!result.success) return errorResponse(res, 400, result.reason === '已解锁所有天赋' ? result.reason : '积分不足，需要100积分解锁天赋');
 
-    const unlocked = await Talent.unlockRandomTalent(userId);
-
-    if (!unlocked) {
-      return errorResponse(res, 400, '已解锁所有天赋');
-    }
-
-    await User.updatePoints(userId, -100);
-
-    successResponse(res, unlocked, '解锁天赋成功');
+    successResponse(res, {
+      ...result.talent,
+      points: result.remainingPoints,
+      lifetimePoints: result.remainingLifetimePoints,
+      pointsConsumed: result.pointsConsumed,
+    }, '解锁天赋成功');
   } catch (error) {
     errorResponse(res, 500, '解锁失败', error.message);
   }
@@ -71,16 +67,12 @@ async function upgradeTalent(req, res) {
     }
 
     const upgradeCost = talent.level * 50;
-    if (user.total_points < upgradeCost) {
+    if ((user.training_points || 0) < upgradeCost) {
       return errorResponse(res, 400, `积分不足，升级需要${upgradeCost}积分`);
     }
 
-    const success = await Talent.upgrade(talentId);
-    if (!success) {
-      return errorResponse(res, 500, '升级失败');
-    }
-
-    await User.updatePoints(userId, -upgradeCost);
+    const result = await Talent.upgradeWithCost(userId, talentId, upgradeCost);
+    if (!result.success) return errorResponse(res, 400, result.reason === '积分不足' ? `积分不足，升级需要${upgradeCost}积分` : '升级失败');
 
     const updatedTalent = await Talent.findById(talentId);
     const presetTalents = await Talent.getPresetTalents();
@@ -89,6 +81,9 @@ async function upgradeTalent(req, res) {
     successResponse(res, {
       ...updatedTalent,
       base_effect: preset?.base_effect || {},
+      points: result.remainingPoints,
+      lifetimePoints: result.remainingLifetimePoints,
+      pointsConsumed: result.pointsConsumed,
     }, '升级天赋成功');
   } catch (error) {
     errorResponse(res, 500, '升级失败', error.message);

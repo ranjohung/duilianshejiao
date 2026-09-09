@@ -5,5 +5,13 @@ playwright-report/
 test-results/
 test_screenshots/
 .dart_tool/
+build/
+build_android_*.log
 parsed_output/
 __pycache__/
+
+# 本地 IDE/Flutter 状态
+.flutter
+.flutter_tool_state
+.idea/
+.workbuddy/

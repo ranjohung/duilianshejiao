@@ -120,13 +120,13 @@ exports.createCustomCoach = async (req, res) => {
 
     // 检查积分是否足够
     const user = await User.findById(userId);
-    if (!user || user.total_points < 100) {
+    if (!user || (user.training_points || 0) < 100) {
       return errorResponse(res, 400, '需要100积分才能创建自定义教练');
     }
 
     // 扣除积分
-    const success = await User.consumeTrainingPoints(userId, 100);
-    if (!success) {
+    const consumeResult = await User.updatePoints(userId, -100);
+    if (!consumeResult.success || consumeResult.newPoints < 0) {
       return errorResponse(res, 400, '积分不足');
     }
 

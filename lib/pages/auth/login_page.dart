@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../config/app_config.dart';
+import '../../config/api_config.dart';
 import '../../network/services/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
@@ -93,7 +94,8 @@ class _LoginPageState extends State<LoginPage> {
     try {
       final result = await _authService.login(
         phone: phone,
-        code: _isPasswordLogin ? '123456' : _smsCodeController.text,
+        password: _isPasswordLogin ? _passwordController.text : null,
+        code: _isPasswordLogin ? null : _smsCodeController.text,
       );
 
       if (result.isSuccess) {
@@ -464,9 +466,16 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         const SizedBox(height: 8),
                         ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             _phoneController.text = '13800138000';
                             _passwordController.text = '123456';
+                            if (ApiConfig.demoMode) {
+                              await _authService.loginDemo();
+                              if (mounted) {
+                                Navigator.pushReplacementNamed(context, '/home');
+                              }
+                              return;
+                            }
                             _doLogin();
                           },
                           style: ElevatedButton.styleFrom(

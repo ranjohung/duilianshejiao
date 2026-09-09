@@ -1,8 +1,8 @@
 # 「对练社交」文档索引
 
-**版本：v2.0 | 更新日期：2026-07-15**
+**版本：v2.4.5 | 更新日期：2026-09-10**
 
-> 本索引为「对练社交」AI对话社交训练平台的完整文档导航。所有文档均从PRD v2.0拆分而来，作为各方向的开发基准。
+> `prd.md` 是产品规则基准，`development-plan.md` 是实现状态与执行优先级基准。`product/`、`frontend/`、`backend/` 中的文件按模块维护；若与前两份基准冲突，以基准文档的“当前实现/生产待实现”标记为准。
 
 ---
 
@@ -11,7 +11,15 @@
 ```
 docs/
 ├── index.md              ← 本文件（总索引）
-├── prd.md                ← 完整PRD v2.0（原始文档）
+├── prd.md                ← 产品规则基准（v2.4.5）
+├── development-plan.md   ← 真实进度、上线缺口与验收门槛
+├── code-review-report-2026-09-03.md ← 审查问题、证据与修复状态
+├── code-review-report-2026-09-04.md ← 学习者视角模块复审与修复回写（最终复核：2026-09-08）
+├── code-review-report-2026-09-08.md ← Flutter 模拟器续审、问题复现与修复证据
+├── user-manual.md        ← 当前版本完整使用说明书
+├── revenue-rules-audit-2026-09-05.md ← 营收、奖励与解锁规则专项审查
+├── knowledge-base-conversion-report-2026-09-10.md ← 知识库课程化与学习卡片接入审查
+├── avatar-assets-report-2026-09-10.md ← 用户真人全身头像素材与功能复核
 ├── product/              ← 产品方向（按模块功能拆分）
 ├── frontend/             ← 前端方向
 └── backend/              ← 后端方向
@@ -27,7 +35,7 @@ docs/
 |------|------|---------|---------|
 | [overview.md](product/overview.md) | 产品概述 | 产品定位、核心差异化、用户画像 | 第1-2章 |
 | [architecture.md](product/architecture.md) | 技术架构 | 技术栈、LLM混合引擎、成本控制 | 第3章 |
-| [tabs.md](product/tabs.md) | 5大Tab功能规格 | 首页/教练/场景/成长/我的，含布局图和功能列表 | 第4章 |
+| [tabs.md](product/tabs.md) | 5大Tab早期规格 | 首页/教练/训练/成长/我的；布局细节以PRD v2.4.5为准 | 第4章 |
 | [coach.md](product/coach.md) | AI教练系统 | 渲染分级、预设角色、性格维度、情绪/记忆系统 | 第5章 |
 | [scene.md](product/scene.md) | 场景与关卡 | 社交模拟场景(6阶段) + 高难度关卡(7个) | 第6-7章 |
 | [growth-system.md](product/growth-system.md) | 成长体系 | 训练积分、学员等级(6级)、道具(4类)、才艺(5项) | 第8-9章、第11章 |
@@ -38,7 +46,7 @@ docs/
 | [psychology.md](product/psychology.md) | 心理健康 | CBT+NVC触发条件、情绪识别训练、三级心理响应 | 第16章 |
 | [retention.md](product/retention.md) | 留存增长 | 晚安计划、情绪日记、每周报告、签到、真实挑战、成就卡片 | 第17章 |
 | [compliance.md](product/compliance.md) | 合规实施 | 实名认证、年龄分层、防沉迷、内容安全、隐私保护 | 第19章 |
-| [schedule.md](product/schedule.md) | 排期与风险 | 开发排期(5 Phase/13周)、素材清单、风险评估 | 第22-24章 |
+| [schedule.md](product/schedule.md) | 历史排期与风险 | 旧版5 Phase/13周计划，仅供追溯；当前计划见 `development-plan.md` | 历史资料 |
 
 ---
 
@@ -54,6 +62,7 @@ docs/
 | [scene-training-ui.md](frontend/scene-training-ui.md) | 场景训练UI | 场景选择、训练对话流程、高难度关卡、语音训练UI | 第6-7章、第12章 |
 | [growth-retention-ui.md](frontend/growth-retention-ui.md) | 成长留存UI | 雷达图、进度条、签到、晚安计划、学习卡片、情绪日记 | 第8-9章、第13章、第17章 |
 | [assets.md](frontend/assets.md) | 素材清单 | Spine立绘(4个)、场景背景、UI图标、TTS音色 | 第23章 |
+| [design-system-v3.md](frontend/design-system-v3.md) | 前端设计系统v3 | 品牌令牌、组件规则、页面层级、动效与验收标准 | 当前实现 |
 
 ---
 
@@ -96,4 +105,4 @@ docs/
 
 ---
 
-> **原始文档：** [prd.md](prd.md)（完整PRD v2.0，3051行，所有修改的源文件）
+> **产品规则基准：** [prd.md](prd.md)（v2.4.5）；**开发状态与计划：** [development-plan.md](development-plan.md)；**学习者视角总复审：** [code-review-report-2026-09-04.md](code-review-report-2026-09-04.md)；**最新 Flutter 模拟器续审：** [code-review-report-2026-09-08.md](code-review-report-2026-09-08.md)；**营收/奖励/解锁专项审查：** [revenue-rules-audit-2026-09-05.md](revenue-rules-audit-2026-09-05.md)；**知识库课程化与学习卡片接入：** [knowledge-base-conversion-report-2026-09-10.md](knowledge-base-conversion-report-2026-09-10.md)；**用户真人头像素材与功能：** [avatar-assets-report-2026-09-10.md](avatar-assets-report-2026-09-10.md)。

@@ -1,6 +1,8 @@
 import '../api_client.dart';
 import '../api_routes.dart';
 import '../api_response.dart';
+import '../../config/api_config.dart';
+import '../../demo/demo_data.dart';
 import '../../models/coach_model.dart';
 
 /// 教练服务
@@ -11,6 +13,14 @@ class CoachService {
   Future<ApiResponse<List<CoachModel>>> getCoachList({
     String? teachingStyle,
   }) async {
+    if (ApiConfig.demoMode) {
+      final data = teachingStyle == null
+          ? DemoData.coaches
+          : DemoData.coaches
+              .where((coach) => coach.teachingStyleDisplayName == teachingStyle)
+              .toList();
+      return ApiResponse(code: 0, message: 'demo', data: data);
+    }
     final res = await _client.get(
       ApiRoutes.coachList,
       queryParameters: {
@@ -27,6 +37,13 @@ class CoachService {
   Future<ApiResponse<CoachModel>> getCoachDetail({
     required String coachId,
   }) async {
+    if (ApiConfig.demoMode) {
+      final coach = DemoData.coaches.firstWhere(
+        (item) => item.id == coachId,
+        orElse: () => DemoData.defaultCoach,
+      );
+      return ApiResponse(code: 0, message: 'demo', data: coach);
+    }
     final res = await _client.get('${ApiRoutes.coachDetail}/$coachId');
     return ApiResponse.fromJson(res.data, (d) => CoachModel.fromJson(d));
   }

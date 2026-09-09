@@ -2,6 +2,8 @@
 
 > 来源：PRD v2.0 第20章
 
+> **v2.4.2 状态校准：** 本文为目标生产表设计。当前初始化脚本已覆盖用户、会员、道具、签到和训练记录等基础表；`scene_unlocks`、好感度事件及积分/道具不可变流水仍需完成迁移并在生产事务中启用，不能把浏览器 localStorage 作为权益账本。
+
 ## 20.1 ER关系概览
 
 ```
@@ -39,8 +41,10 @@ scenes 1──N scene_unlocks
 | avatar | VARCHAR(255) | | 头像URL |
 | gender | TINYINT | | 性别(0未知/1男/2女) |
 | age | INT | | 年龄 |
-| member_level | ENUM('experience','free','daily','weekly','monthly','yearly') | DEFAULT 'free' | 会员等级 |
-| training_points | INT | DEFAULT 0 | 训练积分 |
+| member_level | ENUM('free','daily','weekly','monthly','yearly') | DEFAULT 'free' | 会员等级；历史 `experience` 账号迁移为 `free`，体验日卡使用 `daily` |
+| training_points | INT | DEFAULT 0 | 可消费积分余额；解锁/兑换时扣减 |
+| total_points | INT | DEFAULT 0 | 等级进度累计积分；奖励增加，消费不减少 |
+| student_level | VARCHAR(20) | DEFAULT 'bronze' | 按 `total_points` 计算的学员等级 |
 | total_training_days | INT | DEFAULT 0 | 累计训练天数 |
 | comprehensive_score | DECIMAL(5,2) | DEFAULT 50.00 | 综合能力评分 |
 | is_real_name_verified | BOOLEAN | DEFAULT FALSE | 是否完成实名认证 |
@@ -144,18 +148,14 @@ scenes 1──N scene_unlocks
 |------|------|------|------|
 | id | BIGINT | PK, AUTO_INCREMENT | 记录ID |
 | user_id | BIGINT | FK → users.id, NOT NULL | 用户ID |
-| scene_id | BIGINT | FK → scenes.id, NOT NULL | 场景ID |
-| coach_id | BIGINT | FK → coaches.id, NOT NULL | 教练ID |
-| score | INT | | 总分(0-100) |
-| star_rating | TINYINT | | 星级(1-3) |
-| quality_marks | JSON | | 各维度评分 |
-| emotion_diary | TEXT | | 情绪日记内容 |
-| evaluation_report | JSON | | 评估报告 |
-| dialogue_history | JSON | | 对话历史记录 |
-| items_used | JSON | | 使用的道具 |
-| time_travel_used | INT | DEFAULT 0 | 使用穿梭券次数 |
-| started_at | DATETIME | NOT NULL | 开始时间 |
-| ended_at | DATETIME | | 结束时间 |
+| scene_id | BIGINT | FK → scenes.id | 场景ID |
+| coach_id | BIGINT | FK → coaches.id | 教练ID |
+| messages | JSON | | 训练对话消息；服务端结算后写入 |
+| score | INT | DEFAULT 0 | 本次训练总分 |
+| duration | INT UNSIGNED | DEFAULT 0 | 训练时长（秒） |
+| created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | 结算记录创建时间 |
+
+> 当前 Node/Express 初始化脚本以本表为准；星级、质量维度、报告和道具使用明细暂由 `messages` 或后续独立表扩展，不能在 API 中宣称已经持久化。下方 `quality_marks`/`evaluation_report` 仅是目标结构示例。
 
 **quality_marks JSON结构：**
 
@@ -201,12 +201,33 @@ scenes 1──N scene_unlocks
 |------|------|------|------|
 | id | BIGINT | PK, AUTO_INCREMENT | 会员ID |
 | user_id | BIGINT | FK → users.id, NOT NULL | 用户ID |
-| level | ENUM('experience','free','daily','weekly','monthly','yearly') | NOT NULL | 会员等级 |
+| level | ENUM('daily','weekly','monthly','yearly') | NOT NULL | 已支付会员方案；免费版不写会员记录，体验权益属于引导状态 |
 | expire_at | DATETIME | | 过期时间 |
-| remaining_daily_uses | INT | | 当日剩余训练次数 |
-| auto_renew | BOOLEAN | DEFAULT FALSE | 是否自动续费 |
-| payment_order_id | VARCHAR(100) | | 支付订单号 |
+| remaining_daily_uses | INT | | 当日剩余训练次数快照，真实额度以权益配置和用量账本为准 |
+| auto_renew | BOOLEAN | DEFAULT FALSE | 是否自动续费（需用户明确授权） |
+| payment_order_id | VARCHAR(100) | UNIQUE | 已支付订单号 |
 | created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | 创建时间 |
+
+### membership_orders（会员支付订单）
+
+| 字段 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| id | BIGINT | PK, AUTO_INCREMENT | 内部订单ID |
+| user_id | BIGINT | FK → users.id, NOT NULL | 用户ID |
+| order_no | VARCHAR(64) | UNIQUE, NOT NULL | 服务端幂等订单号 |
+| plan_level | ENUM('daily','weekly','monthly','yearly') | NOT NULL | 方案快照 |
+| amount_fen | INT UNSIGNED | NOT NULL | 服务端计算的金额（分） |
+| payment_method | VARCHAR(20) | NOT NULL | wechat 等 |
+| provider_transaction_id | VARCHAR(100) | UNIQUE | 支付平台流水号 |
+| status | ENUM('pending','paid','entitled','failed','refunded','disputed') | NOT NULL | 订单状态 |
+| idempotency_key | VARCHAR(100) | UNIQUE, NOT NULL | 防重复创建 |
+| paid_at | DATETIME | | 验签成功时间 |
+| refunded_at | DATETIME | | 退款时间 |
+| created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | 创建时间 |
+
+### entitlement_ledger（权益账本）
+
+会员、积分、券和道具发放/扣减必须写入不可变流水；余额由服务端事务汇总，禁止客户端直接修改。流水至少包含 `user_id`、`source_type`、`source_id`、`delta`、`balance_after`、`idempotency_key`、`created_at`，并对 `source_type + source_id` 建唯一约束，支持支付回调、退款和重复请求安全重放。
 
 ### emotion_diaries（情绪日记表）
 
@@ -245,7 +266,7 @@ scenes 1──N scene_unlocks
 | user_id | BIGINT | FK → users.id, NOT NULL | 用户ID |
 | check_in_date | DATE | NOT NULL | 签到日期 |
 | consecutive_days | INT | DEFAULT 1 | 连续天数 |
-| reward_type | ENUM('points','time_travel','hint_card','shield','double_card') | | 奖励类型 |
+| reward_type | ENUM('points','time_shuttle','hint_card','emotion_shield','double_points') | | 奖励类型 |
 | points_earned | INT | | 获得积分 |
 | created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | 创建时间 |
 
@@ -279,27 +300,66 @@ scenes 1──N scene_unlocks
 
 ### scene_unlocks（场景解锁表）
 
+> 目标表，当前 Node 原型尚未完成永久解锁写入；上线前须与积分、券扣减、好感度快照、折扣成本和幂等键放在同一事务中，并增加来源和审计流水。
+
 | 字段 | 类型 | 约束 | 说明 |
 |------|------|------|------|
 | id | BIGINT | PK, AUTO_INCREMENT | 解锁ID |
 | user_id | BIGINT | FK → users.id, NOT NULL | 用户ID |
 | scene_id | BIGINT | FK → scenes.id, NOT NULL | 场景ID |
+| base_points | INT | NOT NULL | 解锁原价（配置快照） |
+| discount_rate | DECIMAL(4,3) | DEFAULT 0 | 解锁时好感度折扣快照 |
+| points_consumed | INT | NOT NULL | 实际扣除的可用积分 |
+| tickets_consumed | INT | DEFAULT 0 | 实际扣除的穿梭券 |
+| idempotency_key | VARCHAR(100) | UNIQUE, NOT NULL | 防重复解锁 |
 | unlocked_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | 解锁时间 |
 
 **UNIQUE约束：** (user_id, scene_id)
+
+### favorability_ledger（好感度事件流水）
+
+> 目标表，当前 Web 仅在本地保存最近30条原因日志；生产必须由服务端审核/规则引擎写入不可变事件，支持申诉、审计和幂等重放。
+
+| 字段 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| id | BIGINT | PK, AUTO_INCREMENT | 事件ID |
+| user_id | BIGINT | FK → users.id, NOT NULL | 用户ID |
+| coach_id | BIGINT | FK → coaches.id | 当前教练 |
+| event_type | VARCHAR(40) | NOT NULL | `training_dismissive`/`moderation_violation`/`inactivity_decay`/`training_reward` 等 |
+| delta | INT | NOT NULL | 好感度变化，负数为扣减 |
+| before_value | INT | NOT NULL | 事件前值 |
+| after_value | INT | NOT NULL | 事件后值，限制0–200 |
+| reason | VARCHAR(255) | NOT NULL | 面向用户的原因 |
+| source_id | VARCHAR(100) | | 训练/登录事件 ID |
+| idempotency_key | VARCHAR(100) | UNIQUE, NOT NULL | 防重复扣减/发放 |
+| created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | 事件时间 |
 
 ### items（道具表）
 
 | 字段 | 类型 | 约束 | 说明 |
 |------|------|------|------|
 | id | BIGINT | PK, AUTO_INCREMENT | 道具ID |
+| name | VARCHAR(100) | NOT NULL | 道具名称 |
+| item_type | VARCHAR(50) | UNIQUE, NOT NULL | 稳定业务类型：`time_shuttle`/`hint_card`/`emotion_shield`/`double_points` |
+| description | VARCHAR(500) | | 道具说明 |
+| icon | VARCHAR(500) | | 图标 |
+| category | VARCHAR(50) | | 道具分类 |
+| price_coins | INT UNSIGNED | DEFAULT 0 | 演示兑换价格 |
+| is_active | BOOLEAN | DEFAULT TRUE | 是否可用 |
+| created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | 创建时间 |
+
+### user_items（用户道具库存表）
+
+| 字段 | 类型 | 约束 | 说明 |
+|------|------|------|------|
+| id | BIGINT | PK, AUTO_INCREMENT | 库存记录ID |
 | user_id | BIGINT | FK → users.id, NOT NULL | 用户ID |
-| item_type | ENUM('time_travel','hint_card','emotion_shield','double_points') | NOT NULL | 道具类型 |
-| quantity | INT | DEFAULT 0 | 数量 |
+| item_id | BIGINT | FK → items.id, NOT NULL | 道具ID |
+| quantity | INT UNSIGNED | DEFAULT 0 | 当前数量 |
 | created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | 创建时间 |
 | updated_at | DATETIME | ON UPDATE CURRENT_TIMESTAMP | 更新时间 |
 
-**UNIQUE约束：** (user_id, item_type)
+**UNIQUE约束：** (user_id, item_id)。业务层使用 `item_type` 查询，写入时解析为 `items.id`。
 
 ### social_posts（朋友圈动态表）
 

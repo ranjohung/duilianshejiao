@@ -19,18 +19,26 @@ class TrainingRecord {
     return { items: rows, total: count[0].total };
   }
 
-  static async create({ userId, coachId, sceneId, chatMessages, scores, evaluation }) {
+  static async create({ userId, coachId, sceneId, messages = [], score = 0, duration = 0 }) {
     const [result] = await pool.execute(
-      `INSERT INTO training_records (user_id, coach_id, scene_id, chat_messages, scores, evaluation, status, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, 'completed', NOW(), NOW())`,
+      `INSERT INTO training_records (user_id, coach_id, scene_id, messages, score, duration, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, NOW())`,
       [
         userId, coachId, sceneId,
-        JSON.stringify(chatMessages),
-        JSON.stringify(scores),
-        JSON.stringify(evaluation),
+        JSON.stringify(messages || []),
+        Number.isFinite(Number(score)) ? Number(score) : 0,
+        Math.max(0, Number(duration) || 0),
       ]
     );
     return result.insertId;
+  }
+
+  static async findByIdForUser(id, userId) {
+    const [rows] = await pool.execute(
+      'SELECT * FROM training_records WHERE id = ? AND user_id = ?',
+      [id, userId]
+    );
+    return rows[0] || null;
   }
 
   static async getLatestByUser(userId, limit = 5) {

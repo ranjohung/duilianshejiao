@@ -70,7 +70,10 @@ module.exports = {
     params.push(pageSize, offset);
 
     const [rows] = await pool.execute(query, params);
-    const [countRows] = await pool.execute(`SELECT COUNT(*) as total FROM ${TABLE} WHERE is_active = 1`, category ? [category] : []);
+    const countSql = category
+      ? `SELECT COUNT(*) as total FROM ${TABLE} WHERE is_active = 1 AND category = ?`
+      : `SELECT COUNT(*) as total FROM ${TABLE} WHERE is_active = 1`;
+    const [countRows] = await pool.execute(countSql, category ? [category] : []);
     return { items: rows, total: countRows[0].total };
   },
 
@@ -145,9 +148,10 @@ module.exports = {
   },
 
   async updateProgress(userId, challengeId, increment = 1) {
+    const safeIncrement = Math.max(1, Math.min(10, Number(increment) || 1));
     const [result] = await pool.execute(
       `UPDATE user_challenges SET progress = progress + ?, updated_at = NOW() WHERE user_id = ? AND challenge_id = ? AND status = 'in_progress'`,
-      [increment, userId, challengeId]
+      [safeIncrement, userId, challengeId]
     );
     return result.affectedRows > 0;
   },
@@ -163,10 +167,13 @@ module.exports = {
 
     if (statusRows.length === 0) return null;
 
-    await pool.execute(
-      `UPDATE user_challenges SET status = 'completed', updated_at = NOW() WHERE id = ?`,
+    const [result] = await pool.execute(
+      `UPDATE user_challenges SET status = 'completed', completed_at = NOW(), updated_at = NOW() WHERE id = ? AND status = 'in_progress'`,
       [statusRows[0].id]
     );
+
+    // 只有一个请求可以把进行中记录改成 completed，避免并发请求重复发放奖励。
+    if (result.affectedRows !== 1) return null;
 
     return { challenge, reward_points: challenge.reward_points };
   },

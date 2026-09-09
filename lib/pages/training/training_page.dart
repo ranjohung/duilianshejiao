@@ -1,20 +1,37 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+
 import '../../config/app_config.dart';
 import '../../models/coach_model.dart';
 import '../../models/scene_model.dart';
-import '../../models/training_model.dart';
 import '../../network/services/training_service.dart';
+import '../../widgets/immersive_stage.dart';
 
-/// 对话训练主页面 - 微信聊天风格
-/// 核心页面：场景名称+教练名称+训练进度、对话消息列表、输入区域、选项区域、反馈区域
+/// 训练模式：决定输入前是否展示 A/B/C 参考选项
+/// - [etiquette] 礼仪/社交训练：输入前有 A/B/C 参考选项，可点选也可自由输入
+/// - [challenge] 真实挑战：输入前无任何提示，只有输入后才有教练评价
+enum TrainingMode { etiquette, challenge }
+
+/// 对话训练主页面 - 沉浸式 3D 舞台风格
+///
+/// 对齐 Web 原型 index.html 的 Stage3D 设计：
+/// - 主角 + NPC 站在对应真实建筑场景中（咖啡厅/办公室/家宴/婚礼…）
+/// - 对话以游戏式气泡锚定在角色头顶，带小尾巴
+/// - 顶部信息条、本关目标卡、教练评价卡、悬浮输入坞
 class TrainingPage extends StatefulWidget {
   final CoachModel coach;
   final SceneModel scene;
 
-  const TrainingPage({super.key, required this.coach, required this.scene});
+  /// 训练模式，默认礼仪训练（输入前有 A/B/C）
+  final TrainingMode mode;
+
+  const TrainingPage({
+    super.key,
+    required this.coach,
+    required this.scene,
+    this.mode = TrainingMode.etiquette,
+  });
 
   @override
   State<TrainingPage> createState() => _TrainingPageState();
@@ -22,7 +39,6 @@ class TrainingPage extends StatefulWidget {
 
 class _TrainingPageState extends State<TrainingPage> {
   final _messageController = TextEditingController();
-  final _scrollController = ScrollController();
   final _trainingService = TrainingService();
   Timer? _timer;
 
@@ -39,10 +55,11 @@ class _TrainingPageState extends State<TrainingPage> {
   int? _feedbackScoreDelta;
   String? _feedbackTip;
   bool _showFeedback = false;
-  bool _isWaitingForUser = false;
   int _remainingTimeTravel = 0;
   bool _canUseHint = true;
   DateTime _trainingStartTime = DateTime.now();
+
+  bool get _isChallengeMode => widget.mode == TrainingMode.challenge;
 
   @override
   void initState() {
@@ -59,7 +76,6 @@ class _TrainingPageState extends State<TrainingPage> {
   void dispose() {
     _timer?.cancel();
     _messageController.dispose();
-    _scrollController.dispose();
     super.dispose();
   }
 
@@ -76,7 +92,6 @@ class _TrainingPageState extends State<TrainingPage> {
         _totalRounds = result['totalRounds'] ?? widget.scene.rounds;
         _currentScore = result['currentScore'] ?? 0;
         _trainingStartTime = DateTime.now();
-        _isWaitingForUser = true;
         _remainingTimeTravel = result['remainingTimeTravel'] ?? 0;
         _canUseHint = result['canUseHint'] ?? true;
       });
@@ -84,12 +99,10 @@ class _TrainingPageState extends State<TrainingPage> {
         _addMessage(_UIMessage(
           role: 'assistant',
           content: result['message'] as String,
-          options: result['options'] != null
-              ? List<String>.from(result['options'])
-              : null,
         ));
       }
-      if (result['options'] != null) {
+      // 真实挑战模式：输入前不展示任何提示选项
+      if (result['options'] != null && !_isChallengeMode) {
         setState(() {
           _options = List<String>.from(result['options']);
         });
@@ -113,7 +126,6 @@ class _TrainingPageState extends State<TrainingPage> {
       _options = null;
       _isSending = true;
       _showFeedback = false;
-      _isWaitingForUser = false;
     });
 
     try {
@@ -130,34 +142,23 @@ class _TrainingPageState extends State<TrainingPage> {
           _currentScore += _feedbackScoreDelta ?? 0;
           _showFeedback = true;
           _feedbackTip = result['feedback']['tip']?.toString();
-
-          Future.delayed(const Duration(milliseconds: 1500), () {
-            if (mounted) {
-              setState(() {
-                _showFeedback = false;
-              });
-            }
-          });
         }
       });
 
       if (result['message'] != null) {
-        await Future.delayed(const Duration(milliseconds: 1500));
+        await Future.delayed(const Duration(milliseconds: 1200));
         _addMessage(_UIMessage(
           role: 'assistant',
           content: result['message'] as String,
-          options: result['options'] != null
-              ? List<String>.from(result['options'])
-              : null,
         ));
       }
 
       setState(() {
         _currentRound = result['currentRound'] ?? _currentRound;
-        _options = result['options'] != null
+        // 真实挑战模式始终不给输入前提示
+        _options = (!_isChallengeMode && result['options'] != null)
             ? List<String>.from(result['options'])
             : null;
-        _isWaitingForUser = _options != null && _options!.isNotEmpty;
         if (result['isFinished'] == true) {
           _endTraining();
         }
@@ -170,7 +171,6 @@ class _TrainingPageState extends State<TrainingPage> {
     } finally {
       setState(() => _isSending = false);
     }
-    _scrollToBottom();
   }
 
   void _selectOption(int index) {
@@ -182,22 +182,8 @@ class _TrainingPageState extends State<TrainingPage> {
     setState(() => _messages.add(_UIMessage(
           role: msg.role,
           content: msg.content,
-          options: msg.options,
           timestamp: msg.timestamp ?? DateTime.now(),
         )));
-    _scrollToBottom();
-  }
-
-  void _scrollToBottom() {
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
-    });
   }
 
   Future<void> _endTraining() async {
@@ -244,52 +230,15 @@ class _TrainingPageState extends State<TrainingPage> {
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
+  String get _npcName {
+    final npc = widget.scene.npcName;
+    return npc.isEmpty ? widget.coach.displayName : npc;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: _confirmEndTraining,
-        ),
-        title: Text(widget.scene.name,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        backgroundColor: AppConfig.primaryColor,
-        foregroundColor: Colors.white,
-        centerTitle: false,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Row(
-              children: [
-                const Icon(Icons.timer_outlined, size: 16),
-                const SizedBox(width: 4),
-                Text(
-                  _formatDuration(),
-                  style: const TextStyle(fontSize: 12, opacity: 0.8),
-                ),
-                const SizedBox(width: 16),
-                const Text(
-                  '进度',
-                  style: TextStyle(fontSize: 12, opacity: 0.8),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  '$_currentRound/$_totalRounds',
-                  style: const TextStyle(
-                      fontSize: 12, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(width: 8),
-                IconButton(
-                  icon: const Icon(Icons.stop_circle_outlined),
-                  onPressed: _confirmEndTraining,
-                  tooltip: '结束训练',
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+      backgroundColor: const Color(0xFFF4F2FB),
       body: _isLoading
           ? const Center(
               child: Column(
@@ -300,139 +249,366 @@ class _TrainingPageState extends State<TrainingPage> {
                 Text('正在进入训练场景...', style: TextStyle(color: Colors.grey)),
               ],
             ))
-          : Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
-                    itemCount: _messages.length,
-                    itemBuilder: (context, index) =>
-                        _buildMessageBubble(_messages[index]),
+          : SafeArea(
+              bottom: false,
+              child: Column(
+                children: [
+                  _buildHeader(),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _buildStage(),
+                          _buildGoalCard(),
+                          if (_showFeedback) _buildFeedbackCard(),
+                          if (_options != null &&
+                              _options!.isNotEmpty &&
+                              !_showFeedback)
+                            _buildOptionArea(),
+                          const SizedBox(height: 8),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-                if (_showFeedback) _buildFeedbackArea(),
-                if (_options != null && _options!.isNotEmpty && !_showFeedback)
-                  _buildOptionArea(),
-                _buildInputArea(),
-                Container(height: 1, color: Colors.grey[200]),
-                if (_currentRound > 0) _buildScoreBar(),
-              ],
+                  _buildInputDock(),
+                  if (_currentRound > 0) _buildScoreBar(),
+                ],
+              ),
             ),
     );
   }
 
-  Widget _buildMessageBubble(_UIMessage msg) {
-    final isUser = msg.role == 'user';
-    final timeStr = DateFormat('HH:mm').format(msg.timestamp ?? DateTime.now());
-    final name = isUser ? '我' : widget.coach.displayName;
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+  // ---------- 顶部信息条 ----------
+  Widget _buildHeader() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(colors: [
+          Color(0xFF5A4BDA),
+          Color(0xFF6C5CE7),
+        ]),
+      ),
       child: Row(
-        mainAxisAlignment:
-            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (!isUser) ...[
-            CircleAvatar(
-              radius: 18,
-              backgroundColor: AppConfig.primaryColor.withOpacity(0.1),
-              child:
-                  Icon(Icons.person, size: 20, color: AppConfig.primaryColor),
-            ),
-            const SizedBox(width: 10),
-          ],
-          Flexible(
+          IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
+            onPressed: _confirmEndTraining,
+          ),
+          Expanded(
             child: Column(
-              crossAxisAlignment:
-                  isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  mainAxisAlignment:
-                      isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
                   children: [
                     Text(
-                      name,
-                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                      widget.scene.name,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      timeStr,
-                      style: TextStyle(fontSize: 10, color: Colors.grey[400]),
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 1),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        _isChallengeMode ? '真实挑战' : '礼仪训练',
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 10),
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: isUser ? AppConfig.primaryColor : Colors.grey[100],
-                    borderRadius: BorderRadius.only(
-                      topLeft: const Radius.circular(18),
-                      topRight: const Radius.circular(18),
-                      bottomLeft: Radius.circular(isUser ? 18 : 4),
-                      bottomRight: Radius.circular(isUser ? 4 : 18),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 2,
-                        offset: const Offset(0, 1),
-                      ),
-                    ],
-                  ),
-                  child: Text(
-                    msg.content,
-                    style: TextStyle(
-                      color: isUser ? Colors.white : Colors.black87,
-                      fontSize: 15,
-                      height: 1.4,
-                    ),
-                  ),
+                Text(
+                  '${widget.coach.displayName} · ${widget.scene.stageDisplay}',
+                  style: TextStyle(
+                      color: Colors.white.withOpacity(0.8), fontSize: 11),
                 ),
               ],
             ),
           ),
-          if (isUser) ...[
-            const SizedBox(width: 10),
-            CircleAvatar(
-              radius: 18,
-              backgroundColor: Colors.grey[200],
-              child: const Icon(Icons.account_circle,
-                  size: 20, color: Colors.grey[500]),
+          Row(
+            children: [
+              Icon(Icons.timer_outlined,
+                  size: 14, color: Colors.white.withOpacity(0.85)),
+              const SizedBox(width: 2),
+              Text(_formatDuration(),
+                  style: TextStyle(
+                      fontSize: 11, color: Colors.white.withOpacity(0.85))),
+              const SizedBox(width: 10),
+              Text('进度',
+                  style: TextStyle(
+                      fontSize: 11, color: Colors.white.withOpacity(0.85))),
+              const SizedBox(width: 2),
+              Text('$_currentRound/$_totalRounds',
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold)),
+              const SizedBox(width: 6),
+              IconButton(
+                icon: Icon(Icons.stop_circle_outlined,
+                    size: 20, color: Colors.white.withOpacity(0.9)),
+                onPressed: _confirmEndTraining,
+                tooltip: '结束训练',
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ---------- 沉浸式 3D 舞台 + 头顶气泡 ----------
+  Widget _buildStage() {
+    final bubbles = <StageBubbleData>[];
+    for (final msg in _messages) {
+      bubbles.add(StageBubbleData(
+        speaker: msg.role == 'user' ? 'user' : 'npc',
+        text: msg.content,
+      ));
+    }
+    final last = _messages.isNotEmpty ? _messages.last : null;
+    final speaking =
+        last == null ? null : (last.role == 'user' ? 'user' : 'npc');
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+      height: 300,
+      child: Stack(
+        children: [
+          ImmersiveStage(
+            environment: StageEnvironment.fromScene(widget.scene),
+            npcName: _npcName,
+            npcTitle: widget.scene.stageDisplay,
+            userName: '我',
+            bubbles: bubbles,
+            speaking: speaking,
+          ),
+          // 场景标签
+          Positioned(
+            left: 8,
+            top: 8,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.35),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                '沉浸式现场 · ${_environmentLabel()}',
+                style: const TextStyle(color: Colors.white, fontSize: 10),
+              ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _environmentLabel() {
+    switch (StageEnvironment.fromScene(widget.scene)) {
+      case StageEnvironment.office:
+        return '办公室';
+      case StageEnvironment.cafe:
+        return '咖啡厅';
+      case StageEnvironment.family:
+        return '家宴餐厅';
+      case StageEnvironment.restaurant:
+        return '宴请包厢';
+      case StageEnvironment.wedding:
+        return '婚礼现场';
+      case StageEnvironment.bar:
+        return '清吧';
+      case StageEnvironment.corridor:
+        return '社区楼道';
+      case StageEnvironment.generic:
+        return '会客厅';
+    }
+  }
+
+  // ---------- 本关目标卡 ----------
+  Widget _buildGoalCard() {
+    final tip =
+        widget.scene.teachingPoint ?? widget.scene.descriptionOrTeaching;
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.flag, size: 14, color: Color(0xFF6C5CE7)),
+              const SizedBox(width: 4),
+              const Text('本关目标 · 教学重点',
+                  style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF5A4BDA))),
+              const Spacer(),
+              if (_isChallengeMode)
+                const Text('本模式输入前无提示',
+                    style: TextStyle(fontSize: 10, color: Colors.orange))
+              else
+                const Text('输入前提供 A/B/C 参考',
+                    style: TextStyle(fontSize: 10, color: Colors.grey)),
+            ],
+          ),
+          if (tip.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Text(tip,
+                style: const TextStyle(
+                    fontSize: 12, color: Colors.black87, height: 1.5)),
           ],
         ],
       ),
     );
   }
 
-  Widget _buildOptionArea() {
+  // ---------- 教练评价卡 ----------
+  Widget _buildFeedbackCard() {
+    final delta = _feedbackScoreDelta ?? 0;
+    final good = delta >= 0;
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: good ? const Color(0xFF4CAF50) : const Color(0xFFF44336),
+          width: 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: Row(
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 12,
+                backgroundColor: const Color(0xFF6C5CE7).withOpacity(0.12),
+                child: const Icon(Icons.sports,
+                    size: 14, color: Color(0xFF6C5CE7)),
+              ),
+              const SizedBox(width: 8),
+              Text('${widget.coach.displayName} 的点评',
+                  style: const TextStyle(
+                      fontSize: 13, fontWeight: FontWeight.bold)),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: (good ? Colors.green : Colors.red).withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '${delta > 0 ? '+' : ''}$delta 分',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: good
+                        ? const Color(0xFF2E7D32)
+                        : const Color(0xFFC62828),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (_feedbackContent != null && _feedbackContent!.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('💡', style: TextStyle(fontSize: 16)),
-                const SizedBox(width: 6),
-                const Text('选择你的回应方式：',
-                    style:
-                        TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                const Text('💬 ', style: TextStyle(fontSize: 12)),
+                Expanded(
+                  child: Text(_feedbackContent!,
+                      style: const TextStyle(
+                          fontSize: 13, height: 1.5, color: Colors.black87)),
+                ),
               ],
             ),
+          ],
+          if (_feedbackTip != null && _feedbackTip!.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('💡 ', style: TextStyle(fontSize: 12)),
+                Expanded(
+                  child: Text(_feedbackTip!,
+                      style: TextStyle(
+                          fontSize: 12, height: 1.5, color: Colors.grey[700])),
+                ),
+              ],
+            ),
+          ],
+          const SizedBox(height: 6),
+          Text('累计得分 $_currentScore/$_totalScore',
+              style: const TextStyle(fontSize: 11, color: Colors.grey)),
+        ],
+      ),
+    );
+  }
+
+  // ---------- A/B/C 参考选项（礼仪模式） ----------
+  Widget _buildOptionArea() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Text('🧭', style: TextStyle(fontSize: 14)),
+              const SizedBox(width: 4),
+              const Text('参考回应（可点选，也可自己输入）',
+                  style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF5A4BDA))),
+            ],
+          ),
+          const SizedBox(height: 10),
           ..._options!
               .asMap()
               .entries
@@ -448,30 +624,27 @@ class _TrainingPageState extends State<TrainingPage> {
     return GestureDetector(
       onTap: _isSending ? null : () => _selectOption(index),
       child: Container(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(12),
         margin: const EdgeInsets.only(bottom: 8),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: const Color(0xFFFAF9FF),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200),
-          boxShadow: [
-            BoxShadow(blurRadius: 4, color: Colors.black.withOpacity(0.05))
-          ],
+          border: Border.all(color: const Color(0xFFE4E0F7)),
         ),
         child: Row(
           children: [
             Container(
               width: 26,
               height: 26,
-              decoration: BoxDecoration(
-                color: AppConfig.primaryColor.withOpacity(0.1),
+              decoration: const BoxDecoration(
+                color: Color(0xFF6C5CE7),
                 shape: BoxShape.circle,
               ),
               child: Center(
                 child: Text(
                   labels[index],
-                  style: TextStyle(
-                      color: AppConfig.primaryColor,
+                  style: const TextStyle(
+                      color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 13),
                 ),
@@ -482,7 +655,7 @@ class _TrainingPageState extends State<TrainingPage> {
               child: Text(
                 text,
                 style: const TextStyle(
-                    fontSize: 14, color: Colors.black87, height: 1.4),
+                    fontSize: 13, color: Colors.black87, height: 1.4),
               ),
             ),
           ],
@@ -491,72 +664,18 @@ class _TrainingPageState extends State<TrainingPage> {
     );
   }
 
-  Widget _buildFeedbackArea() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      color: AppConfig.accentColor.withOpacity(0.05),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.check_circle, color: Colors.green, size: 20),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  _feedbackContent ?? '',
-                  style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black87),
-                ),
-              ),
-            ],
-          ),
-          if (_feedbackScoreDelta != null) ...[
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                const Icon(Icons.trending_up,
-                    color: AppConfig.accentColor, size: 18),
-                const SizedBox(width: 6),
-                Text(
-                  '得分 ${_feedbackScoreDelta! > 0 ? '+' : ''}$_feedbackScoreDelta (累计: $_currentScore/$_totalScore)',
-                  style: TextStyle(
-                      fontSize: 13,
-                      color: _feedbackScoreDelta! >= 0
-                          ? Colors.green
-                          : Colors.red),
-                ),
-              ],
-            ),
-          ],
-          if (_feedbackTip != null) ...[
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                const Icon(Icons.lightbulb,
-                    color: AppConfig.accentColor, size: 16),
-                const SizedBox(width: 6),
-                Text(
-                  '💡 $_feedbackTip',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                ),
-              ],
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInputArea() {
+  // ---------- 悬浮输入坞 ----------
+  Widget _buildInputDock() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
-          BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 4)
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 8,
+            offset: const Offset(0, -2),
+          ),
         ],
       ),
       child: Row(
@@ -566,34 +685,48 @@ class _TrainingPageState extends State<TrainingPage> {
           const SizedBox(width: 4),
           _buildItemButton(
               '💡', _canUseHint ? 1 : 0, () => _useItem('hint_card')),
-          const SizedBox(width: 4),
+          const SizedBox(width: 8),
           Expanded(
             child: TextField(
               controller: _messageController,
               enabled: !_isSending,
-              decoration: const InputDecoration(
-                hintText: '也可以自己输入...',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(20)),
-                  borderSide: BorderSide(color: Colors.grey),
-                ),
+              minLines: 1,
+              maxLines: 3,
+              decoration: InputDecoration(
+                hintText: _isChallengeMode ? '直接输入你的回应…' : '也可以自己输入…',
+                filled: true,
+                fillColor: const Color(0xFFF4F2FB),
                 contentPadding:
-                    EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  borderSide: BorderSide.none,
+                ),
               ),
               onSubmitted: _sendMessage,
             ),
           ),
           const SizedBox(width: 8),
-          IconButton(
-            icon: _isSending
-                ? const SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(strokeWidth: 2))
-                : Icon(Icons.send_rounded,
-                    color: AppConfig.primaryColor, size: 24),
-            onPressed:
+          GestureDetector(
+            onTap:
                 _isSending ? null : () => _sendMessage(_messageController.text),
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                    colors: [Color(0xFF5A4BDA), Color(0xFF6C5CE7)]),
+                shape: BoxShape.circle,
+              ),
+              child: _isSending
+                  ? const Padding(
+                      padding: EdgeInsets.all(10),
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: Colors.white),
+                    )
+                  : const Icon(Icons.send_rounded,
+                      color: Colors.white, size: 18),
+            ),
           ),
         ],
       ),
@@ -607,7 +740,9 @@ class _TrainingPageState extends State<TrainingPage> {
         width: 36,
         height: 36,
         decoration: BoxDecoration(
-          color: count > 0 && !_isSending ? Colors.grey[100] : Colors.grey[50],
+          color: count > 0 && !_isSending
+              ? const Color(0xFFF4F2FB)
+              : Colors.grey[100],
           borderRadius: BorderRadius.circular(18),
         ),
         child: Stack(
@@ -684,8 +819,8 @@ class _TrainingPageState extends State<TrainingPage> {
 
   Widget _buildScoreBar() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: AppConfig.accentColor.withOpacity(0.05),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      color: const Color(0xFFF4F2FB),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -695,10 +830,10 @@ class _TrainingPageState extends State<TrainingPage> {
           ),
           Text(
             '累计得分 $_currentScore/$_totalScore',
-            style: TextStyle(
+            style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
-                color: AppConfig.accentColor),
+                color: Color(0xFF5A4BDA)),
           ),
         ],
       ),
@@ -710,12 +845,11 @@ class _TrainingPageState extends State<TrainingPage> {
 class _UIMessage {
   final String role;
   final String content;
-  final List<String>? options;
   final DateTime? timestamp;
 
-  _UIMessage(
-      {required this.role,
-      required this.content,
-      this.options,
-      this.timestamp});
+  _UIMessage({
+    required this.role,
+    required this.content,
+    this.timestamp,
+  });
 }

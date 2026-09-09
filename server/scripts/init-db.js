@@ -15,7 +15,7 @@ const SQL_STATEMENTS = [
     real_name VARCHAR(50),
     id_card VARCHAR(18),
     is_real_name_verified TINYINT(1) DEFAULT 0,
-    member_level ENUM('experience','free','daily','weekly','monthly','yearly') DEFAULT 'free',
+    member_level ENUM('free','daily','weekly','monthly','yearly') DEFAULT 'free',
     experience_used TINYINT(1) DEFAULT 0,
     coins INT UNSIGNED DEFAULT 0,
     training_points INT UNSIGNED DEFAULT 0,
@@ -199,8 +199,32 @@ const SQL_STATEMENTS = [
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
     is_active TINYINT(1) DEFAULT 1,
+    payment_order_id VARCHAR(100) UNIQUE,
+    auto_renew TINYINT(1) DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_user_id (user_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`,
+
+  // 历史版本曾写入 experience；先迁移旧值，再收紧枚举，避免旧账号继续获得未定义权益。
+  `UPDATE users SET member_level = 'free' WHERE member_level = 'experience'`,
+  `ALTER TABLE users MODIFY COLUMN member_level ENUM('free','daily','weekly','monthly','yearly') DEFAULT 'free'`,
+
+  // 会员支付订单：支付回调验签并对账成功前不得写入 memberships
+  `CREATE TABLE IF NOT EXISTS membership_orders (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NOT NULL,
+    order_no VARCHAR(64) NOT NULL UNIQUE,
+    plan_level ENUM('daily','weekly','monthly','yearly') NOT NULL,
+    amount_fen INT UNSIGNED NOT NULL,
+    payment_method VARCHAR(20) NOT NULL,
+    provider_transaction_id VARCHAR(100) UNIQUE,
+    status ENUM('pending','paid','entitled','failed','refunded','disputed') NOT NULL DEFAULT 'pending',
+    idempotency_key VARCHAR(100) NOT NULL UNIQUE,
+    paid_at DATETIME,
+    refunded_at DATETIME,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_membership_orders_user (user_id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;`,
 
@@ -262,6 +286,7 @@ const SQL_STATEMENTS = [
     progress INT UNSIGNED DEFAULT 0,
     status ENUM('in_progress','completed') DEFAULT 'in_progress',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    completed_at TIMESTAMP NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_user_id (user_id),
     INDEX idx_challenge_id (challenge_id),
@@ -340,7 +365,7 @@ async function initDatabase() {
       INSERT INTO items (name, item_type, description, icon, category, price_coins) VALUES
       ('时空穿梭券', 'time_shuttle', '重新选择对话分支，回到上一个决策点', '🕐', 'utility', 50),
       ('提示卡', 'hint_card', '获取教练对当前场景的额外提示', '💡', 'utility', 30),
-      ('护盾', 'shield', '保护一次训练评分不受扣分影响', '🛡️', 'protection', 40),
+      ('情绪护盾', 'emotion_shield', '保护一次训练评分不受扣分影响', '🛡️', 'protection', 40),
       ('双倍积分卡', 'double_points', '下次训练获得双倍积分', '✨', 'boost', 60)
     `);
   }
@@ -359,7 +384,7 @@ async function initDatabase() {
       ('情商高手', '情绪智力达到60', '🧠', 'dimension', 'emotional_intelligence', 60, 20, NULL, 0, 6),
       ('共情之星', '共情能力达到60', '❤️', 'dimension', 'empathy_score', 60, 20, NULL, 0, 7),
       ('青铜之路', '总积分达到100', '🥉', 'points', 'total_points', 100, 15, NULL, 0, 8),
-      ('白银之辉', '总积分达到300', '🥈', 'points', 'total_points', 300, 30, 'shield', 1, 9),
+      ('白银之辉', '总积分达到300', '🥈', 'points', 'total_points', 300, 30, 'emotion_shield', 1, 9),
       ('黄金之光', '总积分达到600', '🥇', 'points', 'total_points', 600, 60, 'double_points', 1, 10),
       ('连续签到3天', '连续签到3天', '🔥', 'checkin', 'streak_days', 3, 10, 'time_shuttle', 1, 11),
       ('连续签到7天', '连续签到7天', '🌟', 'checkin', 'streak_days', 7, 30, 'double_points', 1, 12)

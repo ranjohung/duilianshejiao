@@ -52,7 +52,7 @@ async function login(req, res) {
       const token = jwt.sign({ id: user.id, phone, nickname: user.nickname });
       return successResponse(res, {
         token,
-        user: { id: user.id, phone, nickname: user.nickname, points: user.total_points || 0, member_level: user.member_level || 'free', student_level: user.student_level || '青铜学员', is_real_name_verified: user.is_real_name_verified || 0 },
+        user: { id: user.id, phone, nickname: user.nickname, points: user.training_points ?? user.total_points ?? 0, total_points: user.total_points ?? user.training_points ?? 0, member_level: user.member_level || 'free', student_level: user.student_level || '青铜学员', is_real_name_verified: user.is_real_name_verified || 0 },
       }, '登录成功');
     }
 
@@ -74,7 +74,7 @@ async function login(req, res) {
 
     successResponse(res, {
       token,
-      user: { id: user.id, phone, nickname: user.nickname, points: user.total_points || 0, member_level: user.member_level || 'free', student_level: user.student_level || '青铜学员', is_real_name_verified: user.is_real_name_verified || 0 },
+      user: { id: user.id, phone, nickname: user.nickname, points: user.training_points ?? user.total_points ?? 0, total_points: user.total_points ?? user.training_points ?? 0, member_level: user.member_level || 'free', student_level: user.student_level || '青铜学员', is_real_name_verified: user.is_real_name_verified || 0 },
     }, '登录成功');
   } catch (error) {
     errorResponse(res, 500, '登录失败', error.message);

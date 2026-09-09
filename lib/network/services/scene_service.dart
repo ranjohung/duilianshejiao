@@ -1,8 +1,9 @@
 import '../api_client.dart';
 import '../api_routes.dart';
 import '../api_response.dart';
+import '../../config/api_config.dart';
+import '../../demo/demo_data.dart';
 import '../../models/scene_model.dart';
-import '../../pages/scene/scene_select_page.dart';
 
 /// 场景服务
 class SceneService {
@@ -13,6 +14,14 @@ class SceneService {
     int? stage,
     bool? isHighChallenge,
   }) async {
+    if (ApiConfig.demoMode) {
+      final data = stage == null
+          ? DemoData.scenes
+          : DemoData.scenes
+              .where((scene) => scene.stage == _stageName(stage))
+              .toList();
+      return ApiResponse(code: 0, message: 'demo', data: data);
+    }
     final res = await _client.get(
       ApiRoutes.sceneList,
       queryParameters: {
@@ -27,11 +36,14 @@ class SceneService {
   }
 
   /// 按阶段分组获取场景列表
-  Future<ApiResponse<List<_StageGroup>>> getGroupedScenes() async {
+  Future<ApiResponse<List<StageGroup>>> getGroupedScenes() async {
+    if (ApiConfig.demoMode) {
+      return ApiResponse(code: 0, message: 'demo', data: DemoData.groupedScenes);
+    }
     final res = await _client.get(ApiRoutes.sceneGrouped);
     return ApiResponse.fromJsonList(
       res.data,
-      (d) => d.map((e) => _StageGroup.fromJson(e)).toList(),
+      (d) => d.map((e) => StageGroup.fromJson(e)).toList(),
     );
   }
 
@@ -39,6 +51,12 @@ class SceneService {
   Future<ApiResponse<List<SceneModel>>> getScenesByStage({
     required int stage,
   }) async {
+    if (ApiConfig.demoMode) {
+      final data = DemoData.scenes
+          .where((scene) => scene.stage == _stageName(stage))
+          .toList();
+      return ApiResponse(code: 0, message: 'demo', data: data);
+    }
     final res = await _client.get(
       ApiRoutes.sceneList,
       queryParameters: {'stage': stage},
@@ -53,6 +71,13 @@ class SceneService {
   Future<ApiResponse<SceneModel>> getSceneDetail({
     required String sceneId,
   }) async {
+    if (ApiConfig.demoMode) {
+      final scene = DemoData.scenes.firstWhere(
+        (item) => item.id == sceneId,
+        orElse: () => DemoData.scenes.first,
+      );
+      return ApiResponse(code: 0, message: 'demo', data: scene);
+    }
     final res = await _client.get('${ApiRoutes.sceneDetail}/$sceneId');
     return ApiResponse.fromJson(res.data, (d) => SceneModel.fromJson(d));
   }
@@ -61,6 +86,9 @@ class SceneService {
   Future<ApiResponse<Map<String, dynamic>>> checkUnlock({
     required String sceneId,
   }) async {
+    if (ApiConfig.demoMode) {
+      return ApiResponse(code: 0, message: 'demo', data: {'unlocked': true});
+    }
     final res = await _client.get(
       '${ApiRoutes.sceneDetail}/$sceneId/check-unlock',
     );
@@ -76,6 +104,9 @@ class SceneService {
     required String coachId,
     String mode = 'text',
   }) async {
+    if (ApiConfig.demoMode) {
+      return ApiResponse(code: 0, message: 'demo', data: {'sessionId': 'demo-session'});
+    }
     final res = await _client.post(
       '${ApiRoutes.sceneDetail}/$sceneId/start',
       data: {'coachId': coachId, 'mode': mode},
@@ -91,6 +122,9 @@ class SceneService {
     required int starRating,
     required List<Map<String, dynamic>> qualityMarks,
   }) async {
+    if (ApiConfig.demoMode) {
+      return ApiResponse(code: 0, message: 'demo', data: const {});
+    }
     final res = await _client.post(
       ApiRoutes.trainingEnd,
       data: {
@@ -101,5 +135,10 @@ class SceneService {
       },
     );
     return ApiResponse.fromJson(res.data, null);
+  }
+
+  String _stageName(int stage) {
+    const names = ['破冰入门', '日常沟通', '职场表达'];
+    return stage > 0 && stage <= names.length ? names[stage - 1] : '';
   }
 }

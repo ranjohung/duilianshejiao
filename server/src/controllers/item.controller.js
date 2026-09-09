@@ -1,4 +1,5 @@
 const { successResponse, errorResponse } = require('../utils/response');
+const Item = require('../models/Item');
 
 const ITEMS = [
   { id: 'time_shuttle', name: '时空穿梭券', description: '可以回到上一轮重新选择', icon: '⏳', price: 0 },
@@ -9,7 +10,9 @@ const ITEMS = [
 
 async function getItemList(req, res) {
   try {
-    successResponse(res, ITEMS, '获取道具列表成功');
+    const inventory = req.user?.id ? await Item.getUserInventory(req.user.id) : [];
+    const quantities = new Map(inventory.map(item => [item.item_type, item.quantity]));
+    successResponse(res, ITEMS.map(item => ({ ...item, quantity: quantities.get(item.id) || 0 })), '获取道具列表成功');
   } catch (error) {
     errorResponse(res, 500, '获取失败', error.message);
   }
@@ -18,7 +21,10 @@ async function getItemList(req, res) {
 async function useItem(req, res) {
   try {
     const { itemId } = req.body;
-    successResponse(res, { itemId, used: true }, '使用成功');
+    if (!itemId) return errorResponse(res, 400, '缺少道具类型');
+    const result = await Item.useItem(req.user.id, itemId);
+    if (!result.success) return errorResponse(res, 400, result.message);
+    successResponse(res, { itemId, used: true, remaining: result.remaining }, '使用成功');
   } catch (error) {
     errorResponse(res, 500, '使用失败', error.message);
   }

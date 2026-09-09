@@ -15,7 +15,7 @@ class ApiRoutes {
   // ============ 用户模块 ============
   static const String userProfile = '$_prefix/users/profile';
   static const String userUpdate = '$_prefix/users/profile';
-  static const String userGrowth = '$_prefix/users/growth';
+  static const String userGrowth = '$_prefix/users/growth-stats';
 
   // ============ 教练模块 ============
   static const String coachList = '$_prefix/coaches';
@@ -40,7 +40,7 @@ class ApiRoutes {
   // ============ 成长模块 ============
   static const String growthRadar = '$_prefix/growth/radar';
   static const String growthProfile = '$_prefix/growth/profile';
-  static const String growthProgress = '$_prefix/growth/progress';
+  static const String growthProgress = '$_prefix/growth/progress-curve';
   static const String growthWeeklyReport = '$_prefix/growth/weekly-report';
   static const String growthWeeklyProgress = '$_prefix/growth/weekly-progress';
   static const String growthProgressCurve = '$_prefix/growth/progress-curve';
@@ -48,7 +48,7 @@ class ApiRoutes {
 
   // ============ 签到模块 ============
   static const String checkIn = '$_prefix/check-in';
-  static const String checkInStatus = '$_prefix/check-in/status';
+  static const String checkInStatus = '$_prefix/check-in/today';
 
   // ============ 晚安计划 ============
   static const String goodnightPlan = '$_prefix/goodnight/plan';
@@ -74,15 +74,15 @@ class ApiRoutes {
   static const String membershipComparison = '$_prefix/membership/comparison';
 
   // ============ 情绪日记 ============
-  static const String emotionDiaries = '$_prefix/emotion-diaries';
+  static const String emotionDiaries = '$_prefix/growth/diary';
 
   // ============ 学习卡片 ============
-  static const String learningCards = '$_prefix/learning-cards';
+  static const String learningCards = '$_prefix/growth/learning-cards';
   static const String learningCardCollect =
-      '$_prefix/learning-cards'; // + /:id/collect
+      '$_prefix/growth/learning-cards'; // + /:id/collect（后端待补）
 
   // ============ 成就 ============
-  static const String achievements = '$_prefix/achievements';
+  static const String achievements = '$_prefix/growth/milestones';
 
   // ============ 才艺 ============
   static const String talents = '$_prefix/talents';

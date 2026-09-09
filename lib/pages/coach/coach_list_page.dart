@@ -1,6 +1,8 @@
 
 import 'package:flutter/material.dart';
+import '../../config/api_config.dart';
 import '../../config/app_config.dart';
+import '../../demo/demo_data.dart';
 import '../../models/coach_model.dart';
 import '../../models/preset_coach_data.dart';
 import '../../network/services/coach_service.dart';
@@ -34,6 +36,10 @@ class _CoachListPageState extends State<CoachListPage> {
   Future<void> _loadCoaches() async {
     setState(() => _isLoading = true);
     try {
+      if (ApiConfig.demoMode) {
+        setState(() => _coaches = DemoData.coaches);
+        return;
+      }
       final result = await _coachService.getCoachList();
       if (result.isSuccess && result.data != null) {
         setState(() => _coaches = result.data!);

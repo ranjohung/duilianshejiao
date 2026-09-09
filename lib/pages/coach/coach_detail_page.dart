@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../config/app_config.dart';
 import '../../models/coach_model.dart';
+import '../../models/preset_coach_data.dart';
 import '../scene/scene_select_page.dart';
 import 'coach_list_page.dart';
 
@@ -25,10 +26,10 @@ class _CoachDetailPageState extends State<CoachDetailPage> {
     if (widget.coach != null) {
       final p = widget.coach!.personalityConfig;
       return [
-        p.decisionBasis == 'feeling' ? 0.85 : 0.4, // 温暖度
-        p.infoProcessing == 'sensing' ? 0.9 : 0.5, // 专业度
-        p.lifeAttitude == 'spontaneous' ? 0.8 : 0.3, // 幽默度
-        p.decisionBasis == 'thinking' ? 0.85 : 0.4, // 直接度
+        p?.decisionBasis == 'feeling' ? 0.85 : 0.4, // 温暖度
+        p?.infoProcessing == 'sensing' ? 0.9 : 0.5, // 专业度
+        p?.lifeAttitude == 'spontaneous' ? 0.8 : 0.3, // 幽默度
+        p?.decisionBasis == 'thinking' ? 0.85 : 0.4, // 直接度
       ];
     }
     // 预设教练的默认雷达值
@@ -101,10 +102,10 @@ class _CoachDetailPageState extends State<CoachDetailPage> {
                   ),
                 ],
               ),
-              child: widget.coach?.avatar != null
+              child: widget.coach != null && widget.coach!.avatar.isNotEmpty
                   ? CircleAvatar(
                       radius: 50,
-                      backgroundImage: NetworkImage(widget.coach!.avatar!),
+                      backgroundImage: NetworkImage(widget.coach!.avatar),
                     )
                   : Icon(_icon, size: 50, color: _themeColor),
             ),
@@ -168,7 +169,6 @@ class _CoachDetailPageState extends State<CoachDetailPage> {
                           const titles = ['温暖度', '专业度', '幽默度', '直接度'];
                           return RadarChartTitle(text: titles[index]);
                         },
-                        titlePositionFactorOffset: 0.2,
                         titleTextStyle: const TextStyle(
                             fontSize: 12, color: Colors.black54),
                       ),

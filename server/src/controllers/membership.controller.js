@@ -1,79 +1,60 @@
-const Membership = require('../models/Membership');
-const User = require('../models/User');
 const { successResponse, errorResponse } = require('../utils/response');
+const { findUserById } = require('../utils/sqlite');
 
-// 会员方案定义
+// 价格以元展示；正式订单必须使用分并由服务端重新计算金额。
+// 体验权益属于新用户引导，不作为可购买方案返回。
 const MEMBERSHIP_PLANS = [
-  { level: 'experience', label: '体验版', price: 0, duration: 0, features: { llmEngine: 'deepseek', weeklyTrainings: 1, renderType: '2d', voiceTraining: false, highDifficulty: false, weeklyShuttles: 0, weeklyDoublePoints: 0 } },
-  { level: 'free', label: '免费版', price: 0, duration: 0, features: { llmEngine: 'ollama', weeklyTrainings: 15, renderType: '2d', voiceTraining: false, highDifficulty: false, weeklyShuttles: 0, weeklyDoublePoints: 0 } },
-  { level: 'daily', label: '日卡', price: 3.9, duration: 1, features: { llmEngine: 'deepseek', weeklyTrainings: 20, renderType: '2d', voiceTraining: false, highDifficulty: false, weeklyShuttles: 0, weeklyDoublePoints: 0 } },
-  { level: 'weekly', label: '周卡', price: 18, duration: 7, features: { llmEngine: 'deepseek', weeklyTrainings: Infinity, renderType: '2.5d', voiceTraining: true, highDifficulty: true, weeklyShuttles: 3, weeklyDoublePoints: 1 } },
-  { level: 'monthly', label: '月卡', price: 58, duration: 30, features: { llmEngine: 'deepseek', weeklyTrainings: Infinity, renderType: '3d', voiceTraining: true, highDifficulty: true, weeklyShuttles: 10, weeklyDoublePoints: 3 } },
-  { level: 'yearly', label: '年卡', price: 398, duration: 365, features: { llmEngine: 'deepseek_high', weeklyTrainings: Infinity, renderType: '3d_plus', voiceTraining: true, highDifficulty: true, weeklyShuttles: 15, weeklyDoublePoints: 3 } },
+  { level: 'daily', label: '体验日卡', price: 3.9, durationDays: 1, features: { dailyTrainings: 20, voiceTraining: false, highDifficulty: false, unlimitedScenes: true } },
+  { level: 'weekly', label: '周卡', price: 19.9, durationDays: 7, features: { dailyTrainings: null, voiceTraining: true, highDifficulty: true, unlimitedScenes: true } },
+  { level: 'monthly', label: '月卡', price: 69, durationDays: 30, features: { dailyTrainings: null, voiceTraining: true, highDifficulty: true, unlimitedScenes: true } },
+  { level: 'yearly', label: '年卡', price: 499, durationDays: 365, features: { dailyTrainings: null, voiceTraining: true, highDifficulty: true, unlimitedScenes: true } },
 ];
 
-// 获取会员方案列表
+const findPlan = level => MEMBERSHIP_PLANS.find(plan => plan.level === level);
+
+// 获取方案只用于展示，不代表已经支付或已开通。
 exports.listPlans = async (req, res) => {
-  successResponse(res, MEMBERSHIP_PLANS);
+  successResponse(res, { currency: 'CNY', plans: MEMBERSHIP_PLANS, paymentStatus: 'not_configured' });
 };
 
-// 获取当前会员状态
+// 演示后端只读取本地用户状态，不虚构支付订单或权益记录。
 exports.getStatus = async (req, res) => {
   try {
-    const userId = req.user.id;
-    const user = await User.findById(userId);
-    const membership = await Membership.findActiveByUser(userId);
+    const user = await findUserById(req.user && req.user.id);
     successResponse(res, {
-      level: user.member_level,
-      membership,
+      level: user?.member_level || 'free',
+      membership: null,
       plans: MEMBERSHIP_PLANS,
+      paymentStatus: 'not_configured',
     });
-  } catch (err) { errorResponse(res, 500, '获取会员状态失败'); }
+  } catch (err) {
+    errorResponse(res, 500, '获取会员状态失败');
+  }
 };
 
-// 购买会员
+// 支付网关、回调验签和权益账本尚未配置。在此之前拒绝创建并开通会员，
+// 避免出现“未支付即开通”的收入与合规风险。
 exports.subscribe = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const { level, paymentMethod } = req.body;
-    const plan = MEMBERSHIP_PLANS.find(p => p.level === level);
-    if (!plan) return errorResponse(res, 400, '无效的会员方案');
-
-    // 创建会员记录
-    const expiresAt = plan.duration > 0
-      ? new Date(Date.now() + plan.duration * 24 * 60 * 60 * 1000)
-      : null;
-
-    const membershipId = await Membership.create({
-      userId, level: plan.level, price: plan.price,
-      startDate: new Date(), expiresAt, paymentMethod,
-    });
-
-    // 更新用户会员等级
-    await User.updateMemberLevel(userId, plan.level);
-
-    // 发放会员道具（穿梭券+双倍积分卡）
-    const Item = require('../models/Item');
-    if (plan.features.weeklyShuttles > 0) await Item.grantItem(userId, 'time_shuttle', plan.features.weeklyShuttles);
-    if (plan.features.weeklyDoublePoints > 0) await Item.grantItem(userId, 'double_points', plan.features.weeklyDoublePoints);
-
-    successResponse(res, { membershipId, plan, expiresAt }, '购买成功');
-  } catch (err) { errorResponse(res, 500, '购买失败'); }
+  const { level, paymentMethod, payment_method: paymentMethodAlias } = req.body || {};
+  const plan = findPlan(level);
+  if (!plan) return errorResponse(res, 400, '无效的会员方案');
+  if (!(paymentMethod || paymentMethodAlias)) return errorResponse(res, 400, '请选择支付方式');
+  return errorResponse(res, 503, '支付服务尚未配置，本次未创建订单、未扣款、未开通会员');
 };
 
-// 会员权益对比表
 exports.getComparison = async (req, res) => {
   successResponse(res, {
-    headers: ['权益', '体验', '免费', '日卡', '周卡', '月卡', '年卡'],
+    headers: ['权益', '免费版', '体验日卡', '周卡', '月卡', '年卡'],
     rows: [
-      { feature: 'LLM引擎', values: ['DeepSeek(1次)', 'Ollama+10%偶遇', 'DeepSeek', 'DeepSeek', 'DeepSeek', 'DeepSeek高优'] },
-      { feature: '每周训练', values: ['1次', '15次', '20次', '无限', '无限', '无限'] },
-      { feature: '教练渲染', values: ['2D', '2D', '2D', '2.5D', '3D', '3D+真人'] },
-      { feature: '语音训练', values: ['❌', '❌', '❌', '✅', '✅', '✅'] },
-      { feature: '高难度关卡', values: ['❌', '❌', '❌', '✅', '✅', '✅'] },
-      { feature: '穿梭券', values: ['0', '签到获取', '签到获取', '3张/周', '10张/月', '15张/月'] },
-      { feature: '双倍积分卡', values: ['0', '签到获取', '签到获取', '1张/周', '3张/月', '3张/月'] },
-      { feature: '价格', values: ['免费', '免费', '¥3.9/日', '¥18/周', '¥58/月', '¥398/年'] },
-    ]
+      { feature: 'AI对话引擎', values: ['基础额度', 'DeepSeek', 'DeepSeek', 'DeepSeek高优', 'DeepSeek高优'] },
+      { feature: '每日训练次数', values: ['5次', '20次', '不限日常次数*', '不限日常次数*', '不限日常次数*'] },
+      { feature: '语音训练', values: ['❌', '❌', '✅', '✅', '✅'] },
+      { feature: '高难度关卡', values: ['按等级/积分/券', '直接访问', '直接访问', '直接访问', '直接访问'] },
+      { feature: '全部场景访问', values: ['逐项解锁', '会员期内访问', '会员期内访问', '会员期内访问', '会员期内访问'] },
+      { feature: '价格', values: ['免费', '¥3.9/日', '¥19.9/周', '¥69/月', '¥499/年'] },
+    ],
+    note: '* 会员不限免费用户的每日次数，但仍受服务端安全限频和异常检测约束。',
   });
 };
+
+module.exports.MEMBERSHIP_PLANS = MEMBERSHIP_PLANS;

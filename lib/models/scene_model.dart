@@ -54,3 +54,28 @@ class SceneModel {
       _$SceneModelFromJson(json);
   Map<String, dynamic> toJson() => _$SceneModelToJson(this);
 }
+
+/// 场景列表按阶段分组后的接口返回模型。
+class StageGroup {
+  final String stage;
+  final bool unlocked;
+  final List<SceneModel> scenes;
+
+  const StageGroup({
+    required this.stage,
+    required this.unlocked,
+    required this.scenes,
+  });
+
+  factory StageGroup.fromJson(Map<String, dynamic> json) {
+    final rawScenes = (json['scenes'] as List<dynamic>?) ?? const [];
+    return StageGroup(
+      stage: json['stage'] as String? ?? '',
+      unlocked: json['unlocked'] as bool? ?? false,
+      scenes: rawScenes
+          .whereType<Map<String, dynamic>>()
+          .map(SceneModel.fromJson)
+          .toList(),
+    );
+  }
+}

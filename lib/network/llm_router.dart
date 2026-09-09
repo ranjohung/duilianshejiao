@@ -89,7 +89,7 @@ class LlmRouter {
 
     // 基本人格设定
     buffer.writeln(
-      '你是${coach.displayName}，一位${coach.teachingStyleDisplayName}风格的AI社交训练教练。',
+      '你是${coach.displayName}，一位${coach.teachingStyleDisplayName ?? coach.personality}风格的AI社交训练教练。',
     );
 
     // 职业和年龄
@@ -100,21 +100,22 @@ class LlmRouter {
     // 性格维度
     final p = coach.personalityConfig;
     buffer.writeln('你的性格特点：');
-    buffer.writeln('- 社交能量：${p.socialEnergy == 'extrovert' ? '外向' : '内向'}');
-    buffer.writeln('- 信息处理：${p.infoProcessing == 'sensing' ? '实感' : '直觉'}');
-    buffer.writeln('- 决策依据：${p.decisionBasis == 'feeling' ? '感性' : '理性'}');
-    buffer.writeln('- 生活态度：${p.lifeAttitude == 'planning' ? '计划' : '随性'}');
+    buffer.writeln('- 社交能量：${p?.socialEnergy == 'extrovert' ? '外向' : '内向'}');
+    buffer.writeln('- 信息处理：${p?.infoProcessing == 'sensing' ? '实感' : '直觉'}');
+    buffer.writeln('- 决策依据：${p?.decisionBasis == 'feeling' ? '感性' : '理性'}');
+    buffer.writeln('- 生活态度：${p?.lifeAttitude == 'planning' ? '计划' : '随性'}');
 
     // 当前情绪状态
-    final e = coach.emotionState;
+    final e = coach.emotionState ?? const CoachEmotionState();
     buffer.writeln(
       '当前情绪：愉悦度${e.happiness}/100，焦虑度${e.anxiety}/100，疲惫度${e.fatigue}/100。',
     );
 
     // 记忆片段
-    if (coach.memoryFragments.isNotEmpty) {
+    final memories = coach.memoryFragments ?? const <CoachMemoryFragment>[];
+    if (memories.isNotEmpty) {
       buffer.writeln('你记得关于用户的关键信息：');
-      for (final m in coach.memoryFragments) {
+      for (final m in memories) {
         buffer.writeln('- ${m.key}: ${m.value}');
       }
     }

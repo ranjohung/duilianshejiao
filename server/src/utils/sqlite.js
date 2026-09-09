@@ -56,6 +56,7 @@ async function initDemoData() {
       nickname: '演示用户',
       password: null,
       coins: 650,
+      training_points: 650,
       total_points: 650,
       student_level: '钻石学员',
       member_level: 'free',
@@ -81,7 +82,7 @@ async function initDemoData() {
     data.items = [
       { id: 1, name: '时空穿梭券', item_type: 'time_shuttle', description: '重新选择对话分支', icon: '🕐', category: 'utility', price_coins: 50 },
       { id: 2, name: '提示卡', item_type: 'hint_card', description: '获取教练提示', icon: '💡', category: 'utility', price_coins: 30 },
-      { id: 3, name: '护盾', item_type: 'shield', description: '保护评分', icon: '🛡️', category: 'protection', price_coins: 40 },
+      { id: 3, name: '情绪护盾', item_type: 'emotion_shield', description: '保护评分', icon: '🛡️', category: 'protection', price_coins: 40 },
       { id: 4, name: '双倍积分卡', item_type: 'double_points', description: '双倍积分', icon: '✨', category: 'boost', price_coins: 60 }
     ];
     saveData();
@@ -179,8 +180,9 @@ const run = async (sql, params = []) => {
       nickname,
       password,
       coins: params[3] || 0,
-      total_points: params[4] || 0,
-      student_level: params[5] || 'bronze',
+      training_points: params[4] || 0,
+      total_points: params[5] || 0,
+      student_level: params[6] || 'bronze',
       member_level: 'free',
       is_real_name_verified: 0,
       created_at: new Date().toISOString(),
@@ -212,7 +214,7 @@ const run = async (sql, params = []) => {
     data.items = [
       { id: 1, name: '时空穿梭券', item_type: 'time_shuttle', description: '重新选择对话分支', icon: '🕐', category: 'utility', price_coins: 50 },
       { id: 2, name: '提示卡', item_type: 'hint_card', description: '获取教练提示', icon: '💡', category: 'utility', price_coins: 30 },
-      { id: 3, name: '护盾', item_type: 'shield', description: '保护评分', icon: '🛡️', category: 'protection', price_coins: 40 },
+      { id: 3, name: '情绪护盾', item_type: 'emotion_shield', description: '保护评分', icon: '🛡️', category: 'protection', price_coins: 40 },
       { id: 4, name: '双倍积分卡', item_type: 'double_points', description: '双倍积分', icon: '✨', category: 'boost', price_coins: 60 }
     ];
     saveData();
@@ -240,10 +242,16 @@ const get = async (sql, params = []) => {
   return results[0] || null;
 };
 
+const findUserById = async (userId) => {
+  await initDemoData();
+  return Object.values(data.users).find(user => String(user.id) === String(userId)) || null;
+};
+
 module.exports = {
   query,
   run,
   get,
+  findUserById,
   setSmsCode,
   getSmsCode
 };

@@ -176,7 +176,6 @@ class TrainingResultPage extends StatelessWidget {
                   const titles = ['沟通力', '表达力', '共情力', '情绪控制', '应变力'];
                   return RadarChartTitle(text: titles[index]);
                 },
-                titlePositionFactorOffset: 0.2,
                 titleTextStyle:
                     const TextStyle(fontSize: 12, color: Colors.black54),
               ),

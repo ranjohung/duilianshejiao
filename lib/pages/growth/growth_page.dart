@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import '../../config/api_config.dart';
 import '../../config/app_config.dart';
 import '../../network/services/growth_service.dart';
 
@@ -70,6 +71,17 @@ class _GrowthPageState extends State<GrowthPage> {
 
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
+    if (ApiConfig.demoMode) {
+      if (!mounted) return;
+      setState(() {
+        _profileData = Map<String, dynamic>.from(_fallbackProfile);
+        _weeklyProgress = <String, dynamic>{'weeklyChange': _fallbackWeeklyChange};
+        _progressCurve = _generateFallbackCurve();
+        _milestones = _fallbackMilestones;
+        _isLoading = false;
+      });
+      return;
+    }
     try {
       final profileRes = await _service.getProfile();
       final weeklyRes = await _service.getWeeklyProgress();
