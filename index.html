@@ -375,7 +375,9 @@ h1,h2,h3 { text-wrap:balance; }
 .knowledge-search-box input{padding-right:38px;}
 .knowledge-search-box .clear-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#999;font-size:14px;cursor:pointer;display:none;}
 .knowledge-search-box.has-value .clear-btn{display:block;}
-.chapter-card{background:#fff;border:1px solid #ecebff;border-radius:18px;padding:0;overflow:hidden;}
+.chapter-card{background:#fff;border:1px solid #ecebff;border-radius:18px;padding:0;overflow:hidden;flex-shrink:0;}
+/* 分类 tab 是横向 flex，禁止被压缩（否则 28 个 tab 会挤成一团） */
+#knowledge-category-tabs > button{flex-shrink:0;}
 .chapter-card.open{box-shadow:0 12px 30px rgba(81,72,200,.12);border-color:#cdc7ff;}
 .chapter-head{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;background:#fff;}
 .chapter-head:hover{background:#faf9ff;}
