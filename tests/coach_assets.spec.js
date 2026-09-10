@@ -27,7 +27,7 @@ test('教练素材按用途渲染且编辑资料支持上传全身照', async ({
     closeModal('coach-select');
     startTrainingSession();
   });
-  await expect(page.locator('#training-coach-avatar')).toHaveAttribute('src', /assets\/images\/coaches\/coach-02\.jpg/);
+  await expect(page.locator('#training-coach-avatar').first()).toHaveAttribute('src', /assets\/images\/coaches\/coach-02\.jpg/);
   await expect(page.locator('#training-messages img').first()).toHaveAttribute('src', /assets\/images\/coaches\/coach-02\.jpg/);
 
   await page.evaluate(() => {
@@ -35,9 +35,9 @@ test('教练素材按用途渲染且编辑资料支持上传全身照', async ({
     showModal('editprofile');
   });
   const tinyPng = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=', 'base64');
-  await page.locator('#edit-avatar-upload').setInputFiles({ name: 'full-body.png', mimeType: 'image/png', buffer: tinyPng });
-  await expect(page.locator('#edit-avatar-preview-image')).toBeVisible();
-  await page.getByRole('button', { name: '保存修改' }).click();
+  await page.locator('#edit-avatar-upload').first().setInputFiles({ name: 'full-body.png', mimeType: 'image/png', buffer: tinyPng });
+  await expect(page.locator('#edit-avatar-preview-image').first()).toBeVisible();
+  await page.getByRole('button', { name: '保存修改' }).first().click();
 
   const userAvatar = await page.evaluate(() => ({
     stored: typeof userData.avatarImage === 'string' && userData.avatarImage.startsWith('data:image/jpeg'),
@@ -65,12 +65,19 @@ test('编辑资料：真人全身头像预设可选择、预览并保存', async
   await page.waitForFunction(() => [...document.querySelectorAll('#profile-avatar-select-grid img')].every(img => img.complete && img.naturalWidth > 0));
   const imagesLoaded = await page.locator('#profile-avatar-select-grid img').evaluateAll(images => images.every(img => img.complete && img.naturalWidth > 0));
   expect(imagesLoaded).toBeTruthy();
+  const firstPreset = page.locator('#profile-avatar-select-grid [data-avatar-id="steady"]');
+  await expect(firstPreset).toHaveAttribute('data-avatar-id', 'steady');
+  await firstPreset.locator('.avatar-preset-zoom').click();
+  await expect(page.locator('#modal-avatar-detail')).toBeVisible();
+  await expect(page.locator('#avatar-detail-image')).toHaveAttribute('src', /assets\/images\/user-avatars\/user-avatar-01\.png/);
+  await page.getByRole('button', { name: '使用这个形象' }).first().click();
+
   const creative = page.locator('#profile-avatar-select-grid [data-avatar-id="creative"]');
   await creative.scrollIntoViewIfNeeded();
   await creative.click();
-  await expect(page.locator('#edit-avatar-preview-image')).toHaveAttribute('src', /assets\/images\/user-avatars\/user-avatar-06\.png/);
+  await expect(page.locator('#edit-avatar-preview-image').first()).toHaveAttribute('src', /assets\/images\/user-avatars\/user-avatar-06\.png/);
   await expect(page.locator('#profile-avatar-select-grid [data-avatar-id="creative"]')).toHaveClass(/is-selected/);
-  await page.getByRole('button', { name: '保存修改' }).click();
+  await page.getByRole('button', { name: '保存修改' }).first().click();
 
   const stored = await page.evaluate(() => ({
     preset: userData.avatarPresetId,
@@ -83,4 +90,31 @@ test('编辑资料：真人全身头像预设可选择、预览并保存', async
     homeVisible: true
   });
   expect(pageErrors).toEqual([]);
+});
+test('训练前形象准备与结算评分透明可追溯', async ({ page }) => {
+  await page.goto(BASE_URL, { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(() => {
+    performLocalLogin('appearance-score-test', '形象评分用户', 650, '钻石学员');
+    document.querySelectorAll('.modal-overlay').forEach(el => { el.style.display = 'none'; });
+    userData.hasSeenOnboarding = true;
+    userData.hasSelectedInitial = true;
+    userData.avatarPresetId = 'steady';
+    userData.avatar = '🧑';
+    userData.avatarImage = 'assets/images/user-avatars/user-avatar-01.png';
+    userAvatarImage = userData.avatarImage;
+    const scene = trainingScenes[0];
+    scene.unlocked = true;
+    currentTraining = scene;
+    currentTraining.shuffledRounds = [...scene.rounds];
+    trainingRoundIdx = currentTraining.shuffledRounds.length - 1;
+    trainingChoices = currentTraining.shuffledRounds.map((_, index) => ({ round: index + 1, scoreDelta: 8, isGood: true }));
+    trainingScore = 60;
+    netScore = 40;
+    currentImageFit = 85;
+    trainingSettlementApplied = false;
+    fullAnalysisUnlocked = false;
+    finishTraining();
+    return { appearance: currentAppearanceScore, bonus: currentAppearanceBonus, net: netScore, score: trainingScore };
+  });
+  expect(result).toEqual({ appearance: 85, bonus: 5, net: 45, score: 65 });
 });

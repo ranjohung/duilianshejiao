@@ -14,7 +14,7 @@ test('训练流程测试 - 场景模板市场点击开始训练', async ({ page 
 
   // 2. Login with demo account
   console.log('2. 使用演示账号登录...');
-  const demoBtn = page.getByRole('button', { name: /演示账号登录/ });
+  const demoBtn = page.getByRole('button', { name: /演示账号登录/ }).first();
   await demoBtn.waitFor({ state: 'visible', timeout: 5000 });
   await demoBtn.click();
   await page.waitForTimeout(1000);
@@ -35,16 +35,16 @@ test('训练流程测试 - 场景模板市场点击开始训练', async ({ page 
     await page.evaluate(() => selectInitialScene(4));
     await expect(page.locator('#initial-selection-confirm-dialog')).toBeVisible();
     await expect(page.locator('#initial-selection-confirm-dialog')).toContainText('唯一一次免费选择机会');
-    await page.getByRole('button', { name: '确认选择' }).click();
+    await page.getByRole('button', { name: '确认选择' }).first().click();
     await expect(page.locator('#initial-selection-success-dialog')).toBeVisible();
     await expect(page.locator('#initial-selection-success-dialog')).toContainText('已免费解锁「加薪谈判」');
-    await page.getByRole('button', { name: '稍后再练' }).click();
+    await page.getByRole('button', { name: '稍后再练' }).first().click();
   }
   await page.screenshot({ path: `${SCREENSHOT_DIR}/03_after_onboarding.png` });
 
   // 4. Click "训练" tab
   console.log('4. 点击"训练"标签...');
-  const trainingTab = page.locator('.tab-item').filter({ hasText: '训练' });
+  const trainingTab = page.locator('.tab-item').filter({ hasText: '训练' }).first();
   await trainingTab.click();
   await page.waitForTimeout(1500);
   await page.screenshot({ path: `${SCREENSHOT_DIR}/04_training_tab.png` });
@@ -52,7 +52,7 @@ test('训练流程测试 - 场景模板市场点击开始训练', async ({ page 
 
   // 5. Enter the scene template market module
   console.log('5. 进入"场景模板市场"功能区...');
-  await page.getByRole('button', { name: /场景模板市场/ }).click();
+  await page.getByRole('button', { name: /场景模板市场/ }).first().click();
   await page.waitForTimeout(500);
   await page.screenshot({ path: `${SCREENSHOT_DIR}/05_after_initial_selection.png` });
 
@@ -161,7 +161,17 @@ test('训练流程测试 - 场景模板市场点击开始训练', async ({ page 
     console.log('   没有发现可见的弹窗');
   }
 
-  // 12. If training modal appeared, check its content
+  // 12. 新增训练前形象准备：确认当前形象后才进入对话
+  if (results['modal-prepare'] && !results['modal-training']) {
+    await expect(modalPrepare.first()).toContainText('训练前形象准备');
+    await expect(page.locator('#prepare-avatar-preview-image').first()).toBeVisible();
+    await modalPrepare.first().getByRole('button', { name: '使用当前形象开始' }).click();
+    await expect(modalTraining.first()).toBeVisible();
+    results['modal-prepare'] = false;
+    results['modal-training'] = true;
+  }
+
+  // 13. If training modal appeared, check its content
   if (results['modal-training']) {
     console.log('   训练弹窗已出现！检查其内容...');
     const trainingTitle = page.locator('#training-title');
@@ -179,10 +189,10 @@ test('训练流程测试 - 场景模板市场点击开始训练', async ({ page 
     await page.screenshot({ path: `${SCREENSHOT_DIR}/11_training_modal_detail.png` });
 
     console.log('   验证训练退出确认...');
-    await page.getByRole('button', { name: '退出训练' }).click();
+    await page.getByRole('button', { name: '退出训练' }).first().click();
     await expect(page.locator('#training-exit-dialog')).toBeVisible();
     await expect(page.locator('#training-exit-dialog')).toContainText('本次不会获得训练积分或好感度');
-    await page.getByRole('button', { name: '继续训练' }).click();
+    await page.getByRole('button', { name: '继续训练' }).first().click();
     await expect(page.locator('#training-exit-dialog')).toHaveCount(0);
   }
 
@@ -193,12 +203,12 @@ test('训练流程测试 - 场景模板市场点击开始训练', async ({ page 
     const titleText = await prepareTitle.innerText().catch(() => '');
     console.log(`   准备标题: ${titleText}`);
 
-    const startBtnPrepare = page.locator('#modal-prepare').getByRole('button', { name: '直接开始训练' });
+    const startBtnPrepare = page.locator('#modal-prepare').first().getByRole('button', { name: '使用当前形象开始' });
     const dressBtnVisible = await startBtnPrepare.isVisible().catch(() => false);
-    console.log(`   "直接开始训练"按钮: ${dressBtnVisible ? '可见' : '不可见'}`);
+    console.log(`   "使用当前形象开始"按钮: ${dressBtnVisible ? '可见' : '不可见'}`);
 
     if (dressBtnVisible) {
-      console.log('   点击"直接开始训练"...');
+      console.log('   点击"使用当前形象开始"...');
       await startBtnPrepare.click();
       await page.waitForTimeout(2000);
       await page.screenshot({ path: `${SCREENSHOT_DIR}/12_after_skip_dress.png` });
@@ -226,17 +236,19 @@ test('新注册账号提示链路完整', async ({ page }) => {
   await page.setViewportSize({ width: 430, height: 932 });
   await page.goto(BASE_URL, { waitUntil: 'domcontentloaded' });
 
-  await page.getByRole('button', { name: '立即注册' }).click();
-  await page.locator('#reg-phone').fill('13900000001');
-  await page.locator('#reg-nickname').fill('新用户测试');
-  await page.locator('#reg-password').fill('123456');
-  await page.locator('#reg-confirm-password').fill('123456');
-  await page.locator('#agree-terms').check();
-  await page.locator('#register-form').getByRole('button', { name: '注 册' }).click();
+  await page.getByRole('button', { name: '立即注册' }).first().click();
+  await page.locator('#reg-phone').first().fill('13900000001');
+  await page.locator('#reg-nickname').first().fill('新用户测试');
+  await page.locator('#reg-password').first().fill('123456');
+  await page.locator('#reg-confirm-password').first().fill('123456');
+  await page.locator('#agree-terms').first().check();
+  await page.locator('#register-form').first().getByRole('button', { name: '注 册' }).first().click();
 
   const onboarding = page.locator('#modal-onboarding');
   await expect(onboarding).toBeVisible();
   await expect(onboarding).toContainText('欢迎来到对练社交');
+  const defaultAvatar = await page.evaluate(() => ({ preset: userData.avatarPresetId, image: userData.avatarImage }));
+  expect(defaultAvatar).toEqual({ preset: 'steady', image: 'assets/images/user-avatars/user-avatar-01.png' });
   await onboarding.getByRole('button', { name: '开始训练' }).click();
 
   const selection = page.locator('#initial-selection-dialog');
@@ -252,8 +264,12 @@ test('新注册账号提示链路完整', async ({ page }) => {
   await expect(success).toBeVisible();
   await success.getByRole('button', { name: '开始训练' }).click();
 
-  await expect(page.locator('#modal-training')).toBeVisible();
-  await page.getByRole('button', { name: '退出训练' }).click();
+  const prepare = page.locator('#modal-prepare').first();
+  await expect(prepare).toBeVisible();
+  await expect(prepare).toContainText('训练前形象准备');
+  await prepare.getByRole('button', { name: '使用当前形象开始' }).click();
+  await expect(page.locator('#modal-training').first()).toBeVisible();
+  await page.getByRole('button', { name: '退出训练' }).first().click();
   const exitDialog = page.locator('#training-exit-dialog');
   await expect(exitDialog).toBeVisible();
   await expect(exitDialog).toContainText('本次不会获得训练积分或好感度');
