@@ -256,7 +256,7 @@ input:focus,textarea:focus,select:focus { border-color:var(--brand-500) !importa
 .tab-item:not(.active):hover { color:#584a6a; background:rgba(91,76,240,.04); }
 
 /* 弹窗与反馈：统一 Radix 风格 */
-.modal-overlay { background:rgba(24,16,38,.48); padding:18px; backdrop-filter:blur(8px); animation:overlayIn .22s ease-out; }
+.modal-overlay { background:rgba(24,16,38,.52); padding:18px; animation:overlayIn .22s ease-out; }
 .modal-content { border:1px solid rgba(255,255,255,.55); border-radius:24px; box-shadow:var(--shadow-lg); animation:dialogIn .34s var(--ease); }
 @keyframes overlayIn { from { opacity:0; } }
 @keyframes dialogIn { from { opacity:0; transform:translateY(18px) scale(.97); } to { opacity:1; transform:none; } }
@@ -367,8 +367,8 @@ h1,h2,h3 { text-wrap:balance; }
 <!-- ===== knowledge + action panel + coach feedback (2026-09-10) ===== -->
 <style id="__DL_KNOWLEDGE_CSS__">
 /* ===== 学习卡片课程化重构（2026-09-10） ===== */
-.modal-knowledge{background:linear-gradient(160deg,#f7f5ff 0%,,#fff7f0 100%);}
-.modal-knowledge .modal-content{background:#fff;border-radius:24px;box-shadow:0 24px 60px rgba(60,40,120,.18);display:flex;flex-direction:column;}
+.modal-knowledge{background:linear-gradient(160deg,#f7f5ff 0%,#fff7f0 100%);backdrop-filter:none;}
+.modal-knowledge .modal-content{background:#fff;border-radius:24px;box-shadow:0 24px 60px rgba(60,40,120,.18);display:flex;flex-direction:column;overflow:hidden;}
 .modal-knowledge .modal-content>div{flex-shrink:0;}
 .modal-knowledge .modal-content>.flex-1.overflow-auto{flex:1 1 auto;min-height:0;}
 .knowledge-search-box{position:relative;}
@@ -426,6 +426,21 @@ h1,h2,h3 { text-wrap:balance; }
 .knowledge-formula .formula-label{font-size:11px;font-weight:600;color:#5d54c0;}
 .knowledge-formula ul{margin-top:8px;padding-left:18px;color:#3a3754;font-size:13px;line-height:1.7;}
 .knowledge-formula ul li::marker{color:#a39ee0;}
+/* 课程详情增强：要点 chips / 原文 / 场景课程目录（2026-09-10） */
+.kd-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.kd-chip{background:#f2f0ff;color:#5d54c0;font-size:11px;padding:4px 10px;border-radius:99px;border:1px solid #e6e2ff;}
+.kd-rawtext{font-size:12.5px;color:#3a3754;line-height:1.75;white-space:pre-wrap;background:#faf9ff;padding:10px 12px;border-radius:10px;margin-top:8px;max-height:300px;overflow:auto;}
+.kd-outline-stat{font-size:11px;color:#8b7fb0;margin-top:5px;line-height:1.5;}
+.kd-outline{margin-top:8px;border:1px solid #f0edff;border-radius:12px;overflow:hidden;}
+.kd-outline-item{display:flex;align-items:center;gap:8px;padding:8px 10px;font-size:12px;color:#4b4566;border-bottom:1px solid #f6f4ff;background:#fff;}
+.kd-outline-item.cur{background:#f4f1ff;font-weight:600;color:#4c3bb0;}
+.kd-outline-idx{width:18px;height:18px;flex-shrink:0;border-radius:50%;background:#eeebff;color:#6b5fd0;font-size:10px;display:inline-flex;align-items:center;justify-content:center;}
+.kd-outline-item.cur .kd-outline-idx{background:#6655ee;color:#fff;}
+.kd-outline-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.kd-outline-cnt{font-size:10px;color:#a39ec0;flex-shrink:0;}
+.kd-samples{padding:6px 10px 10px 34px;background:#fbfaff;border-bottom:1px solid #f6f4ff;}
+.kd-sample{display:flex;gap:6px;font-size:11.5px;color:#4b4566;line-height:1.6;padding:5px 0;}
+.kd-sample-lv{flex-shrink:0;font-size:10px;color:#7a6fd8;background:#f0edff;border-radius:6px;padding:1px 6px;height:fit-content;}
 .knowledge-redline{background:#fff6f6;border:1px solid #ffc8c8;border-radius:14px;padding:12px;color:#9a3a3a;font-size:12px;line-height:1.5;}
 .knowledge-redline .redline-label{font-weight:700;color:#a23d3d;margin-right:6px;}
 .knowledge-quiz{background:#fff;border:1px solid #ecebff;border-radius:14px;padding:14px;}
@@ -440,7 +455,9 @@ h1,h2,h3 { text-wrap:balance; }
 .knowledge-quiz .quiz-feedback{margin-top:10px;padding:10px;border-radius:10px;font-size:12px;line-height:1.55;}
 .knowledge-quiz .quiz-feedback.ok{background:#e6f7ee;color:#1d5d44;}
 .knowledge-quiz .quiz-feedback.bad{background:#fdecea;color:#9a3a3a;}
-.knowledge-detail-actions{position:sticky;bottom:0;background:#fff;padding:12px 0 6px;margin-top:6px;display:flex;flex-direction:column;gap:8px;border-top:1px solid #f1edff;box-shadow:0 -10px 24px rgba(60,40,120,.06);}
+/* 详情页底部操作栏：固定在 modal 最底部（不再 sticky 悬浮到内容中间）2026-09-10 */
+#knowledge-detail-actions-bar{flex-shrink:0;background:#fff;padding:12px 14px calc(12px + env(safe-area-inset-bottom));border-top:1px solid #f1edff;box-shadow:0 -10px 24px rgba(60,40,120,.07);position:relative;z-index:3;}
+.knowledge-detail-actions{display:flex;flex-direction:column;gap:8px;background:transparent;border:none;box-shadow:none;padding:0;margin:0;position:static;}
 .knowledge-detail-actions .row{display:flex;gap:8px;}
 .knowledge-detail-actions button{flex:1;border:none;border-radius:14px;padding:11px 14px;font-size:13px;font-weight:600;cursor:pointer;transition:transform .15s, opacity .15s;}
 .knowledge-detail-actions button:active{transform:scale(.98);}
@@ -3078,6 +3095,7 @@ h1,h2,h3 { text-wrap:balance; }
 
 <script src="knowledge_base/learning_cards.js"></script>
 <script src="knowledge_base/raw_course_cards.js"></script>
+<script src="knowledge_base/extra_course_cards.js"></script>
 <script src="libs/three.min.js"></script>
 <script>
 // ===== 全局状态 =====
@@ -3991,7 +4009,9 @@ const fallbackLearningCards = [
 ];
 const structuredLearningCards = Array.isArray(window.knowledgeLearningCards) ? window.knowledgeLearningCards : [];
 const rawCourseLearningCards = Array.isArray(window.rawCourseLearningCards) ? window.rawCourseLearningCards : [];
-let learningCards = [...structuredLearningCards, ...rawCourseLearningCards];
+// 资料库课程目录全量纳入（音视频课 / 话术资料 / 电子书），不做删减
+const extraCourseCards = Array.isArray(window.extraCourseCards) ? window.extraCourseCards : [];
+let learningCards = [...structuredLearningCards, ...rawCourseLearningCards, ...extraCourseCards];
 if (!learningCards.length) learningCards = fallbackLearningCards;
 
 // 教练动态模板（PRD §15.2）
@@ -16604,15 +16624,17 @@ function useAvatarDetail() {
 
 <!-- ===== 学习卡片课程详情 modal-knowledge-detail ===== -->
 <div class="modal-overlay modal-knowledge" id="modal-knowledge-detail" style="display:none">
-  <div class="modal-content" style="height:92vh;max-height:92vh">
+  <div class="modal-content" style="height:92vh;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;">
     <div class="flex items-center justify-between p-3 border-b" style="border-bottom:1px solid #f1edff;flex-shrink:0;">
       <button class="back" onclick="closeModal('knowledge-detail')" aria-label="返回" style="background:#f5f3ff;color:#5d54c0;width:34px;height:34px;border-radius:50%;border:none;cursor:pointer;font-size:16px;">←</button>
       <span style="font-size:13px;color:#847ea8;">课程详情</span>
       <button onclick="closeModal('knowledge-detail')" class="text-gray-400 hover:text-gray-600 text-xl" aria-label="关闭">✕</button>
     </div>
-    <div class="flex-1 overflow-auto" style="padding:14px 14px 120px;">
+    <div class="flex-1 overflow-auto kd-scroll" style="padding:14px 14px 18px;min-height:0;">
       <div class="knowledge-detail" id="knowledge-detail-content"><!-- injected --></div>
     </div>
+    <!-- 底部操作栏：固定在最下面，内容不会越过它 -->
+    <div id="knowledge-detail-actions-bar"><!-- injected --></div>
   </div>
 </div>
 
@@ -16649,7 +16671,26 @@ function useAvatarDetail() {
     '突发与冲突': 'warm',
     '数字社交': 'teal',
     '职场与事业': 'cool',
-    '好好接话课程': 'violet'
+    '好好接话课程': 'violet',
+    // 资料库课程（2026-09-10 全量纳入）
+    '沟通高手·利他聊天术': 'violet',
+    '销冠·高情商成交话术': 'warm',
+    '各行业销售话术 300 套': 'cool',
+    '微表情读心术': 'teal',
+    '高情商接话聊天话术': 'teal',
+    '中国式送礼指南': 'pink',
+    '礼尚往来实用指南': 'pink',
+    '送礼话术·秘籍': 'pink',
+    '送礼话术·实战': 'pink',
+    '酒桌话术': 'warm',
+    '职场社交精选精读': 'cool',
+    '做局权谋精选精读': 'violet',
+    '人性洞察精选精读': 'violet',
+    '思维认知精选精读': 'teal',
+    '赚钱营销精选精读': 'warm',
+    '两性情感精选精读': 'pink',
+    '女性成长精选精读': 'pink',
+    '说话的艺术精选精读': 'warm'
   };
   var CATEGORY_ICONS = {
     '社交场合与人际交往': '🤝',
@@ -16660,7 +16701,26 @@ function useAvatarDetail() {
     '突发与冲突': '⚡',
     '数字社交': '📱',
     '职场与事业': '💼',
-    '好好接话课程': '🎓'
+    '好好接话课程': '🎓',
+    // 资料库课程（2026-09-10 全量纳入）
+    '沟通高手·利他聊天术': '🗣️',
+    '销冠·高情商成交话术': '🏆',
+    '各行业销售话术 300 套': '📈',
+    '微表情读心术': '👁️',
+    '高情商接话聊天话术': '💬',
+    '中国式送礼指南': '🎁',
+    '礼尚往来实用指南': '🧧',
+    '送礼话术·秘籍': '🎀',
+    '送礼话术·实战': '🎀',
+    '酒桌话术': '🍶',
+    '职场社交精选精读': '📚',
+    '做局权谋精选精读': '♟️',
+    '人性洞察精选精读': '🧠',
+    '思维认知精选精读': '💡',
+    '赚钱营销精选精读': '💰',
+    '两性情感精选精读': '💞',
+    '女性成长精选精读': '🌸',
+    '说话的艺术精选精读': '🎙️'
   };
 
   // ---------- KnowledgeLibrary ----------
@@ -16746,8 +16806,15 @@ function useAvatarDetail() {
     var items = ['全部'].concat(chs.map(function (c) { return c.name; }));
     box.innerHTML = items.map(function (name) {
       var active = (KL._filter === name);
-      return '<button onclick="KL_setFilter(' + name + ')" class="px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors" style="border:1px solid ' + (active ? '#6655ee' : '#ecebff') + ';background:' + (active ? 'linear-gradient(135deg,#6655ee,#9671ff)' : '#fff') + ';color:' + (active ? '#fff' : '#5d54c0') + ';">' + escapeHTML(name) + '</button>';
+      return '<button onclick="KL_setFilterByAttr(this)" data-name="' + escapeHTML(name) + '" class="px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors" style="border:1px solid ' + (active ? '#6655ee' : '#ecebff') + ';background:' + (active ? 'linear-gradient(135deg,#6655ee,#9671ff)' : '#fff') + ';color:' + (active ? '#fff' : '#5d54c0') + ';">' + escapeHTML(name) + '</button>';
     }).join('');
+  }
+
+  // 分类筛选（data-name 包裹函数，避免 onclick 字符串拼接引号逃逸）
+  function KL_setFilterByAttr(el) {
+    if (!el) return;
+    var name = el.getAttribute('data-name') || '全部';
+    KL_setFilter(name);
   }
 
   function renderChapterList() {
@@ -16767,7 +16834,7 @@ function useAvatarDetail() {
       var pct = lessons.length ? Math.round(learned * 100 / lessons.length) : 0;
       var isOpen = (KL._openChapter === ch.name);
       html += '<div class="chapter-card ' + (isOpen ? 'open' : '') + '" data-tone="' + ch.tone + '" data-chapter="' + escapeHTML(ch.name) + '">';
-      html += '  <div class="chapter-head" onclick="KL_toggleChapterByAttr(this)" data-name="' + ch.name + '">';
+      html += '  <div class="chapter-head" onclick="KL_toggleChapterByAttr(this)" data-name="' + escapeHTML(ch.name) + '">';
       html += '    <div class="chapter-icon">' + ch.icon + '</div>';
       html += '    <div class="chapter-meta">';
       html += '      <div class="chapter-title">' + escapeHTML(ch.name) + '</div>';
@@ -16869,8 +16936,20 @@ function useAvatarDetail() {
 
     var tags = (card.tags || []).slice(0, 4);
     var tips = (card.tips || []).slice(0, 5);
-    var badExample = tips[0] ? '「' + tips[0] + '」' + (card.tips[2] ? '、' + card.tips[2] : '') + ' 等场景，若直接表达容易暴露底牌/显得生硬。' : '在不了解情况时直接抛出结论，容易引起对方反感或误会。';
-    var goodExample = card.content ? card.content.split(/[\n。]/)[0].slice(0, 80) : (tips[0] ? '「' + tips[0] + '」' + '可以更柔和、更得体地表达' : '用自己的话表达，关键在于先肯定当下情境，再把话题推进一步。');
+    // 左右两栏：课程原文类卡片展示「原文摘录 / 学习建议」，其余展示「易踩坑 / 建议这样」
+    var isRawCourse = !!card.rawText;
+    var leftLabel, rightLabel, badExample, goodExample;
+    if (isRawCourse) {
+      leftLabel = '📖 原文摘录';
+      rightLabel = '💡 学习建议';
+      badExample = (card.rawText || '').replace(/\s+/g, ' ').trim().slice(0, 72) + '…';
+      goodExample = '先通读下方完整原文，再结合自己真实处境改写一句，最后到对应场景里说一遍。';
+    } else {
+      leftLabel = '❌ 易踩坑';
+      rightLabel = '✅ 建议这样';
+      badExample = tips[0] ? '「' + tips[0] + '」' + (card.tips[2] ? '、' + card.tips[2] : '') + ' 等场景，若直接表达容易暴露底牌/显得生硬。' : '在不了解情况时直接抛出结论，容易引起对方反感或误会。';
+      goodExample = card.content ? card.content.split(/[\n。]/)[0].slice(0, 80) : (tips[0] ? '「' + tips[0] + '」' + '可以更柔和、更得体地表达' : '用自己的话表达，关键在于先肯定当下情境，再把话题推进一步。');
+    }
     var principle = card.principle || '先回应当下情境，再把话题推进一步。';
     var safety = card.safetyNote || '请结合真实情况改写，不编造、不施压。';
     var practice = card.practicePrompt || '用自己的话完成一次表达。';
@@ -16882,6 +16961,13 @@ function useAvatarDetail() {
     html += '  <button class="back" onclick="KL_closeDetail()" aria-label="关闭">✕</button>';
     html += '  <div style="font-size:18px;font-weight:700;margin-top:4px;line-height:1.35;">' + escapeHTML(card.title || '(无标题)') + '</div>';
     html += '  <div style="font-size:11px;opacity:.85;margin-top:4px;">所属：' + escapeHTML(card.category || '通用') + (card.scene ? ' · ' + escapeHTML(card.scene) : '') + '</div>';
+    // 资料类型徽标（音频课 / 视频课 / 电子书 / 课程原文 / 话术资料）
+    if (card.kind || card.medium) {
+      var KIND_LABEL = { lesson: '课程正文', intro: '章节导语', summary: '章节速记', audio: '音频课', video: '视频课', book: '电子书', doc: '话术资料' };
+      var kindLabel = KIND_LABEL[card.kind] || (card.medium === 'audio' ? '音频课' : (card.medium === 'video' ? '视频课' : (card.medium === 'book' ? '电子书' : (card.kind || '参考资料'))));
+      var mediumIcon = card.medium === 'audio' ? '🎧' : (card.medium === 'video' ? '🎬' : (card.medium === 'book' ? '📖' : '📄'));
+      html += '  <div class="head-tags" style="margin-top:6px;"><span class="head-tag" style="background:rgba(255,255,255,.32);">' + mediumIcon + ' ' + escapeHTML(kindLabel) + '</span></div>';
+    }
     if (tags.length) {
       html += '  <div class="head-tags">' + tags.map(function (t) { return '<span class="head-tag">#' + escapeHTML(t) + '</span>'; }).join('') + '</div>';
     }
@@ -16889,8 +16975,8 @@ function useAvatarDetail() {
     html += '</div>';
 
     html += '<div class="knowledge-scenario-row">';
-    html += '  <div class="knowledge-scenario bad"><div class="scenario-tag">❌ 易踩坑</div>' + escapeHTML(badExample) + '</div>';
-    html += '  <div class="knowledge-scenario good"><div class="scenario-tag">✅ 建议这样</div>' + escapeHTML(goodExample) + '</div>';
+    html += '  <div class="knowledge-scenario bad"><div class="scenario-tag">' + leftLabel + '</div>' + escapeHTML(badExample) + '</div>';
+    html += '  <div class="knowledge-scenario good"><div class="scenario-tag">' + rightLabel + '</div>' + escapeHTML(goodExample) + '</div>';
     html += '</div>';
 
     html += '<div class="knowledge-principle">';
@@ -16898,15 +16984,58 @@ function useAvatarDetail() {
     html += '  <div class="principle-body">' + escapeHTML(principle) + '</div>';
     html += '</div>';
 
+    // 关键要点（chip 形式，比竖排列表更易读）
     html += '<div class="knowledge-formula">';
-    html += '  <div class="formula-label">话术公式</div>';
-    html += '  <ul>' + formulaItems.map(function (t) { return '<li>' + escapeHTML(t) + '</li>'; }).join('') + '</ul>';
+    html += '  <div class="formula-label">关键要点</div>';
+    html += '  <div class="kd-chips">' + formulaItems.map(function (t) { return '<span class="kd-chip">' + escapeHTML(t) + '</span>'; }).join('') + '</div>';
     html += '</div>';
 
-    if (card.content) {
+    // 完整原文（不删减）：优先 rawText（资料库课程逐字原文）
+    var fullText = card.rawText || card.content;
+    if (fullText) {
       html += '<div class="knowledge-formula">';
       html += '  <div class="formula-label">完整原文（不删减）</div>';
-      html += '  <div style="font-size:12px;color:#3a3754;line-height:1.7;white-space:pre-wrap;max-height:200px;overflow:auto;background:#faf9ff;padding:10px;border-radius:8px;margin-top:8px;">' + escapeHTML(card.content) + '</div>';
+      html += '  <div class="kd-rawtext">' + escapeHTML(fullText) + '</div>';
+      html += '</div>';
+    }
+
+    // 本场景课程目录：完整列出同场景全部技能点；当前技能点展开其全部参考表达
+    var sameScene = (learningCards || []).filter(function (c) { return c && c.scene && c.scene === card.scene; });
+    if (sameScene.length > 1) {
+      var byPurpose = {}, purposeOrder = [];
+      sameScene.forEach(function (c) {
+        var k = c.title || '(未命名)';
+        if (!byPurpose[k]) { byPurpose[k] = []; purposeOrder.push(k); }
+        byPurpose[k].push(c);
+      });
+      html += '<div class="knowledge-formula">';
+      html += '  <div class="formula-label">📚 本场景课程目录</div>';
+      html += '  <div class="kd-outline-stat">' + escapeHTML(card.scene) + ' · 共 ' + purposeOrder.length + ' 个技能点 / ' + sameScene.length + ' 条参考表达（完整收录）</div>';
+      html += '  <div class="kd-outline">';
+      purposeOrder.forEach(function (p, i) {
+        var isCur = (p === card.title);
+        html += '    <div class="kd-outline-item' + (isCur ? ' cur' : '') + '">';
+        html += '      <span class="kd-outline-idx">' + (i + 1) + '</span>';
+        html += '      <span class="kd-outline-name">' + escapeHTML(p) + '</span>';
+        html += '      <span class="kd-outline-cnt">' + byPurpose[p].length + ' 条</span>';
+        html += '    </div>';
+        if (isCur) {
+          html += '    <div class="kd-samples">';
+          byPurpose[p].forEach(function (it) {
+            html += '      <div class="kd-sample"><span class="kd-sample-lv">' + escapeHTML(it.level || '参考') + '</span><span>' + escapeHTML(it.content || '') + '</span></div>';
+          });
+          html += '    </div>';
+        }
+      });
+      html += '  </div>';
+      html += '</div>';
+    }
+
+    // 原始资料出处（资料库课程可溯源）
+    if (card.source) {
+      html += '<div class="knowledge-formula">';
+      html += '  <div class="formula-label">📎 原始资料</div>';
+      html += '  <div style="font-size:11px;color:#6b6488;line-height:1.6;word-break:break-all;background:#faf9ff;padding:8px 10px;border-radius:8px;margin-top:6px;">' + escapeHTML(card.source) + '</div>';
       html += '</div>';
     }
 
@@ -16928,17 +17057,23 @@ function useAvatarDetail() {
     html += '  <div id="knowledge-quiz-feedback"></div>';
     html += '</div>';
 
-    html += '<div class="knowledge-detail-actions">';
-    html += '  <div class="row">';
-    html += '    <button class="btn-primary" id="knowledge-jump-btn" onclick="KL_jumpToPractice()" disabled>✅ 我已学会，去对练</button>';
-    html += '  </div>';
-    html += '  <div class="btn-row-secondary">';
-    html += '    <button class="btn-secondary" onclick="KL_toggleCollect()">' + (collected ? '★ 取消收藏' : '☆ 收藏') + '</button>';
-    html += '    <button class="btn-secondary" onclick="KL_startReview()">🔁 复习</button>';
-    html += '  </div>';
-    html += '</div>';
-
     box.innerHTML = html;
+
+    // 底部操作栏独立注入：固定在 modal 最底部，不随内容滚动、不被内容越过
+    var bar = document.getElementById('knowledge-detail-actions-bar');
+    if (bar) {
+      var ah = '';
+      ah += '<div class="knowledge-detail-actions">';
+      ah += '  <div class="row">';
+      ah += '    <button class="btn-primary" id="knowledge-jump-btn" onclick="KL_jumpToPractice()"' + (learned ? '' : ' disabled') + '>✅ 我已学会，去对练</button>';
+      ah += '  </div>';
+      ah += '  <div class="btn-row-secondary">';
+      ah += '    <button class="btn-secondary" onclick="KL_toggleCollect()">' + (collected ? '★ 取消收藏' : '☆ 收藏') + '</button>';
+      ah += '    <button class="btn-secondary" onclick="KL_startReview()">🔁 复习</button>';
+      ah += '  </div>';
+      ah += '</div>';
+      bar.innerHTML = ah;
+    }
   }
 
   function KL_closeDetail() {
@@ -17056,6 +17191,7 @@ function useAvatarDetail() {
   // expose
   global.KL = KL;
   global.KL_setFilter = KL_setFilter;
+  global.KL_setFilterByAttr = KL_setFilterByAttr;
   global.buildChapterBody = buildChapterBody;
   global.KL_toggleChapter = KL_toggleChapter;
   global.KL_toggleChapterByAttr = KL_toggleChapterByAttr;
