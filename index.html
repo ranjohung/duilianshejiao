@@ -351,6 +351,163 @@ h1,h2,h3 { text-wrap:balance; }
 
 
 </style>
+
+<!-- ===== knowledge + action panel + coach feedback (2026-09-10) ===== -->
+<style id="__DL_KNOWLEDGE_CSS__">
+/* ===== 学习卡片课程化重构（2026-09-10） ===== */
+.modal-knowledge{background:linear-gradient(160deg,#f7f5ff 0%,,#fff7f0 100%);}
+.modal-knowledge .modal-content{background:#fff;border-radius:24px;box-shadow:0 24px 60px rgba(60,40,120,.18);display:flex;flex-direction:column;}
+.modal-knowledge .modal-content>div{flex-shrink:0;}
+.modal-knowledge .modal-content>.flex-1.overflow-auto{flex:1 1 auto;min-height:0;}
+.knowledge-search-box{position:relative;}
+.knowledge-search-box input{padding-right:38px;}
+.knowledge-search-box .clear-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#999;font-size:14px;cursor:pointer;display:none;}
+.knowledge-search-box.has-value .clear-btn{display:block;}
+.chapter-card{background:#fff;border:1px solid #ecebff;border-radius:18px;padding:0;overflow:hidden;}
+.chapter-card.open{box-shadow:0 12px 30px rgba(81,72,200,.12);border-color:#cdc7ff;}
+.chapter-head{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;background:#fff;}
+.chapter-head:hover{background:#faf9ff;}
+.chapter-icon{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#8c84ff,#5c54f5);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.chapter-card[data-tone="warm"] .chapter-icon{background:linear-gradient(135deg,#ffb46e,#ff7846);}
+.chapter-card[data-tone="cool"] .chapter-icon{background:linear-gradient(135deg,#5dc8ff,#3a76ff);}
+.chapter-card[data-tone="green"] .chapter-icon{background:linear-gradient(135deg,#5fd49b,#229971);}
+.chapter-card[data-tone="pink"] .chapter-icon{background:linear-gradient(135deg,#ff8eb3,#e8508f);}
+.chapter-card[data-tone="violet"] .chapter-icon{background:linear-gradient(135deg,#b289ff,#7e3ff5);}
+.chapter-card[data-tone="teal"] .chapter-icon{background:linear-gradient(135deg,#5edcd1,#1892a3);}
+.chapter-meta{flex:1;min-width:0;}
+.chapter-title{font-weight:600;color:#2b2540;font-size:14px;}
+.chapter-progress{height:6px;background:#ecebff;border-radius:3px;margin-top:6px;overflow:hidden;}
+.chapter-progress-bar{height:100%;background:linear-gradient(90deg,#7e6cff,#ff7846);border-radius:3px;transition:width .3s;}
+.chapter-stat{font-size:11px;color:#847ea8;margin-top:4px;}
+.chapter-toggle{color:#aaa;font-size:14px;transition:transform .2s;}
+.chapter-card.open .chapter-toggle{transform:rotate(180deg);}
+.chapter-body{display:none;padding:0 14px 12px 14px;border-top:1px dashed #ecebff;background:#fcfcff;}
+.chapter-card.open .chapter-body{display:block;}
+.lesson-row{display:flex;align-items:center;gap:10px;padding:10px 6px;border-radius:10px;cursor:pointer;transition:background .15s;}
+.lesson-row:hover{background:#f5f3ff;}
+.lesson-row .lesson-num{width:24px;height:24px;border-radius:50%;background:#ecebff;color:#5d54c0;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.lesson-row .lesson-title{font-size:13px;color:#3a3754;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.lesson-row .lesson-meta{display:flex;align-items:center;gap:6px;}
+.lesson-status{font-size:12px;}
+.lesson-status.done{color:#229971;}
+.lesson-status.star{color:#d49023;}
+.lesson-status.todo{color:#bcb8d4;}
+
+/* 课程详情页 */
+.knowledge-detail{display:flex;flex-direction:column;gap:14px;}
+.knowledge-detail-head{background:linear-gradient(135deg,#6655ee,#9671ff);color:#fff;padding:18px 18px 22px;border-radius:18px;position:relative;}
+.knowledge-detail-head::after{content:'';position:absolute;right:-22px;top:-22px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.08);}
+.knowledge-detail-head .back{background:rgba(255,255,255,.18);color:#fff;width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;border:none;cursor:pointer;font-size:14px;}
+.knowledge-detail-head .head-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.knowledge-detail-head .head-tag{background:rgba(255,255,255,.22);color:#fff;font-size:10px;padding:3px 9px;border-radius:99px;}
+.knowledge-scenario-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.knowledge-scenario{background:#fff;border-radius:14px;padding:12px;font-size:12px;line-height:1.55;border:1px solid #ece9ff;}
+.knowledge-scenario.bad{border-color:#ffc5cc;background:#fff6f7;color:#7a3d3d;}
+.knowledge-scenario.good{border-color:#bcecd2;background:#f3fbf6;color:#1d5d44;}
+.knowledge-scenario .scenario-tag{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:99px;margin-bottom:6px;}
+.knowledge-scenario.bad .scenario-tag{background:#ffd6dc;color:#a23d3d;}
+.knowledge-scenario.good .scenario-tag{background:#d3f3df;color:#1d5d44;}
+.knowledge-principle{background:linear-gradient(135deg,#fff8eb,#ffeed1);border:1px solid #ffd99b;border-radius:14px;padding:14px;}
+.knowledge-principle .principle-label{font-size:11px;font-weight:600;color:#b67218;letter-spacing:.06em;}
+.knowledge-principle .principle-body{color:#3a2e16;font-size:14px;font-weight:600;line-height:1.55;margin-top:6px;}
+.knowledge-formula{background:#fff;border:1px solid #ecebff;border-radius:14px;padding:14px;}
+.knowledge-formula .formula-label{font-size:11px;font-weight:600;color:#5d54c0;}
+.knowledge-formula ul{margin-top:8px;padding-left:18px;color:#3a3754;font-size:13px;line-height:1.7;}
+.knowledge-formula ul li::marker{color:#a39ee0;}
+.knowledge-redline{background:#fff6f6;border:1px solid #ffc8c8;border-radius:14px;padding:12px;color:#9a3a3a;font-size:12px;line-height:1.5;}
+.knowledge-redline .redline-label{font-weight:700;color:#a23d3d;margin-right:6px;}
+.knowledge-quiz{background:#fff;border:1px solid #ecebff;border-radius:14px;padding:14px;}
+.knowledge-quiz .quiz-label{font-size:11px;font-weight:600;color:#5d54c0;}
+.knowledge-quiz .quiz-question{font-size:14px;color:#2b2540;font-weight:600;margin-top:6px;line-height:1.55;}
+.knowledge-quiz .quiz-options{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
+.knowledge-quiz .quiz-option{background:#faf9ff;border:1px solid #ecebff;border-radius:10px;padding:10px;font-size:12px;color:#3a3754;cursor:pointer;transition:all .15s;text-align:left;}
+.knowledge-quiz .quiz-option:hover{border-color:#a39ee0;background:#f5f3ff;}
+.knowledge-quiz .quiz-option.selected{border-color:#6655ee;background:#efedff;}
+.knowledge-quiz .quiz-option.correct{border-color:#229971;background:#e6f7ee;}
+.knowledge-quiz .quiz-option.wrong{border-color:#c0533a;background:#fdecea;}
+.knowledge-quiz .quiz-feedback{margin-top:10px;padding:10px;border-radius:10px;font-size:12px;line-height:1.55;}
+.knowledge-quiz .quiz-feedback.ok{background:#e6f7ee;color:#1d5d44;}
+.knowledge-quiz .quiz-feedback.bad{background:#fdecea;color:#9a3a3a;}
+.knowledge-detail-actions{position:sticky;bottom:0;background:#fff;padding:12px 0 6px;margin-top:6px;display:flex;flex-direction:column;gap:8px;border-top:1px solid #f1edff;box-shadow:0 -10px 24px rgba(60,40,120,.06);}
+.knowledge-detail-actions .row{display:flex;gap:8px;}
+.knowledge-detail-actions button{flex:1;border:none;border-radius:14px;padding:11px 14px;font-size:13px;font-weight:600;cursor:pointer;transition:transform .15s, opacity .15s;}
+.knowledge-detail-actions button:active{transform:scale(.98);}
+.knowledge-detail-actions .btn-primary{background:linear-gradient(135deg,#6655ee,#9671ff);color:#fff;}
+.knowledge-detail-actions .btn-primary:disabled{opacity:.45;cursor:not-allowed;}
+.knowledge-detail-actions .btn-secondary{background:#f5f3ff;color:#5d54c0;}
+.knowledge-detail-actions .btn-ghost{background:#fff;color:#847ea8;border:1px solid #ecebff;}
+.knowledge-detail-actions .btn-row-secondary{display:flex;gap:8px;}
+.knowledge-detail-actions .btn-row-secondary button{flex:1;background:#fff;color:#5d54c0;border:1px solid #ecebff;}
+
+/* 教练实时评价浮层 */
+.coach-feedback-overlay{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);max-width:88vw;background:rgba(20,16,40,.92);color:#fff;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.45;box-shadow:0 18px 40px rgba(15,8,40,.4);z-index:9000;display:flex;align-items:center;gap:8px;opacity:0;pointer-events:none;transition:opacity .25s, transform .25s;}
+.coach-feedback-overlay.show{opacity:1;transform:translateX(-50%) translateY(-6px);pointer-events:auto;}
+.coach-feedback-overlay .cf-tag{font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;background:rgba(255,255,255,.16);flex-shrink:0;}
+.coach-feedback-overlay .cf-tag.good{background:#34d399;color:#064e3b;}
+.coach-feedback-overlay .cf-tag.warn{background:#fbbf24;color:#78350f;}
+.coach-feedback-overlay .cf-tag.bad{background:#f87171;color:#7f1d1d;}
+.coach-feedback-overlay .cf-body{color:#fff;}
+.coach-feedback-overlay .cf-body strong{color:#ffd97a;}
+.coach-feedback-overlay .cf-close{margin-left:6px;color:rgba(255,255,255,.55);cursor:pointer;font-size:16px;line-height:1;}
+
+/* 动作指令全屏面板 */
+.modal-action-panel{position:fixed;inset:0;background:rgba(15,12,36,.78);z-index:9500;display:flex;align-items:center;justify-content:center;padding:18px;opacity:0;pointer-events:none;transition:opacity .2s;}
+.modal-action-panel.show{opacity:1;pointer-events:auto;}
+.modal-action-panel .ap-inner{background:#fff;width:100%;max-width:520px;border-radius:22px;padding:18px;max-height:80vh;overflow:auto;display:flex;flex-direction:column;gap:14px;}
+.modal-action-panel .ap-head{display:flex;justify-content:space-between;align-items:center;}
+.modal-action-panel .ap-head h3{font-weight:700;font-size:15px;color:#2b2540;}
+.modal-action-panel .ap-head .ap-close{background:#f5f3ff;color:#5d54c0;width:30px;height:30px;border-radius:50%;border:none;cursor:pointer;font-size:14px;}
+.modal-action-panel .ap-hint{font-size:11px;color:#847ea8;line-height:1.5;background:#f5f3ff;padding:8px 10px;border-radius:10px;}
+.modal-action-panel .ap-group-title{font-size:11px;font-weight:700;color:#5d54c0;letter-spacing:.04em;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.modal-action-panel .ap-group-title::before{content:'';width:3px;height:12px;background:#6655ee;border-radius:2px;}
+.modal-action-panel .ap-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;}
+@media (max-width:380px){.modal-action-panel .ap-grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
+.modal-action-panel .ap-tile{background:#faf9ff;border:1px solid #ecebff;border-radius:14px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:all .15s;}
+.modal-action-panel .ap-tile:hover{border-color:#a39ee0;background:#f0eeff;transform:translateY(-1px);}
+.modal-action-panel .ap-tile:active{transform:scale(.97);}
+.modal-action-panel .ap-tile .ap-icon{font-size:26px;}
+.modal-action-panel .ap-tile .ap-name{font-size:11px;color:#3a3754;font-weight:600;}
+.modal-action-panel .ap-tile .ap-desc{font-size:9px;color:#a39ec0;text-align:center;line-height:1.3;}
+.modal-action-panel .ap-tile.bad{background:#fff6f6;border-color:#ffc8c8;}
+.modal-action-panel .ap-tile.bad:hover{background:#ffeaea;}
+
+/* 输入框 🎬 按钮 */
+.btn-action-trigger{background:linear-gradient(135deg,#ffe7c4,#ffd49b);color:#b67218;border:none;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:18px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .15s;}
+.btn-action-trigger:hover{transform:scale(1.06);}
+.btn-action-trigger:active{transform:scale(.94);}
+
+/* 训练准备页教练提示 */
+.coach-prepare-hint{background:linear-gradient(135deg,#6655ee,#9671ff);color:#fff;padding:10px 14px;border-radius:14px;font-size:12px;line-height:1.5;display:flex;align-items:center;gap:8px;box-shadow:0 8px 20px rgba(102,85,238,.18);margin-top:12px;}
+.coach-prepare-hint .cph-icon{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.22);display:inline-flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+
+/* 训练模态上半屏状态栏紧凑化（贴顶部边缘） */
+.challenge-stage-hud{top:6px !important;left:6px !important;right:6px !important;background:transparent !important;box-shadow:none !important;padding:0 !important;display:flex;justify-content:space-between;gap:6px;}
+.challenge-stage-hud .hud-card{background:rgba(15,12,36,.72);border-radius:10px;padding:6px 10px;color:#fff;font-size:11px;line-height:1.2;border:1px solid rgba(255,255,255,.18);min-width:0;}
+.challenge-stage-hud .hud-card:first-child{background:rgba(255,255,255,.92);color:#2b2540;border-color:rgba(255,255,255,.95);font-weight:600;max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.challenge-stage-hud .hud-card .hud-sub{font-size:9px;opacity:.7;margin-top:1px;}
+
+/* 策略选项水平 Carousel */
+.options-carousel{display:flex;gap:10px;overflow-x:auto;padding:6px 2px 10px;scroll-snap-type:x mandatory;scrollbar-width:thin;margin:0 -4px;}
+.options-carousel::-webkit-scrollbar{height:4px;}
+.options-carousel::-webkit-scrollbar-thumb{background:#cdc7ff;border-radius:2px;}
+.options-carousel .option-card{flex:0 0 calc(100% - 8px);scroll-snap-align:center;}
+
+/* 已选收藏打勾的小图标（兼容旧 DOM） */
+@media (prefers-reduced-motion:reduce){.chapter-card,.chapter-progress-bar,.lesson-row,.modal-action-panel,.modal-action-panel .ap-tile,.coach-feedback-overlay{transition:none !important;animation:none !important;}}
+
+/* ===== 训练模态：上下分屏（场景常显 + 教学选项同屏）2026-09-10 ===== */
+#modal-etiquette-training .modal-content,
+#modal-challenge-training .modal-content { height:88vh; max-height:88vh; }
+#modal-etiquette-training .challenge-3d-stage.is-photo,
+#modal-challenge-training .challenge-3d-stage.is-photo { height:clamp(190px, 27vh, 250px); min-height:190px; }
+/* 教学选项卡片更紧凑，避免把场景挤出视野 */
+#etiquette-options > * { border-radius:14px !important; }
+#etiquette-options .option-card { padding:10px 12px !important; }
+#etiquette-options .option-card .option-text { font-size:12px !important; line-height:1.5 !important; }
+#etiquette-options .q-badge { font-size:10px !important; padding:2px 7px !important; }
+/* 选项区容器：本身不滚，跟着页面滚 */
+#etiquette-options, #challenge-messages { scroll-margin-top:8px; }
+</style>
 </head>
 <body data-page-node-id="w62ZySAPUczSBdQm5VT3GI">
 <div class="app" id="app" data-page-node-id="ZE7203n81Xdoa1QX3Uuun8">
@@ -963,7 +1120,7 @@ h1,h2,h3 { text-wrap:balance; }
             </div>
           </button>
 
-          <button onclick="showTrainingModule('cards')" class="w-full text-left bg-gradient-to-r from-purple-500 to-indigo-600 rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all" data-page-node-id="dZOxGysfoc0vgndGGCAeHz">
+          <button onclick="openKnowledgeLibrary()" class="w-full text-left bg-gradient-to-r from-purple-500 to-indigo-600 rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all" data-page-node-id="dZOxGysfoc0vgndGGCAeHz">
             <div class="flex items-center justify-between" data-page-node-id="99uvd2G5RTI9mvhBD3tWsQ">
               <div class="flex items-center gap-3" data-page-node-id="8wa1GWRAojPUU9YgG56FK7"><span class="text-2xl" data-page-node-id="Sq3qkW9IT6ZhGMF8M2aQ1o">🧠</span><div data-page-node-id="BSgiuaby8E2jaVg2SSAlJ9"><h3 class="font-semibold text-lg" data-page-node-id="l14AvmdDyXUINtPXA5Dzio">学习卡片</h3><p class="text-xs opacity-80 mt-1" data-page-node-id="2uLF1A0uAHVcK6JfeCV4HZ">按知识点学习高情商话术与安全边界</p></div></div>
               <span class="text-sm opacity-80" data-page-node-id="5EPLqhl3zZ4PIMScBoWn5g"><span id="training-hub-card-total">1024</span>条 →</span>
@@ -1182,7 +1339,7 @@ h1,h2,h3 { text-wrap:balance; }
           </div>
           <div class="flex gap-2 overflow-x-auto scrollbar-hide" id="recent-trainings" data-page-node-id="22rUUEvnqpvIx4ELB7Eq7X"></div>
         </div>
-                <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-3 shadow-sm cursor-pointer" onclick="switchTab('training');showTrainingModule('cards')" data-page-node-id="qDe94YA1D1szrrQ9vXEJq2">
+                <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-3 shadow-sm cursor-pointer" onclick="openKnowledgeLibrary()" data-page-node-id="qDe94YA1D1szrrQ9vXEJq2">
           <div class="flex items-center justify-between mb-2" data-page-node-id="OXwCBiihvzQ4H0IwcHfMoB">
             <h3 class="text-xs font-semibold text-gray-800" data-page-node-id="31jJmlKnaBLDdNJA9dBYHs">📚 学习卡片</h3>
             <span class="text-xs text-indigo-600" data-page-node-id="CIcLZjATjrWxCwdg3jYbFW">去训练中心 →</span>
@@ -2266,7 +2423,7 @@ h1,h2,h3 { text-wrap:balance; }
       <div class="p-3 border-t border-gray-100 bg-gray-50" data-page-node-id="Q4aC9oQEE9mu601R5A1g2v">
         <div class="flex gap-2" data-page-node-id="P2y2uXO5Bs35kRZwsCQhJo">
           <input type="text" id="challenge-input" placeholder="输入你会说的话或会做的动作…" class="flex-1 px-4 py-2 rounded-full border border-gray-200 text-sm focus:outline-none focus:border-indigo-500" data-page-node-id="PSWNuJwdGLquAK121nSl3W">
-          <button onclick="sendChallengeMessage()" class="px-4 py-2 bg-indigo-500 text-white rounded-full text-sm font-medium hover:bg-indigo-600 transition-colors" data-page-node-id="eoxBDZ9YEG4ci4bN0mujna">发送</button>
+          <button onclick="openActionPanel({kind:'input', id:'challenge-input', stageId:'challenge-stage', who:'user'})" class="btn-action-trigger" title="动作指令" aria-label="动作指令">🎬</button><button onclick="sendChallengeMessage()" class="px-4 py-2 bg-indigo-500 text-white rounded-full text-sm font-medium hover:bg-indigo-600 transition-colors" data-page-node-id="eoxBDZ9YEG4ci4bN0mujna">发送</button>
         </div>
         <div id="challenge-coach-evaluation" class="challenge-coach-evaluation is-empty" data-page-node-id="Cb7v8s4BtJ2TToyjhdf0zc">每轮输入都会在这里得到教练评价；本模式不提供选项或示范答案。</div>
       </div>
@@ -2331,7 +2488,7 @@ h1,h2,h3 { text-wrap:balance; }
       <div class="p-3 border-t border-gray-100 bg-gray-50" data-page-node-id="sBLBIOdJ2fKBGzPlTgqSRT">
         <div class="flex gap-2" data-page-node-id="vnlFrtsBG5nXaDR4U8UTtM">
           <input type="text" id="etiquette-input" placeholder="输入你会说的话或会做的动作…" class="flex-1 px-4 py-2 rounded-full border border-gray-200 text-sm focus:outline-none focus:border-amber-500" data-page-node-id="BkfYkHv2sO5CwPfivW2eEE">
-          <button onclick="sendEtiquetteMessage()" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-full text-sm font-medium hover:opacity-90 transition-opacity" data-page-node-id="P68AqiKBFmBA8qsToWe5VK">发送</button>
+          <button onclick="openActionPanel({kind:'input', id:'etiquette-input', stageId:'etiquette-stage', who:'user'})" class="btn-action-trigger" title="动作指令" aria-label="动作指令">🎬</button><button onclick="sendEtiquetteMessage()" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-full text-sm font-medium hover:opacity-90 transition-opacity" data-page-node-id="P68AqiKBFmBA8qsToWe5VK">发送</button>
         </div>
         <div id="etiquette-coach-evaluation" class="challenge-coach-evaluation is-empty" data-page-node-id="NJCG35BP5PGveP6jXuUV4r">每轮输入都会在这里得到教练评价；本模式会先给出 A/B/C 参考选项。</div>
       </div>
@@ -15980,16 +16137,18 @@ initApp();
     return true;
   };
 
-  // 动作坞按钮
+  // 动作入口：只保留一个紧凑按钮，点击打开全屏动作面板（2026-09-10 重构）
   function buildDock(mode) {
     var evalEl = document.getElementById(mode === 'challenge' ? 'challenge-coach-evaluation' : 'etiquette-coach-evaluation');
-    if (!evalEl) return;
+    if (!evalEl || evalEl.parentNode.querySelector('.action-dock-compact')) return;
     var dock = document.createElement('div');
-    dock.className = 'action-dock';
-    dock.innerHTML = '<span class="act-tag">🎬 动作指令</span>' +
-      Object.keys(ACTIONS).map(function (k) {
-        return '<span class="act-chip" data-mode="' + mode + '" data-act="' + k + '">' + k + '</span>';
-      }).join('');
+    dock.className = 'action-dock action-dock-compact';
+    var inputId = mode === 'challenge' ? 'challenge-input' : 'etiquette-input';
+    var stageId = mode === 'challenge' ? 'challenge-stage' : 'etiquette-stage';
+    dock.style.cssText = 'display:flex;align-items:center;gap:8px;margin:0 0 8px;';
+    dock.innerHTML = '<button type="button" class="btn-action-trigger" style="width:auto;padding:0 12px;border-radius:999px;font-size:12px;font-weight:600;height:32px;" ' +
+      'onclick="openActionPanel({kind:\'input\', id:\'' + inputId + '\', stageId:\'' + stageId + '\', who:\'user\'})">🎬 动作指令</button>' +
+      '<span style="font-size:11px;color:#9a94b8;">点开可选鞠躬 / 点头 / 握手 / 微笑等，选中自动写入输入框</span>';
     evalEl.parentNode.insertBefore(dock, evalEl);
   }
 
@@ -16208,4 +16367,645 @@ function useAvatarDetail() {
 @media (prefers-reduced-motion:reduce) {
   #training-module-hub > .space-y-3 > button { transition:none !important; }
 }
-</style></style></body></html>
+</style></style>
+<!-- ===== knowledge + action panel + coach feedback (2026-09-10) ===== -->
+<!-- ===== 学习卡片课程库（章节树）modal-knowledge-library ===== -->
+<div class="modal-overlay modal-knowledge" id="modal-knowledge-library" style="display:none">
+  <div class="modal-content" style="height:90vh;max-height:90vh">
+    <div class="flex items-center justify-between p-4 border-b border-gray-100" style="border-bottom:1px solid #f1edff;">
+      <div class="flex items-center gap-3">
+        <span style="font-size:22px;">📚</span>
+        <div>
+          <h3 class="font-semibold text-gray-800" style="font-size:16px;">课程库</h3>
+          <p class="text-xs text-gray-400" id="knowledge-library-subtitle">系统化微课 · 不删减原则</p>
+        </div>
+      </div>
+      <button onclick="closeModal('knowledge-library')" class="text-gray-400 hover:text-gray-600 text-xl" aria-label="关闭">✕</button>
+    </div>
+    <div class="px-4 pt-3 pb-2" style="flex-shrink:0;">
+      <div class="knowledge-search-box" id="knowledge-search-box">
+        <input type="search" id="knowledge-search-input" placeholder="搜索课程、场景或关键词…" class="w-full px-4 py-2.5 rounded-full border text-sm" style="border-color:#ecebff;background:#faf9ff;outline:none;font-size:13px;">
+        <span class="clear-btn" id="knowledge-search-clear">✕</span>
+      </div>
+      <div class="flex gap-2 px-0 pt-3 pb-1 overflow-x-auto" id="knowledge-category-tabs"></div>
+    </div>
+    <div class="flex-1 overflow-auto px-4 pb-4" id="knowledge-chapter-list" style="display:flex;flex-direction:column;gap:10px;padding-bottom:80px;">
+      <!-- chapters injected here -->
+    </div>
+  </div>
+</div>
+
+<!-- ===== 学习卡片课程详情 modal-knowledge-detail ===== -->
+<div class="modal-overlay modal-knowledge" id="modal-knowledge-detail" style="display:none">
+  <div class="modal-content" style="height:92vh;max-height:92vh">
+    <div class="flex items-center justify-between p-3 border-b" style="border-bottom:1px solid #f1edff;flex-shrink:0;">
+      <button class="back" onclick="closeModal('knowledge-detail')" aria-label="返回" style="background:#f5f3ff;color:#5d54c0;width:34px;height:34px;border-radius:50%;border:none;cursor:pointer;font-size:16px;">←</button>
+      <span style="font-size:13px;color:#847ea8;">课程详情</span>
+      <button onclick="closeModal('knowledge-detail')" class="text-gray-400 hover:text-gray-600 text-xl" aria-label="关闭">✕</button>
+    </div>
+    <div class="flex-1 overflow-auto" style="padding:14px 14px 120px;">
+      <div class="knowledge-detail" id="knowledge-detail-content"><!-- injected --></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 动作指令全屏面板 modal-action-panel ===== -->
+<div class="modal-action-panel" id="modal-action-panel" role="dialog" aria-label="动作指令面板">
+  <div class="ap-inner">
+    <div class="ap-head">
+      <h3>🎬 动作指令</h3>
+      <button class="ap-close" onclick="closeActionPanel()" aria-label="关闭">✕</button>
+    </div>
+    <div class="ap-hint">点选动作后，会自动写入输入框作为前缀（[动作: 微笑] 你好，我是…），你可继续补语言或直接发送。礼仪训练还会同步触发 NPC 的对应微动效。</div>
+    <div id="action-panel-content"><!-- 4 groups injected --></div>
+  </div>
+</div>
+<script id="__DL_KNOWLEDGE_JS__">
+/* ====================================================================
+ *  对练社交 — 学习卡片课程化重构 + 训练 UI 重构（2026-09-10）
+ *  - KnowledgeLibrary: 课程库（章节树 + 单课详情 + 自测 + 跳对练）
+ *  - ActionPanel:      动作指令全屏面板（4 类分组）
+ *  - CoachFeedback:    教练实时评价浮层
+ * ==================================================================== */
+
+(function (global) {
+  'use strict';
+  if (!global) return;
+
+  // ---------- 配色（章节图标背景） ----------
+  var CATEGORY_TONES = {
+    '社交场合与人际交往': 'violet',
+    '日常生活消费': 'warm',
+    '家庭与亲友': 'green',
+    '亲密关系与约会': 'pink',
+    '公共服务与办事': 'cool',
+    '突发与冲突': 'warm',
+    '数字社交': 'teal',
+    '职场与事业': 'cool',
+    '好好接话课程': 'violet'
+  };
+  var CATEGORY_ICONS = {
+    '社交场合与人际交往': '🤝',
+    '日常生活消费': '🛍️',
+    '家庭与亲友': '🏡',
+    '亲密关系与约会': '💞',
+    '公共服务与办事': '🏛️',
+    '突发与冲突': '⚡',
+    '数字社交': '📱',
+    '职场与事业': '💼',
+    '好好接话课程': '🎓'
+  };
+
+  // ---------- KnowledgeLibrary ----------
+  var KL = {
+    _filter: '全部',
+    _search: '',
+    _openChapter: null,
+    _detail: null,
+    _practicePassed: false,
+    _quizChoice: -1,
+    _chaptersCache: null
+  };
+
+  function escapeHTML(s) {
+    return (s == null ? '' : String(s)).replace(/[&<>"']/g, function (c) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+    });
+  }
+
+  function getKnowledgeChapters() {
+    if (KL._chaptersCache) return KL._chaptersCache;
+    var groups = {};
+    (learningCards || []).forEach(function (card) {
+      if (!card || !card.id) return;
+      var cat = card.category || '社交沟通';
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push(card);
+    });
+    var list = Object.keys(groups).map(function (cat) {
+      return { name: cat, icon: CATEGORY_ICONS[cat] || '📘', tone: CATEGORY_TONES[cat] || 'violet', lessons: groups[cat] };
+    });
+    // 排序：好好接话课程放最后；其它按课程数降序
+    list.sort(function (a, b) {
+      if (a.name === '好好接话课程') return 1;
+      if (b.name === '好好接话课程') return -1;
+      return b.lessons.length - a.lessons.length;
+    });
+    KL._chaptersCache = list;
+    return list;
+  }
+
+  function getChapterLessons(name) {
+    var chs = getKnowledgeChapters();
+    for (var i = 0; i < chs.length; i++) if (chs[i].name === name) return chs[i].lessons;
+    return [];
+  }
+
+  function isLearned(cardId) {
+    var p = (userData && userData.knowledgeProgress) || {};
+    return !!(p[cardId] && (p[cardId].opened || p[cardId].practiced));
+  }
+  function markOpened(cardId) {
+    if (!userData) return;
+    if (!userData.knowledgeProgress) userData.knowledgeProgress = {};
+    if (!userData.knowledgeProgress[cardId]) userData.knowledgeProgress[cardId] = {};
+    userData.knowledgeProgress[cardId].opened = true;
+    if (typeof saveData === 'function') try { saveData(); } catch (e) {}
+  }
+  function markPracticed(cardId, passed) {
+    if (!userData) return;
+    if (!userData.knowledgeProgress) userData.knowledgeProgress = {};
+    if (!userData.knowledgeProgress[cardId]) userData.knowledgeProgress[cardId] = {};
+    userData.knowledgeProgress[cardId].practiced = true;
+    userData.knowledgeProgress[cardId].passed = !!passed;
+    userData.knowledgeProgress[cardId].passedAt = Date.now();
+    if (typeof saveData === 'function') try { saveData(); } catch (e) {}
+  }
+
+  function isCollected(cardId) {
+    return !!(collectedCards || []).some(function (c) { return c && c.id === cardId; });
+  }
+
+  function matchesSearch(card, term) {
+    if (!term) return true;
+    var hay = [card.title, card.scene, card.category, card.content, card.principle, card.practicePrompt].concat(card.tags || [], card.tips || []).join(' ').toLowerCase();
+    return hay.indexOf(term) >= 0;
+  }
+
+  function renderCategoryTabs() {
+    var box = document.getElementById('knowledge-category-tabs');
+    if (!box) return;
+    var chs = getKnowledgeChapters();
+    var items = ['全部'].concat(chs.map(function (c) { return c.name; }));
+    box.innerHTML = items.map(function (name) {
+      var active = (KL._filter === name);
+      return '<button onclick="KL_setFilter(' + name + ')" class="px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors" style="border:1px solid ' + (active ? '#6655ee' : '#ecebff') + ';background:' + (active ? 'linear-gradient(135deg,#6655ee,#9671ff)' : '#fff') + ';color:' + (active ? '#fff' : '#5d54c0') + ';">' + escapeHTML(name) + '</button>';
+    }).join('');
+  }
+
+  function renderChapterList() {
+    var box = document.getElementById('knowledge-chapter-list');
+    if (!box) return;
+    var chs = getKnowledgeChapters();
+    var term = (KL._search || '').toLowerCase().trim();
+
+    var html = '';
+    var totalShown = 0;
+    chs.forEach(function (ch) {
+      if (KL._filter !== '全部' && ch.name !== KL._filter) return;
+      var lessons = ch.lessons.filter(function (l) { return matchesSearch(l, term); });
+      if (term && lessons.length === 0) return;
+      totalShown += lessons.length;
+      var learned = lessons.filter(function (l) { return isLearned(l.id); }).length;
+      var pct = lessons.length ? Math.round(learned * 100 / lessons.length) : 0;
+      var isOpen = (KL._openChapter === ch.name);
+      html += '<div class="chapter-card ' + (isOpen ? 'open' : '') + '" data-tone="' + ch.tone + '" data-chapter="' + escapeHTML(ch.name) + '">';
+      html += '  <div class="chapter-head" onclick="KL_toggleChapterByAttr(this)" data-name="' + ch.name + '">';
+      html += '    <div class="chapter-icon">' + ch.icon + '</div>';
+      html += '    <div class="chapter-meta">';
+      html += '      <div class="chapter-title">' + escapeHTML(ch.name) + '</div>';
+      html += '      <div class="chapter-stat">' + lessons.length + ' 课 · 已学 ' + learned + '</div>';
+      html += '      <div class="chapter-progress"><div class="chapter-progress-bar" style="width:' + pct + '%;"></div></div>';
+      html += '    </div>';
+      html += '    <div class="chapter-toggle">▼</div>';
+      html += '  </div>';
+      html += '  <div class="chapter-body" data-lazy="1"></div>';
+      html += '</div>';
+    });
+
+    if (!totalShown) {
+      html = '<div style="text-align:center;padding:40px 0;color:#a39ec0;font-size:13px;">没有匹配的课程，换个关键词试试。</div>';
+    }
+    box.innerHTML = html;
+  }
+
+  function openKnowledgeLibrary() {
+    KL._filter = '全部';
+    KL._search = '';
+    KL._openChapter = null;
+    var inp = document.getElementById('knowledge-search-input');
+    if (inp) inp.value = '';
+    var sb = document.getElementById('knowledge-search-box');
+    if (sb) sb.classList.remove('has-value');
+    renderCategoryTabs();
+    renderChapterList();
+    showModal && showModal('knowledge-library');
+    if (typeof showModal === 'function') showModal('knowledge-library');
+  }
+
+  function KL_setFilter(name) {
+    KL._filter = name || '全部';
+    KL._openChapter = null;
+    renderCategoryTabs();
+    renderChapterList();
+  }
+
+  function KL_toggleChapter(name) {
+    var cards = document.querySelectorAll('.chapter-card');
+    var target = null;
+    for (var i = 0; i < cards.length; i++) {
+      if (cards[i].getAttribute('data-chapter') === name) { target = cards[i]; break; }
+    }
+    if (!target) return;
+    var willOpen = !target.classList.contains('open');
+    // 折叠其它已展开章节
+    for (var j = 0; j < cards.length; j++) {
+      if (cards[j] !== target) cards[j].classList.remove('open');
+    }
+    target.classList.toggle('open', willOpen);
+    KL._openChapter = willOpen ? name : null;
+    if (willOpen) {
+      var body = target.querySelector('.chapter-body');
+      if (body && body.getAttribute('data-lazy') === '1') {
+        body.innerHTML = buildChapterBody(name);
+        body.setAttribute('data-lazy', '0');
+      }
+    }
+  }
+
+  // 生成某章节下的课时行（按需构建，避免一次性渲染 1024 行）
+  function buildChapterBody(name) {
+    var lessons = getChapterLessons(name);
+    var term = (KL._search || '').toLowerCase().trim();
+    lessons = lessons.filter(function (l) { return matchesSearch(l, term); });
+    var out = '';
+    lessons.forEach(function (l, idx) {
+      var st = isLearned(l.id) ? 'done' : (isCollected(l.id) ? 'star' : 'todo');
+      var stIcon = st === 'done' ? '✓' : (st === 'star' ? '★' : '○');
+      out += '<div class="lesson-row" onclick="KL_openDetailByAttr(this)" data-id="' + l.id + '">';
+      out += '  <span class="lesson-num">' + (idx + 1) + '</span>';
+      out += '  <span class="lesson-title">' + escapeHTML(l.title || '(无标题)') + '</span>';
+      out += '  <div class="lesson-meta"><span class="lesson-status ' + st + '">' + stIcon + '</span></div>';
+      out += '</div>';
+    });
+    return out || '<div style="padding:10px;color:#a39ec0;font-size:12px;">没有匹配的课时</div>';
+  }
+
+  function KL_openDetail(cardId) {
+    var card = (learningCards || []).find(function (c) { return c && c.id === cardId; });
+    if (!card) return;
+    KL._detail = card;
+    KL._practicePassed = false;
+    KL._quizChoice = -1;
+    renderKnowledgeDetail(card);
+    markOpened(cardId);
+    // close library modal + open detail modal (compat with both modal open fns)
+    if (typeof closeModal === 'function') closeModal('knowledge-library');
+    if (typeof showModal === 'function') showModal('knowledge-detail');
+  }
+
+  function renderKnowledgeDetail(card) {
+    var box = document.getElementById('knowledge-detail-content');
+    if (!box) return;
+    var learned = isLearned(card.id);
+    var collected = isCollected(card.id);
+
+    var tags = (card.tags || []).slice(0, 4);
+    var tips = (card.tips || []).slice(0, 5);
+    var badExample = tips[0] ? '「' + tips[0] + '」' + (card.tips[2] ? '、' + card.tips[2] : '') + ' 等场景，若直接表达容易暴露底牌/显得生硬。' : '在不了解情况时直接抛出结论，容易引起对方反感或误会。';
+    var goodExample = card.content ? card.content.split(/[\n。]/)[0].slice(0, 80) : (tips[0] ? '「' + tips[0] + '」' + '可以更柔和、更得体地表达' : '用自己的话表达，关键在于先肯定当下情境，再把话题推进一步。');
+    var principle = card.principle || '先回应当下情境，再把话题推进一步。';
+    var safety = card.safetyNote || '请结合真实情况改写，不编造、不施压。';
+    var practice = card.practicePrompt || '用自己的话完成一次表达。';
+
+    var formulaItems = tips.length ? tips.slice(0, 4) : (card.content ? card.content.split(/[\n。]/).filter(function (x) { return x && x.length < 60; }).slice(0, 4) : ['先肯定对方', '加入情境信息', '提出下一步建议']);
+
+    var html = '';
+    html += '<div class="knowledge-detail-head">';
+    html += '  <button class="back" onclick="KL_closeDetail()" aria-label="关闭">✕</button>';
+    html += '  <div style="font-size:18px;font-weight:700;margin-top:4px;line-height:1.35;">' + escapeHTML(card.title || '(无标题)') + '</div>';
+    html += '  <div style="font-size:11px;opacity:.85;margin-top:4px;">所属：' + escapeHTML(card.category || '通用') + (card.scene ? ' · ' + escapeHTML(card.scene) : '') + '</div>';
+    if (tags.length) {
+      html += '  <div class="head-tags">' + tags.map(function (t) { return '<span class="head-tag">#' + escapeHTML(t) + '</span>'; }).join('') + '</div>';
+    }
+    html += '  <div style="font-size:11px;margin-top:8px;opacity:.85;">' + (learned ? '✓ 已学' : '○ 未学') + (collected ? ' · ★ 已收藏' : '') + '</div>';
+    html += '</div>';
+
+    html += '<div class="knowledge-scenario-row">';
+    html += '  <div class="knowledge-scenario bad"><div class="scenario-tag">❌ 易踩坑</div>' + escapeHTML(badExample) + '</div>';
+    html += '  <div class="knowledge-scenario good"><div class="scenario-tag">✅ 建议这样</div>' + escapeHTML(goodExample) + '</div>';
+    html += '</div>';
+
+    html += '<div class="knowledge-principle">';
+    html += '  <div class="principle-label">核心原则</div>';
+    html += '  <div class="principle-body">' + escapeHTML(principle) + '</div>';
+    html += '</div>';
+
+    html += '<div class="knowledge-formula">';
+    html += '  <div class="formula-label">话术公式</div>';
+    html += '  <ul>' + formulaItems.map(function (t) { return '<li>' + escapeHTML(t) + '</li>'; }).join('') + '</ul>';
+    html += '</div>';
+
+    if (card.content) {
+      html += '<div class="knowledge-formula">';
+      html += '  <div class="formula-label">完整原文（不删减）</div>';
+      html += '  <div style="font-size:12px;color:#3a3754;line-height:1.7;white-space:pre-wrap;max-height:200px;overflow:auto;background:#faf9ff;padding:10px;border-radius:8px;margin-top:8px;">' + escapeHTML(card.content) + '</div>';
+      html += '</div>';
+    }
+
+    html += '<div class="knowledge-redline">';
+    html += '  <span class="redline-label">⚠ 红线</span>' + escapeHTML(safety);
+    html += '</div>';
+
+    html += '<div class="knowledge-quiz" id="knowledge-quiz">';
+    html += '  <div class="quiz-label">自测 · 看看你掌握了吗</div>';
+    html += '  <div class="quiz-question">练习情境：' + escapeHTML(practice) + '</div>';
+    html += '  <div class="quiz-options" id="knowledge-quiz-options">';
+    var qA = card.content ? card.content.split(/[\n。]/)[0].slice(0, 80) : '先肯定对方，再把话题推进。';
+    var qB = '这件事我不太懂，能麻烦你再说一次吗？';
+    var qC = '直接质疑对方观点。';
+    html += '    <button class="quiz-option" data-idx="0" onclick="KL_pickAnswer(0)">A. ' + escapeHTML(qA) + '</button>';
+    html += '    <button class="quiz-option" data-idx="1" onclick="KL_pickAnswer(1)">B. ' + escapeHTML(qB) + '</button>';
+    html += '    <button class="quiz-option" data-idx="2" onclick="KL_pickAnswer(2)">C. ' + escapeHTML(qC) + '</button>';
+    html += '  </div>';
+    html += '  <div id="knowledge-quiz-feedback"></div>';
+    html += '</div>';
+
+    html += '<div class="knowledge-detail-actions">';
+    html += '  <div class="row">';
+    html += '    <button class="btn-primary" id="knowledge-jump-btn" onclick="KL_jumpToPractice()" disabled>✅ 我已学会，去对练</button>';
+    html += '  </div>';
+    html += '  <div class="btn-row-secondary">';
+    html += '    <button class="btn-secondary" onclick="KL_toggleCollect()">' + (collected ? '★ 取消收藏' : '☆ 收藏') + '</button>';
+    html += '    <button class="btn-secondary" onclick="KL_startReview()">🔁 复习</button>';
+    html += '  </div>';
+    html += '</div>';
+
+    box.innerHTML = html;
+  }
+
+  function KL_closeDetail() {
+    if (typeof closeModal === 'function') closeModal('knowledge-detail');
+  }
+
+  function KL_pickAnswer(idx) {
+    if (KL._quizChoice >= 0) return;
+    KL._quizChoice = idx;
+    var btns = document.querySelectorAll('#knowledge-quiz-options .quiz-option');
+    btns.forEach(function (b, i) {
+      if (i === idx) b.classList.add('selected');
+      // A(0) 视为得体，B(1) 一般，C(2) 欠妥
+      if (i === idx) {
+        if (i === 0) b.classList.add('correct');
+        else b.classList.add('wrong');
+      } else {
+        if (i === 0) b.classList.add('correct');
+      }
+    });
+    var fb = document.getElementById('knowledge-quiz-feedback');
+    var passed = (idx === 0);
+    var msg = passed
+      ? '✓ 选择很得体！核心原则抓住了。「核心原则」提到：' + (KL._detail && KL._detail.principle ? KL._detail.principle.slice(0, 30) + '…' : '先回应，再推进。') + ' 现在可以去对练实操。'
+      : (idx === 1 ? '⚠ 这一表达过于保守，错失推进话题的机会。试着加入更多情境信息和具体推进。' : '⚠ 这样的表达容易让对方反感。回到「核心原则」，先肯定对方，再提出下一步建议。');
+    fb.outerHTML = '<div class="quiz-feedback ' + (passed ? 'ok' : 'bad') + '" id="knowledge-quiz-feedback">' + msg + '</div>';
+    KL._practicePassed = passed;
+    markPracticed(KL._detail.id, passed);
+    var btn = document.getElementById('knowledge-jump-btn');
+    if (btn) btn.disabled = false;
+    if (typeof global.showCoachFeedback === 'function') {
+      global.showCoachFeedback(passed ? '🎓 选择很得体，符合本课核心原则' : '🎓 答案欠妥，再看一次「核心原则」', passed ? 'good' : 'warn');
+    }
+  }
+
+  function KL_jumpToPractice() {
+    if (!KL._detail) return;
+    if (!KL._practicePassed) {
+      if (typeof showToast === 'function') showToast('请先完成自测题');
+      return;
+    }
+    var cat = KL._detail.category || '';
+    var catToScene = {
+      '社交场合与人际交往': 9001,
+      '日常生活消费': 9003,
+      '家庭与亲友': 9004,
+      '亲密关系与约会': 9005,
+      '公共服务与办事': 9006,
+      '突发与冲突': 9007,
+      '数字社交': 9008,
+      '职场与事业': 9002
+    };
+    var lv = catToScene[cat];
+    if (typeof closeModal === 'function') closeModal('knowledge-detail');
+    if (lv && typeof startEtiquetteLevel === 'function') {
+      startEtiquetteLevel(lv);
+    } else if (typeof openChallengeCustomScene === 'function') {
+      showToast && showToast('为你打开自定义场景，结合本课创建专属练习');
+      openChallengeCustomScene && openChallengeCustomScene();
+    } else if (typeof showToast === 'function') {
+      showToast('已为你找到相关训练入口');
+    }
+  }
+
+  function KL_toggleCollect() {
+    if (!KL._detail) return;
+    var id = KL._detail.id;
+    if (isCollected(id)) {
+      if (typeof global.removeCard === 'function') global.removeCard(id);
+    } else {
+      if (typeof global.collectCard === 'function') global.collectCard(id);
+    }
+    renderKnowledgeDetail(KL._detail);
+  }
+
+  function KL_startReview() {
+    if (!KL._detail) return;
+    if (typeof closeModal === 'function') closeModal('knowledge-detail');
+    if (typeof global.startCardReview === 'function') global.startCardReview(KL._detail.id);
+  }
+
+  // search box bindings
+  function bindKnowledgeSearch() {
+    var inp = document.getElementById('knowledge-search-input');
+    if (!inp || inp._bound) return;
+    inp._bound = true;
+    inp.addEventListener('input', function () {
+      KL._search = inp.value || '';
+      var sb = document.getElementById('knowledge-search-box');
+      if (sb) sb.classList.toggle('has-value', !!KL._search);
+      KL._openChapter = null;
+      renderChapterList();
+    });
+    var clr = document.getElementById('knowledge-search-clear');
+    if (clr) clr.addEventListener('click', function () {
+      inp.value = '';
+      KL._search = '';
+      var sb = document.getElementById('knowledge-search-box');
+      if (sb) sb.classList.remove('has-value');
+      renderChapterList();
+    });
+  }
+
+
+  // data-id wrapper (no quote-escaping hell)
+  function KL_openDetailByAttr(el) {
+    var id = el && el.getAttribute('data-id');
+    if (id) KL_openDetail(id);
+  }
+  function KL_toggleChapterByAttr(el) {
+    var name = el && el.getAttribute('data-name');
+    if (name) KL_toggleChapter(name);
+  }
+
+  // expose
+  global.KL = KL;
+  global.KL_setFilter = KL_setFilter;
+  global.buildChapterBody = buildChapterBody;
+  global.KL_toggleChapter = KL_toggleChapter;
+  global.KL_openDetail = KL_openDetail;
+  global.KL_closeDetail = KL_closeDetail;
+  global.KL_pickAnswer = KL_pickAnswer;
+  global.KL_jumpToPractice = KL_jumpToPractice;
+  global.KL_toggleCollect = KL_toggleCollect;
+  global.KL_startReview = KL_startReview;
+  global.openKnowledgeLibrary = openKnowledgeLibrary;
+  global.bindKnowledgeSearch = bindKnowledgeSearch;
+
+  // ============================================================
+  // ActionPanel — 动作指令全屏面板
+  // ============================================================
+  var AP_TARGET = { kind: 'input', id: 'etiquette-input' }; // default
+
+  var ACTIONS = [
+    // 姿态
+    { id: 'sit', icon: '🪑', name: '坐下', desc: '在座位上正式落座', group: '姿态' },
+    { id: 'stand', icon: '🧍', name: '站立', desc: '从座位上起身', group: '姿态' },
+    { id: 'step', icon: '🚶', name: '前进一步', desc: '主动走近一步', group: '姿态' },
+    // 礼仪
+    { id: 'handshake', icon: '🤝', name: '握手', desc: '主动伸手握手', group: '礼仪' },
+    { id: 'bow', icon: '🙇', name: '鞠躬', desc: '点头致意', group: '礼仪' },
+    { id: 'card', icon: '💳', name: '递名片', desc: '把名片双手递上', group: '礼仪' },
+    { id: 'toast', icon: '🥂', name: '干杯', desc: '举杯敬酒', group: '礼仪' },
+    // 表情
+    { id: 'smile', icon: '🙂', name: '微笑', desc: '嘴角上扬', group: '表情' },
+    { id: 'nod', icon: '👍', name: '点头', desc: '表示认可', group: '表情' },
+    { id: 'shake', icon: '👎', name: '摇头', desc: '表示拒绝', group: '表情' },
+    // 互动
+    { id: 'wave', icon: '👋', name: '挥手', desc: '打招呼或再见', group: '互动' },
+    { id: 'sorry', icon: '🙏', name: '抱歉', desc: '道歉手势', group: '互动' },
+    { id: 'phone', icon: '📱', name: '看手机', desc: '反面动作', group: '互动', bad: true }
+  ];
+
+  var ACTION_GROUP_TONES = { '姿态': 'cool', '礼仪': 'violet', '表情': 'pink', '互动': 'warm' };
+  var ACTION_GROUP_ORDER = ['姿态', '礼仪', '表情', '互动'];
+
+  function renderActionPanel() {
+    var box = document.getElementById('action-panel-content');
+    if (!box) return;
+    var html = '';
+    ACTION_GROUP_ORDER.forEach(function (g) {
+      var tiles = ACTIONS.filter(function (a) { return a.group === g; });
+      if (!tiles.length) return;
+      html += '<div>';
+      html += '  <div class="ap-group-title" style="color:#5d54c0;">' + g + '</div>';
+      html += '  <div class="ap-grid">';
+      tiles.forEach(function (a) {
+        html += '    <button class="ap-tile ' + (a.bad ? 'bad' : '') + '" onclick="AP_pickAction(' + JSON.stringify(a) + ')">';
+        html += '      <span class="ap-icon">' + a.icon + '</span>';
+        html += '      <span class="ap-name">' + escapeHTML(a.name) + '</span>';
+        html += '      <span class="ap-desc">' + escapeHTML(a.desc) + '</span>';
+        html += '    </button>';
+      });
+      html += '  </div>';
+      html += '</div>';
+    });
+    box.innerHTML = html;
+  }
+
+  function openActionPanel(target) {
+    AP_TARGET = target || AP_TARGET;
+    var el = document.getElementById('modal-action-panel');
+    if (!el) return;
+    if (!el._rendered) { renderActionPanel(); el._rendered = true; }
+    el.classList.add('show');
+  }
+
+  function closeActionPanel() {
+    var el = document.getElementById('modal-action-panel');
+    if (el) el.classList.remove('show');
+  }
+
+  function AP_pickAction(action) {
+    closeActionPanel();
+    // 1) fill input prefix
+    var inpId = AP_TARGET && AP_TARGET.id ? AP_TARGET.id : 'etiquette-input';
+    var inp = document.getElementById(inpId);
+    if (inp) {
+      var tag = '[' + action.name + '] ';
+      // 若输入框已有内容且不以本动作开头，则在前面插入动作前缀
+      var cur = inp.value || '';
+      if (!cur.startsWith(tag)) {
+        inp.value = tag + cur;
+      }
+      try { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); } catch (e) {}
+    }
+    // 2) 触发 NPC 动作
+    var stageId = AP_TARGET && AP_TARGET.stageId ? AP_TARGET.stageId : null;
+    var who = AP_TARGET && AP_TARGET.who ? AP_TARGET.who : 'user';
+    if (stageId && global.Stage3D && global.Stage3D.setAction) {
+      try { global.Stage3D.setAction(stageId, who, action.id); } catch (e) {}
+    }
+    // 3) 反馈
+    if (typeof global.showCoachFeedback === 'function') {
+      var isBad = !!action.bad;
+      var msg = isBad
+        ? '⚠ 「' + action.name + '」是反面动作，礼仪不通过 · -1分'
+        : '✓ 动作「' + action.name + '」得体 +2分';
+      global.showCoachFeedback(msg, isBad ? 'bad' : 'good');
+      if (isBad && global.navigator && global.navigator.vibrate) {
+        try { global.navigator.vibrate(60); } catch (e) {}
+      }
+    }
+  }
+
+  global.openActionPanel = openActionPanel;
+  global.closeActionPanel = closeActionPanel;
+  global.AP_pickAction = AP_pickAction;
+
+  // ============================================================
+  // CoachFeedback — 教练实时评价浮层
+  // ============================================================
+  var CF_TIMER = null;
+  function showCoachFeedback(text, level) {
+    var el = document.getElementById('coach-feedback-overlay');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'coach-feedback-overlay';
+      el.className = 'coach-feedback-overlay';
+      el.innerHTML = '<span class="cf-tag"></span><span class="cf-body"></span><span class="cf-close" onclick="hideCoachFeedback()">✕</span>';
+      document.body.appendChild(el);
+    }
+    var tag = el.querySelector('.cf-tag');
+    var body = el.querySelector('.cf-body');
+    tag.className = 'cf-tag ' + (level || 'good');
+    tag.textContent = (level === 'warn' ? '⚠ 教练' : (level === 'bad' ? '✗ 教练' : '✓ 教练'));
+    body.innerHTML = text;
+    el.classList.add('show');
+    if (CF_TIMER) clearTimeout(CF_TIMER);
+    CF_TIMER = setTimeout(hideCoachFeedback, 3500);
+  }
+  function hideCoachFeedback() {
+    var el = document.getElementById('coach-feedback-overlay');
+    if (el) el.classList.remove('show');
+    if (CF_TIMER) { clearTimeout(CF_TIMER); CF_TIMER = null; }
+  }
+
+  global.showCoachFeedback = showCoachFeedback;
+  global.hideCoachFeedback = hideCoachFeedback;
+
+  // boot: 在 DOM 已就绪时绑定搜索
+  function boot() {
+    bindKnowledgeSearch();
+    renderActionPanel();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    setTimeout(boot, 0);
+  }
+
+  // 兼容：当 learningCards 异步注入完毕，主动刷新一次章节缓存
+  setTimeout(function () { KL._chaptersCache = null; }, 1500);
+
+})(window);
+</script>
+</body></html>
