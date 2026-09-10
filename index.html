@@ -432,17 +432,29 @@ h1,h2,h3 { text-wrap:balance; }
 .kd-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
 .kd-chip{background:#f2f0ff;color:#5d54c0;font-size:11px;padding:4px 10px;border-radius:99px;border:1px solid #e6e2ff;}
 .kd-rawtext{font-size:12.5px;color:#3a3754;line-height:1.75;white-space:pre-wrap;background:#faf9ff;padding:10px 12px;border-radius:10px;margin-top:8px;max-height:300px;overflow:auto;}
+.kd-outline{margin-top:8px;border:1px solid #f0edff;border-radius:12px;overflow:hidden;background:#fff;position:relative;}
+.kd-outline.scrollable{max-height:300px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .kd-outline-stat{font-size:11px;color:#8b7fb0;margin-top:5px;line-height:1.5;}
-.kd-outline{margin-top:8px;border:1px solid #f0edff;border-radius:12px;overflow:hidden;}
-.kd-outline-item{display:flex;align-items:center;gap:8px;padding:8px 10px;font-size:12px;color:#4b4566;border-bottom:1px solid #f6f4ff;background:#fff;}
-.kd-outline-item.cur{background:#f4f1ff;font-weight:600;color:#4c3bb0;}
-.kd-outline-idx{width:18px;height:18px;flex-shrink:0;border-radius:50%;background:#eeebff;color:#6b5fd0;font-size:10px;display:inline-flex;align-items:center;justify-content:center;}
+.kd-outline-item{display:flex;align-items:flex-start;gap:8px;padding:9px 10px;font-size:12.5px;color:#4b4566;border-bottom:1px solid #f6f4ff;background:#fff;cursor:pointer;transition:background .12s;}
+.kd-outline-item:last-child{border-bottom:none;}
+.kd-outline-item:active{background:#f4f1ff;}
+.kd-outline-item.cur{background:#f4f1ff;font-weight:600;color:#4c3bb0;border-left:3px solid #6655ee;padding-left:7px;}
+.kd-outline-idx{width:20px;height:20px;flex-shrink:0;border-radius:50%;background:#eeebff;color:#6b5fd0;font-size:10px;display:inline-flex;align-items:center;justify-content:center;margin-top:1px;}
 .kd-outline-item.cur .kd-outline-idx{background:#6655ee;color:#fff;}
-.kd-outline-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.kd-outline-cnt{font-size:10px;color:#a39ec0;flex-shrink:0;}
-.kd-samples{padding:6px 10px 10px 34px;background:#fbfaff;border-bottom:1px solid #f6f4ff;}
-.kd-sample{display:flex;gap:6px;font-size:11.5px;color:#4b4566;line-height:1.6;padding:5px 0;}
-.kd-sample-lv{flex-shrink:0;font-size:10px;color:#7a6fd8;background:#f0edff;border-radius:6px;padding:1px 6px;height:fit-content;}
+.kd-outline-body{flex:1;min-width:0;}
+.kd-outline-name{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.kd-outline-abs{display:block;font-size:10.5px;color:#a39ec0;font-weight:400;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.kd-outline-item.cur .kd-outline-abs{color:#8b7fb0;}
+.kd-outline-kind{flex-shrink:0;font-size:10px;color:#7a6fd8;background:#f0edff;border-radius:6px;padding:1px 6px;margin-top:1px;}
+.kd-outline-item.cur .kd-outline-kind{background:#6655ee;color:#fff;}
+/* 详情页翻页导航（固定在底部操作栏之上，紧凑一行） */
+.kd-pager{flex-shrink:0;display:flex;align-items:center;gap:8px;padding:7px 12px;background:#faf9ff;border-top:1px solid #f1edff;}
+.kd-pager button{border:1px solid #e2ddff;background:#fff;color:#5d54c0;border-radius:10px;padding:7px 12px;font-size:12.5px;font-weight:600;cursor:pointer;transition:background .12s, transform .12s;white-space:nowrap;flex-shrink:0;}
+.kd-pager button:active{transform:scale(.97);}
+.kd-pager button:disabled{opacity:.35;cursor:not-allowed;}
+.kd-pager .pager-info{flex:1;text-align:center;font-size:11px;color:#7a6fd8;line-height:1.35;min-width:0;}
+.kd-pager .pager-info .pager-title{display:block;color:#3a3258;font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.kd-pager .pager-info .pager-pos{display:block;color:#a39ec0;font-size:10px;margin-top:1px;}
 .knowledge-redline{background:#fff6f6;border:1px solid #ffc8c8;border-radius:14px;padding:12px;color:#9a3a3a;font-size:12px;line-height:1.5;}
 .knowledge-redline .redline-label{font-weight:700;color:#a23d3d;margin-right:6px;}
 .knowledge-quiz{background:#fff;border:1px solid #ecebff;border-radius:14px;padding:14px;}
@@ -16635,6 +16647,8 @@ function useAvatarDetail() {
     <div class="flex-1 overflow-auto kd-scroll" style="padding:14px 14px 18px;min-height:0;">
       <div class="knowledge-detail" id="knowledge-detail-content"><!-- injected --></div>
     </div>
+    <!-- 翻页导航：上一节 / 下一节，固定于底部操作栏之上（互不遮盖）2026-09-10 -->
+    <div id="knowledge-detail-pager"><!-- injected --></div>
     <!-- 底部操作栏：固定在最下面，内容不会越过它 -->
     <div id="knowledge-detail-actions-bar"><!-- injected --></div>
   </div>
@@ -16928,6 +16942,23 @@ function useAvatarDetail() {
     // close library modal + open detail modal (compat with both modal open fns)
     if (typeof closeModal === 'function') closeModal('knowledge-library');
     if (typeof showModal === 'function') showModal('knowledge-detail');
+    // modal 可见后再定位目录 + 正文回到顶部（display:none 时元素无布局，scrollTop 不生效）
+    setTimeout(function () {
+      scrollOutlineToCurrent();
+      var sc = document.querySelector('#modal-knowledge-detail .kd-scroll');
+      if (sc) sc.scrollTop = 0;
+    }, 0);
+  }
+
+  // 长目录限高时，把当前节滚到可视区
+  function scrollOutlineToCurrent() {
+    try {
+      var cur = document.getElementById('kd-outline-cur');
+      if (!cur) return;
+      var pn = cur.parentNode;
+      if (!pn || pn.scrollHeight <= pn.clientHeight + 4) return;
+      pn.scrollTop = Math.max(0, cur.offsetTop - 40);
+    } catch (e) {}
   }
 
   function renderKnowledgeDetail(card) {
@@ -17001,36 +17032,59 @@ function useAvatarDetail() {
       html += '</div>';
     }
 
-    // 本场景课程目录：完整列出同场景全部技能点；当前技能点展开其全部参考表达
+    // 本场景课程目录：每张卡片就是一节，按 kind/round 排序；当前卡片高亮，目录项可点击跳转
     var sameScene = (learningCards || []).filter(function (c) { return c && c.scene && c.scene === card.scene; });
     if (sameScene.length > 1) {
-      var byPurpose = {}, purposeOrder = [];
-      sameScene.forEach(function (c) {
-        var k = c.title || '(未命名)';
-        if (!byPurpose[k]) { byPurpose[k] = []; purposeOrder.push(k); }
-        byPurpose[k].push(c);
+      // 按 kind（intro=0 / lesson=1 / summary=2）→ round → 在原数组的顺序
+      var KIND_ORDER = { intro: 0, lesson: 1, summary: 2 };
+      var indexMap = {};
+      (learningCards || []).forEach(function (c, i) { if (c && c.id) indexMap[c.id] = i; });
+      sameScene = sameScene.slice().sort(function (a, b) {
+        var ka = KIND_ORDER[a.kind] == null ? 1 : KIND_ORDER[a.kind];
+        var kb = KIND_ORDER[b.kind] == null ? 1 : KIND_ORDER[b.kind];
+        if (ka !== kb) return ka - kb;
+        var ra = a.round || 0, rb = b.round || 0;
+        if (ra !== rb) return ra - rb;
+        return (indexMap[a.id] || 0) - (indexMap[b.id] || 0);
       });
+      // 缓存到 KL，供翻页按钮用
+      KL._sceneOrder = sameScene.map(function (c) { return c.id; });
+      KL._sceneIdx = sameScene.findIndex(function (c) { return c.id === card.id; });
+      var KIND_LABEL_SHORT = { intro: '导语', lesson: '正文', summary: '速记' };
+      // 同名技能点（同一 title 多条表达）标注 (1/2)，让"同一技能逐条看"更清晰
+      var titleCount = {}, titleSeen = {};
+      sameScene.forEach(function (it) { var k = it.title || ''; titleCount[k] = (titleCount[k] || 0) + 1; });
+      KL._sceneLabels = sameScene.map(function (it) {
+        var k = it.title || '';
+        titleSeen[k] = (titleSeen[k] || 0) + 1;
+        return titleCount[k] > 1 ? (k + '（' + titleSeen[k] + '/' + titleCount[k] + '）') : k;
+      });
+
       html += '<div class="knowledge-formula">';
-      html += '  <div class="formula-label">📚 本场景课程目录</div>';
-      html += '  <div class="kd-outline-stat">' + escapeHTML(card.scene) + ' · 共 ' + purposeOrder.length + ' 个技能点 / ' + sameScene.length + ' 条参考表达（完整收录）</div>';
-      html += '  <div class="kd-outline">';
-      purposeOrder.forEach(function (p, i) {
-        var isCur = (p === card.title);
-        html += '    <div class="kd-outline-item' + (isCur ? ' cur' : '') + '">';
+      html += '  <div class="formula-label">📚 本场景课程目录 · 共 ' + sameScene.length + ' 节</div>';
+      html += '  <div class="kd-outline-stat">本场景共 ' + sameScene.length + ' 节，逐节学习；点击目录可直接跳转' + (sameScene.length > 6 ? '（可上下滚动查看全部）' : '') + '。</div>';
+      html += '  <div class="kd-outline' + (sameScene.length > 8 ? ' scrollable' : '') + '" id="kd-outline-list">';
+      sameScene.forEach(function (it, i) {
+        var isCur = (it.id === card.id);
+        var kindLabel = KIND_LABEL_SHORT[it.kind] || (it.medium === 'audio' ? '音频' : (it.medium === 'video' ? '视频' : (it.medium === 'book' ? '书' : '参考')));
+        // 目录摘要：直接露出本节内容开头，避免"目录只有标题没有知识"
+        var absSrc = (it.rawText || it.content || it.principle || '').replace(/\s+/g, ' ').trim();
+        var abs = absSrc.length > 46 ? absSrc.slice(0, 46) + '…' : absSrc;
+        html += '    <div class="kd-outline-item' + (isCur ? ' cur' : '') + '"' + (isCur ? ' id="kd-outline-cur"' : '') + ' data-id="' + escapeHTML(it.id) + '" onclick="KL_openDetailByAttr(this)">';
         html += '      <span class="kd-outline-idx">' + (i + 1) + '</span>';
-        html += '      <span class="kd-outline-name">' + escapeHTML(p) + '</span>';
-        html += '      <span class="kd-outline-cnt">' + byPurpose[p].length + ' 条</span>';
+        html += '      <span class="kd-outline-body">';
+        html += '        <span class="kd-outline-name">' + escapeHTML(KL._sceneLabels[i] || it.title || '(未命名)') + '</span>';
+        if (abs) html += '        <span class="kd-outline-abs">' + escapeHTML(abs) + '</span>';
+        html += '      </span>';
+        html += '      <span class="kd-outline-kind">' + kindLabel + '</span>';
         html += '    </div>';
-        if (isCur) {
-          html += '    <div class="kd-samples">';
-          byPurpose[p].forEach(function (it) {
-            html += '      <div class="kd-sample"><span class="kd-sample-lv">' + escapeHTML(it.level || '参考') + '</span><span>' + escapeHTML(it.content || '') + '</span></div>';
-          });
-          html += '    </div>';
-        }
       });
       html += '  </div>';
       html += '</div>';
+    } else {
+      KL._sceneOrder = card.id ? [card.id] : [];
+      KL._sceneIdx = 0;
+      KL._sceneLabels = [card.title || '(本节)'];
     }
 
     // 原始资料出处（资料库课程可溯源）
@@ -17061,6 +17115,30 @@ function useAvatarDetail() {
 
     box.innerHTML = html;
 
+    // 翻页导航：上一节 / 下一节 / 返回目录（独立行，不嵌入内容流）
+    var pager = document.getElementById('knowledge-detail-pager');
+    var order = KL._sceneOrder || (card.id ? [card.id] : []);
+    var idx = KL._sceneIdx != null ? KL._sceneIdx : 0;
+    if (pager) {
+      if (order.length > 1) {
+        var prevId = idx > 0 ? order[idx - 1] : null;
+        var nextId = idx < order.length - 1 ? order[idx + 1] : null;
+        var infoTitle = (KL._sceneLabels && KL._sceneLabels[idx]) || card.title || '(本节)';
+        var ph = '';
+        ph += '<div class="kd-pager">';
+        ph += '  <button data-dir="-1" onclick="KL_goSceneStepByAttr(this)"' + (prevId ? '' : ' disabled') + '>← 上一节</button>';
+        ph += '  <div class="pager-info">';
+        ph += '    <span class="pager-title" title="' + escapeHTML(infoTitle) + '">' + escapeHTML(infoTitle.length > 20 ? infoTitle.slice(0, 20) + '…' : infoTitle) + '</span>';
+        ph += '    <span class="pager-pos">第 ' + (idx + 1) + ' / ' + order.length + ' 节</span>';
+        ph += '  </div>';
+        ph += '  <button data-dir="1" onclick="KL_goSceneStepByAttr(this)"' + (nextId ? '' : ' disabled') + '>下一节 →</button>';
+        ph += '</div>';
+        pager.innerHTML = ph;
+      } else {
+        pager.innerHTML = '';
+      }
+    }
+
     // 底部操作栏独立注入：固定在 modal 最底部，不随内容滚动、不被内容越过
     var bar = document.getElementById('knowledge-detail-actions-bar');
     if (bar) {
@@ -17076,6 +17154,9 @@ function useAvatarDetail() {
       ah += '</div>';
       bar.innerHTML = ah;
     }
+
+    // 目录限高时，把当前节自动滚到可视区（避免长目录找不到位置）
+    scrollOutlineToCurrent();
   }
 
   function KL_closeDetail() {
@@ -17189,6 +17270,25 @@ function useAvatarDetail() {
     var name = el && el.getAttribute('data-name');
     if (name) KL_toggleChapter(name);
   }
+  // 翻页按钮：direction = -1（上一节）/ +1（下一节）
+  function KL_goSceneStep(direction) {
+    var order = KL._sceneOrder || [];
+    if (!order.length) return;
+    var idx = KL._sceneIdx != null ? KL._sceneIdx : 0;
+    var ni = idx + (direction > 0 ? 1 : -1);
+    if (ni < 0 || ni >= order.length) return;
+    var nextId = order[ni];
+    if (!nextId) return;
+    KL_openDetail(nextId);
+    // 滚到顶部，便于从头阅读新章节
+    var sc = document.querySelector('#modal-knowledge-detail .kd-scroll');
+    if (sc) sc.scrollTop = 0;
+  }
+  function KL_goSceneStepByAttr(el) {
+    if (!el) return;
+    var d = parseInt(el.getAttribute('data-dir') || '1', 10) || 1;
+    KL_goSceneStep(d);
+  }
 
   // expose
   global.KL = KL;
@@ -17199,6 +17299,8 @@ function useAvatarDetail() {
   global.KL_toggleChapterByAttr = KL_toggleChapterByAttr;
   global.KL_openDetail = KL_openDetail;
   global.KL_openDetailByAttr = KL_openDetailByAttr;
+  global.KL_goSceneStep = KL_goSceneStep;
+  global.KL_goSceneStepByAttr = KL_goSceneStepByAttr;
   global.KL_closeDetail = KL_closeDetail;
   global.KL_pickAnswer = KL_pickAnswer;
   global.KL_jumpToPractice = KL_jumpToPractice;
