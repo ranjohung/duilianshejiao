@@ -1,0 +1,30 @@
+W0910 08:27:52.551000 34692 python\Lib\site-packages\torch\distributed\elastic\multiprocessing\redirects.py:29] NOTE: Redirects are currently not supported in Windows or MacOs.
+G:\sd-webui-HJAI-v4.10\python\Lib\site-packages\huggingface_hub\file_download.py:795: FutureWarning: `resume_download` is deprecated and will be removed in version 1.0.0. Downloads always resume when possible. If you want to force a new download, use `force_download=True`.
+  warnings.warn(
+INFO:     Started server process [34692]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:7861 (Press CTRL+C to quit)
+No module 'xformers'. Proceeding without it.
+*** "--disable-all-extensions" arg was used, will not load any extensions ***
+Loading weights [879db523c3] from G:\sd-webui-HJAI-v4.10\models\Stable-diffusion\dreamshaper_8.safetensors
+Creating model from config: G:\sd-webui-HJAI-v4.10\configs\v1-inference.yaml
+Applying attention optimization: sdp... done.
+Model loaded in 4.0s (create model: 0.7s, apply weights to model: 2.7s, load textual inversion embeddings: 0.1s, calculate empty prompt: 0.3s).
+Startup time: 32.9s (import torch: 22.7s, import gradio: 2.8s, setup paths: 5.2s, initialize shared: 0.3s, other imports: 1.3s, list SD models: 0.2s, load scripts: 0.2s, initialize extra networks: 0.1s).
+INFO:     127.0.0.1:58867 - "GET /sdapi/v1/options HTTP/1.1" 200 OK
+WARNING:root:Sampler Scheduler autocorrection: "Euler" -> "Euler", "None" -> "Automatic"
+  0%|          | 0/20 [00:00<?, ?it/s]
+Total progress:   0%|          | 0/20 [00:00<?, ?it/s][A  5%|¨„         | 1/20 [00:00<00:09,  2.04it/s]
+Total progress:  15%|¨€¨„        | 3/20 [00:00<00:00, 29.12it/s][A 15%|¨€¨„        | 3/20 [00:00<00:02,  6.06it/s] 25%|¨€¨€¨„       | 5/20 [00:00<00:01,  8.14it/s]
+Total progress:  30%|¨€¨€¨€       | 6/20 [00:00<00:00, 17.31it/s][A 35%|¨€¨€¨€¨„      | 7/20 [00:00<00:01, 10.02it/s]
+Total progress:  40%|¨€¨€¨€¨€      | 8/20 [00:00<00:00, 15.20it/s][A 45%|¨€¨€¨€¨€¨„     | 9/20 [00:01<00:00, 11.09it/s]
+Total progress:  50%|¨€¨€¨€¨€¨€     | 10/20 [00:00<00:00, 13.93it/s][A 55%|¨€¨€¨€¨€¨€¨„    | 11/20 [00:01<00:00, 10.63it/s]
+Total progress:  60%|¨€¨€¨€¨€¨€¨€    | 12/20 [00:00<00:00, 12.30it/s][A 65%|¨€¨€¨€¨€¨€¨€¨„   | 13/20 [00:01<00:00, 10.64it/s]
+Total progress:  70%|¨€¨€¨€¨€¨€¨€¨€   | 14/20 [00:01<00:00, 12.23it/s][A 75%|¨€¨€¨€¨€¨€¨€¨€¨„  | 15/20 [00:01<00:00, 11.35it/s]
+Total progress:  80%|¨€¨€¨€¨€¨€¨€¨€¨€  | 16/20 [00:01<00:00, 12.52it/s][A 85%|¨€¨€¨€¨€¨€¨€¨€¨€¨„ | 17/20 [00:01<00:00, 11.80it/s]
+Total progress:  90%|¨€¨€¨€¨€¨€¨€¨€¨€¨€ | 18/20 [00:01<00:00, 12.55it/s][A 95%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨„| 19/20 [00:01<00:00, 12.25it/s]
+Total progress: 100%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨€| 20/20 [00:01<00:00, 12.96it/s][A100%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨€| 20/20 [00:01<00:00, 10.19it/s]
+
+Total progress: 100%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨€| 20/20 [00:01<00:00, 12.96it/s][ATotal progress: 100%|¨€¨€¨€¨€¨€¨€¨€¨€¨€¨€| 20/20 [00:01<00:00, 11.46it/s]
+INFO:     127.0.0.1:58497 - "POST /sdapi/v1/txt2img HTTP/1.1" 200 OK

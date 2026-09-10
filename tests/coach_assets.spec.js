@@ -61,7 +61,7 @@ test('编辑资料：真人全身头像预设可选择、预览并保存', async
 
   const cards = page.locator('#profile-avatar-select-grid .avatar-preset-card');
   await expect(cards).toHaveCount(10);
-  await expect(page.locator('#profile-avatar-select-grid img')).toHaveCount(9);
+  await expect(page.locator('#profile-avatar-select-grid img')).toHaveCount(10);
   await page.waitForFunction(() => [...document.querySelectorAll('#profile-avatar-select-grid img')].every(img => img.complete && img.naturalWidth > 0));
   const imagesLoaded = await page.locator('#profile-avatar-select-grid img').evaluateAll(images => images.every(img => img.complete && img.naturalWidth > 0));
   expect(imagesLoaded).toBeTruthy();
