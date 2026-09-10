@@ -349,6 +349,18 @@ h1,h2,h3 { text-wrap:balance; }
 .challenge-3d-stage.is-photo .photo-char, #etiquette-3d-stage.is-photo .photo-char { height:52%; bottom:2%; }
 .challenge-3d-stage.is-photo .challenge-stage-bubble, #etiquette-3d-stage.is-photo .challenge-stage-bubble { max-height:96px; overflow:hidden; }
 
+/* 前景办公桌 / 餐桌 + NPC 坐姿（此前缺 CSS → 面试官像站着且无桌） */
+.photo-desk { position:absolute; z-index:3; right:0; bottom:0; width:54%; height:24%;
+  background:linear-gradient(180deg,#7d5638 0%,#5b3f29 52%,#3a2617 100%);
+  border-radius:12px 12px 0 0;
+  box-shadow:0 -12px 26px rgba(0,0,0,.42), inset 0 3px 0 rgba(255,255,255,.14), inset 0 -12px 22px rgba(0,0,0,.38);
+  pointer-events:none; }
+.photo-desk::before { content:''; position:absolute; left:8%; right:8%; top:8px; height:3px; background:rgba(255,255,255,.10); border-radius:2px; }
+.photo-desk::after { content:''; position:absolute; right:12%; top:-15px; width:32px; height:15px;
+  background:linear-gradient(180deg,#efe9dc,#cabfa9); border-radius:3px 3px 0 0; box-shadow:0 2px 5px rgba(0,0,0,.28); }
+.challenge-3d-stage.is-photo .photo-char.seated, #etiquette-3d-stage.is-photo .photo-char.seated { bottom:-4%; }
+.photo-char.seated { bottom:-4%; }
+
 
 </style>
 
@@ -495,9 +507,22 @@ h1,h2,h3 { text-wrap:balance; }
 /* 已选收藏打勾的小图标（兼容旧 DOM） */
 @media (prefers-reduced-motion:reduce){.chapter-card,.chapter-progress-bar,.lesson-row,.modal-action-panel,.modal-action-panel .ap-tile,.coach-feedback-overlay{transition:none !important;animation:none !important;}}
 
-/* ===== 训练模态：上下分屏（场景常显 + 教学选项同屏）2026-09-10 ===== */
+/* ===== 训练模态：上下分屏（3D 场景 + 输入框固定，其余内容在下方滚动）2026-09-10 ===== */
 #modal-etiquette-training .modal-content,
-#modal-challenge-training .modal-content { height:88vh; max-height:88vh; }
+#modal-challenge-training .modal-content { height:88vh; max-height:88vh; display:flex; flex-direction:column; overflow:hidden; }
+/* 头部固定 */
+#modal-etiquette-training .modal-content > div:first-child,
+#modal-challenge-training .modal-content > div:first-child { flex-shrink:0; }
+/* 固定区（舞台 / 输入） */
+.ct-fixed { flex-shrink:0; }
+.ct-stage-fixed { padding:10px 12px 4px; }
+.ct-input-fixed { padding:8px 12px 10px; border-top:1px solid rgba(71,52,103,.10); background:#f8f8fb; box-shadow:0 -6px 14px rgba(20,15,49,.05); position:relative; z-index:2; }
+/* 滚动区：只有这里滚动，3D 场景与输入框保持不动 */
+.ct-scroll { flex:1 1 auto; min-height:0; overflow-y:auto; padding:10px 12px 16px; -webkit-overflow-scrolling:touch; }
+.ct-scroll > * + * { margin-top:10px; }
+.ct-scroll::-webkit-scrollbar { width:6px; }
+.ct-scroll::-webkit-scrollbar-thumb { background:rgba(124,58,237,.22); border-radius:99px; }
+/* 舞台高度：保证 3D 场景完整可见 */
 #modal-etiquette-training .challenge-3d-stage.is-photo,
 #modal-challenge-training .challenge-3d-stage.is-photo { height:clamp(190px, 27vh, 250px); min-height:190px; }
 /* 教学选项卡片更紧凑，避免把场景挤出视野 */
@@ -505,8 +530,66 @@ h1,h2,h3 { text-wrap:balance; }
 #etiquette-options .option-card { padding:10px 12px !important; }
 #etiquette-options .option-card .option-text { font-size:12px !important; line-height:1.5 !important; }
 #etiquette-options .q-badge { font-size:10px !important; padding:2px 7px !important; }
-/* 选项区容器：本身不滚，跟着页面滚 */
-#etiquette-options, #challenge-messages { scroll-margin-top:8px; }
+/* 分析/提示分区标题 */
+.ct-scroll .section-cap { font-size:11px; font-weight:700; color:#8b7fb0; letter-spacing:.06em; margin:0 0 6px; }
+
+/* ===== 动作指令：照片角色动画 + 标准示范 Banner + 动作要点卡 ===== */
+/* (历史版本 setAction 加入了 animating-* 类但缺 CSS，这里补齐) */
+.photo-action { position:absolute; z-index:6; padding:5px 10px; border-radius:99px;
+  background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; font-size:11px; font-weight:700;
+  white-space:nowrap; box-shadow:0 8px 18px rgba(99,102,241,.4); border:1px solid rgba(255,255,255,.32);
+  animation:photoActionIn .35s var(--ease) both; transform:translate(-50%,0); pointer-events:none; }
+.photo-action.bad { background:linear-gradient(135deg,#f43f5e,#e11d48); box-shadow:0 8px 18px rgba(244,63,94,.4); }
+@keyframes photoActionIn { from { opacity:0; transform:translate(-50%,6px) scale(.9); } to { opacity:1; transform:translate(-50%,0) scale(1); } }
+
+/* 动作动画 keyframes（作用于 .photo-char 与 .challenge-3d-stage > * 容器） */
+.photo-char.animating-bow, .animating-bow.photo-char { animation:actBow 1.3s var(--ease) both; transform-origin:50% 100%; }
+.photo-char.animating-nod, .animating-nod.photo-char { animation:actNod 1.3s ease-in-out both; }
+.photo-char.animating-shake, .animating-shake.photo-char { animation:actShake 1.3s ease-in-out both; transform-origin:50% 30%; }
+.photo-char.animating-raise, .animating-raise.photo-char { animation:actRaise 1.3s var(--ease) both; transform-origin:50% 100%; }
+.photo-char.animating-step, .animating-step.photo-char { animation:actStep 1.3s var(--ease) both; }
+.photo-char.animating-wave, .animating-wave.photo-char { animation:actWave 1.3s var(--ease) both; transform-origin:50% 30%; }
+.photo-char.animating-turn, .animating-turn.photo-char { animation:actTurn 1.3s var(--ease) both; }
+@keyframes actBow { 0%,100%{transform:translateY(0) scaleY(1) scaleX(1);} 30%,55%{transform:translateY(2%) scaleY(.78) scaleX(1.04);} }
+@keyframes actNod { 0%,100%{transform:translateY(0);} 20%,60%{transform:translateY(-3.5%);} 40%,80%{transform:translateY(0);} }
+@keyframes actShake { 0%,100%{transform:rotate(0) translateX(0);} 20%{transform:rotate(-9deg) translateX(-2%);} 40%{transform:rotate(9deg) translateX(2%);} 60%{transform:rotate(-7deg) translateX(-1.5%);} 80%{transform:rotate(7deg) translateX(1.5%);} }
+@keyframes actRaise { 0%,100%{transform:scaleY(.92);} 50%{transform:scaleY(1) translateY(-2%);} }
+@keyframes actStep { 0%,100%{transform:scale(1);} 50%{transform:scale(1.06) translateY(-1%);} }
+@keyframes actWave { 0%,100%{transform:rotate(0);} 25%{transform:rotate(-6deg);} 50%{transform:rotate(6deg);} 75%{transform:rotate(-6deg);} }
+@keyframes actTurn { 0%{transform:perspective(400px) rotateY(0);} 50%{transform:perspective(400px) rotateY(180deg);} 100%{transform:perspective(400px) rotateY(360deg);} }
+
+/* 教学示范 Banner（盖在 stage 顶部，HUD 下方） */
+.action-demo-banner { position:absolute; z-index:8; top:54px; left:50%; transform:translateX(-50%);
+  padding:7px 14px; border-radius:99px; color:#fff; font-size:12px; font-weight:700; letter-spacing:.02em;
+  white-space:nowrap; box-shadow:0 12px 28px rgba(124,58,237,.42); border:1px solid rgba(255,255,255,.34);
+  background:linear-gradient(135deg,#7c3aed,#ec4899);
+  animation:demoBannerIn .35s var(--ease) both, demoBannerOut .35s ease-in 1.55s both; pointer-events:none; }
+.action-demo-banner.practice { background:linear-gradient(135deg,#f59e0b,#ef4444); box-shadow:0 12px 28px rgba(245,158,11,.42); }
+@keyframes demoBannerIn { from { opacity:0; transform:translate(-50%,-8px) scale(.92);} to { opacity:1; transform:translate(-50%,0) scale(1);} }
+@keyframes demoBannerOut { to { opacity:0; transform:translate(-50%,-6px) scale(.96);} }
+
+/* 标准动作要点卡（盖在 stage 底部） */
+.action-form-card { position:absolute; z-index:7; left:8px; right:8px; bottom:10px; padding:9px 12px;
+  border-radius:12px; background:rgba(15,12,36,.86); color:#fff; font-size:11px; line-height:1.55;
+  border:1px solid rgba(255,255,255,.18); box-shadow:0 12px 26px rgba(8,4,20,.42);
+  animation:formCardIn .35s var(--ease) both, formCardOut .35s ease-in 1.6s both; pointer-events:none; }
+.action-form-card .af-title { font-size:11px; font-weight:700; color:#ffd97a; margin-bottom:4px; letter-spacing:.04em; }
+.action-form-card .af-list { padding:0; margin:0; list-style:none; }
+.action-form-card .af-list li { display:flex; align-items:flex-start; gap:6px; padding:1px 0; }
+.action-form-card .af-list li::before { content:'•'; color:#ffd97a; flex-shrink:0; font-weight:700; }
+@keyframes formCardIn { from { opacity:0; transform:translateY(8px);} to { opacity:1; transform:none;} }
+@keyframes formCardOut { to { opacity:0; transform:translateY(-6px);} }
+
+/* 最终教练点评卡里的标准动作要点区块 */
+.action-form-points { margin-top:6px; padding-top:6px; border-top:1px dashed rgba(124,58,237,.18); font-size:11px; color:#574a78; line-height:1.6; }
+.action-form-points strong { color:#7c3aed; }
+
+/* reduce motion：禁掉所有动作动画与 banner 切换 */
+@media (prefers-reduced-motion:reduce){
+  .photo-char.animating-bow,.photo-char.animating-nod,.photo-char.animating-shake,.photo-char.animating-raise,
+  .photo-char.animating-step,.photo-char.animating-wave,.photo-char.animating-turn,
+  .action-demo-banner,.action-form-card,.photo-action { animation:none !important; transition:none !important; transform:none !important; }
+}
 </style>
 </head>
 <body data-page-node-id="w62ZySAPUczSBdQm5VT3GI">
@@ -2399,7 +2482,7 @@ h1,h2,h3 { text-wrap:balance; }
   <!-- ===== 挑战训练对话框（无ABC选项） ===== -->
   <div class="modal-overlay" id="modal-challenge-training" style="display:none" data-page-node-id="bZNuHUDtdmy00h7ZMsqftq">
     <div class="modal-content h-[70vh] challenge-training-surface" id="challenge-training-surface" data-page-node-id="QIrSystuRw2Ss8HJhcIkNB">
-      <div class="flex items-center justify-between p-4 border-b border-gray-100 bg-white/80 backdrop-blur-sm" data-page-node-id="xtsZ74xuVB2c3XMRcRPzrk">
+      <div class="flex items-center justify-between p-4 border-b border-gray-100 bg-white" data-page-node-id="xtsZ74xuVB2c3XMRcRPzrk">
         <div class="flex items-center gap-3" data-page-node-id="KxcSlmBA4OM2tYplTzEJgT">
           <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Coach" class="w-10 h-10 rounded-full border-2 border-gray-200 object-cover" id="challenge-coach-avatar" alt="教练头像" data-page-node-id="Hwcac5z9GG2lCxGKhC1PAm">
           <div data-page-node-id="Awcido5IzWeyj5kPk4gKJq">
@@ -2410,22 +2493,24 @@ h1,h2,h3 { text-wrap:balance; }
         </div>
         <button onclick="closeModal('challenge-training')" class="text-gray-400 hover:text-gray-600 text-xl" data-page-node-id="ikeSCUIrIvXpAQAJTD0FzR">✕</button>
       </div>
-      <div class="flex-1 overflow-auto p-4 space-y-3" data-page-node-id="phggHWKcH05whJwQa8E1DD">
+      <div class="ct-fixed ct-stage-fixed" data-page-node-id="phggHWKcH05whJwQa8E1DD">
         <div id="challenge-3d-stage" class="challenge-3d-stage" data-page-node-id="QUZzTFHPR8s2OUdDqsGPsF">
           <img id="challenge-stage-backdrop" class="challenge-stage-backdrop" alt="真实挑战 3D 场景背景" data-page-node-id="JYF3iasjOPPzhnNBx0zXlJ">
           <div class="challenge-stage-grid" data-page-node-id="frfJkkm25FTZsV48sOSyhq"></div><div class="challenge-stage-orb" aria-hidden="true" data-page-node-id="Bl3EJxc36WKFx67sX0lqzH"></div>\n          <div id="challenge-stage-bubbles" class="challenge-stage-bubble-layer" aria-live="polite" data-page-node-id="DVXSpnHt523fpcvTjvBuxy"></div>
           <img id="challenge-stage-character" class="challenge-stage-character" alt="场景角色" data-page-node-id="GnUQ3a1ckYKKcsHqFiSVot">
           <div class="challenge-stage-hud" data-page-node-id="IMW4XTRrUkVLHDHRRM6kTT"><div class="hud-card" data-page-node-id="odni6KzTR2P2xtXrnK1Jio"><div class="text-[10px] uppercase tracking-[.16em] text-indigo-100" data-page-node-id="Rt3cvRkXKqdaATUOqzftmh">沉浸式现场</div><div id="challenge-stage-location" class="text-xs font-semibold mt-1" data-page-node-id="0EwqdAJ08SGS520GhfV6b6">场景加载中</div></div><div class="hud-card text-right" data-page-node-id="CbzWs9DshpASTP4vypYGx6"><div class="text-[10px] text-indigo-100" data-page-node-id="PkilDZbwhq2SDOjgHEtLXA">轮次</div><div id="challenge-stage-progress" class="text-sm font-semibold mt-1" data-page-node-id="OAsRzd0y04f2mW1AYlHfHK">0 / 3</div></div></div>
         </div>
-        <div id="challenge-scene-goal" class="challenge-scene-goal" data-page-node-id="uCUtkxMtITdYwQCnTjijiP">本关目标加载中</div>
-        <div id="challenge-messages" class="space-y-3" data-page-node-id="TSDUTqvsaXJUvA7Z9ChHBp"></div>
       </div>
-      <div class="p-3 border-t border-gray-100 bg-gray-50" data-page-node-id="Q4aC9oQEE9mu601R5A1g2v">
-        <div class="flex gap-2" data-page-node-id="P2y2uXO5Bs35kRZwsCQhJo">
+      <div class="ct-fixed ct-input-fixed" data-page-node-id="Q4aC9oQEE9mu601R5A1g2v">
+        <div class="flex gap-2 ct-input-row" data-page-node-id="P2y2uXO5Bs35kRZwsCQhJo">
           <input type="text" id="challenge-input" placeholder="输入你会说的话或会做的动作…" class="flex-1 px-4 py-2 rounded-full border border-gray-200 text-sm focus:outline-none focus:border-indigo-500" data-page-node-id="PSWNuJwdGLquAK121nSl3W">
           <button onclick="openActionPanel({kind:'input', id:'challenge-input', stageId:'challenge-stage', who:'user'})" class="btn-action-trigger" title="动作指令" aria-label="动作指令">🎬</button><button onclick="sendChallengeMessage()" class="px-4 py-2 bg-indigo-500 text-white rounded-full text-sm font-medium hover:bg-indigo-600 transition-colors" data-page-node-id="eoxBDZ9YEG4ci4bN0mujna">发送</button>
         </div>
+      </div>
+      <div class="ct-scroll">
         <div id="challenge-coach-evaluation" class="challenge-coach-evaluation is-empty" data-page-node-id="Cb7v8s4BtJ2TToyjhdf0zc">每轮输入都会在这里得到教练评价；本模式不提供选项或示范答案。</div>
+        <div id="challenge-scene-goal" class="challenge-scene-goal" data-page-node-id="uCUtkxMtITdYwQCnTjijiP">本关目标加载中</div>
+        <div id="challenge-messages" class="space-y-3" data-page-node-id="TSDUTqvsaXJUvA7Z9ChHBp"></div>
       </div>
       </div>
     </div>
@@ -2462,7 +2547,7 @@ h1,h2,h3 { text-wrap:balance; }
   <!-- ===== 社交礼仪训练对话框（3D场景 + 头顶气泡 + 输入前A/B/C选项） ===== -->
   <div class="modal-overlay" id="modal-etiquette-training" style="display:none" data-page-node-id="PnnoO8O2sLMZZw4VndQMNk">
     <div class="modal-content h-[72vh] challenge-training-surface" id="etiquette-training-surface" data-page-node-id="1QPOm7SBvHV0tGMnepYlXk">
-      <div class="flex items-center justify-between p-4 border-b border-gray-100 bg-white/80 backdrop-blur-sm" data-page-node-id="yWSACOU5nTFiwoX526xZSW">
+      <div class="flex items-center justify-between p-4 border-b border-gray-100 bg-white" data-page-node-id="yWSACOU5nTFiwoX526xZSW">
         <div class="flex items-center gap-3" data-page-node-id="b2DDleljKxCGErVFux2OCU">
           <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Coach" class="w-10 h-10 rounded-full border-2 border-gray-200 object-cover" id="etiquette-coach-avatar" alt="教练头像" data-page-node-id="Ywu7oekylp18tcTFtQuOMR">
           <div data-page-node-id="W3YsN6YDMdjQrx9y8U6LDy">
@@ -2473,7 +2558,7 @@ h1,h2,h3 { text-wrap:balance; }
         </div>
         <button onclick="closeModal('etiquette-training')" class="text-gray-400 hover:text-gray-600 text-xl" data-page-node-id="iA1mglBTdvgVZrYKQBHmRV">✕</button>
       </div>
-      <div class="flex-1 overflow-auto p-4 space-y-3" data-page-node-id="oASyT9DGG0eDK4lNFHsjy1">
+      <div class="ct-fixed ct-stage-fixed" data-page-node-id="oASyT9DGG0eDK4lNFHsjy1">
         <div id="etiquette-3d-stage" class="challenge-3d-stage" data-page-node-id="jCq6iM2Rl0kjntnS3zt6ZF">
           <img id="etiquette-stage-backdrop" class="challenge-stage-backdrop" alt="社交礼仪 3D 场景背景" data-page-node-id="BEIw8zOjeuJWJNyrOoUh6V">
           <div class="challenge-stage-grid" data-page-node-id="kGt0hx56zCVQ2XwXVjCNd6"></div><div class="challenge-stage-orb" aria-hidden="true" data-page-node-id="eJHoOhFsrXsfxM5FvlwvzU"></div>
@@ -2481,16 +2566,18 @@ h1,h2,h3 { text-wrap:balance; }
           <img id="etiquette-stage-character" class="challenge-stage-character" alt="场景角色" data-page-node-id="9OyRE3FAGRT6RVXdTJRjZt">
           <div class="challenge-stage-hud" data-page-node-id="3UC1N3iEviX34c0wCz77TF"><div class="hud-card" data-page-node-id="CQ3zSQx6o00WTvlN5ah5Qm"><div class="text-[10px] uppercase tracking-[.16em] text-indigo-100" data-page-node-id="e30uaVDIuWzekfAOOR6O9L">沉浸式现场</div><div id="etiquette-stage-location" class="text-xs font-semibold mt-1" data-page-node-id="ptU3X8tso77JPMptplvvFF">场景加载中</div></div><div class="hud-card text-right" data-page-node-id="miI4jwSeHPvWGBK05sXAjl"><div class="text-[10px] text-indigo-100" data-page-node-id="Wt1EFfzH32x4Gix19tTnpF">回合</div><div id="etiquette-stage-progress" class="text-sm font-semibold mt-1" data-page-node-id="VSCGE9RyQcN1CBcOmiNW7M">0 / 3</div></div></div>
         </div>
-        <div id="etiquette-scene-goal" class="challenge-scene-goal" data-page-node-id="hYQWcVZIMG7lesGE1cNgpC">本关目标加载中</div>
-        <div id="etiquette-messages" class="space-y-3" data-page-node-id="MakbcTlVXQ9RHoTfw1YERA"></div>
-        <div id="etiquette-options" class="space-y-2" data-page-node-id="lU91V2HzFOcpyqQdl5KdVY"></div>
       </div>
-      <div class="p-3 border-t border-gray-100 bg-gray-50" data-page-node-id="sBLBIOdJ2fKBGzPlTgqSRT">
-        <div class="flex gap-2" data-page-node-id="vnlFrtsBG5nXaDR4U8UTtM">
+      <div class="ct-fixed ct-input-fixed" data-page-node-id="sBLBIOdJ2fKBGzPlTgqSRT">
+        <div class="flex gap-2 ct-input-row" data-page-node-id="vnlFrtsBG5nXaDR4U8UTtM">
           <input type="text" id="etiquette-input" placeholder="输入你会说的话或会做的动作…" class="flex-1 px-4 py-2 rounded-full border border-gray-200 text-sm focus:outline-none focus:border-amber-500" data-page-node-id="BkfYkHv2sO5CwPfivW2eEE">
           <button onclick="openActionPanel({kind:'input', id:'etiquette-input', stageId:'etiquette-stage', who:'user'})" class="btn-action-trigger" title="动作指令" aria-label="动作指令">🎬</button><button onclick="sendEtiquetteMessage()" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-full text-sm font-medium hover:opacity-90 transition-opacity" data-page-node-id="P68AqiKBFmBA8qsToWe5VK">发送</button>
         </div>
+      </div>
+      <div class="ct-scroll">
         <div id="etiquette-coach-evaluation" class="challenge-coach-evaluation is-empty" data-page-node-id="NJCG35BP5PGveP6jXuUV4r">每轮输入都会在这里得到教练评价；本模式会先给出 A/B/C 参考选项。</div>
+        <div id="etiquette-options" class="space-y-2" data-page-node-id="lU91V2HzFOcpyqQdl5KdVY"></div>
+        <div id="etiquette-messages" class="space-y-3" data-page-node-id="MakbcTlVXQ9RHoTfw1YERA"></div>
+        <div id="etiquette-scene-goal" class="challenge-scene-goal" data-page-node-id="hYQWcVZIMG7lesGE1cNgpC">本关目标加载中</div>
       </div>
       </div>
     </div>
@@ -16047,20 +16134,48 @@ initApp();
     });
   };
 
-  // 动作库：cls=动画类，label=展示，pass=是否得体，score=加分，tip=教学点评
+  // 动作库：cls=动画类，label=展示，pass=是否得体，score=加分，tip=教学点评，
+  // form=[] 标准动作要点（礼仪训练用，NPC 示范 + 表单卡 + 最终点评展示）
   var ACTIONS = {
-    '鞠躬': { cls: 'bow', label: '鞠躬行礼', pass: true,  score: 2, tip: '微微鞠躬是通用的问候礼节，适合初次见面或表达感谢。' },
-    '点头': { cls: 'nod', label: '点头示意', pass: true,  score: 2, tip: '点头表示听进去了，既回应对方又不打断话语。' },
-    '摇头': { cls: 'shake', label: '摇头', pass: false, score: -1, tip: '当面摇头容易让对方误以为你在否定，建议用语言表达不同意见。' },
-    '坐下': { cls: 'sit', label: '落座', pass: true,  score: 2, tip: '得到示意后再落座，姿态放松自然。' },
-    '起立': { cls: 'raise', label: '起身相迎', pass: true,  score: 2, tip: '对方入场或领导到来时起身相迎，是得体的礼节。' },
-    '递名片': { cls: 'bow', label: '双手递名片', pass: true,  score: 3, tip: '双手递名片、字朝对方，体现出尊重与专业。' },
-    '握手': { cls: 'wave', label: '伸手握手', pass: true,  score: 2, tip: '先伸手、力度适中、目光注视对方，握完轻收。' },
-    '干杯': { cls: 'raise', label: '举杯示意', pass: true,  score: 2, tip: '举杯示意即可，杯沿略低于长辈/上级。' },
-    '挥手': { cls: 'wave', label: '挥手打招呼', pass: true,  score: 2, tip: '轻轻挥手打招呼，不必过于夸张。' },
-    '抱歉': { cls: 'bow', label: '道歉致意', pass: true,  score: 3, tip: '及时道歉并给出弥补方式，最能化解僵局。' },
-    '微笑': { cls: 'nod', label: '微笑示意', pass: true,  score: 2, tip: '保持微笑与眼神接触，是拉近距离的钥匙。' },
-    '前进一步': { cls: 'step', label: '走近一步', pass: true, score: 2, tip: '适当前倾/走近，表达专注倾听与热情。' }
+    '鞠躬': { cls: 'bow', label: '鞠躬行礼', pass: true,  score: 2,
+      form: ['腰部弯曲 15-30°，目光注视对方', '停顿 1-2 秒再起身，双手自然下垂'],
+      tip: '微微鞠躬是通用的问候礼节，适合初次见面或表达感谢。' },
+    '点头': { cls: 'nod', label: '点头示意', pass: true,  score: 2,
+      form: ['幅度不宜过大，配合微笑', '保持眼神接触，表示在听'],
+      tip: '点头表示听进去了，既回应对方又不打断话语。' },
+    '摇头': { cls: 'shake', label: '摇头', pass: false, score: -1,
+      form: ['尽量避免当面摇头', '用"我不太认同…"等语言表达'],
+      tip: '当面摇头容易让对方误以为你在否定，建议用语言表达不同意见。' },
+    '坐下': { cls: 'sit', label: '落座', pass: true,  score: 2,
+      form: ['先示意再落座：得到对方点头或"请坐"再入座', '坐姿自然：双脚平放，背部轻靠椅背'],
+      tip: '得到示意后再落座，姿态放松自然。' },
+    '起立': { cls: 'raise', label: '起身相迎', pass: true,  score: 2,
+      form: ['对方入场或上级到来时立即起身', '起身动作从容，不慌不急'],
+      tip: '对方入场或领导到来时起身相迎，是得体的礼节。' },
+    '递名片': { cls: 'bow', label: '双手递名片', pass: true,  score: 3,
+      form: ['双手奉上，名片字朝对方', '配合简短自我介绍：姓名+单位'],
+      tip: '双手递名片、字朝对方，体现出尊重与专业。' },
+    '握手': { cls: 'wave', label: '伸手握手', pass: true,  score: 2,
+      form: ['主动伸手、力度适中、虎口相对', '目光注视、握完轻收不甩手'],
+      tip: '先伸手、力度适中、目光注视对方，握完轻收。' },
+    '干杯': { cls: 'raise', label: '举杯示意', pass: true,  score: 2,
+      form: ['杯沿略低于长辈或上级', '轻碰即可，不必用力过猛'],
+      tip: '举杯示意即可，杯沿略低于长辈/上级。' },
+    '挥手': { cls: 'wave', label: '挥手打招呼', pass: true,  score: 2,
+      form: ['手掌轻摆，幅度自然', '保持微笑，避免夸张挥舞'],
+      tip: '轻轻挥手打招呼，不必过于夸张。' },
+    '抱歉': { cls: 'bow', label: '道歉致意', pass: true,  score: 3,
+      form: ['立即致歉，目光接触', '说明缘由并给出弥补方式'],
+      tip: '及时道歉并给出弥补方式，最能化解僵局。' },
+    '微笑': { cls: 'nod', label: '微笑示意', pass: true,  score: 2,
+      form: ['嘴角上扬、眼神温和', '自然真诚，避免假笑或僵笑'],
+      tip: '保持微笑与眼神接触，是拉近距离的钥匙。' },
+    '前进一步': { cls: 'step', label: '走近一步', pass: true, score: 2,
+      form: ['适当前倾或走近一步', '表示专注倾听与热情，但保持合理距离'],
+      tip: '适当前倾/走近，表达专注倾听与热情。' },
+    '看手机': { cls: 'turn', label: '看手机（反面）', pass: false, score: -1,
+      form: ['与人对谈时频繁看手机是大忌', '会让对方觉得不被重视', '正确做法：手机收起来、目光回到对方'],
+      tip: '与人交谈时看手机是非常失礼的行为，应把手机收起来。' }
   };
   window.DUILIAN_ACTIONS = ACTIONS;
 
@@ -16088,7 +16203,30 @@ initApp();
     if (prog) prog.textContent = (window[key]) + ' / 3';
   }
 
-  // 执行一个动作：角色动画 + 动作徽标 + 教练判定 + NPC 反应
+  // 在 stage 上方展示「教学示范」/「跟我做」Banner + 动作要点卡
+  function showActionBanner(stageEl, mode, label) {
+    var old = stageEl.querySelector('.action-demo-banner');
+    if (old) old.remove();
+    var b = document.createElement('div');
+    b.className = 'action-demo-banner' + (mode === 'practice' ? ' practice' : '');
+    b.textContent = (mode === 'practice' ? '🎯 跟我做一遍 · ' : '✨ 标准动作示范 · ') + label;
+    stageEl.appendChild(b);
+    // 1.7s 后自动淡出（CSS 动画也设了 1.55s 出）
+    setTimeout(function () { if (b.parentNode) b.parentNode.removeChild(b); }, 1900);
+  }
+  function showActionFormCard(stageEl, form) {
+    var old = stageEl.querySelector('.action-form-card');
+    if (old) old.remove();
+    if (!form || !form.length) return;
+    var c = document.createElement('div');
+    c.className = 'action-form-card';
+    c.innerHTML = '<div class="af-title">🎓 标准动作要点</div><ul class="af-list">' +
+      form.map(function (f) { return '<li>' + esc(f) + '</li>'; }).join('') + '</ul>';
+    stageEl.appendChild(c);
+    setTimeout(function () { if (c.parentNode) c.parentNode.removeChild(c); }, 1900);
+  }
+
+  // 执行一个动作：礼仪训练走「标准示范 → 跟我做 → 教练点评」三段式；真实挑战保持原行为
   window.postAction = function (mode, keyword) {
     var item = ACTIONS[keyword];
     if (!item) return false;
@@ -16096,6 +16234,63 @@ initApp();
     var st = document.getElementById(sid);
     if (!st) return false;
 
+    // ===== 礼仪训练：三段式教学（NPC 先示范 → 用户跟做 → 教练点评） =====
+    if (mode === 'etiquette') {
+      // Phase 1 (0-1.7s) 标准示范：NPC 演示 + 教学 Banner + 标准要点卡
+      showActionBanner(st, 'demo', item.label);
+      showActionFormCard(st, item.form);
+      if (window.Stage3D && window.Stage3D.setAction) window.Stage3D.setAction(sid, 'npc', item.cls);
+
+      // Phase 2 (1.8-3.0s) 跟我做：用户角色做 + 动作徽标
+      setTimeout(function () {
+        showActionBanner(st, 'practice', item.label);
+        if (window.Stage3D && window.Stage3D.setAction) window.Stage3D.setAction(sid, 'user', item.cls);
+        // 动作徽标（用户头顶下方）
+        var badge = document.createElement('div');
+        badge.className = 'photo-action' + (item.pass ? '' : ' bad');
+        badge.textContent = '我 · ' + item.label + (item.pass ? ' ✓' : ' ⚠');
+        var W = st.clientWidth || 360, H = st.clientHeight || 320;
+        badge.style.left = (W * 0.20) + 'px';
+        badge.style.top = (H * 0.62) + 'px';
+        st.appendChild(badge);
+        setTimeout(function () { if (badge.parentNode) badge.parentNode.removeChild(badge); }, 2000);
+      }, 1800);
+
+      // Phase 3 (3.0s) 教练点评：含标准要点 + 教学提示
+      setTimeout(function () {
+        var v = ensureVerdict('etiquette');
+        if (v) {
+          v.classList.remove('is-empty');
+          var html =
+            '<strong>🎬 动作指令判定 · ' + esc(item.label) + '</strong><br>' +
+            (item.pass
+              ? '<span class="font-medium" style="color:#15803d">✔ 动作得体，' + (item.score >= 0 ? '+' : '') + item.score + ' 分</span>'
+              : '<span class="font-medium" style="color:#b91c1c">⚠ 动作不当，需留意场合</span>') +
+            '<div class="mt-1 opacity-85">' + esc(item.tip) + '</div>';
+          if (item.form && item.form.length) {
+            html += '<div class="action-form-points"><strong>📋 标准动作要点：</strong><br>' +
+              item.form.map(function (f) { return '· ' + esc(f); }).join('<br>') + '</div>';
+          }
+          html += '<div class="mt-1 text-[11px] opacity-60">教学提示：除对话外，你也可以点选或输入"动作指令"，观察 NPC 示范 → 跟着做 → 教练点评的三步学习。</div>';
+          v.innerHTML = html;
+        }
+        bumpRound('etiquette');
+      }, 3000);
+
+      // Phase 4 (3.5s) NPC 反应：点头 + 一句回应
+      setTimeout(function () {
+        if (window.Stage3D && window.Stage3D.setAction) window.Stage3D.setAction(sid, 'npc', 'nod');
+        var reply = item.pass
+          ? '（对方微微点头）嗯，这个动作很标准。'
+          : '（对方愣了一下）呃…这个场合可能不太合适哦。';
+        try {
+          if (window.addEtiquetteBubble) window.addEtiquetteBubble('npc', reply);
+        } catch (e) {}
+      }, 3500);
+      return true;
+    }
+
+    // ===== 真实挑战：原行为（用户做 → 教练判定 → NPC 反应） =====
     if (window.Stage3D && window.Stage3D.setAction) window.Stage3D.setAction(sid, 'user', item.cls);
 
     // 动作徽标（用户头顶下方）
@@ -16120,7 +16315,7 @@ initApp();
           ? '<span class="font-medium" style="color:#15803d">✔ 动作得体，' + (item.score >= 0 ? '+' : '') + item.score + ' 分</span>'
           : '<span class="font-medium" style="color:#b91c1c">⚠ 动作不当，需留意场合</span>') +
         '<div class="mt-1 opacity-85">' + esc(item.tip) + '</div>' +
-        '<div class="mt-1 text-[11px] opacity-60">教学提示：除对话外，你也可以点选或输入“动作指令”，观察礼仪是否合格。</div>';
+        '<div class="mt-1 text-[11px] opacity-60">教学提示：除对话外，你也可以点选或输入"动作指令"，观察礼仪是否合格。</div>';
     }
 
     // NPC 反应：点头 + 一句回应
@@ -16180,26 +16375,38 @@ initApp();
     });
   }
 
-  // 教学提示自动滚入视野：礼仪选项渲染时，把 A/B/C 参考卡片滚到可见区域顶部
+  // 教学提示：现在 A/B/C 选项已固定在输入框下方，无需再滚动舞台
+  // （保留 MutationObserver 接口，仅把新内容所在滚动区滚到顶部，确保「分析」可见）
   function autoRevealOptions() {
     var opt = document.getElementById('etiquette-options');
     if (!opt || !window.MutationObserver) return;
     var obs = new MutationObserver(function () {
       if (!opt.querySelector('.option-card')) return;
-      var top = opt.getBoundingClientRect().top;
-      if (top > window.innerHeight * 0.55) {
-        try { opt.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) { opt.scrollIntoView(); }
-      }
+      var sc = opt.closest('.ct-scroll');
+      if (sc) sc.scrollTop = 0;
     });
     obs.observe(opt, { childList: true });
   }
 
+  // 评价更新时，把所在滚动区拉回顶部，确保「分析」始终可见
+  function bindEvalAutoTop() {
+    if (!window.MutationObserver) return;
+    ['etiquette', 'challenge'].forEach(function (mode) {
+      var ev = document.getElementById(mode === 'challenge' ? 'challenge-coach-evaluation' : 'etiquette-coach-evaluation');
+      if (!ev) return;
+      var obs = new MutationObserver(function () {
+        var sc = ev.closest('.ct-scroll');
+        if (sc) sc.scrollTop = 0;
+      });
+      obs.observe(ev, { childList: true, subtree: true, characterData: true });
+    });
+  }
+
   function ready() {
-    buildDock('challenge');
-    buildDock('etiquette');
     bindDockClicks();
     bindFreeTyping();
     autoRevealOptions();
+    bindEvalAutoTop();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ready);
   else ready();
@@ -16851,7 +17058,9 @@ function useAvatarDetail() {
   global.KL_setFilter = KL_setFilter;
   global.buildChapterBody = buildChapterBody;
   global.KL_toggleChapter = KL_toggleChapter;
+  global.KL_toggleChapterByAttr = KL_toggleChapterByAttr;
   global.KL_openDetail = KL_openDetail;
+  global.KL_openDetailByAttr = KL_openDetailByAttr;
   global.KL_closeDetail = KL_closeDetail;
   global.KL_pickAnswer = KL_pickAnswer;
   global.KL_jumpToPractice = KL_jumpToPractice;
@@ -16899,7 +17108,7 @@ function useAvatarDetail() {
       html += '  <div class="ap-group-title" style="color:#5d54c0;">' + g + '</div>';
       html += '  <div class="ap-grid">';
       tiles.forEach(function (a) {
-        html += '    <button class="ap-tile ' + (a.bad ? 'bad' : '') + '" onclick="AP_pickAction(' + JSON.stringify(a) + ')">';
+        html += '    <button class="ap-tile ' + (a.bad ? 'bad' : '') + '" onclick="AP_pickActionByAttr(this)" data-act-id="' + a.id + '">';
         html += '      <span class="ap-icon">' + a.icon + '</span>';
         html += '      <span class="ap-name">' + escapeHTML(a.name) + '</span>';
         html += '      <span class="ap-desc">' + escapeHTML(a.desc) + '</span>';
@@ -16926,19 +17135,34 @@ function useAvatarDetail() {
 
   function AP_pickAction(action) {
     closeActionPanel();
-    // 1) fill input prefix
-    var inpId = AP_TARGET && AP_TARGET.id ? AP_TARGET.id : 'etiquette-input';
-    var inp = document.getElementById(inpId);
+    // 0) 礼仪训练模式：点选直接走「标准示范 → 跟我做 → 教练点评」三段式，无需再点 发送
+    var targetId = AP_TARGET && AP_TARGET.id ? AP_TARGET.id : 'etiquette-input';
+    var isEtiquette = /etiquette/.test(targetId);
+    if (isEtiquette && typeof global.postAction === 'function') {
+      // postAction 内部已按 mode='etiquette' 走三段式；映射面板动作名 → 字典 keyword
+      var kw = null;
+      var idMap = { bow: '鞠躬', nod: '点头', shake: '摇头', sit: '坐下', stand: '起立',
+                     step: '前进一步', wave: '挥手', smile: '微笑', toast: '干杯',
+                     handshake: '握手', card: '递名片', sorry: '抱歉', phone: '看手机' };
+      // 面板 id 与字典 cls 对齐时直接用，否则用 action.name
+      if (idMap[action.id]) kw = idMap[action.id];
+      else if (window.DUILIAN_ACTIONS && window.DUILIAN_ACTIONS[action.name]) kw = action.name;
+      if (kw && window.DUILIAN_ACTIONS[kw]) {
+        global.postAction('etiquette', kw);
+        return;
+      }
+    }
+    // 1) fill input prefix（真实挑战模式：写入输入框等用户 发送）
+    var inp = document.getElementById(targetId);
     if (inp) {
       var tag = '[' + action.name + '] ';
-      // 若输入框已有内容且不以本动作开头，则在前面插入动作前缀
       var cur = inp.value || '';
       if (!cur.startsWith(tag)) {
         inp.value = tag + cur;
       }
       try { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); } catch (e) {}
     }
-    // 2) 触发 NPC 动作
+    // 2) 触发 NPC 动作（仅做预览动画，等发送/Enter 走完整流程）
     var stageId = AP_TARGET && AP_TARGET.stageId ? AP_TARGET.stageId : null;
     var who = AP_TARGET && AP_TARGET.who ? AP_TARGET.who : 'user';
     if (stageId && global.Stage3D && global.Stage3D.setAction) {
@@ -16957,9 +17181,18 @@ function useAvatarDetail() {
     }
   }
 
+  // data-id 包裹函数：避免 onclick 内嵌 JSON 双引号截断属性（历史 bug）
+  function AP_pickActionByAttr(el) {
+    var id = el && el.getAttribute('data-act-id');
+    if (!id) return;
+    var a = ACTIONS.filter(function (x) { return x.id === id; })[0];
+    if (a) AP_pickAction(a);
+  }
+
   global.openActionPanel = openActionPanel;
   global.closeActionPanel = closeActionPanel;
   global.AP_pickAction = AP_pickAction;
+  global.AP_pickActionByAttr = AP_pickActionByAttr;
 
   // ============================================================
   // CoachFeedback — 教练实时评价浮层

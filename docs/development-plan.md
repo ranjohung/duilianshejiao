@@ -275,3 +275,18 @@
 | 动作指令全屏面板 | ✅ 原型已接入 | `modal-action-panel` 按四类分组（姿态 / 礼仪 / 表情 / 互动），选中后自动写入输入框并触发 `Stage3D.setAction` |
 | 真实挑战模式无预选项 | ✅ 原型已接入 | A/B/C 渲染跳过；保留 🎬 动作按钮 + 自由输入 |
 | 浏览器回归 | ✅ 已验证 | 8 项既有 + 6 项新增（气泡 / 坐姿 / 动作面板 / 动画 / 教练浮层 / Carousel）通过 |
+
+## 13. 2026-09-10 训练界面固定分屏 + 角色动作示范复核（追加）
+
+| 检查项 | 状态 | 证据与说明 |
+|---|---|---|
+| 3D 场景滚动时固定不动 | ✅ 已验证 | 礼仪模态：滚动前后舞台 `top` 恒 167px、输入框 `top` 恒 396px（`stageMoved:false` / `inputMoved:false`）；舞台移出滚动容器至 `.ct-fixed.ct-stage-fixed`，仅 `.ct-scroll` 可滚 |
+| 提示 + 分析统一移到输入框下方 | ✅ 已验证 | DOM/几何顺序：输入(396) < 教练分析(464) < 教学提示 A/B/C(531)；两模态均适用 |
+| 教练分析更新自动回顶可见 | ✅ 原型已接入 | `bindEvalAutoTop` 用 MutationObserver 监听评价节点，更新时把 `.ct-scroll.scrollTop` 归零 |
+| NPC 按用户动作指令示范标准动作 | ✅ 已验证 | 礼仪三段式时间轴：218ms NPC `animating-bow` + `✨标准动作示范` Banner + 要点卡 → 1957ms 用户 `animating-bow` + 徽标 → 3712ms NPC `animating-nod` |
+| 真实挑战不出现示范（保持考试定位） | ✅ 已验证 | 挑战模式动作：无 `.action-demo-banner`、无 `.action-form-card`，仅用户动画 + NPC 点头 |
+| 动作字典补齐 `form` 标准要点 | ✅ 原型已接入 | `window.DUILIAN_ACTIONS` 13 项（含新增反面动作「看手机」）均带 `form[]` 要领数组 |
+| 动作面板点选修复（引号截断） | ✅ 已验证 | tile 改 `data-act-id` + `AP_pickActionByAttr(this)`；点选「握手」→ `✨标准动作示范·伸手握手` + NPC `animating-wave`；礼仪下直接触发示范 |
+| 缺失 CSS 补齐（桌 / 坐姿 / 动作动画 / 徽标） | ✅ 已验证 | `.photo-desk`（宽 193×高 53）、`.photo-char.seated`、`@keyframes actBow…actTurn`、`.photo-action` 已补；挑战 `desk:true`、`npcSeated:true` |
+| 课程库点击链修复 | ✅ 已验证 | `KL_toggleChapterByAttr` / `KL_openDetailByAttr` 补 global 导出后：9 章节、展开 148 课、详情 5 模块（情境/原则/公式/自测/CTA）全部可点 |
+| 全流程无报错 | ✅ 已验证 | 知识库 / 礼仪 / 挑战三链路 `pageerror` 为空 |
