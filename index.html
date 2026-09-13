@@ -3144,6 +3144,7 @@ h1,h2,h3 { text-wrap:balance; }
 <script src="knowledge_base/raw_course_cards.js"></script>
 <script src="knowledge_base/extra_course_cards.js"></script>
 <script src="libs/three.min.js"></script>
+<script src="libs/etiquette_anim_data.js"></script>
 <script src="libs/game_stage3d.js"></script>
 <script>
 // ===== 全局状态 =====
@@ -4558,7 +4559,10 @@ function EM_showPaywall(context) {
   const box = document.getElementById('paywall-content');
   if (!box) { showToast('今日免费次数已用完，开通会员可无限训练'); return; }
   const adLeft = Math.max(0, EM.AD_DAILY_LIMIT - (Number(userData.adTrainsUsed) || 0));
-  const ctxTitle = context === 'knowledge' ? '去对练需要训练次数' : '继续训练';
+  const ctxTitle = context === 'knowledge' ? '去对练需要训练次数'
+    : context === 'etiquette' ? '礼仪训练需要训练次数'
+    : context === 'challenge' ? '真实挑战需要训练次数'
+    : '继续训练';
   let html = '';
   html += '<div class="bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl p-4 text-white text-center mb-4">';
   html += '  <div class="text-sm opacity-85">今日 ' + EM.FREE_DAILY_TRAINS + ' 次免费训练已用完</div>';
@@ -4659,6 +4663,38 @@ function EM_sceneTier(scene) {
   if (scene.tier === 'advanced') return 'advanced';
   if (scene.stage >= 2) return 'advanced';
   return 'basic';
+}
+
+// ===== 3D 高成本内容（礼仪训练/真实挑战）体验规则（§18.3 v2.5.1） =====
+// 每类保留 1 个体验项目免费（消耗每日训练次数，免费层 3 次/日+付费墙三选一）；
+// 其余项目高级会员专属；体验项目无视积分解锁门槛，保证免费用户始终有体验入口。
+EM.TRIAL_ETIQUETTE_ID = 9001;   // 礼仪体验项目：咖啡厅的邂逅（etiquetteLevels 第一关）
+EM.TRIAL_CHALLENGE_ID = 9001;   // 挑战体验项目：真实挑战列表第一项
+
+function EM_isTrial3DProject(kind, id) {
+  return Number(id) === (kind === 'challenge' ? EM.TRIAL_CHALLENGE_ID : EM.TRIAL_ETIQUETTE_ID);
+}
+
+// 统一闸门：pro 全部解锁；体验项目走每日次数闸门（含付费墙）；其余项目引导升级高级会员。
+function EM_gate3DProject(kind, id, resumeFn) {
+  if (EM_isPro()) return true;
+  if (!EM_isTrial3DProject(kind, id)) {
+    showToast(kind === 'challenge'
+      ? '👑 该真实挑战为高级会员专属；「' + EM_trialLabel(kind) + '」可免费体验'
+      : '👑 该礼仪训练为高级会员专属；「' + EM_trialLabel(kind) + '」可免费体验');
+    goToMember();
+    return false;
+  }
+  return EM_checkTrainGate(kind, resumeFn);
+}
+
+function EM_trialLabel(kind) {
+  if (kind === 'challenge') {
+    const c = (typeof challenges !== 'undefined' && Array.isArray(challenges)) ? challenges.find(function (x) { return x && x.id === EM.TRIAL_CHALLENGE_ID; }) : null;
+    return c ? '《' + c.title + '》' : '体验项目';
+  }
+  const l = (typeof etiquetteLevels !== 'undefined' && Array.isArray(etiquetteLevels)) ? etiquetteLevels.find(function (x) { return x && x.id === EM.TRIAL_ETIQUETTE_ID; }) : null;
+  return l ? '《' + l.title + '》' : '体验项目';
 }
 
 function EM_buyAdvancedScene(sceneId) {
@@ -7305,7 +7341,8 @@ function renderMemberCenter() {
       { label: '单章永久解锁', free: '¥6·200币', basic: '已含', pro: '已含' },
       { label: '自测AI详细批改', free: '20币/次', basic: '免费', pro: '免费' },
       { label: '深度复盘', free: '15币/次', basic: '15币/次', pro: '免费' },
-      { label: '3D礼仪训练', free: '❌', basic: '❌', pro: '✅' },
+      { label: '礼仪训练（3D）', free: '体验1项·3次/日', basic: '体验1项', pro: '全部' },
+      { label: '真实挑战（3D）', free: '体验1项·3次/日', basic: '体验1项', pro: '全部' },
       { label: '原始资料下载', free: '❌', basic: '❌', pro: '✅' },
       { label: '进阶场景', free: '100币/个', basic: '期内免费', pro: '期内免费' },
       { label: '月赠社交币', free: '—', basic: '300', pro: '800' }
@@ -14457,7 +14494,9 @@ function renderChallenges(isModal = false) {
     const progress = status ? status.progress : 0;
     const progressPercent = Math.min(100, (progress / challenge.target_count) * 100);
 
-    const isUnlocked = challenge.unlocked || currentPoints >= (challenge.unlockScore || 0);
+    // v2.5.1（§18.3）：体验挑战无视积分解锁门槛；其余项目维持积分解锁 + 高级会员专属判定
+    const isTrialChallenge = EM_isTrial3DProject('challenge', challenge.id);
+    const isUnlocked = isTrialChallenge || challenge.unlocked || currentPoints >= (challenge.unlockScore || 0);
 
     let actionBtn = '';
     if (evidencePending) {
@@ -14481,7 +14520,8 @@ function renderChallenges(isModal = false) {
         </div>
       `;
     } else if (isUnlocked) {
-      actionBtn = `<button onclick="startChallenge(${challenge.id})" class="w-full py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-xs font-medium rounded-lg hover:opacity-90 transition-opacity">开始挑战</button>`;
+      const trialLabel = isTrialChallenge && !EM_isPro() ? '免费体验（每日 3 次）' : '开始挑战';
+      actionBtn = `<button onclick="startChallenge(${challenge.id})" class="w-full py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-xs font-medium rounded-lg hover:opacity-90 transition-opacity">${trialLabel}</button>`;
     } else {
       actionBtn = `<button disabled class="w-full py-2 bg-gray-100 text-gray-400 text-xs font-medium rounded-lg cursor-not-allowed">🔒 需${challenge.unlockScore}积分</button>`;
     }
@@ -14498,6 +14538,7 @@ function renderChallenges(isModal = false) {
               <div class="flex items-center gap-2">
                 <span class="font-medium text-gray-800">${challenge.title}</span>
                 ${challenge.creator === '官方推荐' ? '<span class="px-1.5 py-0.5 bg-yellow-100 text-yellow-600 text-xs rounded-full">官方推荐</span>' : ''}
+                ${isTrialChallenge && !EM_isPro() ? '<span class="px-1.5 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">🎁 免费体验</span>' : ''}
                 ${isCompleted ? '<span class="px-1.5 py-0.5 bg-green-100 text-green-600 text-xs rounded-full">已完成</span>' : ''}
                 ${evidencePending ? '<span class="px-1.5 py-0.5 bg-amber-100 text-amber-700 text-xs rounded-full">待审核</span>' : ''}
               </div>
@@ -14565,10 +14606,14 @@ function startChallenge(challengeId) {
   }
 
   const currentPoints = getLevelProgressPoints();
-  if (!challenge.unlocked && currentPoints < (challenge.unlockScore || 0)) {
+  // v2.5.1（§18.3）：真实挑战保留 1 个免费体验项目——无视积分解锁门槛，消耗每日训练次数；其余项目高级会员专属
+  const isTrialChallenge = EM_isTrial3DProject('challenge', challengeId);
+  if (!isTrialChallenge && !challenge.unlocked && currentPoints < (challenge.unlockScore || 0)) {
     alert(`🔒 该挑战未解锁！\n\n需要 ${challenge.unlockScore} 积分才能解锁，当前 ${currentPoints} 积分。\n\n继续训练获得更多积分吧！`);
     return;
   }
+  if (!EM_gate3DProject('challenge', challengeId, function () { startChallenge(challengeId); })) return;
+  EM_accountTrainStart();
 
   closeModal('challenge');
 
@@ -16111,7 +16156,15 @@ function renderEtiquetteLevelList() {
   const root = $('etiquette-level-list');
   if (!root) return;
   const badge = (quality) => quality === 'good' ? 'bg-green-100 text-green-600' : quality === 'neutral' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-600';
-  root.innerHTML = etiquetteLevels.map((level, i) => `
+  const isProUser = EM_isPro();
+  root.innerHTML = etiquetteLevels.map((level, i) => {
+    const isTrial = EM_isTrial3DProject('etiquette', level.id);
+    // v2.5.1（§18.3）：体验项目免费可玩（消耗每日次数）；其余项目高级会员专属
+    const trialTag = isTrial && !isProUser ? '<span class="px-1.5 py-0.5 bg-green-100 text-green-700 text-[10px] rounded-full">🎁 免费体验</span>' : '';
+    const actionBtn = (isTrial || isProUser)
+      ? `<button onclick="startEtiquetteLevel(${level.id})" class="w-full py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium rounded-xl hover:opacity-90 transition-opacity">${isTrial && !isProUser ? '免费体验（每日 3 次）' : '开始训练'}</button>`
+      : `<button onclick="goToMember()" class="w-full py-2.5 bg-purple-100 text-purple-600 text-sm font-medium rounded-xl hover:bg-purple-200 transition-colors">👑 高级会员专属</button>`;
+    return `
     <div class="bg-white rounded-2xl p-4 shadow-sm border border-amber-100">
       <div class="flex items-center justify-between mb-2">
         <div class="flex items-center gap-2">
@@ -16124,12 +16177,14 @@ function renderEtiquetteLevelList() {
         <span class="px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] rounded-full">${level.worldName}</span>
       </div>
       <div class="text-xs text-gray-600 mb-2">🎯 ${level.goal}</div>
-      <div class="flex items-center gap-3 text-xs text-gray-400 mb-3">
+      <div class="flex items-center gap-3 text-xs text-gray-400 mb-3 flex-wrap">
         <span>📌 ${level.focus}</span>
         <span class="flex items-center gap-1">${level.options.map(o => `<span class="px-1.5 py-0.5 rounded ${badge(o.quality)}">${o.label}</span>`).join('')} 选项参考</span>
       </div>
-      <button onclick="startEtiquetteLevel(${level.id})" class="w-full py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium rounded-xl hover:opacity-90 transition-opacity">开始训练</button>
-    </div>`).join('');
+      <div class="flex items-center gap-1.5 mb-2">${trialTag}${!isTrial && !isProUser ? '<span class="text-[10px] text-gray-400">开通高级会员解锁全部礼仪训练</span>' : ''}</div>
+      ${actionBtn}
+    </div>`;
+  }).join('');
 }
 
 function getEtiquetteSceneMeta(level) {
@@ -16156,14 +16211,8 @@ function getEtiquetteSceneLabel(level) {
 function startEtiquetteLevel(levelId) {
   const level = etiquetteLevels.find(l => l.id === levelId);
   if (!level) return;
-  // v2.5（§18.3）：3D 礼仪训练为高级会员专属，坚决不进免费池
-  if (!EM_isPro()) {
-    showToast('🎭 3D 礼仪训练为高级会员专属，开通高级会员后体验');
-    goToMember();
-    return;
-  }
-  // v2.5（§8.3）：礼仪训练同样消耗当日训练次数（学习卡片「去对练」同源）
-  if (!EM_checkTrainGate('etiquette', function () { startEtiquetteLevel(levelId); })) return;
+  // v2.5.1（§18.3）：礼仪训练保留 1 个免费体验项目（消耗每日训练次数），其余项目高级会员专属
+  if (!EM_gate3DProject('etiquette', levelId, function () { startEtiquetteLevel(levelId); })) return;
   EM_accountTrainStart();
   closeModal('etiquette');
   window.currentEtiquetteLevel = level;
@@ -16508,13 +16557,16 @@ initApp();
     '起立': { cls: 'raise', label: '起身相迎', pass: true,  score: 2,
       form: ['对方入场或上级到来时立即起身', '起身动作从容，不慌不急'],
       tip: '对方入场或领导到来时起身相迎，是得体的礼节。' },
-    '递名片': { cls: 'bow', label: '双手递名片', pass: true,  score: 3,
-      form: ['双手奉上，名片字朝对方', '配合简短自我介绍：姓名+单位'],
-      tip: '双手递名片、字朝对方，体现出尊重与专业。' },
-    '握手': { cls: 'wave', label: '伸手握手', pass: true,  score: 2,
-      form: ['主动伸手、力度适中、虎口相对', '目光注视、握完轻收不甩手'],
-      tip: '先伸手、力度适中、目光注视对方，握完轻收。' },
-    '干杯': { cls: 'raise', label: '举杯示意', pass: true,  score: 2,
+    '递名片': { cls: 'card', label: '双手递名片', pass: true,  score: 3,
+      form: ['左手托名片、字朝对方，右手轻扶', '递至对方胸前，配合简短自我介绍：姓名+单位', '对方接过后收至胸前注视，不随手塞兜'],
+      tip: '双手递名片、字朝对方，递到对方方便承接的高度，体现出尊重与专业。' },
+    '握手': { cls: 'handshake', label: '伸手握手', pass: true,  score: 3,
+      form: ['主动伸手、虎口相对、力度适中', '目光注视对方，握 2-3 秒轻收不甩手', '对方未伸手前不强行抓握'],
+      tip: '先伸手、目光注视、力度适中，握完轻收——IK 会把你的手送到对方手里。' },
+    '引领': { cls: 'lead', label: '引领手势', pass: true,  score: 2,
+      form: ['手掌并拢、斜前 45° 示意方向', '目光随手势方向，另一手自然下垂', '引领时走在客人左前方半步'],
+      tip: '五指并拢斜前示意，比用手指指点点礼貌得多。' },
+    '干杯': { cls: 'toast', label: '举杯示意', pass: true,  score: 2,
       form: ['杯沿略低于长辈或上级', '轻碰即可，不必用力过猛'],
       tip: '举杯示意即可，杯沿略低于长辈/上级。' },
     '挥手': { cls: 'wave', label: '挥手打招呼', pass: true,  score: 2,
@@ -17796,8 +17848,9 @@ function useAvatarDetail() {
     { id: 'step', icon: '🚶', name: '前进一步', desc: '主动走近一步', group: '姿态' },
     // 礼仪
     { id: 'handshake', icon: '🤝', name: '握手', desc: '主动伸手握手', group: '礼仪' },
-    { id: 'bow', icon: '🙇', name: '鞠躬', desc: '点头致意', group: '礼仪' },
+    { id: 'bow', icon: '🙇', name: '鞠躬', desc: '30° 致意鞠躬', group: '礼仪' },
     { id: 'card', icon: '💳', name: '递名片', desc: '把名片双手递上', group: '礼仪' },
+    { id: 'lead', icon: '🧭', name: '引领', desc: '手势示意方向', group: '礼仪' },
     { id: 'toast', icon: '🥂', name: '干杯', desc: '举杯敬酒', group: '礼仪' },
     // 表情
     { id: 'smile', icon: '🙂', name: '微笑', desc: '嘴角上扬', group: '表情' },
@@ -17858,7 +17911,7 @@ function useAvatarDetail() {
       var kw = null;
       var idMap = { bow: '鞠躬', nod: '点头', shake: '摇头', sit: '坐下', stand: '起立',
                      step: '前进一步', wave: '挥手', smile: '微笑', toast: '干杯',
-                     handshake: '握手', card: '递名片', sorry: '抱歉', phone: '看手机' };
+                     handshake: '握手', card: '递名片', lead: '引领', sorry: '抱歉', phone: '看手机' };
       // 面板 id 与字典 cls 对齐时直接用，否则用 action.name
       if (idMap[action.id]) kw = idMap[action.id];
       else if (window.DUILIAN_ACTIONS && window.DUILIAN_ACTIONS[action.name]) kw = action.name;

@@ -388,6 +388,7 @@
 | 开发计划 v2.5 | ✅ 已完成 | 本节 + P0-5 更新 |
 | 软硬通货钱包（积分/社交币/券隔离） | ✅ 原型已实现（2026-09-13） | `EM` 模块（index.html 主脚本）：EM_coins/EM_addCoins/EM_spendCoins + coinLedger 流水；积分与社交币互不可兑 |
 | 每日 3 次免费训练 + 付费墙 | ✅ 原型已实现（2026-09-13） | `EM_checkTrainGate/EM_accountTrainStart`（开始即占用）；第4次起 `modal-paywall`（EM_showPaywall：10币续练/看广告1次/开会员） |
+| 3D 礼仪/真实挑战体验规则（v2.5.1） | ✅ 原型已实现（2026-09-13） | `EM_gate3DProject`：每类 1 个体验项目（礼仪/挑战 id=9001）免费、消耗每日次数（EM_checkTrainGate 同池）、无视 unlockScore；其余项目高级会员专属（列表标记“👑 高级会员专属”，点击引导 goToMember）；pro 全解锁；回归 `regress_economy_v25.js` 38/38 含本规则 9 项 |
 | 深度复盘付费墙 | ✅ 原型已实现（2026-09-13） | `unlockFullAnalysis` 改 15 社交币/次（EM_isPro 免费；穿梭券路径下架，券回归剧情分支专职） |
 | 场景双轨解锁 | ✅ 原型已实现（2026-09-13） | `EM_sceneTier`：stage≥2=advanced；advanced=100币买断（EM_buyAdvancedScene，券不可用）或会员期内直接访问；basic 维持积分+券 |
 | 学习卡片门控 | ✅ 原型已实现（2026-09-13） | EM_isTrialCard（每章节第1张 ok 卡）；EM_cardLocked 锁定渲染（VIP/200币/¥6 三按钮）；EM_unlockChapterByCoins/ByCash；原始资料 EM_isPro 专属；EM_payAiReview 20币/会员免费；KL_jumpToPractice 接入次数闸门 |
@@ -425,6 +426,6 @@
 ### 19.2 验收链路（headless）
 
 - [x] Blender 后台自检：脚本执行、产物落盘（`tools/_blender_selfcheck.txt`）
-- [ ] `blender_automation.py` 校准零违例、GLB + 动画曲线表双产物生成
-- [ ] 九环境截图：双方互看、鞠躬三档角度、握手触达 ≤0.06m 不穿模、名片移交
-- [ ] 礼仪 9001 真实 UI + `regress_web.js` 四链路回归绿
+- [x] `blender_automation.py` 校准零违例、GLB + 动画曲线表双产物生成（STATUS=OK，7 clips，0 违例）
+- [x] 九环境截图：双方互看、鞠躬三档角度（15/30/45° 精确）、握手触达 ≤0.06m 不穿模（实测 minGap=0.028m）、名片移交
+- [x] 礼仪 9001 真实 UI + `regress_web.js` 四链路回归绿（9001 需测试旁路 v2.5 会员门禁：置 `userData.member`）

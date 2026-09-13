@@ -112,12 +112,81 @@ function check(name, cond, detail) {
   check('会员训练不限次不计数', member.unlimited);
   check('高级会员开通+跨月赠800币+pro判定', member.pro.tier === 'pro' && member.pro.pro && member.pro.coins === 1140, JSON.stringify(member.pro));
 
-  // ===== 7) 3D礼仪高级会员专属（§18.3） =====
-  const etiquetteGate = await p.evaluate(() => {
+  // ===== 7) 3D 体验项目规则（§18.3 v2.5.1：礼仪/挑战各留 1 个免费体验项目，其余高级会员专属） =====
+  const trial3d = await p.evaluate(() => {
+    const r = {};
+    // headless 未走登录初始化时 challenges 为空数组——从剧情模板填充最小数据
+    if ((!Array.isArray(challenges) || !challenges.length) && typeof realChallengeLevels !== 'undefined') {
+      challenges = realChallengeLevels.map(level => ({
+        id: level.id, title: level.title, description: level.description, icon: level.icon,
+        category: level.category, difficulty: level.difficulty, difficultyStars: level.difficultyStars,
+        target_count: 1, reward_points: level.reward_points, userStatus: null, unlocked: true,
+        unlockScore: 0, completed: false, bestScore: 0, creator: '回归', source: 'mock',
+        requiresEvidence: false, sceneMeta: getChallengeSceneMeta(level), gameMeta: level
+      }));
+    }
+    userData.memberTier = 'free'; userData.memberTierExpiresAt = '';
+    userData.dailyTrainingCount = 0; userData.bonusTrains = 0;
+    delete userData.challengeEvidence;
+    // 免费用户：体验项目（9001）可进入，开始即占 1 次额度
+    startEtiquetteLevel(EM.TRIAL_ETIQUETTE_ID);
+    r.etTrialEnter = !!(window.currentEtiquetteLevel && window.currentEtiquetteLevel.id === EM.TRIAL_ETIQUETTE_ID);
+    r.etCounted = userData.dailyTrainingCount === 1;
+    // 免费用户：非体验礼仪项目拦截（引导升级，不进入训练）
+    window.currentEtiquetteLevel = null;
+    startEtiquetteLevel(9002);
+    r.etOtherBlocked = !window.currentEtiquetteLevel;
+    // 免费用户：挑战体验项目无视 unlockScore 可进入
+    startChallenge(EM.TRIAL_CHALLENGE_ID);
+    r.chTrialEnter = window.currentChallengeId === EM.TRIAL_CHALLENGE_ID;
+    // 免费用户：其他挑战拦截
+    const otherCh = challenges.find(c => c.id !== EM.TRIAL_CHALLENGE_ID);
+    window.currentChallengeId = null;
+    startChallenge(otherCh.id);
+    r.chOtherBlocked = window.currentChallengeId !== otherCh.id;
+    closeModal('challenge');
+    // 列表标记：体验项目“免费体验”，其余“高级会员专属”
+    renderEtiquetteLevelList();
+    const etListText = $('etiquette-level-list').textContent || '';
+    r.etListTrial = etListText.includes('免费体验');
+    r.etListPro = etListText.includes('高级会员专属');
+    // 免费次数用完：体验项目也弹付费墙三选一
+    userData.dailyTrainingCount = 3; userData.bonusTrains = 0;
+    window.currentEtiquetteLevel = null;
+    startEtiquetteLevel(EM.TRIAL_ETIQUETTE_ID);
+    r.etWallOnExhaust = document.getElementById('modal-paywall').style.display !== 'none';
+    closeModal('paywall');
+    // basic 会员：体验项目不限次可玩，其他项目仍拦截
     userData.memberTier = 'basic'; userData.memberTierExpiresAt = new Date(Date.now() + 86400000).toISOString();
-    return { basicPro: EM_isPro() };
+    userData.dailyTrainingCount = 5; userData.bonusTrains = 0;
+    startEtiquetteLevel(EM.TRIAL_ETIQUETTE_ID);
+    r.basicTrialUnlimited = !!(window.currentEtiquetteLevel && window.currentEtiquetteLevel.id === EM.TRIAL_ETIQUETTE_ID);
+    window.currentEtiquetteLevel = null;
+    startEtiquetteLevel(9002);
+    r.basicOtherBlocked = !window.currentEtiquetteLevel;
+    // pro 会员：全部解锁
+    userData.memberTier = 'pro'; userData.memberTierExpiresAt = new Date(Date.now() + 86400000).toISOString();
+    startEtiquetteLevel(9002);
+    r.proEtAll = !!(window.currentEtiquetteLevel && window.currentEtiquetteLevel.id === 9002);
+    startChallenge(otherCh.id);
+    r.proChAll = window.currentChallengeId === otherCh.id;
+    closeModal('challenge');
+    // 权益表同步
+    userData.memberTier = 'free'; userData.memberTierExpiresAt = '';
+    goToMember();
+    r.benefits3D = ($('member-benefits').textContent || '').includes('体验1项');
+    closeModal('member');
+    return r;
   });
-  check('基础会员不等于高级权益', etiquetteGate.basicPro === false);
+  check('免费用户可进礼仪体验项目并占用次数', trial3d.etTrialEnter && trial3d.etCounted, JSON.stringify(trial3d));
+  check('免费用户非体验礼仪项目被拦截', trial3d.etOtherBlocked);
+  check('免费用户挑战体验项目无视门槛', trial3d.chTrialEnter);
+  check('免费用户其他挑战被拦截', trial3d.chOtherBlocked);
+  check('礼仪列表标记体验/专属', trial3d.etListTrial && trial3d.etListPro);
+  check('体验项目次数用完弹付费墙', trial3d.etWallOnExhaust);
+  check('基础会员体验项目不限次/其他仍拦截', trial3d.basicTrialUnlimited && trial3d.basicOtherBlocked);
+  check('高级会员礼仪挑战全部解锁', trial3d.proEtAll && trial3d.proChAll);
+  check('权益表同步体验规则', trial3d.benefits3D);
 
   // ===== 8) 场景双轨：advanced=100币（§18.3） =====
   const sceneTier = await p.evaluate(() => {
