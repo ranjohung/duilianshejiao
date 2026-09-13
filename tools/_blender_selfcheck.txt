@@ -1,0 +1,2 @@
+BLENDER_OK 5.2.1 LTS | win32 | 2026-09-13 09:37:22
+gltf_exporter=False

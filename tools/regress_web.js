@@ -74,7 +74,8 @@ const NO_BLUR = '*{backdrop-filter:none !important;-webkit-backdrop-filter:none 
     const s2 = Math.round(st.getBoundingClientRect().top);
     const i2 = Math.round(inp.getBoundingClientRect().top);
     return {
-      isPhoto: st.classList.contains('is-photo'),
+      is3d: st.classList.contains('is-3d'),
+      has3dCanvas: !!st.querySelector('.stage3d-canvas'),
       stageFixed: s1 === s2, inputFixed: i1 === i2,
       hasActionBtn: !!document.querySelector('.btn-action-trigger'),
       options: document.querySelectorAll('#etiquette-options .option-card').length
@@ -95,9 +96,8 @@ const NO_BLUR = '*{backdrop-filter:none !important;-webkit-backdrop-filter:none 
   out.challenge = await p.evaluate(() => {
     const st = document.getElementById('challenge-3d-stage');
     return {
-      isPhoto: st.classList.contains('is-photo'),
-      desk: !!st.querySelector('.photo-desk'),
-      npcSeated: st.querySelector('.photo-npc') ? st.querySelector('.photo-npc').classList.contains('seated') : null,
+      is3d: st.classList.contains('is-3d'),
+      has3dCanvas: !!st.querySelector('.stage3d-canvas'),
       optionsSuppressed: document.querySelectorAll('#challenge-messages .option-card').length === 0
     };
   });

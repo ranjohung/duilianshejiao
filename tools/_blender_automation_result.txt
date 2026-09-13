@@ -1,0 +1,20 @@
+STATUS=OK
+{
+ "blender": "5.2.1 LTS",
+ "clips": [
+  "bow15(48f/2.0s)",
+  "bow30(60f/2.5s)",
+  "bow45(72f/3.0s)",
+  "nod(26f/1.1s)",
+  "lead(72f/3.0s)",
+  "greet(84f/3.5s)",
+  "idle(48f/2.0s)"
+ ],
+ "violations": [],
+ "outputs": {
+  "js": "F:\\开发软件项目文件\\对练社交\\libs\\etiquette_anim_data.js (90262 bytes)",
+  "glb": "F:\\开发软件项目文件\\对练社交\\assets\\models\\etiquette_actions.glb (474768 bytes)"
+ },
+ "gltf_exporter": true,
+ "elapsed_s": 1.6
+}
