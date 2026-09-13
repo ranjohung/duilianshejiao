@@ -414,6 +414,20 @@ h1,h2,h3 { text-wrap:balance; }
 .knowledge-detail-head .back{background:rgba(255,255,255,.18);color:#fff;width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;border:none;cursor:pointer;font-size:14px;}
 .knowledge-detail-head .head-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
 .knowledge-detail-head .head-tag{background:rgba(255,255,255,.22);color:#fff;font-size:10px;padding:3px 9px;border-radius:99px;}
+
+/* 内容主体（提取出的真实正文） */
+.knowledge-content-main{background:#fff;border:1px solid #ecebff;border-radius:14px;padding:16px 16px 14px;}
+.knowledge-content-main.empty{background:#fbfaff;border-style:dashed;}
+.knowledge-content-main .kc-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:1px dashed #ecebff;margin-bottom:10px;}
+.kc-title{font-size:14px;font-weight:700;color:#3a3258;}
+.kc-meta{font-size:11px;color:#a39ec0;}
+.kc-sec{margin-top:12px;}
+.kc-sec:first-of-type{margin-top:0;}
+.kc-sec-t{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.kc-sec-i{flex-shrink:0;width:22px;height:22px;background:linear-gradient(135deg,#6655ee,#9671ff);color:#fff;border-radius:50%;font-size:11px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;}
+.kc-sec-n{font-size:13.5px;font-weight:600;color:#3a3258;line-height:1.4;}
+.kc-sec-x{font-size:13px;color:#3a3754;line-height:1.85;white-space:pre-wrap;word-break:break-word;}
+.kc-note{margin-top:8px;font-size:11px;color:#a39ec0;border-top:1px dashed #ecebff;padding-top:8px;}
 .knowledge-scenario-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .knowledge-scenario{background:#fff;border-radius:14px;padding:12px;font-size:12px;line-height:1.55;border:1px solid #ece9ff;}
 .knowledge-scenario.bad{border-color:#ffc5cc;background:#fff6f7;color:#7a3d3d;}
@@ -433,6 +447,9 @@ h1,h2,h3 { text-wrap:balance; }
 .kd-chip{background:#f2f0ff;color:#5d54c0;font-size:11px;padding:4px 10px;border-radius:99px;border:1px solid #e6e2ff;}
 .kd-rawtext{font-size:12.5px;color:#3a3754;line-height:1.75;white-space:pre-wrap;background:#faf9ff;padding:10px 12px;border-radius:10px;margin-top:8px;max-height:300px;overflow:auto;}
 .kd-outline{margin-top:8px;border:1px solid #f0edff;border-radius:12px;overflow:hidden;background:#fff;position:relative;}
+.kd-outline-toggle{cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:space-between;}
+.kd-toggle-arrow{font-size:10px;color:#a39ec0;margin-left:6px;transition:transform .15s;}
+.kd-outline-wrap{background:#fbfaff;border-radius:10px;padding:6px 0;margin-top:4px;}
 .kd-outline.scrollable{max-height:300px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .kd-outline-stat{font-size:11px;color:#8b7fb0;margin-top:5px;line-height:1.5;}
 .kd-outline-item{display:flex;align-items:flex-start;gap:8px;padding:9px 10px;font-size:12.5px;color:#4b4566;border-bottom:1px solid #f6f4ff;background:#fff;cursor:pointer;transition:background .12s;}
@@ -2658,17 +2675,33 @@ h1,h2,h3 { text-wrap:balance; }
         <button onclick="closeModal('member')" class="text-gray-400 hover:text-gray-600 text-xl" data-page-node-id="XGg4CcPJmd45vm9L1FXzTG">✕</button>
       </div>
       <div class="flex-1 overflow-auto p-4" data-page-node-id="aeYeUBnKM9C2ov36UHgb5s">
-        <div class="bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl p-4 text-white mb-6 text-center" data-page-node-id="9mLgY2x7cuV7FG5t5jqi5n">
+        <div class="bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl p-4 text-white mb-4 text-center" data-page-node-id="9mLgY2x7cuV7FG5t5jqi5n">
           <div class="text-sm opacity-80 mb-1" data-page-node-id="Vr2gILdRbEv6lhjWqteF7t">当前会员</div>
           <div class="text-2xl font-bold" id="member-status" data-page-node-id="7opOvI6jArxpMo8lisTvln">免费版</div>
         </div>
-        <div class="bg-blue-50 text-blue-700 rounded-xl p-3 mb-4 text-xs" data-page-node-id="jJ68cQBP3vir2yNynVtlNM">当前为功能演示，支付通道尚未接入；点击方案不会扣款，也不会立即开通权益。</div>
+        <div class="bg-white border border-gray-100 rounded-xl p-3 mb-4 flex items-center justify-around text-center" id="member-wallet"></div>
+        <div class="bg-blue-50 text-blue-700 rounded-xl p-3 mb-4 text-xs" data-page-node-id="jJ68cQBP3vir2yNynVtlNM">当前为功能演示，支付通道尚未接入；点击方案不会真实扣款。</div>
         <div class="space-y-4" id="member-plans" data-page-node-id="1OCCGSWhDk69FpBSQRGXc6"></div>
+        <div class="mt-6">
+          <h4 class="text-sm font-semibold text-gray-800 mb-2">💎 社交币充值（1元=10币）</h4>
+          <div class="grid grid-cols-2 gap-2" id="member-coinpacks"></div>
+        </div>
         <div class="mt-6 bg-gray-50 rounded-xl p-4" data-page-node-id="aJ15FeGMGSEw07cpLYgc7R">
           <h4 class="text-sm font-semibold text-gray-800 mb-3" data-page-node-id="dGY4BF8CJrUbz7hA0TliXF">会员权益对比</h4>
           <div class="space-y-2 text-xs" id="member-benefits" data-page-node-id="Sz2KQGfGqN8VQFyHlIC3fM"></div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ===== v2.5 训练付费墙（§18.3 三选一） ===== -->
+  <div class="modal-overlay" id="modal-paywall" style="display:none">
+    <div class="modal-content">
+      <div class="flex items-center justify-between p-4 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-800">⚡ 继续训练</h3>
+        <button onclick="closeModal('paywall')" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+      </div>
+      <div class="p-4" id="paywall-content"></div>
     </div>
   </div>
 
@@ -3111,6 +3144,7 @@ h1,h2,h3 { text-wrap:balance; }
 <script src="knowledge_base/raw_course_cards.js"></script>
 <script src="knowledge_base/extra_course_cards.js"></script>
 <script src="libs/three.min.js"></script>
+<script src="libs/game_stage3d.js"></script>
 <script>
 // ===== 全局状态 =====
 let currentTab = 'home';
@@ -3694,6 +3728,7 @@ let trainingRoundIdx = 0;
 let trainingChoices = [];
 let trainingScore = 0;
 let trainingPointsGain = 0;
+let trainingGrade = '';   // v2.5 训练评价档位：A/B/C（§8.5），报告页展示用
 let showTrainingOptions = false;
 let showTrainingReport = false;
 let trainingFeedback = '';
@@ -4333,9 +4368,27 @@ function getLevelProgressPoints() {
 }
 
 // 会员权益必须有可验证的有效期；只有等级而没有到期时间时按免费层处理，避免过期/伪造会员永久放行。
+// v2.5：新阶梯 basic/pro（memberTier+memberTierExpiresAt）与 v2.4 旧档位并存；旧卡在有效期内按原权益执行（PRD §18.7）。
+function EM_memberTierActive() {
+  if (userData.memberTier !== 'basic' && userData.memberTier !== 'pro') return false;
+  const exp = new Date(userData.memberTierExpiresAt || '').getTime();
+  return Number.isFinite(exp) && exp >= Date.now();
+}
+
 function hasPaidMembership() {
+  if (EM_memberTierActive()) return true;
   const paidLevels = ['daily', 'weekly', 'monthly', 'yearly'];
   if (!paidLevels.includes(userData.member)) return false;
+  const expiry = userData.membershipExpiresAt || userData.membership_expire || userData.membershipExpire;
+  if (!expiry) return false;
+  const expiryTime = new Date(expiry).getTime();
+  return Number.isFinite(expiryTime) && expiryTime >= Date.now();
+}
+
+// 高级权益判定：新 pro 档；v2.4 旧月卡/年卡在有效期内视同高级权益（§18.7 已购旧卡按原权益执行）。
+function EM_isPro() {
+  if (EM_memberTierActive() && userData.memberTier === 'pro') return true;
+  if (!['monthly', 'yearly'].includes(userData.member)) return false;
   const expiry = userData.membershipExpiresAt || userData.membership_expire || userData.membershipExpire;
   if (!expiry) return false;
   const expiryTime = new Date(expiry).getTime();
@@ -4345,6 +4398,361 @@ function hasPaidMembership() {
 function isFreeTier() {
   return !hasPaidMembership();
 }
+
+// ===== v2.5 经济系统（EM = Economy Module，PRD §8.5 / §13.3 / §18） =====
+// 软硬通货隔离墙：points=成长积分（软通货，仅解锁基础场景/道具，每日严格限量）；
+// coins=社交币（硬通货，1元=10币，解锁高级内容的唯一货币）。穿梭券严禁兑换课程/高级场景。
+const EM = {
+  FREE_DAILY_TRAINS: 3,        // 免费每日训练次数（§8.3）
+  EXTRA_TRAIN_COINS: 10,       // 继续训练1次（§18.5）
+  AD_DAILY_LIMIT: 1,           // 广告换训练/日
+  DEEP_REVIEW_COINS: 15,       // 深度复盘/次（高级会员免费）
+  ADV_SCENE_COINS: 100,        // 进阶场景买断（永久，券不可用）
+  CHAPTER_COINS: 200,          // 单个大章节解锁（币）
+  CHAPTER_CASH: 6,             // 单个大章节解锁（¥）
+  AI_REVIEW_COINS: 20,         // 自测AI详细批改/次
+  SIGNIN_POINTS: 20,           // 每日签到积分（§8.5 上调）
+  SIGNIN_POINTS_CAP: 20,       // 签到类全天入账上限
+  TRAIN_GAIN: { A: 10, B: 5, C: -5 },   // 训练评价档位积分，C档倒扣
+  TRAIN_POINTS_CAP: 10,        // 训练类全天正向入账上限
+  DAILY_POINTS_CAP: 30,        // 全天积分入账上限（签到20+训练10）
+  MONTHLY_GIFT: { basic: 300, pro: 800 },
+  PLANS: {
+    basic: { label: '基础会员', icon: '⭐', monthly: 39,  yearly: 298, gift: 300, desc: '无限训练 · 全课程库畅读 · 自测AI批改免费' },
+    pro:   { label: '高级会员', icon: '👑', monthly: 99,  yearly: 698, gift: 800, desc: '基础全部 · 3D礼仪专属 · 深度复盘免费 · 原始资料' }
+  },
+  COIN_PACKS: [
+    { id: 'p60',   price: 6,   coins: 60,   bonus: 0 },
+    { id: 'p320',  price: 30,  coins: 320,  bonus: 20 },
+    { id: 'p750',  price: 68,  coins: 750,  bonus: 70 },
+    { id: 'p1480', price: 128, coins: 1480, bonus: 200 }
+  ]
+};
+
+// 旧存档/新账号统一补齐经济字段（loadData 与 resetAccountState 共用）。
+function EM_normalizeUser(u) {
+  if (!u || typeof u !== 'object') return u;
+  const defaults = {
+    coins: 0, memberTier: 'free', memberTierExpiresAt: '', memberGiftMonth: '',
+    dailyPointsDate: '', dailyPointsGained: 0, dailySigninPoints: 0, dailyTrainPoints: 0,
+    bonusTrainsDate: '', bonusTrains: 0, adTrainsDate: '', adTrainsUsed: 0,
+    unlockedChapters: [], coinLedger: []
+  };
+  Object.keys(defaults).forEach(k => { if (u[k] === undefined) u[k] = defaults[k]; });
+  if (!Array.isArray(u.unlockedChapters)) u.unlockedChapters = [];
+  if (!Array.isArray(u.coinLedger)) u.coinLedger = [];
+  return u;
+}
+
+function EM_syncDaily() {
+  const today = getDateKey();
+  if (userData.dailyPointsDate !== today) {
+    userData.dailyPointsDate = today;
+    userData.dailyPointsGained = 0;
+    userData.dailySigninPoints = 0;
+    userData.dailyTrainPoints = 0;
+  }
+  if (userData.bonusTrainsDate !== today) {
+    userData.bonusTrainsDate = today;
+    userData.bonusTrains = 0;
+  }
+  if (userData.adTrainsDate !== today) {
+    userData.adTrainsDate = today;
+    userData.adTrainsUsed = 0;
+  }
+}
+
+function EM_coins() { return Math.max(0, Math.floor(Number(userData.coins) || 0)); }
+
+function EM_logCoin(delta, reason) {
+  userData.coinLedger = Array.isArray(userData.coinLedger) ? userData.coinLedger : [];
+  userData.coinLedger.push({ t: Date.now(), delta: delta, reason: reason || '', balance: EM_coins() });
+  if (userData.coinLedger.length > 50) userData.coinLedger = userData.coinLedger.slice(-50);
+}
+
+function EM_addCoins(amount, reason) {
+  const value = Math.max(0, Math.floor(Number(amount) || 0));
+  if (value <= 0) return 0;
+  userData.coins = EM_coins() + value;
+  EM_logCoin(value, reason);
+  return value;
+}
+
+function EM_spendCoins(amount, reason) {
+  const value = Math.max(0, Math.floor(Number(amount) || 0));
+  if (EM_coins() < value) return false;
+  userData.coins = EM_coins() - value;
+  EM_logCoin(-value, reason);
+  return true;
+}
+
+// 积分入账统一入口：签到类全天≤20、训练类全天≤10、三星等奖励仅受全天30上限（§8.5）。
+// 内部仍走 addPoints，保留免费层累计2000上限。
+function EM_grantPoints(amount, kind) {
+  EM_syncDaily();
+  const value = Math.max(0, Math.floor(Number(amount) || 0));
+  if (value <= 0) return 0;
+  const poolKey = kind === 'signin' ? 'dailySigninPoints' : 'dailyTrainPoints';
+  if (Number(userData[poolKey]) !== Number(userData[poolKey])) userData[poolKey] = 0;
+  const cap = kind === 'signin' ? EM.SIGNIN_POINTS_CAP : (kind === 'train' ? EM.TRAIN_POINTS_CAP : EM.DAILY_POINTS_CAP);
+  const globalRemaining = Math.max(0, EM.DAILY_POINTS_CAP - (Number(userData.dailyPointsGained) || 0));
+  const poolRemaining = kind === 'bonus' ? globalRemaining : Math.max(0, cap - (Number(userData[poolKey]) || 0));
+  const allowed = Math.min(value, poolRemaining, globalRemaining);
+  if (allowed <= 0) return 0;
+  const actual = addPoints(allowed);
+  userData.dailyPointsGained = (Number(userData.dailyPointsGained) || 0) + actual;
+  if (kind !== 'bonus') userData[poolKey] = (Number(userData[poolKey]) || 0) + actual;
+  return actual;
+}
+
+// C档倒扣：可消费积分最低扣至0；等级进度积分（lifetimePoints）不受影响（§8.5）。
+function EM_deductPoints(amount, reason) {
+  const value = Math.max(0, Math.floor(Number(amount) || 0));
+  if (value <= 0) return 0;
+  const before = Math.max(0, Number(userData.points) || 0);
+  const after = Math.max(0, before - value);
+  userData.points = after;
+  userData.lastPointsDeduction = { t: Date.now(), amount: before - after, reason: reason || '训练评分C档倒扣' };
+  return before - after;
+}
+
+// 今日额外训练次数余额（第4次起需消耗已购/广告次数；开始训练即占用，退出不返还 §8.6）。
+function EM_bonusTrainAvailable() {
+  EM_syncDaily();
+  const used = Math.max(0, Number(userData.dailyTrainingCount) || 0);
+  const freeOver = Math.max(0, used - EM.FREE_DAILY_TRAINS);
+  return Math.max(0, (Number(userData.bonusTrains) || 0) - freeOver);
+}
+
+// 训练闸门：true=可开始；false=已弹付费墙（三选一：10币续练/看广告/开会员 §18.3）。
+function EM_checkTrainGate(context, resumeFn) {
+  if (hasPaidMembership()) return true;
+  EM_syncDaily();
+  EM._pendingTrain = (typeof resumeFn === 'function') ? resumeFn : null;
+  EM._paywallContext = context || 'train';
+  if (EM_bonusTrainAvailable() > 0) return true;
+  const used = Math.max(0, Number(userData.dailyTrainingCount) || 0);
+  if (used < EM.FREE_DAILY_TRAINS) return true;
+  EM_showPaywall(context || 'train');
+  return false;
+}
+
+// 开始训练即占用1次（§8.6）；会员不限次不计数。
+function EM_accountTrainStart() {
+  if (hasPaidMembership()) return;
+  userData.dailyTrainingCount = (Number(userData.dailyTrainingCount) || 0) + 1;
+  saveData();
+}
+
+function EM_resumePendingTrain() {
+  const pending = EM._pendingTrain;
+  EM._pendingTrain = null;
+  if (typeof pending === 'function') setTimeout(pending, 250);
+  else if (EM._paywallContext === 'knowledge') showToast('训练次数已到账，请再点击一次「去对练」');
+}
+
+// ===== 付费墙（§18.3 三选一） =====
+function EM_showPaywall(context) {
+  EM._paywallContext = context || 'train';
+  EM_syncDaily();
+  const box = document.getElementById('paywall-content');
+  if (!box) { showToast('今日免费次数已用完，开通会员可无限训练'); return; }
+  const adLeft = Math.max(0, EM.AD_DAILY_LIMIT - (Number(userData.adTrainsUsed) || 0));
+  const ctxTitle = context === 'knowledge' ? '去对练需要训练次数' : '继续训练';
+  let html = '';
+  html += '<div class="bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl p-4 text-white text-center mb-4">';
+  html += '  <div class="text-sm opacity-85">今日 ' + EM.FREE_DAILY_TRAINS + ' 次免费训练已用完</div>';
+  html += '  <div class="text-xl font-bold mt-1">' + ctxTitle + '，选择一种方式</div>';
+  html += '</div>';
+  html += '<div class="space-y-3">';
+  html += '  <div class="border border-gray-200 rounded-xl p-4 flex items-center justify-between">';
+  html += '    <div><div class="font-bold text-gray-800">💰 10 社交币续练 1 次</div><div class="text-xs text-gray-500 mt-0.5">当前余额：' + EM_coins() + ' 币</div></div>';
+  html += '    <button onclick="EM_paywallBuyTrain()" class="px-4 py-2 bg-amber-500 text-white text-sm font-semibold rounded-lg hover:bg-amber-600">续练</button>';
+  html += '  </div>';
+  html += '  <div class="border border-gray-200 rounded-xl p-4 flex items-center justify-between">';
+  html += '    <div><div class="font-bold text-gray-800">📺 看广告得 1 次</div><div class="text-xs text-gray-500 mt-0.5">每日限 1 次' + (adLeft <= 0 ? ' · 今日已用' : '') + '</div></div>';
+  html += '    <button onclick="EM_paywallAd()"' + (adLeft <= 0 ? ' disabled' : '') + ' class="px-4 py-2 bg-green-500 text-white text-sm font-semibold rounded-lg hover:bg-green-600' + (adLeft <= 0 ? ' opacity-50 cursor-not-allowed' : '') + '">观看</button>';
+  html += '  </div>';
+  html += '  <div class="border-2 border-indigo-300 bg-indigo-50 rounded-xl p-4 flex items-center justify-between">';
+  html += '    <div><div class="font-bold text-indigo-700">⭐ 开通会员无限练</div><div class="text-xs text-indigo-500 mt-0.5">基础 ¥39/月 · 全课程库畅读 · 月赠300币</div></div>';
+  html += '    <button onclick="EM_paywallMember()" class="px-4 py-2 bg-indigo-500 text-white text-sm font-semibold rounded-lg hover:bg-indigo-600">查看方案</button>';
+  html += '  </div>';
+  html += '</div>';
+  html += '<div class="bg-gray-50 text-gray-400 text-xs rounded-lg p-2 mt-3 text-center">演示环境：支付不产生真实扣款</div>';
+  box.innerHTML = html;
+  showModal('paywall');
+}
+
+function EM_paywallBuyTrain() {
+  if (!EM_spendCoins(EM.EXTRA_TRAIN_COINS, '继续训练1次')) {
+    showToast('社交币不足，可充值或开通会员');
+    EM_paywallMember();
+    return;
+  }
+  userData.bonusTrains = (Number(userData.bonusTrains) || 0) + 1;
+  saveData();
+  closeModal('paywall');
+  showToast('💰 已续练：今日可再训练 1 次');
+  EM_resumePendingTrain();
+}
+
+function EM_paywallAd() {
+  EM_syncDaily();
+  if ((Number(userData.adTrainsUsed) || 0) >= EM.AD_DAILY_LIMIT) { showToast('今日广告次数已用完'); return; }
+  userData.adTrainsUsed = (Number(userData.adTrainsUsed) || 0) + 1;
+  userData.bonusTrains = (Number(userData.bonusTrains) || 0) + 1;
+  saveData();
+  closeModal('paywall');
+  showToast('📺 广告观看完成（演示），获得 1 次训练');
+  EM_resumePendingTrain();
+}
+
+function EM_paywallMember() {
+  closeModal('paywall');
+  goToMember();
+}
+
+// 演示支付统一弹窗：明确告知不产生真实扣款（开发计划 §18.2 验收要求）。
+function EM_confirmDemoPay(title, detail, onOk) {
+  const ok = confirm(title + '\n\n' + detail + '\n\n（演示环境：不产生真实扣款，点击"确定"模拟支付成功）');
+  if (ok && typeof onOk === 'function') onOk();
+}
+
+// ===== 会员订阅（§18 三档阶梯，演示支付） =====
+function EM_subscribe(tier, cycle) {
+  const plan = EM.PLANS[tier];
+  if (!plan) return;
+  const price = cycle === 'yearly' ? plan.yearly : plan.monthly;
+  const days = cycle === 'yearly' ? 365 : 30;
+  const label = plan.label + (cycle === 'yearly' ? '·年费' : '·月费');
+  const monthKey = getDateKey().slice(0, 7);
+  const gift = userData.memberGiftMonth === monthKey ? 0 : plan.gift;
+  EM_confirmDemoPay('开通' + label, '价格：¥' + price + (gift > 0 ? ' · 开通即赠 ' + gift + ' 社交币（本月月赠）' : ' · 本月月赠币已发放，不重复赠送'), function () {
+    userData.memberTier = tier;
+    userData.memberTierExpiresAt = new Date(Date.now() + days * 86400000).toISOString();
+    if (gift > 0) {
+      userData.memberGiftMonth = monthKey;
+      EM_addCoins(gift, label + ' 月赠币');
+    }
+    saveData();
+    showToast('🎉 ' + label + ' 开通成功！' + (gift > 0 ? gift + ' 社交币已到账' : ''));
+    if (typeof renderMemberCenter === 'function') renderMemberCenter();
+    if (typeof renderProfile === 'function') renderProfile();
+  });
+}
+
+// ===== 社交币充值（§18.5 价格表，演示支付） =====
+function EM_buyCoins(packId) {
+  const pack = EM.COIN_PACKS.find(function (p) { return p.id === packId; });
+  if (!pack) return;
+  EM_confirmDemoPay('充值社交币', '¥' + pack.price + ' = ' + pack.coins + ' 币' + (pack.bonus ? '（含赠 ' + pack.bonus + ' 币）' : ''), function () {
+    EM_addCoins(pack.coins, '充值 ¥' + pack.price);
+    saveData();
+    showToast('💰 充值成功：+' + pack.coins + ' 社交币（演示）');
+    if (typeof renderMemberCenter === 'function') renderMemberCenter();
+  });
+}
+
+// ===== 场景双轨（§18.3）：basic=积分解锁；advanced=100币买断或会员期内直接访问 =====
+function EM_sceneTier(scene) {
+  if (!scene) return 'basic';
+  if (scene.tier === 'advanced') return 'advanced';
+  if (scene.stage >= 2) return 'advanced';
+  return 'basic';
+}
+
+function EM_buyAdvancedScene(sceneId) {
+  let scene = trainingScenes.find(function (s) { return s.id === sceneId; });
+  if (!scene) return;
+  if (scene.unlocked || hasPaidMembership()) { startTraining(sceneId); return; }
+  if (!EM_spendCoins(EM.ADV_SCENE_COINS, '买断进阶场景：' + scene.name)) {
+    if (confirm('社交币不足（需 ' + EM.ADV_SCENE_COINS + ' 币，当前 ' + EM_coins() + ' 币）。\n\n是否前往充值？')) {
+      goToMember();
+    }
+    return;
+  }
+  scene.unlocked = true;
+  saveData();
+  renderScenes();
+  showToast('✅ 进阶场景已永久解锁：' + scene.name);
+  startTraining(sceneId);
+}
+
+// ===== 学习卡片门控（§13.3） =====
+function EM_chapterOf(card) { return (card && card.category) || ''; }
+
+// 试读判定：trial===true → 免费；兜底=每分类第1张 status:ok 卡（§13.3 开发口径）。
+function EM_isTrialCard(card) {
+  if (!card) return false;
+  if (card.trial === true) return true;
+  const cat = EM_chapterOf(card);
+  if (!cat || typeof learningCards === 'undefined' || !Array.isArray(learningCards)) return false;
+  const first = learningCards.find(function (c) { return c && c.category === cat && c.status === 'ok'; });
+  return !!first && first.id === card.id;
+}
+
+function EM_isChapterUnlocked(card) {
+  const cat = EM_chapterOf(card);
+  return !!cat && Array.isArray(userData.unlockedChapters) && userData.unlockedChapters.includes(cat);
+}
+
+// 锁定判定：非试读 + 章节未买断 + 无有效会员 → 锁。
+function EM_cardLocked(card) {
+  if (!card) return false;
+  if (EM_isTrialCard(card)) return false;
+  if (EM_isChapterUnlocked(card)) return false;
+  if (hasPaidMembership()) return false;
+  return true;
+}
+
+function EM_unlockChapterByCoins(el) {
+  const cat = el && el.getAttribute('data-chapter');
+  if (!cat) return;
+  if (EM_isChapterUnlocked({ category: cat })) { showToast('该章节已解锁'); return; }
+  if (!EM_spendCoins(EM.CHAPTER_COINS, '解锁章节：' + cat)) {
+    showToast('社交币不足（需 ' + EM.CHAPTER_COINS + ' 币），可充值或开通基础会员畅学全部');
+    return;
+  }
+  userData.unlockedChapters = userData.unlockedChapters || [];
+  userData.unlockedChapters.push(cat);
+  saveData();
+  showToast('✅ 章节已永久解锁：' + cat);
+  if (typeof KL_rerenderDetail === 'function') KL_rerenderDetail();
+}
+
+function EM_unlockChapterByCash(el) {
+  const cat = el && el.getAttribute('data-chapter');
+  if (!cat) return;
+  EM_confirmDemoPay('解锁章节「' + cat + '」', '价格：¥' + EM.CHAPTER_CASH + '（永久解锁该章节全部课程）', function () {
+    userData.unlockedChapters = userData.unlockedChapters || [];
+    if (!userData.unlockedChapters.includes(cat)) userData.unlockedChapters.push(cat);
+    saveData();
+    showToast('✅ 章节已永久解锁：' + cat);
+    if (typeof KL_rerenderDetail === 'function') KL_rerenderDetail();
+  });
+}
+
+// 自测AI详细批改：会员免费；免费用户 20 币/次（§13.3）。
+function EM_canAiReview() { return hasPaidMembership(); }
+
+function EM_payAiReview() {
+  if (EM_canAiReview()) { EM_showAiReview(); return; }
+  if (!EM_spendCoins(EM.AI_REVIEW_COINS, '自测AI详细批改')) {
+    showToast('社交币不足（需 ' + EM.AI_REVIEW_COINS + ' 币），充值后使用或开通会员免费');
+    return;
+  }
+  saveData();
+  EM_showAiReview();
+}
+
+function EM_showAiReview() {
+  const d = (typeof KL !== 'undefined' && KL && KL._detail) || {};
+  const principle = d.principle || '先回应当下情境，再把话题推进一步。';
+  alert('🤖 AI 详细批改（演示）\n\n✔ 表达结构：贴合情境的推进式表达，符合「先肯定、再推进」原则。\n✔ 情绪温度：语气平和，无评价性词汇，适合当下关系。\n💡 改进建议：加入一个具体的请求或下一步动作，让对话更容易落地。\n\n本课核心原则：' + principle);
+}
+
+// 原始资料：高级会员专属福利（§18.4）。
+function EM_canAccessSource() { return EM_isPro(); }
 
 function addPoints(amount) {
   const value = Math.max(0, Number(amount) || 0);
@@ -4391,10 +4799,25 @@ function resetAccountState() {
     nickname: '用户', phone: '', password: '', points: 0, lifetimePoints: 0,
     streak: 0, member: 'free', level: '青铜学员',
     realNameVerified: false, realNameInfo: { name: '', idCard: '' }, avatar: '👤', avatarImage: '',
-    inviteCode: '', unlockedTemplateIds: [], favorability: 0, favorabilityPenaltyLog: [], lastFavorabilityPenalty: null, lastLoginTime: 0, trainingCount: 0, dailyTrainingCount: 0, dailyTrainingDate: '', dailyAnalysisUnlocked: 0,
+    // v2.5 经济系统字段（PRD §18）：coins=社交币（硬通货，1元=10币）；积分仍为软通货
+  coins: 0,
+  memberTier: 'free',           // free | basic | pro（v2.5 三档阶梯）
+  memberTierExpiresAt: '',      // ISO 时间，v2.5 会员到期
+  memberGiftMonth: '',          // 已发放月赠币的月份标记
+  dailyPointsDate: '',          // 每日积分入账账本（§8.5 全天≤30）
+  dailyPointsGained: 0,
+  dailySigninPoints: 0,         // 签到类全天≤20
+  dailyTrainPoints: 0,          // 训练类全天≤10
+  bonusTrainsDate: '',          // 今日已购/广告获得的额外训练次数
+  bonusTrains: 0,
+  adTrainsDate: '', adTrainsUsed: 0,  // 广告换训练每日限1次
+  unlockedChapters: [],         // 单章买断的章节（card.category，§13.3）
+  coinLedger: [],               // 社交币流水（原型账本）
+  inviteCode: '', unlockedTemplateIds: [], favorability: 0, favorabilityPenaltyLog: [], lastFavorabilityPenalty: null, lastLoginTime: 0, trainingCount: 0, dailyTrainingCount: 0, dailyTrainingDate: '', dailyAnalysisUnlocked: 0,
     hasSeenOnboarding: false, hasSelectedInitial: false, hasCompletedFirstTraining: false, hasStartedTrainingBefore: false,
     antiAddiction: { dailyTimeLimit: 0, continuousReminder: 0, usageDate: '', dailyTrainingSeconds: 0, forcedRestUntil: 0, lastReminderAt: 0 }
   };
+  EM_normalizeUser(userData);   // v2.5 经济字段默认值（coins/memberTier/每日账本等）
   trainingScenes = JSON.parse(JSON.stringify(trainingSceneCatalog));
   customScenes = [];
   abilityStats = { communication:65, expression:55, empathy:70, emotionControl:50, adaptability:45 };
@@ -4454,7 +4877,7 @@ function loadData(phone) {
     const saved = localStorage.getItem(key);
     if (saved) {
       const data = JSON.parse(saved);
-      if (data.userData && typeof data.userData === 'object') userData = data.userData;
+      if (data.userData && typeof data.userData === 'object') userData = EM_normalizeUser(data.userData);
       if (data.trainingScenes && Array.isArray(data.trainingScenes)) {
         const savedScenes = data.trainingScenes;
         savedScenes.forEach(savedScene => {
@@ -5384,7 +5807,8 @@ function doSignin() {
   }
   checkInDates.push(todayStr);
   checkedInToday = true;
-  const pointsEarned = addPoints(10);
+  // v2.5：签到 20 分（§8.5 上调），走签到类全天≤20 池 + 全天≤30 总池
+  const pointsEarned = EM_grantPoints(EM.SIGNIN_POINTS, 'signin');
 
   let ticketReward = 1;
   let bonusMessage = '';
@@ -5404,7 +5828,7 @@ function doSignin() {
   const btn = $('signin-btn');
   btn.textContent = '✓ 签到成功！';
 
-  const pointMessage = pointsEarned > 0 ? `获得${pointsEarned}积分` : '累计积分已达免费上限，本次未增加积分';
+  const pointMessage = pointsEarned > 0 ? `获得${pointsEarned}积分` : '今日积分入账已达上限（全天≤30），本次未增加积分';
   const ticketMessage = ticketResult.actual > 0 ? `，${ticketResult.actual}张穿梭券` : '';
   showToast(`签到成功！${pointMessage}${ticketMessage}${bonusMessage}`);
 
@@ -6148,7 +6572,7 @@ function endVoiceTraining() {
   voiceTrainingActive = false;
 
   const requestedPoints = Math.floor(voiceScore / 10) + 10;
-  const pointsEarned = addPoints(requestedPoints);
+  const pointsEarned = EM_grantPoints(requestedPoints, 'bonus');
 
   saveCoachMemory('lastTrainingDate', new Date().toISOString().split('T')[0]);
   saveCoachMemory('lastTrainingScene', voiceCurrentScene.name);
@@ -6810,6 +7234,94 @@ function showPaymentUnavailable(planName) {
   showToast(`💳 ${planName}支付接入中，当前不会扣款或开通会员，请等待后续更新`);
 }
 
+// ===== v2.5 会员中心（§18 三档阶梯 + 社交币充值，演示支付） =====
+function renderMemberCenter() {
+  const statusEl = $('member-status');
+  if (!statusEl) return;
+  let statusText = '免费版';
+  if (EM_memberTierActive()) {
+    const plan = EM.PLANS[userData.memberTier];
+    const exp = new Date(userData.memberTierExpiresAt);
+    statusText = (plan ? plan.label : userData.memberTier) + ' · ' + (exp.getMonth() + 1) + '/' + exp.getDate() + ' 到期';
+  } else if (hasPaidMembership()) {
+    statusText = ({ daily:'体验日卡', weekly:'周卡', monthly:'月卡', yearly:'年卡' }[userData.member] || '会员') + '（旧版权益有效期内）';
+  }
+  statusEl.textContent = statusText;
+
+  const walletEl = $('member-wallet');
+  if (walletEl) {
+    walletEl.innerHTML =
+      '<div><div class="text-xs text-gray-400">成长积分 · 软通货</div><div class="text-lg font-bold text-gray-800">⭐ ' + (userData.points || 0) + '</div></div>' +
+      '<div><div class="text-xs text-gray-400">社交币 · 硬通货</div><div class="text-lg font-bold text-amber-600">💎 ' + EM_coins() + '</div></div>' +
+      '<div><div class="text-xs text-gray-400">穿梭券</div><div class="text-lg font-bold text-indigo-600">🎫 ' + timeRewindTickets + '</div></div>';
+  }
+
+  const plans = $('member-plans');
+  if (plans) {
+    const planCard = function (tier) {
+      const p = EM.PLANS[tier];
+      const isCurrent = EM_memberTierActive() && userData.memberTier === tier;
+      return '<div class="border' + (isCurrent ? '-2 border-indigo-500 bg-indigo-50/40' : ' border-gray-200') + ' rounded-xl p-4">' +
+        '<div class="flex items-center gap-2 mb-2">' +
+        '  <span class="text-2xl">' + p.icon + '</span>' +
+        '  <div><div class="font-bold text-gray-800">' + p.label + (isCurrent ? ' <span class="text-xs text-indigo-500">当前方案</span>' : '') + '</div>' +
+        '  <div class="text-xs text-gray-500">' + p.desc + '</div></div>' +
+        '</div>' +
+        '<div class="flex gap-2 mt-3">' +
+        '  <button onclick="EM_subscribe(\'' + tier + '\',\'monthly\')" class="flex-1 py-2 text-sm font-semibold rounded-lg bg-indigo-500 text-white hover:bg-indigo-600 transition-colors">¥' + p.monthly + '/月<br><span class="text-[10px] font-normal opacity-85">月赠' + p.gift + '币</span></button>' +
+        '  <button onclick="EM_subscribe(\'' + tier + '\',\'yearly\')" class="flex-1 py-2 text-sm font-semibold rounded-lg bg-purple-500 text-white hover:bg-purple-600 transition-colors">¥' + p.yearly + '/年<br><span class="text-[10px] font-normal opacity-85">月赠' + p.gift + '币 · 省' + (p.monthly * 12 - p.yearly) + '</span></button>' +
+        '</div>' +
+        '</div>';
+    };
+    plans.innerHTML = planCard('basic') + planCard('pro');
+  }
+
+  const packs = $('member-coinpacks');
+  if (packs) {
+    packs.innerHTML = EM.COIN_PACKS.map(function (p) {
+      return '<button onclick="EM_buyCoins(\'' + p.id + '\')" class="border border-amber-200 bg-amber-50 rounded-xl p-3 text-center hover:border-amber-400 transition-colors">' +
+        '<div class="text-sm font-bold text-amber-700">💎 ' + p.coins + ' 币</div>' +
+        (p.bonus ? '<div class="text-[10px] text-orange-500">含赠 ' + p.bonus + ' 币</div>' : '<div class="text-[10px] text-gray-400">基础比率</div>') +
+        '<div class="text-xs text-gray-500 mt-1">¥' + p.price + '</div>' +
+        '</button>';
+    }).join('');
+  }
+
+  const benefits = $('member-benefits');
+  if (benefits) {
+    benefits.innerHTML =
+      '<div class="flex items-center justify-between py-1 mb-1 border-b border-gray-200 pb-2">' +
+      '  <span class="text-xs font-medium text-gray-700">权益项目</span>' +
+      '  <div class="flex gap-3 text-xs font-medium w-44 justify-end">' +
+      '    <span class="w-14 text-center text-gray-400">免费</span>' +
+      '    <span class="w-14 text-center text-indigo-600">基础</span>' +
+      '    <span class="w-14 text-center text-purple-600">高级</span>' +
+      '  </div>' +
+      '</div>' +
+    [
+      { label: '每日训练次数', free: '3次', basic: '不限', pro: '不限' },
+      { label: '次数用尽后续练', free: '10币/广告', basic: '—', pro: '—' },
+      { label: '课程库 1000+ 节', free: '每类试读', basic: '畅读', pro: '畅读' },
+      { label: '单章永久解锁', free: '¥6·200币', basic: '已含', pro: '已含' },
+      { label: '自测AI详细批改', free: '20币/次', basic: '免费', pro: '免费' },
+      { label: '深度复盘', free: '15币/次', basic: '15币/次', pro: '免费' },
+      { label: '3D礼仪训练', free: '❌', basic: '❌', pro: '✅' },
+      { label: '原始资料下载', free: '❌', basic: '❌', pro: '✅' },
+      { label: '进阶场景', free: '100币/个', basic: '期内免费', pro: '期内免费' },
+      { label: '月赠社交币', free: '—', basic: '300', pro: '800' }
+    ].map(function (b) {
+      return '<div class="flex items-center justify-between py-1">' +
+        '  <span class="text-gray-500">' + b.label + '</span>' +
+        '  <div class="flex gap-3 text-xs w-44 justify-end">' +
+        '    <span class="w-14 text-center text-gray-400">' + b.free + '</span>' +
+        '    <span class="w-14 text-center text-indigo-500">' + b.basic + '</span>' +
+        '    <span class="w-14 text-center text-purple-500">' + b.pro + '</span>' +
+        '  </div>' +
+        '</div>';
+    }).join('');
+  }
+}
+
 // 统一计算场景解锁状态，供市场卡片和训练入口共用。
 // 等级是最低门槛（达到更高等级也应视为满足），积分和穿梭券是实际消耗门槛。
 // 好感度折扣只减少本次应消耗的可用积分，累计等级积分和穿梭券成本保持不变。
@@ -6833,6 +7345,11 @@ function getSceneUnlockStatus(scene) {
   if (!scene) return 'level';
   if (scene.membershipOnly && !hasPaidMembership()) return 'membership';
   if (scene.unlocked || hasPaidMembership()) return 'unlocked';
+
+  // v2.5 双轨（§18.3）：进阶场景不进积分池，100 社交币买断或会员期内直接访问
+  if (EM_sceneTier(scene) === 'advanced') {
+    return EM_coins() >= EM.ADV_SCENE_COINS ? 'coins' : 'coins-poor';
+  }
 
   const requirement = getSceneUnlockRequirement(scene);
   const requiredLevelPoints = getLevelPoints(requirement.unlockLevel);
@@ -6890,6 +7407,20 @@ function renderSceneList() {
               解锁 ${requirement.unlockPoints}积分+${requirement.unlockTickets}张券${requirement.discountPercent ? `（${requirement.discountPercent}%折扣）` : ''}
             </button>`;
             iconClass = 'bg-yellow-100';
+          } else if (status === 'coins') {
+            lockInfo = `<span class="text-xs text-amber-600">💎 进阶场景 · ${EM.ADV_SCENE_COINS}社交币买断（永久，券不可用）</span>`;
+            iconClass = 'bg-amber-100';
+            buttonHtml = `<button onclick="EM_buyAdvancedScene(${s.id})"
+              class="mt-3 w-full py-2 text-sm font-medium rounded-lg transition-all bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600">
+              ${EM.ADV_SCENE_COINS}币买断${hasPaidMembership() ? '（会员期内免费）' : ''}
+            </button>`;
+          } else if (status === 'coins-poor') {
+            lockInfo = `<span class="text-xs text-amber-600">💎 进阶场景 · 需${EM.ADV_SCENE_COINS}币（当前${EM_coins()}币）</span>`;
+            iconClass = 'bg-gray-100';
+            buttonHtml = `<button onclick="goToMember()"
+              class="mt-3 w-full py-2 text-sm font-medium rounded-lg transition-all bg-gray-100 text-amber-600 hover:bg-gray-200">
+              币不足 · 去充值/开会员
+            </button>`;
           } else if (status === 'membership') {
             lockInfo = '<span class="text-xs text-purple-600">🔒 会员专属内容，请开通有效会员</span>';
             iconClass = 'bg-purple-100';
@@ -8776,19 +9307,20 @@ function startTraining(sceneId) {
   }
   ensurePostInitialUnlockCosts();
   const requirement = getSceneUnlockRequirement(scene);
-  if (scene.membershipOnly && !hasPaidMembership()) {
-    showToast('该模板的会员体验已结束，请续费后继续训练');
+  if (scene.membershipOnly && !EM_isPro()) {
+    showToast('该内容为高级会员专属（§18.3），开通高级会员后体验');
+    goToMember();
     return;
   }
-  if (isFreeTier()) {
-    const dailyTrainingCount = Number(userData.dailyTrainingCount) || 0;
-    if (dailyTrainingCount >= 5) {
-      showToast('今日训练次数已达上限，请明天再来');
-      return;
-    }
-  }
+  // v2.5（§8.3）：免费每日 3 次；第 4 次起弹付费墙三选一（10币续练/看广告1次/开会员）
+  if (!EM_checkTrainGate('train', function () { startTraining(sceneId); })) return;
 
   if (!scene.unlocked && !hasPaidMembership()) {
+    // v2.5 双轨（§18.3）：进阶场景 100 社交币买断（券不可用），不进积分池
+    if (EM_sceneTier(scene) === 'advanced') {
+      EM_buyAdvancedScene(scene.id);
+      return;
+    }
     const status = getSceneUnlockStatus(scene);
     const currentLevel = getLevel(getLevelProgressPoints()).name;
     const levelName = requirement.unlockLevel + '学员';
@@ -8813,8 +9345,8 @@ function startTraining(sceneId) {
   }
 
   if (isFreeTier()) {
-    userData.dailyTrainingCount = (Number(userData.dailyTrainingCount) || 0) + 1;
-    saveData();
+    // v2.5：开始训练即占用1次（§8.6），会员不限次不计数
+    EM_accountTrainStart();
   }
 
   if (userData.hasStartedTrainingBefore) {
@@ -10821,15 +11353,11 @@ function finishTraining() {
     pointsReason = '训练完成度不足70%';
   }
 
-  if (netScore < 30) {
-    canEarnPoints = false;
-    pointsReason = '训练评分低于30分';
-  }
-
-  if (isFreeTier() && getLevelProgressPoints() >= 2000) {
-    canEarnPoints = false;
-    pointsReason = '累计积分已达上限';
-  }
+  // v2.5（§8.5）：评价档位积分 A +10 / B +5 / C -5（倒扣）。
+  // 完成度<70% 属中途放弃：不发不扣，保留反馈与记录（§8.6）；完成但评分<30 按 C 档倒扣。
+  trainingGrade = 'C';
+  if (completionRate >= 0.7 && netScore >= 80) trainingGrade = 'A';
+  else if (completionRate >= 0.7 && netScore >= 30) trainingGrade = 'B';
 
   const today = getDateKey();
   let sceneDailyCount = (userData.sceneDailyCounts && userData.sceneDailyCounts[currentTraining.id]) || {};
@@ -10837,38 +11365,42 @@ function finishTraining() {
   let pointsMultiplier = 1;
 
   if (sceneCountToday >= 3) {
-    pointsMultiplier = 0.5;
+    pointsMultiplier = 0.5;   // 递减收益保留（§8.6），只作用于正向积分
   }
 
-  const basePoints = Math.round(Math.max(20, Math.min(50, (netScore + 100) / 4)) * pointsMultiplier);
+  if (!isRerender) {
+    if (!canEarnPoints) {
+      trainingPointsGain = 0;   // 中途放弃：不发不扣
+    } else if (isFreeTier() && getLevelProgressPoints() >= 2000 && (EM.TRAIN_GAIN[trainingGrade] || 0) > 0) {
+      trainingPointsGain = 0;   // 免费层累计积分已达2000上限，正向不再入账
+    } else {
+      const gradeGain = EM.TRAIN_GAIN[trainingGrade] || 0;
+      if (gradeGain > 0) {
+        const firstGain = EM_grantPoints(Math.round(gradeGain * pointsMultiplier), 'train');
+        if (useDoublePoints && firstGain > 0) {
+          // 双倍积分卡只在真正入账后消耗（§8.6），差额部分同样受每日池限制
+          doublePointCards = Math.max(0, doublePointCards - 1);
+          trainingPointsGain = firstGain + EM_grantPoints(firstGain, 'train');
+        } else {
+          trainingPointsGain = firstGain;
+        }
+      } else {
+        // C 档倒扣：最低扣至0余额，等级进度积分不受影响（§8.5）
+        trainingPointsGain = -EM_deductPoints(-gradeGain, '训练评分C档倒扣');
+      }
 
-  if (!isRerender && canEarnPoints) {
-    let awardedPoints = 0;
-    trainingPointsGain = basePoints;
-    if (useDoublePoints) {
-      doublePointCards = Math.max(0, doublePointCards - 1);
-      trainingPointsGain *= 2;
+      if (!userData.sceneDailyCounts) userData.sceneDailyCounts = {};
+      if (!userData.sceneDailyCounts[currentTraining.id]) userData.sceneDailyCounts[currentTraining.id] = {};
+      userData.sceneDailyCounts[currentTraining.id][today] = sceneCountToday + 1;
+
+      // 三星通关额外 +20（§8.5：计入全天 30 分封顶，bonus 池）
+      const stars = getStars(netScore);
+      const scene = trainingScenes.find(s => s.id === currentTraining.id);
+      if (stars === 3 && scene && !scene.threeStarCompleted && trainingPointsGain > 0) {
+        trainingPointsGain += EM_grantPoints(20, 'bonus');
+        scene.threeStarCompleted = true;
+      }
     }
-    awardedPoints += addPoints(trainingPointsGain);
-
-    if (!userData.sceneDailyCounts) userData.sceneDailyCounts = {};
-    if (!userData.sceneDailyCounts[currentTraining.id]) userData.sceneDailyCounts[currentTraining.id] = {};
-    userData.sceneDailyCounts[currentTraining.id][today] = sceneCountToday + 1;
-
-    if (netScore >= 80) {
-      awardedPoints += addPoints(10);
-    }
-
-    const stars = getStars(netScore);
-    const scene = trainingScenes.find(s => s.id === currentTraining.id);
-    if (stars === 3 && scene && !scene.threeStarCompleted) {
-      awardedPoints += addPoints(20);
-      scene.threeStarCompleted = true;
-    }
-    // 报告显示实际入账值，而不是包含被免费账号上限截断前的请求值。
-    trainingPointsGain = awardedPoints;
-  } else if (!isRerender) {
-    trainingPointsGain = 0;
   }
 
   if (!isRerender) {
@@ -11090,9 +11622,10 @@ function finishTraining() {
         <div class="flex items-center justify-center gap-4">
           <div class="text-center"><div class="text-2xl font-bold">${trainingScore}</div><div class="text-xs opacity-80">综合得分</div></div>
           <div class="text-center"><div class="text-2xl font-bold">${netScore > 0 ? '+' : ''}${netScore}</div><div class="text-xs opacity-80">净得分</div></div>
-          <div class="text-center"><div class="text-2xl font-bold">${trainingPointsGain > 0 ? '+' : ''}${trainingPointsGain}</div><div class="text-xs opacity-80">训练积分</div></div>
+          <div class="text-center"><div class="text-2xl font-bold">${trainingPointsGain > 0 ? '+' : ''}${trainingPointsGain}</div><div class="text-xs opacity-80">训练积分 · ${trainingGrade || 'C'}档（A+10/B+5/C-5）</div></div>
         </div>
         ${trainingPointsGain === 0 ? `<div class="text-[11px] text-center opacity-80 mt-2">本次未发放积分：${pointsReason || '未达到结算条件'}。训练次数仍按开始时计入。</div>` : ''}
+        ${trainingPointsGain < 0 ? `<div class="text-[11px] text-center opacity-80 mt-2">C档倒扣 -5 分（§8.5）：评分低于30分按倒扣处理；积分余额最低扣至0，等级进度不受影响。认真练习即可挽回。</div>` : ''}
       <div class="mt-3 rounded-lg bg-white/15 px-3 py-2 text-[11px] text-center opacity-90">👤 形象准备 ${currentAppearanceScore > 0 ? currentAppearanceScore + '/100 · 评分贡献 +' + currentAppearanceBonus + '分' : '未计入（可在训练前选择头像或搭配）'}；对话能力仍是主要评分依据</div>
       </div>
       ${currentTrainingFavorabilityPenalty > 0 ? `<div class="bg-rose-50 border border-rose-100 rounded-xl p-3 text-xs text-rose-700 animate-in"><div class="font-semibold mb-1">❤️ 好感度变化</div><div>本次 -${currentTrainingFavorabilityPenalty}：${currentTrainingFavorabilityPenaltyReason}</div><div class="text-rose-500 mt-1">这是对明确态度问题的单次记录，不影响训练积分、累计等级或已解锁场景。</div><div class="text-indigo-500 mt-1">${FAVORABILITY_RULE_DISCLOSURE}</div></div>` : ''}
@@ -11322,7 +11855,7 @@ function checkinActionSuggestion(index) {
     return;
   }
 
-  const pointsEarned = addPoints(5);
+  const pointsEarned = EM_grantPoints(5, 'bonus');
   const appliedFavorability = addFavorability(2);
 
   userData.actionSuggestions.push({
@@ -11339,34 +11872,29 @@ function checkinActionSuggestion(index) {
 }
 
 function unlockFullAnalysis() {
-  if (hasPaidMembership()) {
-    showToast('会员已包含完整分析，无需消耗穿梭券');
+  if (fullAnalysisUnlocked) {
+    showToast('本次完整分析已解锁');
     return;
   }
   if (!showTrainingReport || !trainingSettlementApplied) {
     showToast('请完成训练后再解锁完整分析');
     return;
   }
-  syncDailyTrainingPeriod();
-  if (isFreeTier() && (Number(userData.dailyAnalysisUnlocked) || 0) >= 2) {
-    showToast('今日用券解锁完整分析已达2次上限');
+  // v2.5（§18.5）：深度复盘 15 社交币/次，高级会员免费；穿梭券回归"重置剧情分支"专职（§18.2）。
+  if (EM_isPro()) {
+    fullAnalysisUnlocked = true;
+    finishTraining();   // 仅重绘报告，finishTraining 内的结算幂等保护会阻止重复发奖。
     return;
   }
-  if (fullAnalysisUnlocked) {
-    showToast('本次完整分析已解锁');
-    return;
-  }
-  if (timeRewindTickets <= 0) {
-    alert('穿梭券不足，签到可获取！');
-    return;
-  }
-  if (confirm('确定使用1张时空穿梭券解锁完整分析报告吗？')) {
-    timeRewindTickets--;
-    userData.dailyAnalysisUnlocked = (Number(userData.dailyAnalysisUnlocked) || 0) + 1;
+  if (EM_spendCoins(EM.DEEP_REVIEW_COINS, '深度复盘/逐句拆解')) {
     fullAnalysisUnlocked = true;
     saveData();
-    // 仅重绘报告，finishTraining 内的结算幂等保护会阻止重复发奖。
+    showToast('💎 深度复盘已解锁（-' + EM.DEEP_REVIEW_COINS + ' 币）');
     finishTraining();
+  } else {
+    if (confirm('深度复盘需 ' + EM.DEEP_REVIEW_COINS + ' 社交币（当前 ' + EM_coins() + ' 币）。\n\n开通高级会员可无限次免费复盘，基础会员 ¥39/月。\n\n是否前往充值/开通？')) {
+      goToMember();
+    }
   }
 }
 
@@ -11956,56 +12484,7 @@ function renderModal(name) {
     $('edit-invite-code').value = userData.inviteCode;
     renderAvatarPresetGallery('profile-avatar-select-grid', selectedEditAvatarId, 'selectAvatar');
   } else if (name === 'member') {
-    $('member-status').textContent = { free:'免费版', daily:'体验日卡', weekly:'周卡', monthly:'月卡', yearly:'年卡' }[userData.member] || '免费版';
-    $('member-plans').innerHTML = [
-      { name:'体验日卡', price:'3.9', color:'green', icon:'💫', desc:'有效期1天；支付接入后生效', tag:'推荐' },
-      { name:'周卡', price:'19.9', color:'indigo', icon:'🌙', desc:'有效期7天；仍受安全限频', tag:'' },
-      { name:'月卡', price:'69', color:'purple', icon:'⭐', desc:'有效期30天；含语音训练入口', tag:'最值' },
-      { name:'年卡', price:'499', color:'amber', icon:'👑', desc:'有效期365天；长期训练方案', tag:'' }
-    ].map((p,i) => `
-      <div class="border${p.tag==='推荐'?'-2 border-green-500':' border-gray-200'} rounded-xl p-4 relative overflow-hidden">
-        ${p.tag ? `<div class="absolute top-0 right-0 bg-green-500 text-white text-xs px-2 py-0.5">${p.tag}</div>` : ''}
-        <div class="flex items-center gap-2 mb-2">
-          <span class="text-2xl">${p.icon}</span>
-          <div><div class="font-bold text-gray-800">${p.name}</div><div class="text-xs text-gray-500">${p.desc}</div></div>
-        </div>
-        <div class="flex items-end gap-1 mb-3">
-          <span class="text-sm text-gray-500">¥</span>
-          <span class="text-3xl font-bold text-${p.color}-600">${p.price}</span>
-        </div>
-        <button onclick="showPaymentUnavailable('${p.name}')" class="w-full py-2 bg-${p.color}-500 text-white font-semibold rounded-lg hover:bg-${p.color}-600 transition-colors">支付接入中</button>
-      </div>`).join('');
-
-    $('member-benefits').innerHTML = `
-      <div class="flex items-center justify-between py-1 mb-1 border-b border-gray-200 pb-2">
-        <span class="text-xs font-medium text-gray-700">权益项目</span>
-        <div class="flex gap-2 text-xs font-medium">
-          <span class="w-14 text-center text-gray-400">免费</span>
-          <span class="w-14 text-center text-gray-400">日卡</span>
-          <span class="w-14 text-center text-green-600">周卡</span>
-          <span class="w-14 text-center text-green-600">月卡</span>
-          <span class="w-14 text-center text-green-600">年卡</span>
-        </div>
-      </div>` +
-    [
-      { label:'AI对话次数', free:'基础额度', daily:'按限频', weekly:'按限频', monthly:'按限频', yearly:'按限频' },
-      { label:'每日训练次数', free:'5次', daily:'20次', weekly:'无限*', monthly:'无限*', yearly:'无限*' },
-      { label:'语音训练', free:'❌', daily:'❌', weekly:'✅', monthly:'✅', yearly:'✅' },
-      { label:'高难度关卡', free:'❌', daily:'❌', weekly:'✅', monthly:'✅', yearly:'✅' },
-      { label:'3D渲染教练', free:'❌', daily:'待上线', weekly:'待上线', monthly:'待上线', yearly:'待上线' },
-      { label:'专属客服', free:'❌', daily:'待上线', weekly:'待上线', monthly:'待上线', yearly:'待上线' },
-      { label:'时空穿梭券', free:'签到获取', daily:'签到获取', weekly:'待上线', monthly:'待上线', yearly:'待上线' }
-    ].map(b => `
-      <div class="flex items-center justify-between py-1">
-        <span class="text-gray-500">${b.label}</span>
-        <div class="flex gap-2 text-xs">
-          <span class="w-14 text-center text-gray-400">${b.free}</span>
-          <span class="w-14 text-center text-gray-400">${b.daily}</span>
-          <span class="w-14 text-center text-green-500">${b.weekly}</span>
-          <span class="w-14 text-center text-green-500">${b.monthly}</span>
-          <span class="w-14 text-center text-green-500">${b.yearly}</span>
-        </div>
-      </div>`).join('');
+    renderMemberCenter();
   } else if (name === 'realname') {
     if (userData.realNameVerified) {
       $('realname-content').innerHTML = '<div class="text-center py-8"><div class="text-5xl mb-3">✅</div><h4 class="text-lg font-semibold text-green-600 mb-1">已完成实名认证</h4><p class="text-sm text-gray-500">' + userData.realNameInfo.name + '（' + userData.realNameInfo.idCard.slice(0,3) + '****' + userData.realNameInfo.idCard.slice(-4) + '）</p></div>';
@@ -12175,7 +12654,7 @@ function completeHomework(index) {
     return;
   }
   homework.status = 'completed';
-  const pointsEarned = addPoints(homework.rewardPoints);
+  const pointsEarned = EM_grantPoints(homework.rewardPoints, 'bonus');
   const favorabilityEarned = Math.max(0, Number(homework.rewardFavorability) || 0);
   const appliedFavorability = addFavorability(favorabilityEarned);
   saveData();
@@ -12980,7 +13459,7 @@ function finishCardReview() {
   if (!userData.cardMastery) userData.cardMastery = {};
   userData.cardMastery[card.id] = Math.max(userData.cardMastery[card.id] || 0, mastery);
 
-  const pointsEarned = addPoints(5);
+  const pointsEarned = EM_grantPoints(5, 'bonus');
   const appliedFavorability = addFavorability(1);
 
   saveData();
@@ -15049,7 +15528,7 @@ function completeLevelChallenge() {
 
   if (!userData.completedLevels.includes(level.id)) {
     userData.completedLevels.push(level.id);
-    const pointsEarned = addPoints(level.rewards[0]);
+    const pointsEarned = EM_grantPoints(level.rewards[0], 'bonus');
     saveUserData();
 
     alert(`🎉 恭喜通关第${level.id}关「${level.name}」！\n\n实际奖励：+${pointsEarned}积分\n徽章：${level.rewards[1]}`);
@@ -15087,7 +15566,7 @@ function showChallengeResult() {
     const success = totalScore >= 0;
 
     if (success) {
-      const pointsEarned = addPoints(challenge.reward_points);
+      const pointsEarned = EM_grantPoints(challenge.reward_points, 'bonus');
       userData.completedChallengeIds.push(challenge.id);
       saveData();
       renderGrowth();
@@ -15677,6 +16156,15 @@ function getEtiquetteSceneLabel(level) {
 function startEtiquetteLevel(levelId) {
   const level = etiquetteLevels.find(l => l.id === levelId);
   if (!level) return;
+  // v2.5（§18.3）：3D 礼仪训练为高级会员专属，坚决不进免费池
+  if (!EM_isPro()) {
+    showToast('🎭 3D 礼仪训练为高级会员专属，开通高级会员后体验');
+    goToMember();
+    return;
+  }
+  // v2.5（§8.3）：礼仪训练同样消耗当日训练次数（学习卡片「去对练」同源）
+  if (!EM_checkTrainGate('etiquette', function () { startEtiquetteLevel(levelId); })) return;
+  EM_accountTrainStart();
   closeModal('etiquette');
   window.currentEtiquetteLevel = level;
   window.etiquetteRound = 0;
@@ -15875,174 +16363,8 @@ function showEtiquetteResult() {
  * Stage3D —— 真·3D游戏舞台：主角与NPC站位真实建筑场景
  * 真实挑战 & 社交礼仪训练共用；气泡锚定在角色头顶
  * ============================================================ */
-/* Stage3D 照片合成版：真实场景底图 + 教练/用户真实照片人形 + 头顶气泡锚点 */
-window.Stage3D = (function () {
-  const instances = {};
-
-  // 环境 → 真实生活场景底图
-  const BG = {
-    office: 'assets/images/scenes/office.png',
-    cafe: 'assets/images/scenes/cafe.png',
-    community: 'assets/images/scenes/generic.png',
-    family: 'assets/images/scenes/family.png',
-    service: 'assets/images/scenes/office.png',
-    market: 'assets/images/scenes/cafe.png',
-    home: 'assets/images/scenes/family.png',
-    public: 'assets/images/scenes/generic.png',
-    auto: 'assets/images/scenes/generic.png',
-    wedding: 'assets/images/scenes/wedding.png',
-    restaurant: 'assets/images/scenes/restaurant.png',
-    bar: 'assets/images/scenes/bar.png',
-    corridor: 'assets/images/scenes/corridor.png'
-  };
-
-  // NPC 默认全身像（可在挂载时用 npc.image 覆盖）
-  const DEFAULT_NPC = 'assets/images/chars/npc-wang.png';
-  const DEFAULT_USER = 'assets/images/chars/user.png';
-
-  function mount(stageId, cfg) {
-    const stage = document.getElementById(stageId);
-    if (!stage) return false;
-    dispose(stageId);
-
-    const env = cfg.env || 'office';
-    const npcImg = (cfg.npc && (cfg.npc.image || cfg.npc.fullBody)) || DEFAULT_NPC;
-    const userImg = (cfg.user && cfg.user.image) || DEFAULT_USER;
-
-    stage.classList.add('is-3d');
-    stage.classList.add('is-photo');
-    stage.style.background = '#0e0e16';
-
-    // 真实场景底图
-    const bgEl = document.createElement('img');
-    bgEl.className = 'photo-bg';
-    bgEl.src = BG[env] || BG.office;
-    bgEl.alt = '场景背景';
-    bgEl.draggable = false;
-    stage.insertBefore(bgEl, stage.firstChild);
-
-    // 暗角 + 地面柔光
-    const vign = document.createElement('div');
-    vign.className = 'photo-vignette';
-    stage.appendChild(vign);
-
-    // NPC（右）
-    const npcEl = document.createElement('img');
-    npcEl.className = 'photo-char photo-npc';
-    npcEl.src = npcImg;
-    npcEl.draggable = false;
-    stage.appendChild(npcEl);
-
-    // 用户主角（左）
-    const userEl = document.createElement('img');
-    userEl.className = 'photo-char photo-user';
-    userEl.src = userImg;
-    userEl.draggable = false;
-    stage.appendChild(userEl);
-
-    // 名牌
-    const tagN = document.createElement('div');
-    tagN.className = 'photo-tag photo-tag-npc';
-    tagN.textContent = (cfg.npc && cfg.npc.label) || '场景角色';
-    stage.appendChild(tagN);
-    const tagU = document.createElement('div');
-    tagU.className = 'photo-tag photo-tag-user';
-    tagU.textContent = (cfg.user && cfg.user.label) || '我';
-    stage.appendChild(tagU);
-
-    const inst = {
-      stage: stage, bgEl: bgEl, npcEl: npcEl, userEl: userEl,
-      tagN: tagN, tagU: tagU, ro: null, onLayout: cfg.onLayout, anchors: null,
-      lastLayout: 0, desk: null
-    };
-    instances[stageId] = inst;
-
-    // 场景道具：需要“落座/商务”的场合（面试/商务/餐厅）给 NPC 加前景桌，模拟实际坐姿
-    const DESK_ENVS = ['office', 'service', 'restaurant'];
-    if (DESK_ENVS.indexOf(env) >= 0) {
-      const desk = document.createElement('div');
-      desk.className = 'photo-desk';
-      stage.appendChild(desk);
-      inst.desk = desk;
-      npcEl.classList.add('seated');
-    }
-
-    function updateAnchors() {
-      const W = stage.clientWidth || 360, H = stage.clientHeight || 320;
-      inst.anchors = {
-        npc: { x: W * 0.80, y: H * 0.40 },
-        user: { x: W * 0.20, y: H * 0.40 },
-        npcChest: { x: W * 0.78, y: H * 0.68 },
-        userChest: { x: W * 0.22, y: H * 0.68 }
-      };
-      tagN.style.left = inst.anchors.npcChest.x + 'px';
-      tagN.style.top = inst.anchors.npcChest.y + 'px';
-      tagU.style.left = inst.anchors.userChest.x + 'px';
-      tagU.style.top = inst.anchors.userChest.y + 'px';
-      const now = performance.now();
-      if (now - inst.lastLayout > 200) { inst.lastLayout = now; if (inst.onLayout) inst.onLayout(inst.anchors); }
-    }
-
-    if (window.ResizeObserver) { inst.ro = new ResizeObserver(updateAnchors); inst.ro.observe(stage); }
-    updateAnchors();
-    setTimeout(updateAnchors, 80);
-    return true;
-  }
-
-  function dispose(stageId) {
-    const inst = instances[stageId];
-    if (!inst) return;
-    if (inst.ro) inst.ro.disconnect();
-    [inst.bgEl, inst.npcEl, inst.userEl, inst.tagN, inst.tagU, inst.desk].forEach(function (el) {
-      if (el && el.parentNode) el.parentNode.removeChild(el);
-    });
-    Array.prototype.forEach.call(inst.stage.querySelectorAll('.photo-vignette'), function (el) { el.remove(); });
-    inst.stage.classList.remove('is-photo');
-    inst.stage.style.background = '';
-    const layer = inst.stage.querySelector('.challenge-stage-bubble-layer');
-    if (layer) {
-      layer.classList.remove('anchored');
-      Array.prototype.forEach.call(layer.children, function (b) {
-        b.style.left = b.style.top = b.style.transform = b.style.opacity = '';
-      });
-    }
-    delete instances[stageId];
-  }
-
-  function getAnchors(stageId) {
-    const inst = instances[stageId];
-    return inst ? inst.anchors : null;
-  }
-
-  function setSpeaking(stageId, who) {
-    const inst = instances[stageId];
-    if (!inst) return;
-    const el = who === 'user' ? inst.userEl : inst.npcEl;
-    el.classList.remove('speaking');
-    void el.offsetWidth;
-    el.classList.add('speaking');
-  }
-
-  function setAction(stageId, who, action) {
-    const inst = instances[stageId];
-    if (!inst) return;
-    const el = who === 'user' ? inst.userEl : inst.npcEl;
-    ['bow','nod','shake','raise','step','wave','turn'].forEach(function (k) { el.classList.remove('animating-' + k); });
-    void el.offsetWidth;
-    if (action === 'sit') { el.classList.add('seated'); return; }
-    if (action === 'stand') { el.classList.remove('seated'); return; }
-    if (action === 'bow') el.classList.add('animating-bow');
-    else if (action === 'nod') el.classList.add('animating-nod');
-    else if (action === 'shake') el.classList.add('animating-shake');
-    else if (action === 'raise') el.classList.add('animating-raise');
-    else if (action === 'step') el.classList.add('animating-step');
-    else if (action === 'wave') el.classList.add('animating-wave');
-    else if (action === 'turn') el.classList.add('animating-turn');
-    setTimeout(function () { el.classList.remove('animating-bow','animating-nod','animating-shake','animating-raise','animating-step','animating-wave','animating-turn'); }, 1350);
-  }
-
-  return { supported: true, mount: mount, dispose: dispose, getAnchors: getAnchors, setSpeaking: setSpeaking, setAction: setAction };
-})();
+/* Stage3D 已迁移至 libs/game_stage3d.js（Three.js 游戏 3D 场景 + 真实生活逻辑动作序列） */
+window.Stage3D = window.GameStage3D || null;
 
 
 /* ===== Stage3D 集成辅助：场景键、NPC 外观、气泡布局 ===== */
@@ -16931,12 +17253,45 @@ function useAvatarDetail() {
     return out || '<div style="padding:10px;color:#a39ec0;font-size:12px;">没有匹配的课时</div>';
   }
 
+  // ---- 正文分卷懒加载：课程正文较大，按章节分卷存放在 knowledge_base/course_content/ ----
+  // 打开卡片时按需注入对应分卷的 <script>，避免首屏加载几十 MB 正文。
+  var KL_contentLoading = {};
+  function KL_ensureContent(card, done) {
+    var id = card && card.id;
+    if (!id) { done(); return; }
+    var store = window.CourseContent || {};
+    if (store[id]) { done(); return; }
+    if (!card.bundle) { done(); return; }        // 该卡无正文（扫描件/损坏/待转录）
+    if (KL_contentLoading[id]) { KL_contentLoading[id].push(done); return; }
+    KL_contentLoading[id] = [done];
+    var s = document.createElement('script');
+    s.src = 'knowledge_base/course_content/' + card.bundle;
+    s.async = true;
+    var finish = function () {
+      var q = KL_contentLoading[id] || [];
+      delete KL_contentLoading[id];
+      q.forEach(function (fn) { try { fn(); } catch (e) { console.warn(e); } });
+    };
+    s.onload = finish;
+    s.onerror = function () { console.warn('正文分卷加载失败:', card.bundle); finish(); };
+    document.head.appendChild(s);
+  }
+  // 把分卷里的真实正文写回卡片对象
+  function KL_applyContent(card) {
+    var cv = (window.CourseContent || {})[card.id];
+    if (!cv) return false;
+    if (cv.full) card.rawText = cv.full;
+    if (cv.sections && cv.sections.length) card.sections = cv.sections;
+    return true;
+  }
+
   function KL_openDetail(cardId) {
     var card = (learningCards || []).find(function (c) { return c && c.id === cardId; });
     if (!card) return;
     KL._detail = card;
     KL._practicePassed = false;
     KL._quizChoice = -1;
+    // 先渲染骨架（列表/目录即时可见），正文分卷到达后再补渲染
     renderKnowledgeDetail(card);
     markOpened(cardId);
     // close library modal + open detail modal (compat with both modal open fns)
@@ -16948,6 +17303,14 @@ function useAvatarDetail() {
       var sc = document.querySelector('#modal-knowledge-detail .kd-scroll');
       if (sc) sc.scrollTop = 0;
     }, 0);
+    // 懒加载正文
+    KL_ensureContent(card, function () {
+      if (KL._detail !== card) return;   // 用户已切走
+      if (KL_applyContent(card)) {
+        renderKnowledgeDetail(card);
+        setTimeout(scrollOutlineToCurrent, 0);
+      }
+    });
   }
 
   // 长目录限高时，把当前节滚到可视区
@@ -16957,9 +17320,23 @@ function useAvatarDetail() {
       if (!cur) return;
       var pn = cur.parentNode;
       if (!pn || pn.scrollHeight <= pn.clientHeight + 4) return;
+      if (!pn.offsetParent) return;   // 折叠状态下无布局，跳过
       pn.scrollTop = Math.max(0, cur.offsetTop - 40);
     } catch (e) {}
   }
+
+  // 课程目录折叠开关（目录只在需要时展开，正文才是主角）
+  function KL_toggleOutline(el) {
+    var wrap = document.getElementById('kd-outline-wrap');
+    if (!wrap) return;
+    var open = wrap.style.display !== 'none';
+    wrap.style.display = open ? 'none' : 'block';
+    var arrow = el && el.querySelector('.kd-toggle-arrow');
+    if (arrow) arrow.textContent = open ? '展开 ▾' : '收起 ▴';
+    if (!open) setTimeout(scrollOutlineToCurrent, 0);
+  }
+
+  function KL_toggleOutlineByAttr(el) { KL_toggleOutline(el); }
 
   function renderKnowledgeDetail(card) {
     var box = document.getElementById('knowledge-detail-content');
@@ -17007,10 +17384,72 @@ function useAvatarDetail() {
     html += '  <div style="font-size:11px;margin-top:8px;opacity:.85;">' + (learned ? '✓ 已学' : '○ 未学') + (collected ? ' · ★ 已收藏' : '') + '</div>';
     html += '</div>';
 
-    html += '<div class="knowledge-scenario-row">';
-    html += '  <div class="knowledge-scenario bad"><div class="scenario-tag">' + leftLabel + '</div>' + escapeHTML(badExample) + '</div>';
-    html += '  <div class="knowledge-scenario good"><div class="scenario-tag">' + rightLabel + '</div>' + escapeHTML(goodExample) + '</div>';
-    html += '</div>';
+    // ===== 正文主体：一次只显示一节，看完点“下一节” =====
+    // 每份资料按内容切成若干「节」；一张卡片就是一堂课，节内逐条翻页学习。
+    var steps = (card.sections && card.sections.length)
+      ? card.sections
+      : [{ t: card.title || '正文', x: card.rawText || card.content || '' }];
+    if (KL._detailId !== card.id) { KL._detailId = card.id; KL._stepIdx = 0; }   // 换卡片时回到第 1 节
+    if (KL._stepIdx == null || KL._stepIdx < 0 || KL._stepIdx >= steps.length) KL._stepIdx = 0;
+    KL._steps = steps;
+
+    var rawFull = card.rawText || '';
+    var hasRealContent = (card.status === 'ok') || (card.status === undefined && (rawFull || steps.length));
+    if (hasRealContent && (rawFull || steps.length)) {
+      var wc = (rawFull || '').length || card.chars || 0;
+      var cur = steps[KL._stepIdx] || { t: card.title || '正文', x: '' };
+      // 标题已在节头上显示，正文若以标题开头则去掉这段前缀（避免重复；剩余内容过短时保留原文）
+      var bodyText = cur.x || '';
+      if (cur.t && bodyText.indexOf(cur.t) === 0 && bodyText.length > cur.t.length * 2) {
+        bodyText = bodyText.slice(cur.t.length).replace(/^[。！？；：，、\s\n]+/, '');
+      }
+      // v2.5（§13.3）课程门控：非试读 + 章节未买断 + 无有效会员 → 锁定正文，显示解锁引导
+      var emLocked = (typeof EM_cardLocked === 'function') ? EM_cardLocked(card) : false;
+      var emTrial = (typeof EM_isTrialCard === 'function') ? EM_isTrialCard(card) : false;
+      html += '<div class="knowledge-content-main">';
+      html += '  <div class="kc-head"><span class="kc-title">📖 课程正文</span><span class="kc-meta">' +
+              (emLocked ? '🔒 会员内容'
+                : (emTrial ? '✨ 免费试读 · ' : '') +
+              (steps.length > 1 ? '第 ' + (KL._stepIdx + 1) + ' / ' + steps.length + ' 节 · ' : '') + wc + ' 字') + '</span></div>';
+      if (emLocked) {
+        var chName = EM_chapterOf(card) || '本章节';
+        var teaser = (bodyText || '').replace(/\s+/g, ' ').trim().slice(0, 60);
+        html += '  <div class="kc-sec">';
+        html += '    <div class="kc-sec-t"><span class="kc-sec-i">🔒</span><span class="kc-sec-n">' + escapeHTML(cur.t || ('第 ' + (KL._stepIdx + 1) + ' 节')) + '</span></div>';
+        html += '    <div class="kc-sec-x" style="max-height:110px;overflow:hidden;filter:blur(4px);opacity:.7;user-select:none;pointer-events:none;">' + escapeHTML(bodyText) + '</div>';
+        html += '    <div style="position:relative;margin-top:-20px;padding:16px 14px;text-align:center;background:linear-gradient(180deg,rgba(255,255,255,.55),#fff);border-radius:10px;">';
+        html += '      <div style="font-size:13px;font-weight:700;color:#4c1d95;margin-bottom:4px;">🔓 该课程为会员内容</div>';
+        html += '      <div style="font-size:11px;color:#6b6488;line-height:1.6;margin-bottom:12px;">开通基础会员畅学全部 1000+ 节课程，或永久解锁本章节「' + escapeHTML(chName) + '」。</div>';
+        html += '      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">';
+        html += '        <button onclick="goToMember()" style="padding:8px 14px;border:none;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-size:12px;font-weight:700;cursor:pointer;">⭐ 开会员畅学</button>';
+        html += '        <button data-chapter="' + escapeHTML(chName) + '" onclick="EM_unlockChapterByCoins(this)" style="padding:8px 14px;border:1px solid #f59e0b;border-radius:10px;background:#fffbeb;color:#b45309;font-size:12px;font-weight:700;cursor:pointer;">💎 200币解锁</button>';
+        html += '        <button data-chapter="' + escapeHTML(chName) + '" onclick="EM_unlockChapterByCash(this)" style="padding:8px 14px;border:1px solid #f59e0b;border-radius:10px;background:#fffbeb;color:#b45309;font-size:12px;font-weight:700;cursor:pointer;">¥6 永久解锁</button>';
+        html += '      </div>';
+        if (teaser) html += '      <div style="margin-top:10px;font-size:11px;color:#9ca3af;">试读片段：' + escapeHTML(teaser) + '…</div>';
+        html += '    </div>';
+        html += '  </div>';
+      } else {
+        html += '  <div class="kc-sec">';
+        html += '    <div class="kc-sec-t"><span class="kc-sec-i">' + (KL._stepIdx + 1) + '</span><span class="kc-sec-n">' + escapeHTML(cur.t || ('第 ' + (KL._stepIdx + 1) + ' 节')) + '</span></div>';
+        html += '    <div class="kc-sec-x">' + escapeHTML(bodyText) + '</div>';
+        html += '  </div>';
+      }
+      if (card.truncated && !emLocked) {
+        html += '<div class="kc-note">该资料正文较长，本卡收录前 ' + wc + ' 字；完整文件见下方「原始资料」。</div>';
+      }
+      html += '</div>';
+    } else {
+      var stMap = {
+        scanned: ['🖼', '该资料暂无法转为文字', '这份资料是图片型 PDF / 无有效语音的音视频，原文件已完整归档；文字识别完成后会自动补入正文。'],
+        corrupt: ['⚠', '原文件损坏', '该文件在网盘下载时不完整（内容为零填充或缺失索引），已登记在册但无法提取正文；重新下载该文件后可补入。'],
+        missing: ['⏳', '正文待提取', '该条目尚未完成正文提取，稍后重新同步即可补入。']
+      };
+      var st = stMap[card.status] || stMap.missing;
+      html += '<div class="knowledge-content-main empty">';
+      html += '  <div class="kc-head"><span class="kc-title">' + st[0] + ' ' + st[1] + '</span></div>';
+      html += '  <div class="kc-sec-x">' + st[2] + '</div>';
+      html += '</div>';
+    }
 
     html += '<div class="knowledge-principle">';
     html += '  <div class="principle-label">核心原则</div>';
@@ -17023,75 +17462,75 @@ function useAvatarDetail() {
     html += '  <div class="kd-chips">' + formulaItems.map(function (t) { return '<span class="kd-chip">' + escapeHTML(t) + '</span>'; }).join('') + '</div>';
     html += '</div>';
 
-    // 完整原文（不删减）：优先 rawText（资料库课程逐字原文）
-    var fullText = card.rawText || card.content;
-    if (fullText) {
+    // ===== 本课程目录：列出这份资料的全部「节」，点哪节看哪节 =====
+    if (steps.length > 1) {
       html += '<div class="knowledge-formula">';
-      html += '  <div class="formula-label">完整原文（不删减）</div>';
-      html += '  <div class="kd-rawtext">' + escapeHTML(fullText) + '</div>';
+      html += '  <div class="formula-label kd-outline-toggle" onclick="KL_toggleOutline(this)">📚 本课程目录 · 共 ' + steps.length + ' 节<span class="kd-toggle-arrow">展开 ▾</span></div>';
+      html += '  <div class="kd-outline-wrap" id="kd-outline-wrap" style="display:none;">';
+      html += '  <div class="kd-outline-stat">共 ' + steps.length + ' 节，逐节学习；点击任意一节可直接跳到该节。' + (steps.length > 6 ? '（列表内可上下滚动）' : '') + '</div>';
+      html += '  <div class="kd-outline' + (steps.length > 8 ? ' scrollable' : '') + '" id="kd-outline-list">';
+      steps.forEach(function (s, i) {
+        var isCur = (i === KL._stepIdx);
+        var absSrc = (s.x || '').replace(/\s+/g, ' ').trim();
+        var abs = absSrc.length > 46 ? absSrc.slice(0, 46) + '…' : absSrc;
+        html += '    <div class="kd-outline-item' + (isCur ? ' cur' : '') + '"' + (isCur ? ' id="kd-outline-cur"' : '') + ' data-step="' + i + '" onclick="KL_goStepByAttr(this)">';
+        html += '      <span class="kd-outline-idx">' + (i + 1) + '</span>';
+        html += '      <span class="kd-outline-body">';
+        html += '        <span class="kd-outline-name">' + escapeHTML(s.t || ('第 ' + (i + 1) + ' 节')) + '</span>';
+        if (abs) html += '        <span class="kd-outline-abs">' + escapeHTML(abs) + '</span>';
+        html += '      </span>';
+        html += '      <span class="kd-outline-kind">' + (s.x || '').length + '字</span>';
+        html += '    </div>';
+      });
+      html += '  </div>';
+      html += '  </div>';
       html += '</div>';
     }
 
-    // 本场景课程目录：每张卡片就是一节，按 kind/round 排序；当前卡片高亮，目录项可点击跳转
-    var sameScene = (learningCards || []).filter(function (c) { return c && c.scene && c.scene === card.scene; });
-    if (sameScene.length > 1) {
-      // 按 kind（intro=0 / lesson=1 / summary=2）→ round → 在原数组的顺序
-      var KIND_ORDER = { intro: 0, lesson: 1, summary: 2 };
-      var indexMap = {};
-      (learningCards || []).forEach(function (c, i) { if (c && c.id) indexMap[c.id] = i; });
-      sameScene = sameScene.slice().sort(function (a, b) {
-        var ka = KIND_ORDER[a.kind] == null ? 1 : KIND_ORDER[a.kind];
-        var kb = KIND_ORDER[b.kind] == null ? 1 : KIND_ORDER[b.kind];
+    // ===== 同一分类下的其他资料（次要入口，不影响逐节阅读）=====
+    var siblings = (learningCards || []).filter(function (c) { return c && c.scene && c.scene === card.scene && c.id !== card.id; });
+    if (siblings.length) {
+      var KIND_ORDER2 = { intro: 0, lesson: 1, summary: 2 };
+      var idxMap2 = {};
+      (learningCards || []).forEach(function (c, i) { if (c && c.id) idxMap2[c.id] = i; });
+      siblings = siblings.slice().sort(function (a, b) {
+        var ka = KIND_ORDER2[a.kind] == null ? 1 : KIND_ORDER2[a.kind];
+        var kb = KIND_ORDER2[b.kind] == null ? 1 : KIND_ORDER2[b.kind];
         if (ka !== kb) return ka - kb;
-        var ra = a.round || 0, rb = b.round || 0;
-        if (ra !== rb) return ra - rb;
-        return (indexMap[a.id] || 0) - (indexMap[b.id] || 0);
+        return (idxMap2[a.id] || 0) - (idxMap2[b.id] || 0);
       });
-      // 缓存到 KL，供翻页按钮用
-      KL._sceneOrder = sameScene.map(function (c) { return c.id; });
-      KL._sceneIdx = sameScene.findIndex(function (c) { return c.id === card.id; });
-      var KIND_LABEL_SHORT = { intro: '导语', lesson: '正文', summary: '速记' };
-      // 同名技能点（同一 title 多条表达）标注 (1/2)，让"同一技能逐条看"更清晰
-      var titleCount = {}, titleSeen = {};
-      sameScene.forEach(function (it) { var k = it.title || ''; titleCount[k] = (titleCount[k] || 0) + 1; });
-      KL._sceneLabels = sameScene.map(function (it) {
-        var k = it.title || '';
-        titleSeen[k] = (titleSeen[k] || 0) + 1;
-        return titleCount[k] > 1 ? (k + '（' + titleSeen[k] + '/' + titleCount[k] + '）') : k;
-      });
-
       html += '<div class="knowledge-formula">';
-      html += '  <div class="formula-label">📚 本场景课程目录 · 共 ' + sameScene.length + ' 节</div>';
-      html += '  <div class="kd-outline-stat">本场景共 ' + sameScene.length + ' 节，逐节学习；点击目录可直接跳转' + (sameScene.length > 6 ? '（可上下滚动查看全部）' : '') + '。</div>';
-      html += '  <div class="kd-outline' + (sameScene.length > 8 ? ' scrollable' : '') + '" id="kd-outline-list">';
-      sameScene.forEach(function (it, i) {
-        var isCur = (it.id === card.id);
-        var kindLabel = KIND_LABEL_SHORT[it.kind] || (it.medium === 'audio' ? '音频' : (it.medium === 'video' ? '视频' : (it.medium === 'book' ? '书' : '参考')));
-        // 目录摘要：直接露出本节内容开头，避免"目录只有标题没有知识"
-        var absSrc = (it.rawText || it.content || it.principle || '').replace(/\s+/g, ' ').trim();
+      html += '  <div class="formula-label kd-outline-toggle" onclick="KL_toggleSiblings(this)">📚 『' + escapeHTML(card.scene || '') + '』下的其他资料 · ' + siblings.length + ' 篇<span class="kd-toggle-arrow">展开 ▾</span></div>';
+      html += '  <div class="kd-outline-wrap" id="kd-sibling-wrap" style="display:none;">';
+      html += '  <div class="kd-outline' + (siblings.length > 8 ? ' scrollable' : '') + '">';
+      siblings.forEach(function (it) {
+        var kindLabel = { intro: '导语', lesson: '正文', summary: '速记' }[it.kind] || (it.medium === 'audio' ? '音频' : (it.medium === 'video' ? '视频' : (it.medium === 'book' ? '书' : '参考')));
+        var absSrc = ((it.content || it.principle || '') + '').replace(/\s+/g, ' ').trim();
         var abs = absSrc.length > 46 ? absSrc.slice(0, 46) + '…' : absSrc;
-        html += '    <div class="kd-outline-item' + (isCur ? ' cur' : '') + '"' + (isCur ? ' id="kd-outline-cur"' : '') + ' data-id="' + escapeHTML(it.id) + '" onclick="KL_openDetailByAttr(this)">';
-        html += '      <span class="kd-outline-idx">' + (i + 1) + '</span>';
+        html += '    <div class="kd-outline-item" data-id="' + escapeHTML(it.id) + '" onclick="KL_openDetailByAttr(this)">';
+        html += '      <span class="kd-outline-idx">' + (it.status === 'ok' ? '📄' : (it.status === 'scanned' ? '🖼' : (it.status === 'corrupt' ? '⚠' : '⏳'))) + '</span>';
         html += '      <span class="kd-outline-body">';
-        html += '        <span class="kd-outline-name">' + escapeHTML(KL._sceneLabels[i] || it.title || '(未命名)') + '</span>';
+        html += '        <span class="kd-outline-name">' + escapeHTML(it.title || '(未命名)') + '</span>';
         if (abs) html += '        <span class="kd-outline-abs">' + escapeHTML(abs) + '</span>';
         html += '      </span>';
         html += '      <span class="kd-outline-kind">' + kindLabel + '</span>';
         html += '    </div>';
       });
       html += '  </div>';
+      html += '  </div>';
       html += '</div>';
-    } else {
-      KL._sceneOrder = card.id ? [card.id] : [];
-      KL._sceneIdx = 0;
-      KL._sceneLabels = [card.title || '(本节)'];
     }
 
-    // 原始资料出处（资料库课程可溯源）
+    // 原始资料出处（资料库课程可溯源）—— v2.5：高级会员专属福利（§18.4）
     if (card.source) {
+      var srcLocked = (typeof EM_canAccessSource === 'function') ? !EM_canAccessSource() : false;
       html += '<div class="knowledge-formula">';
       html += '  <div class="formula-label">📎 原始资料</div>';
-      html += '  <div style="font-size:11px;color:#6b6488;line-height:1.6;word-break:break-all;background:#faf9ff;padding:8px 10px;border-radius:8px;margin-top:6px;">' + escapeHTML(card.source) + '</div>';
+      if (srcLocked) {
+        html += '  <div style="font-size:11px;color:#6b6488;line-height:1.7;background:#faf9ff;padding:10px 12px;border-radius:8px;margin-top:6px;text-align:center;">👑 原始资料为高级会员专属福利<br><button onclick="goToMember()" style="margin-top:6px;padding:6px 14px;border:none;border-radius:8px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:12px;font-weight:700;cursor:pointer;">开通高级会员查看</button></div>';
+      } else {
+        html += '  <div style="font-size:11px;color:#6b6488;line-height:1.6;word-break:break-all;background:#faf9ff;padding:8px 10px;border-radius:8px;margin-top:6px;">' + escapeHTML(card.source) + '</div>';
+      }
       html += '</div>';
     }
 
@@ -17111,27 +17550,27 @@ function useAvatarDetail() {
     html += '    <button class="quiz-option" data-idx="2" onclick="KL_pickAnswer(2)">C. ' + escapeHTML(qC) + '</button>';
     html += '  </div>';
     html += '  <div id="knowledge-quiz-feedback"></div>';
+    // v2.5（§13.3）：自测题人人可答；AI 详细批改会员免费，免费用户 20 币/次
+    var aiLabel = (typeof EM_canAiReview === 'function' && EM_canAiReview()) ? '🤖 AI 详细批改（会员免费）' : '🤖 AI 详细批改（20 币/次）';
+    html += '  <button onclick="EM_payAiReview()" style="margin-top:10px;width:100%;padding:9px 12px;border:1px solid #e0d7ff;border-radius:10px;background:#faf9ff;color:#6d28d9;font-size:12px;font-weight:700;cursor:pointer;">' + aiLabel + '</button>';
     html += '</div>';
 
     box.innerHTML = html;
 
-    // 翻页导航：上一节 / 下一节 / 返回目录（独立行，不嵌入内容流）
+    // 翻页导航：在本份资料的「节」之间前后翻（不是在不同文件之间）
     var pager = document.getElementById('knowledge-detail-pager');
-    var order = KL._sceneOrder || (card.id ? [card.id] : []);
-    var idx = KL._sceneIdx != null ? KL._sceneIdx : 0;
     if (pager) {
-      if (order.length > 1) {
-        var prevId = idx > 0 ? order[idx - 1] : null;
-        var nextId = idx < order.length - 1 ? order[idx + 1] : null;
-        var infoTitle = (KL._sceneLabels && KL._sceneLabels[idx]) || card.title || '(本节)';
+      if (steps.length > 1) {
+        var i0 = KL._stepIdx;
+        var curT = (steps[i0] && steps[i0].t) || card.title || '(本节)';
         var ph = '';
         ph += '<div class="kd-pager">';
-        ph += '  <button data-dir="-1" onclick="KL_goSceneStepByAttr(this)"' + (prevId ? '' : ' disabled') + '>← 上一节</button>';
+        ph += '  <button data-dir="-1" onclick="KL_goStepByAttr(this)"' + (i0 > 0 ? '' : ' disabled') + '>← 上一节</button>';
         ph += '  <div class="pager-info">';
-        ph += '    <span class="pager-title" title="' + escapeHTML(infoTitle) + '">' + escapeHTML(infoTitle.length > 20 ? infoTitle.slice(0, 20) + '…' : infoTitle) + '</span>';
-        ph += '    <span class="pager-pos">第 ' + (idx + 1) + ' / ' + order.length + ' 节</span>';
+        ph += '    <span class="pager-title" title="' + escapeHTML(curT) + '">' + escapeHTML(curT.length > 20 ? curT.slice(0, 20) + '…' : curT) + '</span>';
+        ph += '    <span class="pager-pos">第 ' + (i0 + 1) + ' / ' + steps.length + ' 节</span>';
         ph += '  </div>';
-        ph += '  <button data-dir="1" onclick="KL_goSceneStepByAttr(this)"' + (nextId ? '' : ' disabled') + '>下一节 →</button>';
+        ph += '  <button data-dir="1" onclick="KL_goStepByAttr(this)"' + (i0 < steps.length - 1 ? '' : ' disabled') + '>下一节 →</button>';
         ph += '</div>';
         pager.innerHTML = ph;
       } else {
@@ -17198,6 +17637,8 @@ function useAvatarDetail() {
       if (typeof showToast === 'function') showToast('请先完成自测题');
       return;
     }
+    // v2.5（§18.4）：去对练消耗当日训练次数；次数用完触发付费墙（学完立刻练=最佳付费触发点）
+    if (typeof EM_checkTrainGate === 'function' && !EM_checkTrainGate('knowledge', function () { KL_jumpToPractice(); })) return;
     var cat = KL._detail.category || '';
     var catToScene = {
       '社交场合与人际交往': 9001,
@@ -17270,25 +17711,51 @@ function useAvatarDetail() {
     var name = el && el.getAttribute('data-name');
     if (name) KL_toggleChapter(name);
   }
-  // 翻页按钮：direction = -1（上一节）/ +1（下一节）
-  function KL_goSceneStep(direction) {
-    var order = KL._sceneOrder || [];
-    if (!order.length) return;
-    var idx = KL._sceneIdx != null ? KL._sceneIdx : 0;
-    var ni = idx + (direction > 0 ? 1 : -1);
-    if (ni < 0 || ni >= order.length) return;
-    var nextId = order[ni];
-    if (!nextId) return;
-    KL_openDetail(nextId);
-    // 滚到顶部，便于从头阅读新章节
+  // 翻页按钮：在本份资料的「节」之间前后翻
+  function KL_goStep(direction) {
+    var steps = KL._steps || [];
+    if (steps.length <= 1) return;
+    var i = KL._stepIdx != null ? KL._stepIdx : 0;
+    var ni = i + (direction > 0 ? 1 : -1);
+    if (ni < 0 || ni >= steps.length) return;
+    KL._stepIdx = ni;
+    var card = KL._detail;
+    if (!card) return;
+    renderKnowledgeDetail(card);
+    var sc = document.querySelector('#modal-knowledge-detail .kd-scroll');
+    if (sc) sc.scrollTop = 0;                      // 新的一节从头读
+    setTimeout(scrollOutlineToCurrent, 0);
+  }
+  // 目录点击：跳到指定节
+  function KL_goStepTo(i) {
+    var steps = KL._steps || [];
+    if (i < 0 || i >= steps.length) return;
+    KL._stepIdx = i;
+    renderKnowledgeDetail(KL._detail);
     var sc = document.querySelector('#modal-knowledge-detail .kd-scroll');
     if (sc) sc.scrollTop = 0;
+    setTimeout(scrollOutlineToCurrent, 0);
   }
-  function KL_goSceneStepByAttr(el) {
+  function KL_goStepByAttr(el) {
     if (!el) return;
+    var i = parseInt(el.getAttribute('data-step'), 10);
+    if (!isNaN(i)) { KL_goStepTo(i); return; }
     var d = parseInt(el.getAttribute('data-dir') || '1', 10) || 1;
-    KL_goSceneStep(d);
+    KL_goStep(d);
   }
+  // 同分类其他资料折叠
+  function KL_toggleSiblings(el) {
+    var wrap = document.getElementById('kd-sibling-wrap');
+    if (!wrap) return;
+    var open = wrap.style.display !== 'none';
+    wrap.style.display = open ? 'none' : 'block';
+    var arrow = el && el.querySelector('.kd-toggle-arrow');
+    if (arrow) arrow.textContent = open ? '展开 ▾' : '收起 ▴';
+  }
+
+  // 兼容旧调用名
+  function KL_goSceneStep(direction) { KL_goStep(direction); }
+  function KL_goSceneStepByAttr(el) { KL_goStepByAttr(el); }
 
   // expose
   global.KL = KL;
@@ -17297,8 +17764,14 @@ function useAvatarDetail() {
   global.buildChapterBody = buildChapterBody;
   global.KL_toggleChapter = KL_toggleChapter;
   global.KL_toggleChapterByAttr = KL_toggleChapterByAttr;
+  global.KL_toggleOutline = KL_toggleOutline;
+  global.KL_toggleOutlineByAttr = KL_toggleOutlineByAttr;
   global.KL_openDetail = KL_openDetail;
   global.KL_openDetailByAttr = KL_openDetailByAttr;
+  global.KL_goStep = KL_goStep;
+  global.KL_goStepTo = KL_goStepTo;
+  global.KL_goStepByAttr = KL_goStepByAttr;
+  global.KL_toggleSiblings = KL_toggleSiblings;
   global.KL_goSceneStep = KL_goSceneStep;
   global.KL_goSceneStepByAttr = KL_goSceneStepByAttr;
   global.KL_closeDetail = KL_closeDetail;
@@ -17306,6 +17779,8 @@ function useAvatarDetail() {
   global.KL_jumpToPractice = KL_jumpToPractice;
   global.KL_toggleCollect = KL_toggleCollect;
   global.KL_startReview = KL_startReview;
+  // v2.5：章节解锁（EM_unlockChapter*）后重渲染当前详情页
+  global.KL_rerenderDetail = function () { if (KL._detail) renderKnowledgeDetail(KL._detail); };
   global.openKnowledgeLibrary = openKnowledgeLibrary;
   global.bindKnowledgeSearch = bindKnowledgeSearch;
 
