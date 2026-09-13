@@ -19,3 +19,6 @@ __pycache__/
 
 # 本地模型/资产（不提交）
 libs/u2net.onnx
+
+# 知识库中间产物（体积大且站点不加载）
+knowledge_base/extracted/
