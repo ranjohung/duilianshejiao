@@ -22,3 +22,6 @@ libs/u2net.onnx
 
 # 知识库中间产物（体积大且站点不加载）
 knowledge_base/extracted/
+
+# GLB 换装管线原始源（30MB 未压缩，站点不加载）
+assets/models/source/Ch14.glb

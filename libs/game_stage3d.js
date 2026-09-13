@@ -496,6 +496,244 @@ function _GS3D_init() {
     };
   }
 
+  /* ---------- GLB 写实绑定角色后端 ----------
+   * 影视真人风格：加载 mixamorig 骨骼 GLB，逐帧把引擎关节世界旋转共轭映射到骨骼：
+   *   bone.quaternion = qParentWorld⁻¹ ⊗ qEngineJointWorld ⊗ K
+   * K 在绑定时标定（数据驱动，兼容 T/A-pose、任意骨轴/预旋转）：
+   *   K = qEngine(0)⁻¹ ⊗ hangQ ⊗ qBoneRest，hangQ 把静息骨向旋到竖直下垂(0,-1,0)。
+   * 于是 K⊗骨向 = 竖直向下，E(引擎欧拉) 永远作用在"已下垂"的姿态上 ——
+   * 引擎的屈曲/摆动/注视语义在真实网格上逐度复现；IK/行走/坐下零改动。
+   * 段长覆盖：肘/膝/踝骨骼位移改写为引擎段长（蒙皮微拉伸不可见），视觉与 IK 精准契合。 */
+  var GLB_CAST = { 'user': 'SuitNavy', 'npc-wang': 'SuitCharcoal', 'npc-zhang': 'SuitCharcoal', 'npc-li': 'MichelleDark', 'npc-lin': 'Michelle' };
+  var GLB_DIR = 'assets/models/';
+  var GLB_MAP = [ // [引擎关节, mixamo 骨名候选, 躯干欧拉分摊分数（弯腰在脊柱三节间平滑分布）]
+    ['torsoG', ['Spine'], 0.25],
+    ['torsoG', ['Spine1'], 0.35],
+    ['torsoG', ['Spine2'], 0.40],
+    ['headG', ['Head', 'Neck'], 1],
+    ['shL', ['LeftArm'], 1], ['elL', ['LeftForeArm'], 1],
+    ['shR', ['RightArm'], 1], ['elR', ['RightForeArm'], 1],
+    ['hipL', ['LeftUpLeg'], 1], ['kneeL', ['LeftLeg'], 1], ['ankL', ['LeftFoot'], 1],
+    ['hipR', ['RightUpLeg'], 1], ['kneeR', ['RightLeg'], 1], ['ankR', ['RightFoot'], 1]
+  ];
+  // K 目标方向 = 引擎零位时该关节子内容的朝向（actor-local）：
+  // 躯干/头部朝上、脚掌朝前放平、其余四肢竖直下垂 —— 与 mkHuman 网格布局一一对应
+  var GLB_HANG = { torsoG: [0, 1, 0], headG: [0, 1, 0], ankL: [0, 0, 1], ankR: [0, 0, 1] };
+
+  var _glbP = {};
+  var _sq1 = new THREE.Quaternion(), _sq2 = new THREE.Quaternion(), _sq3 = new THREE.Quaternion();
+  var _seE = new THREE.Euler();
+  var _gbM1 = new THREE.Matrix4(), _gbM2 = new THREE.Matrix4(), _gbV1 = new THREE.Vector3();
+
+  function loadGLB(url) {
+    if (!_glbP[url]) {
+      _glbP[url] = new Promise(function (res, rej) {
+        new THREE.GLTFLoader().load(url, res, undefined, rej);
+      });
+    }
+    return _glbP[url];
+  }
+  function glbChildBone(b) {
+    for (var i = 0; i < b.children.length; i++) if (b.children[i].isBone) return b.children[i];
+    return null;
+  }
+  function glbParentK(map, node) {
+    for (var i = 0; i < map.length; i++) if (map[i].bone === node) return map[i].K;
+    return null;
+  }
+  // CPU 蒙皮包围盒（一次性绑定用，勿进渲染循环）：对顶点执行与着色器一致的蒙皮变换
+  function skinnedBBox(rootObj, box) {
+    box.makeEmpty();
+    rootObj.updateMatrixWorld(true);
+    rootObj.traverse(function (o) {
+      if (!o.isSkinnedMesh || !o.geometry || !o.geometry.attributes.position) return;
+      var pos = o.geometry.attributes.position;
+      var si = o.geometry.attributes.skinIndex, sw = o.geometry.attributes.skinWeight;
+      if (!si || !sw) { box.expandByObject(o); return; }
+      var bones = o.skeleton.bones, inverses = o.skeleton.boneInverses;
+      var mw = o.matrixWorld, bm = o.bindMatrix, bim = o.bindMatrixInverse;
+      for (var i = 0; i < pos.count; i++) {
+        _gbV1.fromBufferAttribute(pos, i).applyMatrix4(bm);
+        _gbM1.set(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        var w4 = [sw.getX(i), sw.getY(i), sw.getZ(i), sw.getW(i)];
+        var b4 = [si.getX(i), si.getY(i), si.getZ(i), si.getW(i)];
+        for (var k = 0; k < 4; k++) {
+          var w = w4[k];
+          if (w < 0.0001) continue;
+          var bi = b4[k];
+          if (bi >= bones.length) continue;
+          _gbM2.multiplyMatrices(bones[bi].matrixWorld, inverses[bi]);
+          var e1 = _gbM1.elements, e2 = _gbM2.elements;
+          for (var e = 0; e < 16; e++) e1[e] += w * e2[e];
+        }
+        _gbV1.applyMatrix4(_gbM1).applyMatrix4(bim).applyMatrix4(mw);
+        box.expandByPoint(_gbV1);
+      }
+    });
+    return box;
+  }
+
+  function attachGLB(inst, actor, stem) {
+    var file = GLB_CAST[stem];
+    if (!file) return;
+    if (!window.THREE || !THREE.GLTFLoader || !THREE.SkeletonUtils) return; // 加载器缺失 → 胶囊兜底
+    loadGLB(GLB_DIR + file + '.glb').then(function (gltf) {
+      if (inst.disposed || !actor.group.parent) return; // 已卸载
+      try { buildGLBActor(actor, gltf); }
+      catch (e) { console.error('GS3D GLB bind failed, capsule fallback:', e.message); }
+    }).catch(function (e) { console.error('GS3D GLB load fail:', file, e && (e.message || e)); });
+  }
+
+  function buildGLBActor(actor, gltf) {
+    var model = THREE.SkeletonUtils.clone(gltf.scene);
+    model.rotation.y = Math.PI; // 本批 GLB 静止朝 -z，引擎约定朝 +z；平移在旋转外侧，居中/落地数学不变
+    var wrap = new THREE.Group();
+    wrap.add(model);
+    model.traverse(function (o) { if (o.isMesh) { o.castShadow = true; o.frustumCulled = false; } });
+    actor.group.add(wrap);
+
+    // 找骨（GLTFLoader sanitizeNodeName 会删掉 mixamorig:Hips 的冒号 → 两种写法都兼容）
+    var bones = {};
+    model.traverse(function (o) {
+      if (o.isBone) { var n = o.name.replace(/^mixamorig:?/, ''); if (!bones[n]) bones[n] = o; }
+    });
+
+    // ---- K 标定：引擎关节清零 → 采集 → 恢复（同步块内无渲染帧穿插）----
+    actor.group.updateMatrixWorld(true);
+    var qG0 = new THREE.Quaternion();
+    actor.group.getWorldQuaternion(qG0);
+    var qG0i = qG0.clone().invert();
+    var saved = capturePose(actor);
+    JOINTS.forEach(function (n) { if (actor.j[n]) actor.j[n].rotation.set(0, 0, 0); });
+    actor.group.updateMatrixWorld(true);
+
+    var map = [];
+    GLB_MAP.forEach(function (pr) {
+      var jn = pr[0], bone = null;
+      for (var i = 0; i < pr[1].length; i++) { bone = bones[pr[1][i]]; if (bone) break; }
+      if (!bone || !actor.j[jn]) return;
+      var ej = actor.j[jn];
+      var qJ0 = new THREE.Quaternion(); ej.getWorldQuaternion(qJ0);   // 清零态 = qG0
+      var qB0 = new THREE.Quaternion(); bone.getWorldQuaternion(qB0); // GLB 静息（含全部预旋转）
+      var tgt = new THREE.Vector3().fromArray(GLB_HANG[jn] || [0, -1, 0]); // 引擎零位子内容朝向
+      // 子骨选取：静息方向与目标最接近的骨子（Spine2 的第一个子骨可能是手臂，不能取首项）
+      var dLocal = new THREE.Vector3(1, 0, 0), best = -2;
+      for (var c = 0; c < bone.children.length; c++) {
+        var ch = bone.children[c];
+        if (!ch.isBone || ch.position.lengthSq() < 1e-6) continue;
+        var d = ch.position.clone().normalize().applyQuaternion(qB0).applyQuaternion(qG0i).dot(tgt);
+        if (d > best) { best = d; dLocal.copy(ch.position).normalize(); }
+      }
+      var dirAl = dLocal.clone().applyQuaternion(qB0).applyQuaternion(qG0i); // actor-local 静息骨向
+      var hangQ = new THREE.Quaternion().setFromUnitVectors(dirAl, tgt);
+      var hangQw = qG0.clone().multiply(hangQ).multiply(qG0i); // hangQ 是 actor-local → 共轭到世界
+      var K = qJ0.clone().invert().multiply(hangQw).multiply(qB0);
+      map.push({ jn: jn, bone: bone, K: K, frac: pr[2] || 1 });
+    });
+
+    /* applyPose 留待归一化结束后恢复 —— 归一化必须在零位站姿下测（绑定常与入场坐姿竞态）：
+    坐姿下测 hipH/落地会把坐姿偏移烘进模型位置，站立后整体沉入地面。
+    actor.glb 也在末尾赋值 —— 中途赋值会让等待方读到半归一化状态。 */
+
+    // ---- 归一化（零位站姿；CPU 蒙皮实测，个体比例差异免疫）----
+    // ① 引擎零位同步一次 → 实测全高 → 统一缩放到 1.66m
+    actor.group.updateMatrixWorld(true);
+    syncGLB(actor);
+    var box1 = skinnedBBox(model, new THREE.Box3());
+    var hRaw = Math.max(0.5, box1.max.y - box1.min.y);
+    var s = 1.66 / hRaw;
+    wrap.scale.setScalar(s);
+    // ② 落地（y）→ 实测 hipH（站姿髋骨世界高）
+    actor.group.updateMatrixWorld(true);
+    syncGLB(actor);
+    var box2 = skinnedBBox(model, new THREE.Box3());
+    model.position.y -= box2.min.y / s;
+    syncGLB(actor);
+    var _gp1 = new THREE.Vector3(), _gp2 = new THREE.Vector3(), _hv = new THREE.Vector3();
+    var upY = [];
+    map.forEach(function (m) {
+      if (m.jn === 'hipL' || m.jn === 'hipR') { m.bone.getWorldPosition(_hv); upY.push(_hv.y - (actor.group.position.y || 0)); }
+    });
+    var hipH0 = upY.length ? Math.max(0.5, Math.min(1.3, upY.reduce(function (a, b) { return a + b; }, 0) / upY.length)) : 0.93;
+    // ③ 段长覆盖：臂=0.27（锚点/握手 IK 一致）；小腿=0.42（坐姿膝高-seatY+0.02-0.42≈0.07 脚落地）；
+    //    大腿=hipH0-踝高-0.42（踝高由鞋面网格决定不可归一，保自然髋高）
+    actor.group.updateMatrixWorld(true);
+    syncGLB(actor);
+    var ankYs = [];
+    map.forEach(function (m) {
+      if (m.jn === 'ankL' || m.jn === 'ankR') { m.bone.getWorldPosition(_hv); ankYs.push(_hv.y - (actor.group.position.y || 0)); }
+    });
+    var ankH = ankYs.length ? ankYs.reduce(function (a, b) { return a + b; }, 0) / ankYs.length : 0.07;
+    map.forEach(function (m) {
+      var target;
+      if (m.jn === 'elL' || m.jn === 'elR') target = 0.27;
+      else if (m.jn === 'ankL' || m.jn === 'ankR') target = 0.42;
+      else if (m.jn === 'kneeL' || m.jn === 'kneeR') target = Math.max(0.15, hipH0 - ankH - 0.42);
+      else return;
+      var pk = glbParentK(map, m.bone.parent);
+      if (!pk) return; // 父骨未映射 → 保留静息位移（自然肩宽/髋宽）
+      m.bone.parent.getWorldPosition(_gp1);
+      m.bone.getWorldPosition(_gp2);
+      var worldLen = _gp1.distanceTo(_gp2);
+      if (worldLen < 1e-4) return;
+      m.bone.position.multiplyScalar(target / worldLen); // 等比缩放：方向不变、长度对齐引擎
+    });
+    // ④ 网格包围盒对中（xz）+ 二次落地（腿段覆盖可能改变足底）
+    //    skinnedBBox 是世界坐标（含 group 平移）：对中目标=组原点，必须先扣掉 group.xz，
+    //    否则 mesh 恒被对中到世界原点（office NPC 组 z=-1.62 → mesh 坐到 1.6m 外的 user 椅上）。
+    //    y 不受影响（group.y 恒 0，根高走 human.position.y）。
+    actor.group.updateMatrixWorld(true);
+    syncGLB(actor);
+    var box3 = skinnedBBox(model, new THREE.Box3());
+    var _gx = actor.group.position.x || 0, _gz = actor.group.position.z || 0;
+    model.position.y -= box3.min.y / s;
+    model.position.x -= (box3.min.x + box3.max.x) / (2 * s) - _gx / s;
+    model.position.z -= (box3.min.z + box3.max.z) / (2 * s) - _gz / s;
+    // ⑤ hipH 终测（坐姿 rootY 数学根）→ 恢复引擎现场姿态
+    actor.group.updateMatrixWorld(true);
+    syncGLB(actor);
+    var upY2 = [];
+    map.forEach(function (m) {
+      if (m.jn === 'hipL' || m.jn === 'hipR') { m.bone.getWorldPosition(_hv); upY2.push(_hv.y - (actor.group.position.y || 0)); }
+    });
+    actor.hipH = upY2.length ? Math.max(0.6, Math.min(1.2, upY2.reduce(function (a, b) { return a + b; }, 0) / upY2.length)) : 0.93;
+
+    applyPose(actor, saved);
+    actor.group.updateMatrixWorld(true);
+    actor.glb = { wrap: wrap, model: model, map: map };
+    syncGLB(actor);
+
+    if (actor.human) actor.human.visible = false; // 胶囊隐退，GLB 登场
+  }
+
+  function syncGLB(a) {
+    if (!a.glb) return;
+    var map = a.glb.map;
+    // GLB 跟随引擎根高（坐姿下沉/行走重心起伏）：setRootY 只写 human（胶囊容器），
+    // GLB wrap 挂在 group 下 y 恒 0 —— 不补这一行，坐姿会悬浮在站立髋高（hip 0.912/踝 0.466）。
+    // build 归一化期间 a.glb 未赋值（末尾才赋），本行不参与落地基准计算。
+    a.glb.wrap.position.y = a.rootY || 0;
+    for (var i = 0; i < map.length; i++) {
+      var m = map[i], j = a.j[m.jn];
+      if (!j) continue;
+      if (m.frac !== 1) {
+        // 弯腰分摊：关节父链（hips）无自转 → E_local = qParent⁻¹ ⊗ qJoint，欧拉分量按 frac 缩放
+        j.parent.getWorldQuaternion(_sq2);
+        j.getWorldQuaternion(_sq3);
+        _sq3.copy(_sq2).invert().multiply(_sq3);
+        _seE.setFromQuaternion(_sq3, 'XYZ');
+        _seE.x *= m.frac; _seE.y *= m.frac; _seE.z *= m.frac;
+        _sq3.setFromEuler(_seE);
+        _sq1.copy(_sq2).multiply(_sq3); // 引擎关节"分数世界姿态"
+      } else {
+        j.getWorldQuaternion(_sq1);
+      }
+      m.bone.parent.getWorldQuaternion(_sq2);
+      m.bone.quaternion.copy(_sq2).invert().multiply(_sq1).multiply(m.K);
+      m.bone.updateWorldMatrix(true, false); // 同帧下游骨（脊柱→头/臂）读新鲜父链
+    }
+  }
+
   /* ---------- 姿态（关节角目标 + 骨盆高度） ---------- */
   function poseTargets(actor, seated) {
     if (!seated) {
@@ -631,6 +869,7 @@ function _GS3D_init() {
       if (actor.j.skirt) actor.j.skirt.rotation.x = -Math.abs(s) * 0.1;
       setRootY(actor, baseY + c * 0.022);
     }, function () {
+      setRootY(actor, baseY); // 步态终点相位任意（c=|cos|∈[0,1]），不归零会残留 ≤2.2cm/次并跨次累积（rootY 爬升）
       snapPose(actor);
       if (cb) cb();
     });
@@ -756,13 +995,14 @@ function _GS3D_init() {
     actor.group.position.set(startPos.x, 0, startPos.z);
     inst.scene.add(actor.group);
     if (startSeated && cfgSeat) {
-      setRootY(actor, cfgSeat.seatY - 0.91);
+      setRootY(actor, cfgSeat.seatY - (actor.hipH || 0.93) + 0.02);
       applyPose(actor, poseTargets(actor, true));
       var f = cfgSeat.chair ? new THREE.Vector3(0, 0, 1).applyEuler(cfgSeat.chair.rotation) : null;
       actor.group.rotation.y = f ? Math.atan2(f.x, f.z) : (cfgSeat.rotY || 0);
     } else {
       applyPose(actor, poseTargets(actor, false));
     }
+    attachGLB(inst, actor, stem); // 写实 GLB 异步替换胶囊（失败自动胶囊兜底）
     return actor;
   }
 
@@ -1392,6 +1632,10 @@ function _GS3D_init() {
         a.j.headG.rotation.x = on ? Math.sin(tSec * 5.1 + 1.1) * 0.05 : a.j.headG.rotation.x * 0.92;
       });
 
+      // GLB 骨骼镜像：引擎关节世界旋转 → mixamo 骨骼（每帧绝对覆写，无累积）
+      syncGLB(inst.npc);
+      syncGLB(inst.user);
+
       // 视差
       inst.px += (inst.pxT - inst.px) * 0.06;
       inst.py += (inst.pyT - inst.py) * 0.06;
@@ -1498,7 +1742,38 @@ function _GS3D_init() {
     return { phase: inst.phase || 'talk', npc: actorInfo(inst.npc), user: actorInfo(inst.user) };
   }
 
-  window.GameStage3D = { supported: true, mount: mount, dispose: dispose, getAnchors: getAnchors, setSpeaking: setSpeaking, setAction: setAction, setPhase: setPhase, debugInfo: debugInfo };
+  /* GLB 调试探针（验证脚本用：绑定状态/骨骼世界坐标/CPU蒙皮真实包围盒） */
+  var _gbB = new THREE.Box3();
+  function glbDebug(stageId) {
+    var inst = instances[stageId];
+    if (!inst) return null;
+    function info(a) {
+      if (!a) return null;
+      if (!a.glb) return { glb: false, capsuleVisible: !!(a.human && a.human.visible) };
+      a.group.updateMatrixWorld(true);
+      syncGLB(a);
+      a.group.updateMatrixWorld(true);
+      var bones = {};
+      var _v = new THREE.Vector3();
+      a.glb.map.forEach(function (m) {
+        m.bone.getWorldPosition(_v);
+        bones[m.jn] = [+_v.x.toFixed(3), +_v.y.toFixed(3), +_v.z.toFixed(3)];
+      });
+      skinnedBBox(a.glb.model, _gbB);
+      return {
+        glb: true, mapLen: a.glb.map.length, hipH: +a.hipH.toFixed(3),
+        wrapScale: +a.glb.wrap.scale.x.toFixed(3),
+        modelPos: [+a.glb.model.position.x.toFixed(3), +a.glb.model.position.y.toFixed(3), +a.glb.model.position.z.toFixed(3)],
+        capsuleVisible: !!(a.human && a.human.visible),
+        bones: bones,
+        bboxMin: [+_gbB.min.x.toFixed(3), +_gbB.min.y.toFixed(3), +_gbB.min.z.toFixed(3)],
+        bboxMax: [+_gbB.max.x.toFixed(3), +_gbB.max.y.toFixed(3), +_gbB.max.z.toFixed(3)]
+      };
+    }
+    return { npc: info(inst.npc), user: info(inst.user) };
+  }
+
+  window.GameStage3D = { supported: true, mount: mount, dispose: dispose, getAnchors: getAnchors, setSpeaking: setSpeaking, setAction: setAction, setPhase: setPhase, debugInfo: debugInfo, glbDebug: glbDebug };
 }
 
 _GS3D_init();
