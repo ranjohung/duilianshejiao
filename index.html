@@ -706,8 +706,8 @@ h1,h2,h3 { text-wrap:balance; }
             登 录
           </button>
 
-          <button onclick="fillDemoAccount()" class="w-full mt-3 py-3 bg-white border border-gray-200 text-gray-600 font-medium rounded-xl hover:bg-gray-50 transition-all" data-page-node-id="gJJdP7BaFmwkp50ACrhNii">
-            👤 使用演示账号登录
+          <button onclick="fillTestAccount()" class="w-full mt-3 py-3 bg-white border border-indigo-200 text-indigo-600 font-medium rounded-xl hover:bg-indigo-50 transition-all" data-page-node-id="gJJdP7BaFmwkp50ACrhNii">
+            🧪 演示账号登录 · 填充测试账号（手动输入密码）
           </button>
 
           <div class="flex items-center justify-center mt-6" data-page-node-id="HyhMWazJQBBWO45JqMLar7">
@@ -5049,20 +5049,41 @@ async function sendRegSms() {
   }
 }
 
-async function fillDemoAccount() {
-  console.log('fillDemoAccount called');
-  try {
-    loginMode = 'password';
-    $('login-phone').value = '13800138000';
-    $('login-password').value = '123456';
-    switchLoginMode('password');
-    $('login-error').style.display = 'none';
-    console.log('fillDemoAccount completed, calling doLogin');
-    await doLogin();
-  } catch(e) {
-    console.error('fillDemoAccount error:', e);
-    alert('演示账号登录失败：' + e.message);
-  }
+const TEST_ACCOUNT_PHONE = '17351455944';
+const TEST_ACCOUNT_PASSWORD_HASH = '0bbc86f081714d7e9e1ba06110209a2b95ae1a00552216f38d98d9c61733d512';
+
+function fillTestAccount() {
+  loginMode = 'password';
+  switchLoginMode('password');
+  $('login-phone').value = TEST_ACCOUNT_PHONE;
+  $('login-password').value = '';
+  $('login-error').style.display = 'none';
+  showToast('已填入测试账号手机号，请手动输入密码后点击“登录”');
+  $('login-password').focus();
+}
+
+function applyTestAccountEntitlements() {
+  const expires = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
+  userData = {
+    ...userData,
+    nickname: '全功能测试账号',
+    phone: TEST_ACCOUNT_PHONE,
+    member: 'yearly',
+    membershipExpiresAt: expires,
+    memberTier: 'pro',
+    memberTierExpiresAt: expires,
+    coins: 99999,
+    points: 99999,
+    lifetimePoints: 99999,
+    level: '钻石学员',
+    hasSeenOnboarding: true,
+    hasSelectedInitial: true,
+    realNameVerified: true,
+    realNameInfo: { name: '测试用户', idCard: '110101199001010011' },
+    isTestAccount: true
+  };
+  trainingScenes = trainingScenes.map(scene => ({ ...scene, unlocked: true }));
+  saveData();
 }
 
 function loadLocalUser(phone, password) {
@@ -5148,6 +5169,10 @@ function performLocalLogin(phone, nickname, points = 650, level = '钻石学员'
     };
   }
 
+  if (options && options.testAccount) {
+    applyTestAccountEntitlements();
+  }
+
   // 本地账号会在上面重新初始化 userData；在展示首页前补齐首个真人头像，
   // 确保新注册/首次登录与远程账号使用同一套头像迁移规则。
   syncAvatarState();
@@ -5183,6 +5208,11 @@ async function doLogin() {
 
       if (phone === '13800138000' && pwd === '123456') {
         performLocalLogin('13800138000', '演示用户', 650, '钻石学员');
+        return;
+      }
+
+      if (phone === TEST_ACCOUNT_PHONE && (await hashPassword(pwd)) === TEST_ACCOUNT_PASSWORD_HASH) {
+        performLocalLogin(TEST_ACCOUNT_PHONE, '全功能测试账号', 99999, '钻石学员', { testAccount: true });
         return;
       }
 
