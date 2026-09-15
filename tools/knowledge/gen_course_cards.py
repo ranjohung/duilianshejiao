@@ -53,9 +53,15 @@ COLLECTIONS = [
     (r"B.精选好书合集\思维认知54本合集", "思维认知精选", "🔭", "book"),
     (r"B.精选好书合集\职场社交55本合集", "职场社交精选", "💼", "book"),
     (r"B.精选好书合集\赚钱营销51本合集", "赚钱营销精选", "💰", "book"),
+    (r"版块12--礼仪培训大全集 共11个模块 （182套）\赠送3：礼仪全集-视频配套PPT", "礼仪培训大全·视频配套讲义", "🙇", "doc"),
+    (r"版块12--礼仪培训大全集 共11个模块 （182套）\模块11：赠送 金正昆课程全集 23套", "礼仪培训大全·金正昆课程", "🎓", "doc"),
+    (r"版块12--礼仪培训大全集 共11个模块 （182套）", "礼仪培训大全", "🙇", "doc"),
     (r"8.《酒桌话术》.pdf", "酒桌话术", "🍶", "book"),
 ]
 DEFAULT_COLLECTION = ("其他资料", "📄", "doc")
+
+# 非学习内容：播放器安装说明等，不生成学习卡片
+EXCLUDE_RULES = ["##网络播放器"]
 
 MEDIUM_LABEL = {"audio": "音频课", "video": "视频课", "book": "电子书", "doc": "话术资料"}
 
@@ -474,6 +480,8 @@ def main():
 
     # 遍历真实文件
     for rel, info in sorted(all_rel.items()):
+        if any(x in rel for x in EXCLUDE_RULES):
+            continue
         chapter, icon, medium = collection_of(rel)
         add_card(rel, info["name"], info["ext"], medium, chapter, icon)
 

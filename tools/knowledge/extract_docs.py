@@ -14,6 +14,24 @@
 """
 import os, sys, json, re, io, hashlib, argparse, traceback
 
+# PYTHONPATH 直跑（venv python.exe 缺失）时补齐 pywin32 的路径：
+# win32\lib 提供 pywintypes.py；win32 提供 _win32sysloader.pyd；pywin32_system32 提供 DLL。
+_SP = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
+_SP = None
+for _p in (os.environ.get("PYTHONPATH") or "").split(os.pathsep):
+    if _p and os.path.exists(os.path.join(_p, "pywin32_system32")):
+        _SP = _p
+        break
+if _SP:
+    for _sub in ("win32", os.path.join("win32", "lib"), "pywin32_system32"):
+        _d = os.path.join(_SP, _sub)
+        if os.path.isdir(_d) and _d not in sys.path:
+            sys.path.insert(0, _d)
+    try:
+        os.add_dll_directory(os.path.join(_SP, "pywin32_system32"))
+    except Exception:
+        pass
+
 ROOT = r"G:\BaiduNetdiskDownload\高情商话术"
 OUTDIR = r"F:\开发软件项目文件\对练社交\knowledge_base\extracted"
 MANIFEST = os.path.join(OUTDIR, "_manifest.json")

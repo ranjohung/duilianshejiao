@@ -66,6 +66,22 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
 .challenge-stage-bubble-layer.anchored .challenge-stage-bubble::after { margin:0 auto -4px; transform:rotate(45deg); }
 .challenge-stage-bubble-layer.anchored .challenge-stage-bubble.user::after { margin:0 auto -4px; transform:rotate(45deg); }
 .training-card-module { padding:20px 18px 112px; }
+.training-card-module { position:absolute; inset:0; height:100%; overflow-y:auto; overscroll-behavior:contain; padding:22px 18px 112px; background:var(--surface-soft); }
+#training-card-module .training-card-toolbar { margin:0 -2px 14px; padding:8px 2px 14px; }
+#training-card-module #training-card-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; align-items:stretch; }
+#training-card-module #training-card-list .training-card-item { min-height:306px; display:flex; flex-direction:column; padding:14px !important; cursor:pointer; }
+#training-card-module #training-card-list .training-card-item:focus-visible { outline:3px solid rgba(99,102,241,.35); outline-offset:2px; }
+#training-card-module #training-card-list .training-card-quote,#training-card-module #training-card-list .card-principle-preview { display:-webkit-box; -webkit-box-orient:vertical; overflow:hidden; }
+#training-card-module #training-card-list .training-card-quote { -webkit-line-clamp:3; }
+#training-card-module #training-card-list .card-principle-preview { -webkit-line-clamp:3; }
+#training-card-module #training-card-list .card-open-link { margin-top:auto; display:flex; align-items:center; justify-content:space-between; gap:8px; padding-top:12px; color:#5b4cf0; font-size:12px; font-weight:600; }
+#training-card-module #training-card-list .card-open-link span:last-child { color:#9b8cf7; font-size:16px; transition:transform .2s ease; }
+#training-card-module #training-card-list .training-card-item:hover .card-open-link span:last-child { transform:translateX(3px); }
+.card-detail-modal { width:min(94vw,460px); max-height:88vh; }
+#modal-card-detail .card-detail-raw { white-space:pre-wrap; line-height:1.78; color:#403653; font-size:13px; }
+#modal-card-detail .card-detail-section { border:1px solid rgba(124,58,237,.10); border-radius:16px; background:linear-gradient(145deg,#fff,#faf8ff); padding:13px; }
+#modal-card-detail .card-detail-label { color:#6657df; font-size:12px; font-weight:700; margin-bottom:6px; }
+@media (max-width:360px) { #training-card-module #training-card-list { grid-template-columns:1fr; } #training-card-module #training-card-list .training-card-item { min-height:0; } }
 .training-card-toolbar { position:sticky; top:-1px; z-index:5; padding:4px 0 12px; background:linear-gradient(180deg,var(--surface-soft) 78%,transparent); }
 .training-card-item { position:relative; overflow:hidden; border:1px solid rgba(124,58,237,.10); border-radius:20px; background:linear-gradient(145deg,#fff 0%,#faf8ff 72%,#fff4fb 100%); box-shadow:var(--shadow-sm); transition:transform .22s var(--ease),box-shadow .22s var(--ease); }
 .training-card-item:hover { transform:translateY(-2px); box-shadow:var(--shadow-md); }
@@ -639,7 +655,91 @@ h1,h2,h3 { text-wrap:balance; }
   .action-demo-banner,.action-form-card,.photo-action { animation:none !important; transition:none !important; transform:none !important; }
 }
 </style>
-</head>
+<style id="cinematic-photo-stage-css">
+/* 真人影视舞台：真实照片背景、全身人物和电影化光影；对话/评价逻辑保持不变 */
+#modal-challenge-training .modal-content,
+#modal-etiquette-training .modal-content { background:#0b0a12; }
+#modal-challenge-training .ct-stage-fixed,
+#modal-etiquette-training .ct-stage-fixed { background:linear-gradient(180deg,#0c0b14,#171326); }
+.challenge-3d-stage.is-photo {
+  position:relative;
+  overflow:hidden;
+  isolation:isolate;
+  background:#11101a;
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:0 18px 45px rgba(5,3,18,.32), inset 0 1px 0 rgba(255,255,255,.16);
+}
+.challenge-3d-stage.is-photo .photo-bg {
+  z-index:0;
+  filter:saturate(1.08) contrast(1.06) brightness(.82);
+  transform:scale(1.035);
+}
+.challenge-3d-stage.is-photo .photo-vignette {
+  z-index:1;
+  background:
+    linear-gradient(180deg,rgba(5,4,14,.42),rgba(5,4,14,.04) 30%,rgba(5,4,14,.16) 70%,rgba(5,4,14,.66)),
+    linear-gradient(90deg,rgba(5,4,14,.28),transparent 32%,transparent 68%,rgba(5,4,14,.32));
+}
+.challenge-3d-stage.is-photo .photo-char {
+  z-index:2;
+  height:78%;
+  bottom:-4%;
+  max-width:45%;
+  filter:drop-shadow(0 16px 20px rgba(3,2,10,.62)) saturate(1.04) contrast(1.04);
+  object-fit:contain;
+}
+.challenge-3d-stage.is-photo .photo-user { left:3%; }
+.challenge-3d-stage.is-photo .photo-npc { right:3%; transform:scaleX(-1); }
+.challenge-3d-stage.is-photo .photo-char.speaking { animation:cinematicPhotoSpeak .55s var(--ease); }
+@keyframes cinematicPhotoSpeak {
+  0%,100% { filter:drop-shadow(0 16px 20px rgba(3,2,10,.62)) saturate(1.04) contrast(1.04); }
+  45% { filter:drop-shadow(0 20px 25px rgba(30,18,72,.72)) saturate(1.12) contrast(1.08); transform:translateY(-4px) scale(1.015); }
+}
+.challenge-3d-stage.is-photo .photo-desk {
+  z-index:3;
+  opacity:.94;
+  box-shadow:0 -12px 28px rgba(2,1,8,.48), inset 0 2px 0 rgba(255,255,255,.16), inset 0 -14px 24px rgba(0,0,0,.38);
+}
+.challenge-3d-stage.is-photo .photo-tag {
+  z-index:5;
+  background:rgba(10,8,24,.72);
+  border-color:rgba(255,255,255,.28);
+  box-shadow:0 6px 14px rgba(4,2,14,.42);
+}
+.challenge-3d-stage.is-photo .challenge-stage-bubble-layer.anchored {
+  position:absolute;
+  inset:0;
+  z-index:6;
+  display:block;
+  pointer-events:none;
+}
+.challenge-3d-stage.is-photo .challenge-stage-bubble-layer.anchored .challenge-stage-bubble {
+  position:absolute;
+  max-width:46%;
+  margin:0;
+  transform:translate(-50%,-100%);
+  box-shadow:0 10px 24px rgba(7,4,24,.34);
+  backdrop-filter:blur(12px);
+}
+.challenge-3d-stage.is-photo .challenge-stage-bubble-layer.anchored .challenge-stage-bubble.user {
+  background:linear-gradient(135deg,#655df4,#a34df4);
+}
+.challenge-3d-stage.is-photo .challenge-stage-hud { z-index:7; }
+.challenge-3d-stage.is-photo .challenge-stage-hud .hud-card {
+  background:rgba(9,7,22,.58);
+  border-color:rgba(255,255,255,.24);
+  box-shadow:0 8px 20px rgba(2,1,9,.24);
+}
+.cinematic-scene-note {
+  color:#d7ccef;
+  font-size:11px;
+  letter-spacing:.02em;
+}
+@media (max-width:430px) {
+  .challenge-3d-stage.is-photo .photo-char { height:76%; }
+  .challenge-3d-stage.is-photo .challenge-stage-bubble-layer.anchored .challenge-stage-bubble { max-width:52%; font-size:11px; }
+}
+</style></head>
 <body data-page-node-id="w62ZySAPUczSBdQm5VT3GI">
 <div class="app" id="app" data-page-node-id="ZE7203n81Xdoa1QX3Uuun8">
 
@@ -668,13 +768,13 @@ h1,h2,h3 { text-wrap:balance; }
           <div class="space-y-4" data-page-node-id="68Bby39WjyOhhcZPKbQitR">
             <div data-page-node-id="hKsBRHsTLGDkVNjgY5AGOI">
               <label class="block text-sm font-medium text-gray-700 mb-1.5" data-page-node-id="kxiEhP2mynSZxGlFiEs1CH">手机号</label>
-              <input id="login-phone" type="tel" maxlength="11" placeholder="请输入手机号" value="13800138000"
+              <input id="login-phone" type="tel" maxlength="13" placeholder="请输入手机号"
                 class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all" data-page-node-id="hEkEe9cJdowZUdqoohg43u">
             </div>
             <div id="login-password-group" data-page-node-id="9DQ3k8jZED0FvvwcDMMZy6">
               <label class="block text-sm font-medium text-gray-700 mb-1.5" data-page-node-id="TFr4k0RvlIorMRkHLeq2gF">密码</label>
               <div class="relative" data-page-node-id="umcLo429aljju70FFQXL1V">
-                <input id="login-password" type="password" placeholder="请输入密码" value="123456"
+                <input id="login-password" type="password" placeholder="请输入密码"
                   class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all" data-page-node-id="LRmYR9v440Zye3TozG05LC">
                 <button type="button" onclick="toggleLoginPwd()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" data-page-node-id="EsXPMhRpAWQCUSWl4WQBmt">
                   <span id="login-pwd-eye" data-page-node-id="ZA0Ult8LuF97ZGQW1UfKNw">👁</span>
@@ -688,7 +788,6 @@ h1,h2,h3 { text-wrap:balance; }
                   class="flex-1 px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all" data-page-node-id="UMjoy7zyDYSmsvJ5tJ88Rq">
                 <button onclick="sendSms()" id="sms-btn" class="px-4 py-3 bg-indigo-50 text-indigo-600 rounded-xl text-sm font-medium hover:bg-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all whitespace-nowrap" data-page-node-id="rt6XvNFGgh9Mw1lhFlWb2u">获取验证码</button>
               </div>
-              <p class="text-xs text-gray-400 mt-1" data-page-node-id="AObXIXnh00OdZ4UZ9aTUfw">体验验证码：123456</p>
             </div>
           </div>
 
@@ -706,8 +805,8 @@ h1,h2,h3 { text-wrap:balance; }
             登 录
           </button>
 
-          <button onclick="fillTestAccount()" class="w-full mt-3 py-3 bg-white border border-indigo-200 text-indigo-600 font-medium rounded-xl hover:bg-indigo-50 transition-all" data-page-node-id="gJJdP7BaFmwkp50ACrhNii">
-            🧪 演示账号登录 · 填充测试账号（手动输入密码）
+          <button onclick="demoLogin()" class="w-full mt-3 py-3 bg-white border border-indigo-200 text-indigo-600 font-medium rounded-xl hover:bg-indigo-50 transition-all" data-page-node-id="gJJdP7BaFmwkp50ACrhNii">
+            演示账号登录
           </button>
 
           <div class="flex items-center justify-center mt-6" data-page-node-id="HyhMWazJQBBWO45JqMLar7">
@@ -722,7 +821,7 @@ h1,h2,h3 { text-wrap:balance; }
           <div class="space-y-4" data-page-node-id="2xJw0nQaVwi8BMnXquXjK1">
             <div data-page-node-id="ki7ADWttSOEZQzBvWngxrH">
               <label class="block text-sm font-medium text-gray-700 mb-1.5" data-page-node-id="KnSY2oCLEUdtDrawjyrHId">手机号</label>
-              <input id="reg-phone" type="tel" maxlength="11" placeholder="请输入手机号"
+              <input id="reg-phone" type="tel" maxlength="13" placeholder="请输入手机号"
                 class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all" data-page-node-id="Ay6VeujvZQvaU4eY4CAvPF">
             </div>
             <div data-page-node-id="nLgI486EznBHZFGUfbHeG4">
@@ -1259,7 +1358,7 @@ h1,h2,h3 { text-wrap:balance; }
           </button>
           <button onclick="showHomework()" class="w-full text-left bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all" data-page-node-id="zxWsgnyiijJfHQpfGBpnyE">
             <div class="flex items-center justify-between" data-page-node-id="tOX9bIFjanNXqJkdAP5ZDa">
-              <div class="flex items-center gap-3" data-page-node-id="YuQl3Yc0UrNZbFmoxiD4Y2"><span class="text-2xl" data-page-node-id="7GICmqslpI9r0zNHcGJP9N">📝</span><div data-page-node-id="y0bbTVVm0yvoLeBnCoygxO"><h3 class="font-semibold text-lg" data-page-node-id="6CqQBiquA388GMrS514HJK">我的作业</h3><p class="text-xs opacity-80 mt-1" data-page-node-id="3jQNVCDoZ47StGB75hm77g">查看教练布置的专项练习</p></div></div>
+              <div class="flex items-center gap-3" data-page-node-id="YuQl3Yc0UrNZbFmoxiD4Y2"><span class="text-2xl" data-page-node-id="7GICmqslpI9r0zNHcGJP9N">📝</span><div data-page-node-id="y0bbTVVm0yvoLeBnCoygxO"><h3 class="font-semibold text-lg" data-page-node-id="6CqQBiquA388GMrS514HJK">现实挑战</h3><p class="text-xs opacity-80 mt-1" data-page-node-id="3jQNVCDoZ47StGB75hm77g">查看教练布置的专项练习</p></div></div>
               <span class="text-sm opacity-80" data-page-node-id="kQuX7mjzOSb89tHsronjHe">进入 →</span>
             </div>
           </button>
@@ -2774,6 +2873,17 @@ h1,h2,h3 { text-wrap:balance; }
     </div>
   </div>
 
+  <!-- ===== 学习卡片详情弹窗 ===== -->
+  <div class="modal-overlay" id="modal-card-detail" style="display:none" role="dialog" aria-modal="true" aria-labelledby="card-detail-title">
+    <div class="modal-content h-[88vh] flex flex-col card-detail-modal">
+      <div class="flex items-center justify-between p-4 border-b border-gray-100">
+        <div><div class="text-xs text-indigo-500 font-medium">课程详情</div><h3 id="card-detail-title" class="font-semibold text-gray-800 mt-1">📖 学习课程</h3></div>
+        <button onclick="closeModal('card-detail')" aria-label="关闭课程详情" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+      </div>
+      <div class="flex-1 overflow-auto p-4" id="card-detail-content"></div>
+    </div>
+  </div>
+
   <!-- ===== 学习卡片复习弹窗 ===== -->
   <div class="modal-overlay" id="modal-card-review" style="display:none" data-page-node-id="OUm9Og8LlqHvrpEzLQwDP8">
     <div class="modal-content h-[80vh]" data-page-node-id="VFhvHBIzHgEXZpGJrSCAdj">
@@ -2811,7 +2921,7 @@ h1,h2,h3 { text-wrap:balance; }
   <div class="modal-overlay" id="modal-homework" style="display:none" data-page-node-id="0XMxmES7eDid6qLyVzBS12">
     <div class="modal-content h-[80vh]" data-page-node-id="AwjpbRFl7Cos5HFUMTUUSR">
       <div class="flex items-center justify-between p-4 border-b border-gray-100" data-page-node-id="8n7PG7LPoQpjtPFwGsyBX0">
-        <h3 class="font-semibold text-gray-800" data-page-node-id="7FVGxqqvKYFgXDY6Q1LRyr">📝 我的作业</h3>
+        <h3 class="font-semibold text-gray-800" data-page-node-id="7FVGxqqvKYFgXDY6Q1LRyr">📝 现实挑战</h3>
         <button onclick="closeModal('homework')" class="text-gray-400 hover:text-gray-600 text-xl" data-page-node-id="R4EAJoCCCLiBpC1T8G8x7p">✕</button>
       </div>
       <div class="flex-1 overflow-auto p-4" id="homework-content" data-page-node-id="B5E2k1kmVFYnTA6lF5qja9"></div>
@@ -3148,6 +3258,7 @@ h1,h2,h3 { text-wrap:balance; }
 <script src="libs/SkeletonUtils.js"></script>
 <script src="libs/etiquette_anim_data.js"></script>
 <script src="libs/game_stage3d.js"></script>
+
 <script>
 // ===== 全局状态 =====
 let currentTab = 'home';
@@ -3718,6 +3829,119 @@ let trainingScenes = [
       { type:'B', label:'平衡型', desc:'询问价格 + 表达购买意愿', example:'多少钱？便宜点我就买' },
       { type:'C', label:'含蓄型', desc:'简单询问', example:'多少钱？' }
     ], bestAnswer:'这个挺好看的，老板便宜点吧，我诚心买，30块怎么样？' }
+  ]},
+  // ===== 以下 6 个场景依据「礼仪培训大全」原始资料（模块1-6 配套讲义）补充，作为学习卡片知识的练习检验 =====
+  { id:201, icon:'🤝', name:'商务接待九部曲', desc:'迎候·握手·名片·引领·送别全流程', stage:2, difficulty:3, duration:'15min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, userStarts:true, rounds:[
+    { ai:'（客户第一次来访，你在公司大堂迎候）您就是李总吧？一路辛苦了！', thinking:[
+      { type:'A', label:'主动型', desc:'称呼得体 + 握手七步走完整流程', example:'李总您好，欢迎莅临！一直盼着您来。（相距约1米大方伸手，虎口相对、满握、抖三下，面带微笑眼神交流）' },
+      { type:'B', label:'平衡型', desc:'热情问候 + 等对方先伸手', example:'李总您好，欢迎欢迎！您路上还顺利吗？' },
+      { type:'C', label:'含蓄型', desc:'点头示意不主动', example:'李总好，这边请。' }
+    ], bestAnswer:'李总您好，欢迎莅临！一直盼着您来。（相距约1米大方伸手，虎口相对、满握、抖三下，面带微笑眼神交流）' },
+    { ai:'这是我的名片，请多关照。', thinking:[
+      { type:'A', label:'主动型', desc:'双手接 + 赞美名字 + 珍惜名字', example:'谢谢李总！（双手接过，认真看几秒）"李"是百家大姓，"总"这个称呼您担得起——我念一遍记住了：李总。我也互换一张名片。' },
+      { type:'B', label:'平衡型', desc:'双手接 + 简短回应', example:'谢谢，我收好了，这是我的名片，请多指教。' },
+      { type:'C', label:'含蓄型', desc:'单手接过放好', example:'好的，收到。' }
+    ], bestAnswer:'谢谢李总！（双手接过，认真看几秒）"李"是百家大姓，"总"这个称呼您担得起——我念一遍记住了：李总。我也互换一张名片。' },
+    { ai:'那我们走吧，会议室在哪边？', thinking:[
+      { type:'A', label:'主动型', desc:'以右为尊引领 + 电梯先进按门再请尊者在后', example:'李总这边请，您走我右手边。（空电梯自己先进按住按钮挡门，请李总进；出电梯请李总先行，尊者离开越快越安全）' },
+      { type:'B', label:'平衡型', desc:'并排引导 + 提醒路线', example:'这边请，前面右转就到，您小心台阶。' },
+      { type:'C', label:'含蓄型', desc:'自己前面走', example:'跟我来。' }
+    ], bestAnswer:'李总这边请，您走我右手边。（空电梯自己先进按住按钮挡门，请李总进；出电梯请李总先行，尊者离开越快越安全）' },
+    { ai:'辛苦你了，今天聊得很愉快，我先回去了。', thinking:[
+      { type:'A', label:'主动型', desc:'重视末轮效应 + 送别到电梯/车 + 目送离开', example:'李总今天辛苦了！（送至电梯口，帮按电梯）您慢走，期待下次合作，我看着您上去再离开。' },
+      { type:'B', label:'平衡型', desc:'礼貌送别到大堂', example:'李总慢走，有空常来！' },
+      { type:'C', label:'含蓄型', desc:'办公室门口道别', example:'好，再见。' }
+    ], bestAnswer:'李总今天辛苦了！（送至电梯口，帮按电梯）您慢走，期待下次合作，我看着您上去再离开。' }
+  ]},
+  { id:202, icon:'🚗', name:'乘车座次礼仪', desc:'专职司机·主人驾车·商务车座次', stage:2, difficulty:3, duration:'10min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, userStarts:true, rounds:[
+    { ai:'（公司派专职司机接一位重要客户）王总，车到了，您请上车——您看坐哪儿合适？', thinking:[
+      { type:'A', label:'主动型', desc:'有专职司机时尊者坐右后侧 + 上车前扶门框', example:'王总，您坐右后侧这个位置最安全也最方便下车。（助理用手扶一下尊者头部上方的门框）' },
+      { type:'B', label:'平衡型', desc:'请客人自选 + 说明都方便', example:'王总您随意坐，哪个位置都行。' },
+      { type:'C', label:'含蓄型', desc:'拉开副驾驶门请客人上', example:'王总，坐前面视野好。' }
+    ], bestAnswer:'王总，您坐右后侧这个位置最安全也最方便下车。（助理用手扶一下尊者头部上方的门框）' },
+    { ai:'（另一个场合）今天我自己开车来接你，别客气，随便坐！', thinking:[
+      { type:'A', label:'主动型', desc:'主人开车主客同级 → 坐副驾驶方便交流', example:'那我就坐您旁边副驾驶了，正好路上多聊聊——有专职司机才坐后排呢。' },
+      { type:'B', label:'平衡型', desc:'客气一下再坐副驾驶', example:'不好意思麻烦您专程来接，那我坐前面啦。' },
+      { type:'C', label:'含蓄型', desc:'坚持坐后排以示尊敬', example:'不用，我坐后面就好。' }
+    ], bestAnswer:'那我就坐您旁边副驾驶了，正好路上多聊聊——有专职司机才坐后排呢。' },
+    { ai:'下周接待批次人多，要坐七座商务车，座位怎么安排？', thinking:[
+      { type:'A', label:'主动型', desc:'商务车：尊者坐司机右后方，接待方最高者坐司机正后方，职级低的先上坐最后一排', example:'让主宾坐司机右后方，我方带队领导坐司机正后方陪同，我们几个先上车坐最后一排，跟领导说"您后上更方便"。' },
+      { type:'B', label:'平衡型', desc:'大致按职位高低排，不细究方位', example:'按职级从前往后排就行。' },
+      { type:'C', label:'含蓄型', desc:'谁先到谁先坐', example:'随意坐，不用讲究。' }
+    ], bestAnswer:'让主宾坐司机右后方，我方带队领导坐司机正后方陪同，我们几个先上车坐最后一排，跟领导说"您后上更方便"。' },
+    { ai:'（送客户下车后）送到这儿了，您慢走！', thinking:[
+      { type:'A', label:'主动型', desc:'客户下车后摇下车窗目送，位分高则右后两窗全放', example:'王总慢走！（等客户转身关门的一刹那能对上眼神，把右侧车窗摇下来挥手道别再驶离）' },
+      { type:'B', label:'平衡型', desc:'点头道别即走', example:'好的，再见！（关门后直接开车走）' },
+      { type:'C', label:'含蓄型', desc:'按喇叭示意', example:'（按两下喇叭离开）' }
+    ], bestAnswer:'王总慢走！（等客户转身关门的一刹那能对上眼神，把右侧车窗摇下来挥手道别再驶离）' }
+  ]},
+  { id:203, icon:'🍽', name:'商务宴请座次与话题', desc:'主陪副陪·宴席话题·结账禁忌', stage:2, difficulty:4, duration:'15min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, userStarts:true, rounds:[
+    { ai:'今晚我主请客户吃饭，包间圆桌，我和客户还有6个陪同，座位怎么安排？', thinking:[
+      { type:'A', label:'主动型', desc:'面门为上定主陪，主陪对面靠门是副陪，主宾坐主陪右手边', example:'您坐正对包间门的主陪位，客户坐您右手边主宾位，副陪坐您对面靠门位方便进出张罗。' },
+      { type:'B', label:'平衡型', desc:'大致让客户坐中间', example:'让客户坐主位，我们围着坐就行。' },
+      { type:'C', label:'含蓄型', desc:'不讲究座次', example:'随便坐，都是自己人。' }
+    ], bestAnswer:'您坐正对包间门的主陪位，客户坐您右手边主宾位，副陪坐您对面靠门位方便进出张罗。' },
+    { ai:'（席间有点冷场）你觉得聊点什么好？', thinking:[
+      { type:'A', label:'主动型', desc:'聊自己擅长的行业领域，逐步过渡到对方业务，不聊娱乐八卦', example:'可以从您深耕的行业趋势聊起，再请教客户业务上的经验——宴席话题选自己擅长的领域最稳妥。' },
+      { type:'B', label:'平衡型', desc:'聊热点新闻破冰', example:'最近那个大新闻您看到了吗？' },
+      { type:'C', label:'含蓄型', desc:'聊娱乐八卦活跃气氛', example:'说说最近哪个明星的瓜？' }
+    ], bestAnswer:'可以从您深耕的行业趋势聊起，再请教客户业务上的经验——宴席话题选自己擅长的领域最稳妥。' },
+    { ai:'饭吃完了，服务员拿来账单，当着客户的面怎么处理最得体？', thinking:[
+      { type:'A', label:'主动型', desc:'提前离席或提前结账，不当客户面争执账单', example:'（提前去前台把账结了，回来继续谈笑）——结账不当着客人面进行，也绝不和客户抢账单。' },
+      { type:'B', label:'平衡型', desc:'当着面抢着买单', example:'这单我来！不能让您请！（当客户面拉扯账单）' },
+      { type:'C', label:'含蓄型', desc:'提议AA制', example:'咱们各付各的吧。' }
+    ], bestAnswer:'（提前去前台把账结了，回来继续谈笑）——结账不当着客人面进行，也绝不和客户抢账单。' }
+  ]},
+  { id:204, icon:'🚪', name:'引导与电梯礼仪', desc:'敲门·引路·上下电梯细节', stage:1, difficulty:2, duration:'8min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, userStarts:true, rounds:[
+    { ai:'（要给领导办公室送材料）直接推门进去行吗？', thinking:[
+      { type:'A', label:'主动型', desc:'敲门三下 + 两次无人不再敲', example:'先"铛铛铛"敲三下，若两次都没人回应就不再敲了——尊重对方隐私，改发消息预约。' },
+      { type:'B', label:'平衡型', desc:'敲一下就进', example:'（敲一下门直接进去）' },
+      { type:'C', label:'含蓄型', desc:'门开着就直接进', example:'（门开着就不敲了）' }
+    ], bestAnswer:'先"铛铛铛"敲三下，若两次都没人回应就不再敲了——尊重对方隐私，改发消息预约。' },
+    { ai:'（送完材料出门时）材料放桌上了，怎么离开最得体？', thinking:[
+      { type:'A', label:'主动型', desc:'关门脸朝领导 + 可问是否需要关门', example:'倒退半步把门轻轻带上，让领导全程看到我的正面；门原本开着的话再问一句"领导，需要我帮您把门关上吗？"' },
+      { type:'B', label:'平衡型', desc:'普通道别关门', example:'领导您忙，我先走了。（转身随手关门）' },
+      { type:'C', label:'含蓄型', desc:'悄悄退出', example:'（不出声退出去）' }
+    ], bestAnswer:'倒退半步把门轻轻带上，让领导全程看到我的正面；门原本开着的话再问一句"领导，需要我帮您把门关上吗？"' },
+    { ai:'（陪领导进电梯，电梯里空无一人）谁先进去？', thinking:[
+      { type:'A', label:'主动型', desc:'无人时自己先进按住按钮挡门，请尊者后进；有人时请尊者先进', example:'电梯空着我先进去按住开门键，再请领导进；要是里面有人，就在外按住门请领导先进。' },
+      { type:'B', label:'平衡型', desc:'一定让领导先进', example:'领导您先请！（不管电梯里有没有人）' },
+      { type:'C', label:'含蓄型', desc:'自己先冲进去站好', example:'（先进去按楼层）' }
+    ], bestAnswer:'电梯空着我先进去按住开门键，再请领导进；要是里面有人，就在外按住门请领导先进。' }
+  ]},
+  { id:205, icon:'🏪', name:'门店服务接待礼仪', desc:'迎接·微笑·致歉·欢送四规范', stage:1, difficulty:2, duration:'10min', unlocked:false, completed:false, unlockLevel:'青铜', unlockPoints:0, unlockTickets:0, userStarts:true, rounds:[
+    { ai:'（你做门店店员，一位顾客推门进来）这时候第一句话说什么？', thinking:[
+      { type:'A', label:'主动型', desc:'标准迎接语 + 微笑露出6-8颗门牙、目光正视', example:'（面带微笑露出6-8颗门牙，双眼正视顾客）欢迎光临！您随便看，有需要随时叫我。' },
+      { type:'B', label:'平衡型', desc:'点头问好', example:'您好。（低头继续理货）' },
+      { type:'C', label:'含蓄型', desc:'不打扰顾客', example:'（假装没看见）' }
+    ], bestAnswer:'（面带微笑露出6-8颗门牙，双眼正视顾客）欢迎光临！您随便看，有需要随时叫我。' },
+    { ai:'顾客抱怨：上周买的衣服洗一次就变形了，你们什么质量！', thinking:[
+      { type:'A', label:'主动型', desc:'先致歉安抚 + 了解细节 + 给出解决路径', example:'实在抱歉给您添麻烦了！（先致歉）您方便把衣服拿来吗？我帮您登记，按售后流程先检测再给您换或退，今天一定给您答复。' },
+      { type:'B', label:'平衡型', desc:'解释洗护原因', example:'是不是您洗的方式不对？我们标签上有洗涤说明的。' },
+      { type:'C', label:'含蓄型', desc:'让顾客找厂家', example:'这是厂家的问题，您得找他们。' }
+    ], bestAnswer:'实在抱歉给您添麻烦了！（先致歉）您方便把衣服拿来吗？我帮您登记，按售后流程先检测再给您换或退，今天一定给您答复。' },
+    { ai:'问题解决了，顾客满意地离开，最后一步做什么？', thinking:[
+      { type:'A', label:'主动型', desc:'标准欢送语 + 末轮效应留下好印象', example:'请慢走，欢迎再次光临！（送到门口目送，最后环节决定顾客对整次服务的记忆）' },
+      { type:'B', label:'平衡型', desc:'简单道别', example:'再见。' },
+      { type:'C', label:'含蓄型', desc:'顾客走了就行', example:'（忙自己的事）' }
+    ], bestAnswer:'请慢走，欢迎再次光临！（送到门口目送，最后环节决定顾客对整次服务的记忆）' }
+  ]},
+  { id:206, icon:'🌍', name:'涉外商务交往', desc:'欧美客户的话题·顺序·禁忌', stage:3, difficulty:4, duration:'12min', unlocked:false, completed:false, unlockLevel:'白银', unlockPoints:50, unlockTickets:1, userStarts:true, rounds:[
+    { ai:'（接待一位德国客户，刚开始寒暄）你该避免问什么？', thinking:[
+      { type:'A', label:'主动型', desc:'不问工资、家庭等隐私，聊行业与专业', example:'不问收入和家庭，可以聊行业动态、对方的专业经历——欧美商务交往中隐私是禁忌，夸人常说"很专业"。' },
+      { type:'B', label:'平衡型', desc:'客套拉家常', example:'您工资高吗？孩子多大了？' },
+      { type:'C', label:'含蓄型', desc:'全程沉默', example:'（不主动找话题）' }
+    ], bestAnswer:'不问收入和家庭，可以聊行业动态、对方的专业经历——欧美商务交往中隐私是禁忌，夸人常说"很专业"。' },
+    { ai:'和欧美客户做生意，信任建立的顺序和中国有什么不同？', thinking:[
+      { type:'A', label:'主动型', desc:'法理情顺序，先生意后朋友', example:'欧美是"法、理、情"——先谈合同细节把生意做规范，信任建立在守时、专业和诚信上，交情是生意之后慢慢来的。' },
+      { type:'B', label:'平衡型', desc:'先交朋友再谈生意', example:'咱们先吃饭喝酒处成朋友，生意好谈。' },
+      { type:'C', label:'含蓄型', desc:'顺其自然', example:'慢慢来呗，无所谓顺序。' }
+    ], bestAnswer:'欧美是"法、理、情"——先谈合同细节把生意做规范，信任建立在守时、专业和诚信上，交情是生意之后慢慢来的。' },
+    { ai:'客户第一次来中国，约了上午10点在公司谈合作，你几点到？', thinking:[
+      { type:'A', label:'主动型', desc:'提前10-15分钟到，材料、译员、座位提前备好', example:'9:45 前到公司，会议室茶水、资料提前备好——欧美客户把守时当作专业和诚信的第一信号，迟到一次基本出局。' },
+      { type:'B', label:'平衡型', desc:'10点准时到就行', example:'准时到不算失礼吧？' },
+      { type:'C', label:'含蓄型', desc:'客户来了我再出现', example:'到点了下去接就行。' }
+    ], bestAnswer:'9:45 前到公司，会议室茶水、资料提前备好——欧美客户把守时当作专业和诚信的第一信号，迟到一次基本出局。' }
   ]}
 ];
 
@@ -4982,7 +5206,7 @@ function renderRegister() {
 }
 
 async function sendSms() {
-  const phone = $('login-phone').value.trim();
+  const phone = $('login-phone').value.replace(/[\uFF01-\uFF5E\u3000]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0)).replace(/\s+/g, '');
   if (!phone || phone.length!==11) { alert('请输入正确的手机号'); return; }
 
   const btn = $('sms-btn');
@@ -5016,7 +5240,7 @@ async function sendSms() {
 }
 
 async function sendRegSms() {
-  const phone = $('reg-phone').value.trim();
+  const phone = $('reg-phone').value.replace(/[\uFF01-\uFF5E\u3000]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0)).replace(/\s+/g, '');
   if (!phone || phone.length!==11) { alert('请输入正确的手机号'); return; }
 
   const btn = $('reg-sms-btn');
@@ -5052,14 +5276,15 @@ async function sendRegSms() {
 const TEST_ACCOUNT_PHONE = '17351455944';
 const TEST_ACCOUNT_PASSWORD_HASH = '0bbc86f081714d7e9e1ba06110209a2b95ae1a00552216f38d98d9c61733d512';
 
-function fillTestAccount() {
+// 演示账号入口：仅供开发验收。不回填、不一键登录，必须手动输入演示账号和密码才能进入（防白嫖）。
+function demoLogin() {
   loginMode = 'password';
   switchLoginMode('password');
-  $('login-phone').value = TEST_ACCOUNT_PHONE;
+  $('login-phone').value = '';
   $('login-password').value = '';
   $('login-error').style.display = 'none';
-  showToast('已填入测试账号手机号，请手动输入密码后点击“登录”');
-  $('login-password').focus();
+  showToast('请输入演示账号和密码后登录');
+  $('login-phone').focus();
 }
 
 function applyTestAccountEntitlements() {
@@ -5104,7 +5329,7 @@ function loadLocalUser(phone, password) {
   return null;
 }
 
-function performLocalLogin(phone, nickname, points = 650, level = '钻石学员') {
+function performLocalLogin(phone, nickname, points = 650, level = '钻石学员', options = {}) {
   resetAccountState();
   const savedKey = STORAGE_PREFIX + 'user_' + phone;
   const savedData = localStorage.getItem(savedKey);
@@ -5193,7 +5418,9 @@ function performLocalLogin(phone, nickname, points = 650, level = '钻石学员'
 
 async function doLogin() {
   try {
-    const phone = $('login-phone').value.trim();
+    // 全角→半角 + 去所有空白：输入法全角模式、粘贴带空格的手机号/密码都能正确匹配。
+    const fw = s => s.replace(/[\uFF01-\uFF5E\u3000]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0));
+    const phone = fw($('login-phone').value).replace(/\s+/g, '');
     const err = $('login-error');
 
     if (!phone || phone.length!==11) {
@@ -5203,13 +5430,9 @@ async function doLogin() {
     }
 
     if (loginMode === 'password') {
-      const pwd = $('login-password').value.trim();
+      // 全角字符归一化为半角：输入法开着时打出的 ｙｊｊ８８０９０５ 也能正确匹配。
+      const pwd = fw($('login-password').value).replace(/\s+/g, '');
       if (!pwd) { err.textContent='请输入密码'; err.style.display='block'; return; }
-
-      if (phone === '13800138000' && pwd === '123456') {
-        performLocalLogin('13800138000', '演示用户', 650, '钻石学员');
-        return;
-      }
 
       if (phone === TEST_ACCOUNT_PHONE && (await hashPassword(pwd)) === TEST_ACCOUNT_PASSWORD_HASH) {
         performLocalLogin(TEST_ACCOUNT_PHONE, '全功能测试账号', 99999, '钻石学员', { testAccount: true });
@@ -5267,7 +5490,7 @@ async function doLogin() {
         isLocalUser: !isRemote
       };
     } else {
-      const sms = $('login-sms').value.trim();
+      const sms = fw($('login-sms').value).replace(/\s+/g, '');
       if (!sms || sms.length!==6) { err.textContent='请输入6位验证码'; err.style.display='block'; return; }
       const result = await apiRequest('/auth/login', {
         method: 'POST',
@@ -5343,10 +5566,11 @@ function showGuideHint(text) {
 }
 
 async function doRegister() {
-  const phone = $('reg-phone').value.trim();
+  const fwR = s => s.replace(/[\uFF01-\uFF5E\u3000]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0));
+  const phone = fwR($('reg-phone').value).replace(/\s+/g, '');
   const nick = $('reg-nickname').value.trim();
-  const pwd = $('reg-password').value.trim();
-  const confirmPwd = $('reg-confirm-password').value.trim();
+  const pwd = fwR($('reg-password').value).replace(/\s+/g, '');
+  const confirmPwd = fwR($('reg-confirm-password').value).replace(/\s+/g, '');
   const agreeTerms = $('agree-terms').checked;
   const err = $('register-error');
 
@@ -6948,6 +7172,9 @@ const sceneCategories = [
   { id:'数字社交', name:'数字社交', icon:'📱', color:'bg-indigo-500', count:4 }
 ];
 
+// V3 模块需要通过 window.templateScenes 访问（const 声明不在 window 上）
+window.templateScenes = templateScenes;
+
 function checkInitialSceneSelection() {
   // 会员仅在权益有效期内获得直接访问权，不把场景永久写入 unlocked，避免到期后仍可使用。
   if (!isFreeTier()) return;
@@ -7292,6 +7519,7 @@ function showTrainingModule(moduleName) {
 
   const trainingPage = $('page-training');
   if (trainingPage) trainingPage.scrollTop = 0;
+  if (cards && moduleName === 'cards') cards.scrollTop = 0;
 }
 
 function showComingSoon(featureName) {
@@ -13302,9 +13530,27 @@ function escapeCardText(value) {
   return div.innerHTML;
 }
 
+function getLearningCardCategory(card) {
+  if (!card) return '社交沟通';
+  if (card.kind !== 'lesson' && card.kind !== 'summary' && card.kind !== 'intro') return card.category || '社交沟通';
+  const sourceText = String(card.scene || '') + ' ' + String(card.title || '');
+  const rules = [
+    [/表情|倾听|回应|谈话终结/, '倾听与回应'],
+    [/暗示|读心|情绪|同理/, '同理与情绪'],
+    [/万用话题|话题|聊天内容|谈资/, '话题拓展'],
+    [/攀谈|炒热气氛|融入人群|破冰/, '破冰与融入'],
+    [/故事|表达|说服|说明/, '表达与故事'],
+    [/投其所好|赞美|恭维|关系/, '赞美与关系'],
+    [/职场|上司|下属|工作/, '职场沟通'],
+    [/发问|提问|问题|询问/, '提问与信息']
+  ];
+  const matched = rules.find(function(item) { return item[0].test(sourceText); });
+  return matched ? matched[1] : (card.category || '好好接话课程');
+}
+
 function getCardCategories() {
-  const categories = Array.from(new Set(learningCards.map(card => card.category).filter(Boolean)));
-  return ['全部', ...categories];
+  const categories = Array.from(new Set(learningCards.map(getLearningCardCategory).filter(Boolean)));
+  return ['全部'].concat(categories);
 }
 
 function showCards() {
@@ -13318,7 +13564,8 @@ function showCards() {
 function setCardSearchTerm(value) {
   cardSearchTerm = String(value || '').trim().toLowerCase();
   cardPage = 1;
-  renderCards('training');
+  const target = document.getElementById('training-card-module') && document.getElementById('training-card-module').style.display !== 'none' ? 'training' : 'modal';
+  renderCards(target);
 }
 
 function setCardFilter(value, target) {
@@ -13334,26 +13581,92 @@ function loadMoreCards() {
 
 function cardMatchesSearch(card) {
   if (!cardSearchTerm) return true;
-  const haystack = [card.title, card.scene, card.category, card.content, card.principle, card.practicePrompt, ...(card.tags || []), ...(card.tips || [])].join(' ').toLowerCase();
+  const category = getLearningCardCategory(card);
+  const haystack = [card.title, card.scene, category, card.category, card.content, card.rawText, card.principle, card.practicePrompt].concat(card.tags || [], card.tips || []).join(' ').toLowerCase();
   return haystack.includes(cardSearchTerm);
 }
 
+function learningCardJsArg(id) {
+  return JSON.stringify(String(id == null ? '' : id));
+}
+
+function getLearningCardTarget() {
+  const module = document.getElementById('training-card-module');
+  return module && module.style.display !== 'none' ? 'training' : 'modal';
+}
+
+function refreshLearningCards() {
+  renderCards(getLearningCardTarget());
+}
+
 function renderCardItem(card) {
-  const collected = collectedCards.some(item => item.id === card.id);
+  const collected = collectedCards.some(function(item) { return item.id === card.id; });
   const tips = Array.isArray(card.tips) ? card.tips.slice(0, 3) : [];
-  return `<article class="training-card-item p-4">
-    <div class="relative z-10 flex items-start justify-between gap-3">
-      <div class="flex flex-wrap items-center gap-2"><span class="px-2 py-1 rounded-full bg-indigo-100 text-indigo-700 text-[11px] font-medium">${escapeCardText(card.category || '社交沟通')}</span><span class="px-2 py-1 rounded-full bg-white/80 text-gray-500 text-[11px]">${escapeCardText(card.scene || '通用场景')}</span></div>
-      ${collected ? '<span class="text-[11px] text-green-600">★ 已收藏</span>' : ''}
-    </div>
-    <h3 class="relative z-10 text-base font-semibold text-gray-900 mt-3">${escapeCardText(card.title)}</h3>
-    <p class="relative z-10 training-card-quote text-sm mt-2">${escapeCardText(card.content || card.principle || '先理解场景，再组织表达。')}</p>
-    <div class="relative z-10 mt-3 rounded-xl bg-white/75 p-3"><div class="text-[11px] font-semibold text-indigo-600 mb-1">核心原则</div><p class="text-xs text-gray-600 leading-relaxed">${escapeCardText(card.principle || '结合真实信息，尊重对方边界。')}</p></div>
-    ${tips.length ? `<div class="relative z-10 flex flex-wrap gap-1.5 mt-3">${tips.map(t => `<span class="px-2 py-1 rounded-lg bg-purple-50 text-purple-700 text-[11px]">${escapeCardText(t)}</span>`).join('')}</div>` : ''}
-    <div class="relative z-10 mt-3 flex items-center justify-between gap-2"><span class="text-[11px] text-gray-500">练习：${escapeCardText(card.practicePrompt || '用自己的话完成一次表达')}</span><button onclick="${collected ? `startCardReview(${JSON.stringify(card.id)})` : `collectCard(${JSON.stringify(card.id)})`}" class="flex-shrink-0 px-3 py-2 rounded-lg ${collected ? 'bg-emerald-500 text-white' : 'bg-indigo-50 text-indigo-700'} text-xs font-medium">${collected ? '开始复习' : '+ 收藏'}</button></div>
-    ${collected ? `<button onclick="removeCard(${JSON.stringify(card.id)})" class="relative z-10 mt-2 text-[11px] text-gray-400 underline">取消收藏</button>` : ''}
-    <p class="relative z-10 text-[10px] text-amber-700 mt-3">⚠️ ${escapeCardText(card.safetyNote || '请结合真实情况改写，不编造、不施压。')}</p>
-  </article>`;
+  const category = getLearningCardCategory(card);
+  const cardArgHtml = learningCardJsArg(card.id).replace(/"/g, '&quot;');
+  const sourceLabel = card.rawText ? '原文课程' : '结构化知识';
+  const collectAction = collected ? 'startCardReview(' + cardArgHtml + ')' : 'collectCard(' + cardArgHtml + ')';
+  const html = [
+    '<article class="training-card-item p-4" role="button" tabindex="0" aria-label="查看课程：' + escapeCardText(card.title) + '" onclick="openLearningCard(' + cardArgHtml + ')" onkeydown="if(event.key===&quot;Enter&quot;||event.key===&quot; &quot;){event.preventDefault();openLearningCard(' + cardArgHtml + ')}">',
+    '<div class="relative z-10 flex items-start justify-between gap-3"><div class="flex flex-wrap items-center gap-2"><span class="px-2 py-1 rounded-full bg-indigo-100 text-indigo-700 text-[11px] font-medium">' + escapeCardText(category) + '</span><span class="px-2 py-1 rounded-full bg-white/80 text-gray-500 text-[11px]">' + escapeCardText(card.scene || '通用场景') + '</span></div>' + (collected ? '<span class="text-[11px] text-green-600">★ 已收藏</span>' : '') + '</div>',
+    '<h3 class="relative z-10 text-base font-semibold text-gray-900 mt-3">' + escapeCardText(card.title) + '</h3>',
+    '<p class="relative z-10 training-card-quote text-sm mt-2">' + escapeCardText(card.content || card.principle || '先理解场景，再组织表达。') + '</p>',
+    '<div class="relative z-10 mt-3 rounded-xl bg-white/75 p-3 card-principle-preview"><div class="text-[11px] font-semibold text-indigo-600 mb-1">核心原则</div><p class="text-xs text-gray-600 leading-relaxed">' + escapeCardText(card.principle || '结合真实信息，尊重对方边界。') + '</p></div>',
+    tips.length ? '<div class="relative z-10 flex flex-wrap gap-1.5 mt-3">' + tips.map(function(t) { return '<span class="px-2 py-1 rounded-lg bg-purple-50 text-purple-700 text-[11px]">' + escapeCardText(t) + '</span>'; }).join('') + '</div>' : '',
+    '<div class="relative z-10 card-open-link"><span>' + sourceLabel + ' · 点击查看完整课程</span><span aria-hidden="true">→</span></div>',
+    '<div class="relative z-10 mt-3 flex items-center justify-between gap-2"><span class="text-[11px] text-gray-500">练习：' + escapeCardText(card.practicePrompt || '用自己的话完成一次表达') + '</span><button onclick="event.stopPropagation();' + collectAction + '" class="flex-shrink-0 px-3 py-2 rounded-lg ' + (collected ? 'bg-emerald-500 text-white' : 'bg-indigo-50 text-indigo-700') + ' text-xs font-medium">' + (collected ? '开始复习' : '+ 收藏') + '</button></div>',
+    collected ? '<button onclick="event.stopPropagation();removeCard(' + cardArgHtml + ')" class="relative z-10 mt-2 text-[11px] text-gray-400 underline">取消收藏</button>' : '',
+    '<p class="relative z-10 text-[10px] text-amber-700 mt-3">⚠️ ' + escapeCardText(card.safetyNote || '请结合真实情况改写，不编造、不施压。') + '</p>',
+    '</article>'
+  ];
+  return html.join('');
+}
+
+function renderLearningCardDetail(card) {
+  const detail = $('card-detail-content');
+  const title = $('card-detail-title');
+  if (!detail || !card) return;
+  const category = getLearningCardCategory(card);
+  const rawText = card.rawText || card.content || card.principle || '暂无课程正文';
+  const tips = Array.isArray(card.tips) ? card.tips : [];
+  const collected = collectedCards.some(function(item) { return item.id === card.id; });
+  const cardArgHtml = learningCardJsArg(card.id).replace(/"/g, '&quot;');
+  if (title) title.textContent = '📖 ' + (card.title || '学习课程');
+  detail.innerHTML = [
+    '<div class="space-y-4">',
+    '<div><div class="flex flex-wrap items-center gap-2 mb-2"><span class="px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-700 text-xs font-medium">' + escapeCardText(category) + '</span><span class="px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 text-xs">' + (card.rawText ? '原始课程正文' : '结构化知识点') + '</span></div><h4 class="text-xl font-bold text-gray-900 leading-snug">' + escapeCardText(card.title) + '</h4><p class="text-xs text-gray-500 mt-2">场景：' + escapeCardText(card.scene || '通用场景') + '</p></div>',
+    '<section class="card-detail-section"><div class="card-detail-label">课程正文</div><div class="card-detail-raw">' + escapeCardText(rawText) + '</div></section>',
+    '<section class="card-detail-section"><div class="card-detail-label">核心原则</div><p class="text-sm text-gray-700 leading-relaxed">' + escapeCardText(card.principle || '先理解当下情境，再组织真实、尊重边界的表达。') + '</p></section>',
+    tips.length ? '<section class="card-detail-section"><div class="card-detail-label">练习要点</div><ul class="text-sm text-gray-700 leading-relaxed list-disc pl-5">' + tips.map(function(t) { return '<li>' + escapeCardText(t) + '</li>'; }).join('') + '</ul></section>' : '',
+    '<section class="card-detail-section"><div class="card-detail-label">练习任务</div><p class="text-sm text-gray-700 leading-relaxed">' + escapeCardText(card.practicePrompt || '用自己的话完成一次表达，再回看课程原则。') + '</p></section>',
+    '<section class="card-detail-section"><div class="card-detail-label">安全边界</div><p class="text-sm text-amber-700 leading-relaxed">⚠️ ' + escapeCardText(card.safetyNote || '请结合真实情况改写，不编造、不施压，并允许对方拒绝。') + '</p></section>',
+    '<p class="text-[11px] text-gray-400">来源：' + escapeCardText(card.source || '项目知识库') + '</p>',
+    '<div class="flex gap-2 pt-1"><button onclick="toggleCardCollectionFromDetail(' + cardArgHtml + ')" class="flex-1 py-3 rounded-xl ' + (collected ? 'bg-gray-100 text-gray-600' : 'bg-indigo-50 text-indigo-700') + ' text-sm font-medium">' + (collected ? '取消收藏' : '收藏课程') + '</button><button onclick="startCardReviewFromDetail(' + cardArgHtml + ')" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-medium">开始复习</button></div>',
+    '</div>'
+  ].join('');
+}
+
+let currentLearningCard = null;
+
+function openLearningCard(id) {
+  const card = learningCards.find(function(item) { return String(item.id) === String(id); });
+  if (!card) return;
+  currentLearningCard = card;
+  renderLearningCardDetail(card);
+  showModal('card-detail');
+}
+
+function toggleCardCollectionFromDetail(id) {
+  const card = learningCards.find(function(item) { return String(item.id) === String(id); });
+  if (!card) return;
+  const collected = collectedCards.some(function(item) { return item.id === card.id; });
+  if (collected) removeCard(card.id); else collectCard(card.id);
+  renderLearningCardDetail(card);
+}
+
+function startCardReviewFromDetail(id) {
+  closeModal('card-detail');
+  startCardReview(id);
 }
 
 function renderCards(target) {
@@ -13362,10 +13675,19 @@ function renderCards(target) {
   const listEl = $(isTraining ? 'training-card-list' : 'card-list');
   if (!filterEl || !listEl) return;
   const categories = getCardCategories();
-  filterEl.innerHTML = categories.map(category => `<button onclick="setCardFilter(${JSON.stringify(category)},${JSON.stringify(target)})" class="px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${cardFilter === category ? 'bg-indigo-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}">${escapeCardText(category)}</button>`).join('');
-  const filtered = learningCards.filter(card => (cardFilter === '全部' || card.category === cardFilter) && cardMatchesSearch(card));
+  const categoryCounts = categories.slice(1).reduce(function(acc, category) {
+    acc[category] = learningCards.filter(function(card) { return getLearningCardCategory(card) === category; }).length;
+    return acc;
+  }, {});
+  filterEl.innerHTML = categories.map(function(category) {
+    const label = category === '全部' ? '全部 ' + learningCards.length : category + ' ' + (categoryCounts[category] || 0);
+    const categoryArg = learningCardJsArg(category).replace(/"/g, '&quot;');
+    const targetArg = learningCardJsArg(target).replace(/"/g, '&quot;');
+    return '<button onclick="setCardFilter(' + categoryArg + ',' + targetArg + ')" class="px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ' + (cardFilter === category ? 'bg-indigo-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200') + '">' + escapeCardText(label) + '</button>';
+  }).join('');
+  const filtered = learningCards.filter(function(card) { return (cardFilter === '全部' || getLearningCardCategory(card) === cardFilter) && cardMatchesSearch(card); });
   const visible = isTraining ? filtered.slice(0, cardPage * cardPageSize) : filtered.slice(0, cardPageSize);
-  listEl.innerHTML = visible.length ? visible.map(renderCardItem).join('') : '<div class="text-center py-10 text-gray-400 text-sm">没有找到匹配的知识点，换个关键词试试。</div>';
+  listEl.innerHTML = visible.length ? visible.map(renderCardItem).join('') : '<div class="text-center py-10 text-gray-400 text-sm col-span-full">没有找到匹配的知识点，换个关键词试试。</div>';
   if (isTraining) {
     const total = $('training-card-total');
     const collected = $('training-card-collected');
@@ -13373,23 +13695,26 @@ function renderCards(target) {
     const more = $('training-card-load-more');
     if (total) total.textContent = learningCards.length;
     if (collected) collected.textContent = collectedCards.length;
-    if (count) count.textContent = `显示 ${visible.length} / ${filtered.length} 个知识点`;
-    if (more) { more.style.display = visible.length < filtered.length ? 'block' : 'none'; }
+    if (count) count.textContent = '显示 ' + visible.length + ' / ' + filtered.length + ' 个知识点';
+    if (more) more.style.display = visible.length < filtered.length ? 'block' : 'none';
   }
 }
+
 function collectCard(id) {
-  const card = learningCards.find(c => c.id===id);
-  if (card && !collectedCards.find(c => c.id===id)) {
+  const card = learningCards.find(function(c) { return String(c.id) === String(id); });
+  if (card && !collectedCards.find(function(c) { return String(c.id) === String(id); })) {
     collectedCards.push(card);
     saveData();
-    renderCards();
+    refreshLearningCards();
+    if (currentLearningCard && String(currentLearningCard.id) === String(id)) renderLearningCardDetail(card);
   }
 }
 
 function removeCard(id) {
-  collectedCards = collectedCards.filter(c => c.id!==id);
+  collectedCards = collectedCards.filter(function(c) { return String(c.id) !== String(id); });
   saveData();
-  renderCards();
+  refreshLearningCards();
+  if (currentLearningCard && String(currentLearningCard.id) === String(id)) renderLearningCardDetail(currentLearningCard);
 }
 
 // ===== 学习卡片复习功能 =====
@@ -14386,6 +14711,7 @@ const challengeSceneCatalog = {
     tone: '信息充分、守住底线'
   }
 };
+window.challengeSceneCatalog = challengeSceneCatalog;
 
 const realChallengeLevels = [
   { id: 9001, title: '咖啡厅的邂逅', description: '向同小区邻居自然开启一段对话', icon: '☕', category: '社交场合与人际交往', difficulty: 'easy', difficultyStars: 1, reward_points: 15, sceneKey: 'cafe', world: 'basic', worldName: '基础社交', story: '你刚搬到新城市，在咖啡厅排队时遇到一位熟悉的邻居。', relation: '同小区邻居', goal: '自然开启对话，留下友好的第一印象', focus: '微笑、眼神、开场白' },
@@ -14398,6 +14724,7 @@ const realChallengeLevels = [
   { id: 9008, title: '朋友间的冲突', description: '表达立场，同时不伤害长期关系', icon: '🫶', category: '突发与冲突', difficulty: 'hard', difficultyStars: 4, reward_points: 35, sceneKey: 'home', world: 'deep', worldName: '深度社交', story: '你和最好的朋友产生分歧，双方都有些情绪。', relation: '最好的朋友', goal: '先倾听和表达感受，再讨论可执行的解决方式', focus: '非暴力沟通、倾听、边界' },
   { id: 9009, title: '婚礼上的致辞', description: '在重要人生时刻用得体的话语表达祝福', icon: '💍', category: '社交场合与人际交往', difficulty: 'hard', difficultyStars: 5, reward_points: 40, sceneKey: 'public', world: 'deep', worldName: '深度社交', story: '你受邀在好友婚礼上作为伴郎或伴娘致辞。', relation: '好友及其家人', goal: '准备、表达、控制节奏并适时结束', focus: '公开致辞、分寸、祝福' }
 ];
+window.realChallengeLevels = realChallengeLevels;
 
 function getChallenge3DWorld(meta) {
   const key = String(meta && meta.key || 'office');
@@ -14665,19 +14992,33 @@ function startChallenge(challengeId) {
     challengeCoachAvatar.src = getCoachAvatarSrc(window.challengeCoach);
     challengeCoachAvatar.alt = window.challengeCoach.name + '，' + window.challengeSceneMeta.role;
   }
+  const cinematicImage = getCinematicSceneImage(window.challengeSceneMeta);
   const challengeSurface = $('challenge-training-surface');
   if (challengeSurface) {
-    challengeSurface.style.backgroundImage = "linear-gradient(rgba(255,255,255,.88),rgba(255,255,255,.94)), url('" + window.challengeSceneMeta.image + "')";
+    challengeSurface.style.backgroundImage = "linear-gradient(rgba(7,5,18,.76),rgba(10,8,22,.92)), url('" + cinematicImage + "')";
+    challengeSurface.dataset.visualMode = 'cinematic-photo';
   }
-  const stage3dOk = mountStage3DForChallenge('challenge-3d-stage', {
+  const cinematicMounted = typeof window.mountCinematicPhotoStage === 'function' && window.mountCinematicPhotoStage('challenge-3d-stage', {
     env: getStage3DEnvKey(window.challengeSceneMeta, challenge.title),
-    npcLabel: window.challengeCoach.name + ' 饰 ' + (window.challengeSceneMeta.role || '场景角色')
+    background: cinematicImage,
+    backgroundAlt: (window.challengeSceneMeta.location || '真实场景') + ' 真人影视背景',
+    npcSrc: getCinematicNpcSrc(getStage3DEnvKey(window.challengeSceneMeta, challenge.title)),
+    npcLabel: window.challengeCoach.name + ' 饰 ' + (window.challengeSceneMeta.role || '场景角色'),
+    npcAlt: window.challengeCoach.name + '，' + window.challengeSceneMeta.role + '，真人全身形象',
+    userSrc: getCinematicUserSrc(),
+    table: true
   });
-  if (!stage3dOk) {
-    const stageBackdrop = $('challenge-stage-backdrop');
-    if (stageBackdrop) { stageBackdrop.src = getChallenge3DImage(window.challengeSceneMeta); stageBackdrop.alt = (window.challengeSceneMeta.location || '真实场景') + ' 3D 背景'; }
-    const stageCharacter = $('challenge-stage-character');
-    if (stageCharacter) { stageCharacter.src = getCoachFullBodySrc(window.challengeCoach); stageCharacter.alt = window.challengeCoach.name + '，' + window.challengeSceneMeta.role; }
+  if (!cinematicMounted) {
+    const stage3dOk = mountStage3DForChallenge('challenge-3d-stage', {
+      env: getStage3DEnvKey(window.challengeSceneMeta, challenge.title),
+      npcLabel: window.challengeCoach.name + ' 饰 ' + (window.challengeSceneMeta.role || '场景角色')
+    });
+    if (!stage3dOk) {
+      const stageBackdrop = $('challenge-stage-backdrop');
+      if (stageBackdrop) { stageBackdrop.src = getChallenge3DImage(window.challengeSceneMeta); stageBackdrop.alt = (window.challengeSceneMeta.location || '真实场景') + ' 3D 背景'; }
+      const stageCharacter = $('challenge-stage-character');
+      if (stageCharacter) { stageCharacter.src = getCoachFullBodySrc(window.challengeCoach); stageCharacter.alt = window.challengeCoach.name + '，' + window.challengeSceneMeta.role; }
+    }
   }
   const stageLocation = $('challenge-stage-location');
   if (stageLocation) stageLocation.textContent = window.challengeSceneMeta.location || '真实场景';
@@ -14771,8 +15112,14 @@ function addChallengeMessage(role, text) {
       bubble.setAttribute('aria-label', `${isUser ? '用户' : ((window.challengeCoach && window.challengeCoach.name) || '场景角色')}：${text}`);
       bubbleLayer.appendChild(bubble);
       while (bubbleLayer.children.length > 3) bubbleLayer.removeChild(bubbleLayer.firstElementChild);
-      if (window.Stage3D) Stage3D.setSpeaking('challenge-3d-stage', isUser ? 'user' : 'npc');
-      layoutStage3DBubbles('challenge-3d-stage', 'challenge-stage-bubbles');
+      if (window.Stage3D && document.getElementById('challenge-3d-stage')?.classList.contains('is-3d')) {
+        Stage3D.setSpeaking('challenge-3d-stage', isUser ? 'user' : 'npc');
+      }
+      if (document.getElementById('challenge-3d-stage')?.classList.contains('is-photo')) {
+        layoutCinematicBubbles('challenge-3d-stage', 'challenge-stage-bubbles');
+      } else {
+        layoutStage3DBubbles('challenge-3d-stage', 'challenge-stage-bubbles');
+      }
       return;
     }
   }
@@ -16261,14 +16608,30 @@ function startEtiquetteLevel(levelId) {
   $('etiquette-subtitle').textContent = meta.location + ' · ' + level.goal;
   $('etiquette-coach-role').textContent = coach.name + ' · ' + meta.role + ' · ' + meta.tone;
 
+  const cinematicImage = getCinematicSceneImage(meta);
   const surface = $('etiquette-training-surface');
-  if (surface) surface.style.backgroundImage = "linear-gradient(rgba(255,255,255,.88),rgba(255,255,255,.94)), url('" + meta.image + "')";
-  const stage3dOk = mountStage3DForEtiquette('etiquette-3d-stage', level);
-  if (!stage3dOk) {
-    const backdrop = $('etiquette-stage-backdrop');
-    if (backdrop) { backdrop.src = getChallenge3DImage(meta); backdrop.alt = (meta.location || '礼仪场景') + ' 3D 背景'; }
-    const character = $('etiquette-stage-character');
-    if (character) { character.src = getCoachFullBodySrc(coach); character.alt = coach.name + '，' + meta.role; }
+  if (surface) {
+    surface.style.backgroundImage = "linear-gradient(rgba(7,5,18,.76),rgba(10,8,22,.92)), url('" + cinematicImage + "')";
+    surface.dataset.visualMode = 'cinematic-photo';
+  }
+  const cinematicMounted = typeof window.mountCinematicPhotoStage === 'function' && window.mountCinematicPhotoStage('etiquette-3d-stage', {
+    env: getStage3DEnvKey(meta, level.title),
+    background: cinematicImage,
+    backgroundAlt: (meta.location || '礼仪场景') + ' 真人影视背景',
+    npcSrc: getCinematicNpcSrc(getStage3DEnvKey(meta, level.title), level.id),
+    npcLabel: coach.name + ' 饰 ' + (meta.role || '场景角色'),
+    npcAlt: coach.name + '，' + meta.role + '，真人全身形象',
+    userSrc: getCinematicUserSrc(),
+    table: true
+  });
+  if (!cinematicMounted) {
+    const stage3dOk = mountStage3DForEtiquette('etiquette-3d-stage', level);
+    if (!stage3dOk) {
+      const backdrop = $('etiquette-stage-backdrop');
+      if (backdrop) { backdrop.src = getChallenge3DImage(meta); backdrop.alt = (meta.location || '礼仪场景') + ' 3D 背景'; }
+      const character = $('etiquette-stage-character');
+      if (character) { character.src = getCoachFullBodySrc(coach); character.alt = coach.name + '，' + meta.role; }
+    }
   }
   const location = $('etiquette-stage-location');
   if (location) location.textContent = meta.location || '礼仪场景';
@@ -16302,8 +16665,14 @@ function addEtiquetteBubble(role, text) {
   bubble.setAttribute('aria-label', `${isUser ? '用户' : ((window.etiquetteCoach && window.etiquetteCoach.name) || '场景角色')}：${text}`);
   layer.appendChild(bubble);
   while (layer.children.length > 3) layer.removeChild(layer.firstElementChild);
-  if (window.Stage3D) Stage3D.setSpeaking('etiquette-3d-stage', isUser ? 'user' : 'npc');
-  layoutStage3DBubbles('etiquette-3d-stage', 'etiquette-stage-bubbles');
+  if (window.Stage3D && document.getElementById('etiquette-3d-stage')?.classList.contains('is-3d')) {
+    Stage3D.setSpeaking('etiquette-3d-stage', isUser ? 'user' : 'npc');
+  }
+  if (document.getElementById('etiquette-3d-stage')?.classList.contains('is-photo')) {
+    layoutCinematicBubbles('etiquette-3d-stage', 'etiquette-stage-bubbles');
+  } else {
+    layoutStage3DBubbles('etiquette-3d-stage', 'etiquette-stage-bubbles');
+  }
 }
 
 function renderEtiquetteOptions(level) {
@@ -16446,6 +16815,164 @@ function showEtiquetteResult() {
  * ============================================================ */
 /* Stage3D 已迁移至 libs/game_stage3d.js（Three.js 游戏 3D 场景 + 真实生活逻辑动作序列） */
 window.Stage3D = window.GameStage3D || null;
+
+/* 真人影视舞台：复用项目内真人场景和全身人物素材，不改变训练数据流。 */
+window.getCinematicSceneImage = function (meta) {
+  const key = String((meta && meta.key) || 'office');
+  const map = {
+    cafe: 'cafe-realistic.jpg',
+    office: 'office-realistic.jpg',
+    community: 'community-realistic.jpg',
+    family: 'family-realistic.jpg',
+    service: 'service-realistic.jpg',
+    market: 'market-realistic.jpg',
+    home: 'home-realistic.jpg',
+    public: 'public-realistic.jpg',
+    auto: 'auto-realistic.jpg',
+    wedding: 'public-realistic.jpg',
+    restaurant: 'family-realistic.jpg',
+    bar: 'home-realistic.jpg',
+    corridor: 'community-realistic.jpg'
+  };
+  return 'assets/images/challenges/' + (map[key] || map.office);
+};
+
+window.getCinematicNpcSrc = function (env, levelId) {
+  const levelMap = {
+    9001: 'npc-lin-full.png', 9002: 'npc-zhang-full.png', 9003: 'npc-wang-full.png',
+    9004: 'npc-wang-full.png', 9005: 'npc-zhang-full.png', 9006: 'npc-wang-full.png',
+    9007: 'npc-li-full.png', 9008: 'npc-wang-full.png', 9009: 'npc-zhang-full.png'
+  };
+  const envMap = {
+    cafe: 'npc-lin-full.png', office: 'npc-wang-full.png', community: 'npc-wang-full.png',
+    family: 'npc-li-full.png', service: 'npc-zhang-full.png', market: 'npc-zhang-full.png',
+    home: 'npc-lin-full.png', public: 'npc-zhang-full.png', auto: 'npc-zhang-full.png',
+    wedding: 'npc-zhang-full.png', restaurant: 'npc-zhang-full.png', bar: 'npc-wang-full.png',
+    corridor: 'npc-wang-full.png'
+  };
+  return 'assets/images/chars/' + (levelMap[levelId] || envMap[env] || envMap.office);
+};
+
+window.getCinematicUserSrc = function () {
+  return (typeof userData !== 'undefined' && userData && userData.avatarImage) ||
+    'assets/images/chars/user-full.png';
+};
+
+window.layoutCinematicBubbles = function (stageId, layerId) {
+  const stage = document.getElementById(stageId);
+  const layer = document.getElementById(layerId);
+  if (!stage || !layer || !stage.classList.contains('is-photo')) return;
+  const W = stage.clientWidth || 360;
+  const H = stage.clientHeight || 220;
+  const groups = { npc: [], user: [] };
+  Array.prototype.forEach.call(layer.children, function (bubble) {
+    groups[bubble.classList.contains('user') ? 'user' : 'npc'].push(bubble);
+  });
+  [['user', W * 0.25], ['npc', W * 0.75]].forEach(function (pair) {
+    const list = groups[pair[0]];
+    let bottom = H * 0.63;
+    for (let i = list.length - 1; i >= 0; i -= 1) {
+      const bubble = list[i];
+      bubble.style.left = Math.max(W * 0.16, Math.min(W * 0.84, pair[1])) + 'px';
+      bubble.style.top = bottom + 'px';
+      const height = bubble.offsetHeight || 34;
+      const age = list.length - 1 - i;
+      bubble.style.opacity = age === 0 ? '1' : age === 1 ? '.72' : '.42';
+      bottom -= height + 7;
+    }
+  });
+};
+
+window.playCinematicPhotoAction = function (stageId, who, action) {
+  const stage = document.getElementById(stageId);
+  if (!stage || !stage.classList.contains('is-photo')) return;
+  const actor = stage.querySelector(who === 'user' ? '.photo-user' : '.photo-npc');
+  if (!actor) return;
+  const cls = 'animating-' + String(action || 'nod');
+  actor.classList.remove(cls);
+  void actor.offsetWidth;
+  actor.classList.add(cls);
+  setTimeout(function () { actor.classList.remove(cls); }, 1450);
+};
+window.mountCinematicPhotoStage = function (stageId, opts) {
+  const stage = document.getElementById(stageId);
+  if (!stage) return false;
+  opts = opts || {};
+  try {
+    if (window.Stage3D && typeof window.Stage3D.dispose === 'function') {
+      window.Stage3D.dispose(stageId);
+    }
+  } catch (e) {}
+  if (stage._cinematicResizeObserver) stage._cinematicResizeObserver.disconnect();
+  if (stage._cinematicResizeHandler) stage.removeEventListener('resize', stage._cinematicResizeHandler);
+  const bubbleLayer = stage.querySelector('.challenge-stage-bubble-layer');
+  const hud = stage.querySelector('.challenge-stage-hud');
+  Array.prototype.slice.call(stage.children).forEach(function (child) {
+    if (child !== bubbleLayer && child !== hud) child.remove();
+  });
+  stage.classList.remove('is-3d');
+  stage.classList.add('is-photo');
+  stage.dataset.visualMode = 'cinematic-photo';
+  stage.style.background = '#11101a';
+
+  const bg = document.createElement('img');
+  bg.className = 'photo-bg';
+  bg.src = opts.background || 'assets/images/challenges/office-realistic.jpg';
+  bg.alt = opts.backgroundAlt || '真人影视场景背景';
+  const vignette = document.createElement('div');
+  vignette.className = 'photo-vignette';
+  const user = document.createElement('img');
+  user.className = 'photo-char photo-user';
+  user.src = opts.userSrc || window.getCinematicUserSrc();
+  user.alt = opts.userAlt || '用户全身形象';
+  const npc = document.createElement('img');
+  npc.className = 'photo-char photo-npc';
+  npc.src = opts.npcSrc || window.getCinematicNpcSrc(opts.env);
+  npc.alt = opts.npcAlt || '场景角色全身形象';
+  stage.appendChild(bg);
+  stage.appendChild(vignette);
+  if (opts.table !== false) {
+    const desk = document.createElement('div');
+    desk.className = 'photo-desk';
+    desk.setAttribute('aria-hidden', 'true');
+    stage.appendChild(desk);
+  }
+  stage.appendChild(user);
+  stage.appendChild(npc);
+
+  const tagUser = document.createElement('div');
+  tagUser.className = 'photo-tag photo-tag-user';
+  tagUser.textContent = opts.userLabel || '我 · 主角';
+  const tagNpc = document.createElement('div');
+  tagNpc.className = 'photo-tag photo-tag-npc';
+  tagNpc.textContent = opts.npcLabel || '场景角色';
+  stage.appendChild(tagUser);
+  stage.appendChild(tagNpc);
+  if (bubbleLayer) {
+    bubbleLayer.classList.remove('anchored');
+    bubbleLayer.innerHTML = '';
+    stage.appendChild(bubbleLayer);
+    bubbleLayer.classList.add('anchored');
+  }
+  if (hud) stage.appendChild(hud);
+  const layout = function () {
+    const rect = stage.getBoundingClientRect();
+    const h = stage.clientHeight || 220;
+    tagUser.style.left = (stage.clientWidth * 0.25) + 'px';
+    tagUser.style.top = (h * 0.38) + 'px';
+    tagNpc.style.left = (stage.clientWidth * 0.75) + 'px';
+    tagNpc.style.top = (h * 0.38) + 'px';
+    if (bubbleLayer) window.layoutCinematicBubbles(stageId, bubbleLayer.id);
+  };
+  stage._cinematicResizeHandler = layout;
+  stage.addEventListener('resize', layout);
+  if (window.ResizeObserver) {
+    stage._cinematicResizeObserver = new ResizeObserver(layout);
+    stage._cinematicResizeObserver.observe(stage);
+  }
+  requestAnimationFrame(layout);
+  return true;
+};
 
 
 /* ===== Stage3D 集成辅助：场景键、NPC 外观、气泡布局 ===== */
@@ -16680,11 +17207,13 @@ initApp();
       showActionBanner(st, 'demo', item.label);
       showActionFormCard(st, item.form);
       if (window.Stage3D && window.Stage3D.setAction) window.Stage3D.setAction(sid, 'npc', item.cls);
+      if (window.playCinematicPhotoAction) window.playCinematicPhotoAction(sid, 'npc', item.cls);
 
       // Phase 2 (1.8-3.0s) 跟我做：用户角色做 + 动作徽标
       setTimeout(function () {
         showActionBanner(st, 'practice', item.label);
         if (window.Stage3D && window.Stage3D.setAction) window.Stage3D.setAction(sid, 'user', item.cls);
+        if (window.playCinematicPhotoAction) window.playCinematicPhotoAction(sid, 'user', item.cls);
         // 动作徽标（用户头顶下方）
         var badge = document.createElement('div');
         badge.className = 'photo-action' + (item.pass ? '' : ' bad');
@@ -16720,6 +17249,7 @@ initApp();
       // Phase 4 (3.5s) NPC 反应：点头 + 一句回应
       setTimeout(function () {
         if (window.Stage3D && window.Stage3D.setAction) window.Stage3D.setAction(sid, 'npc', 'nod');
+        if (window.playCinematicPhotoAction) window.playCinematicPhotoAction(sid, 'npc', 'nod');
         var reply = item.pass
           ? '（对方微微点头）嗯，这个动作很标准。'
           : '（对方愣了一下）呃…这个场合可能不太合适哦。';
@@ -16732,6 +17262,7 @@ initApp();
 
     // ===== 真实挑战：原行为（用户做 → 教练判定 → NPC 反应） =====
     if (window.Stage3D && window.Stage3D.setAction) window.Stage3D.setAction(sid, 'user', item.cls);
+        if (window.playCinematicPhotoAction) window.playCinematicPhotoAction(sid, 'user', item.cls);
 
     // 动作徽标（用户头顶下方）
     var badge = document.createElement('div');
@@ -16761,6 +17292,7 @@ initApp();
     // NPC 反应：点头 + 一句回应
     setTimeout(function () {
       if (window.Stage3D && window.Stage3D.setAction) window.Stage3D.setAction(sid, 'npc', 'nod');
+        if (window.playCinematicPhotoAction) window.playCinematicPhotoAction(sid, 'npc', 'nod');
       var reply = item.pass
         ? '（对方微微点头）嗯，这个举动很得体。'
         : '（对方愣了一下）呃…这个场合可能不太合适哦。';
@@ -17480,7 +18012,10 @@ function useAvatarDetail() {
     var rawFull = card.rawText || '';
     var hasRealContent = (card.status === 'ok') || (card.status === undefined && (rawFull || steps.length));
     if (hasRealContent && (rawFull || steps.length)) {
-      var wc = (rawFull || '').length || card.chars || 0;
+      // 字数：优先用正文全文；scenes 类卡片无 rawText/chars 时按各节实文累计（避免显示“0 字”）
+      var wc = (rawFull || '').length
+        || (steps.reduce(function (n, s) { return n + ((s && s.x) || '').length; }, 0))
+        || card.chars || 0;
       var cur = steps[KL._stepIdx] || { t: card.title || '正文', x: '' };
       // 标题已在节头上显示，正文若以标题开头则去掉这段前缀（避免重复；剩余内容过短时保留原文）
       var bodyText = cur.x || '';
@@ -18041,4 +18576,15 @@ function useAvatarDetail() {
 
 })(window);
 </script>
+
+<!-- ===== V3.0 模块加载 ===== -->
+<script src="libs/v3_economy_loop.js"></script>
+<script src="libs/v3_ui_components.js"></script>
+<script src="libs/v3_integration.js"></script>
+<script src="libs/v3_3d_fix.js"></script>
+<script src="libs/v3_learning_cards.js"></script>
+<script src="libs/v3_ai_mutations.js"></script>
+<script src="libs/v3_evidence_library.js"></script>
+<script src="libs/v3_protocol_ui.js"></script>
+
 </body></html>

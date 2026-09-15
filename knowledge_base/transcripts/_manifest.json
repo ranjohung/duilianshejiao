@@ -424,21 +424,21 @@
   "path": "送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第01课 送礼“避雷针”：搞懂送礼10“戒律”，拒绝吃力不讨好.mp4",
   "chars": 0,
   "status": "error",
-  "error": "RuntimeError: ffmpeg failed: [in#0 @ 00000291fc816cc0] moov atom not found\r\n[in#0 @ 00000291fc816a80] Error opening input: Invalid data found when processing input\r\nError opening input file G:\\BaiduNetdiskDownload\\高情商话术\\送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第01课 送礼“避雷针”：搞懂送礼10“戒律”，拒绝吃力不讨好.mp4.\r\nError opening input files: Invalid data foun"
+  "error": "RuntimeError: ffmpeg failed: [in#0 @ 000001953dd6aa40] moov atom not found\r\n[in#0 @ 000001953dd6a800] Error opening input: Invalid data found when processing input\r\nError opening input file G:\\BaiduNetdiskDownload\\高情商话术\\送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第01课 送礼“避雷针”：搞懂送礼10“戒律”，拒绝吃力不讨好.mp4.\r\nError opening input files: Invalid data foun"
  },
  "送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第02课 礼物海选法：买贵不如买对，多元切入筛选最优礼物.mp4": {
   "idx": "307d87e648",
   "path": "送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第02课 礼物海选法：买贵不如买对，多元切入筛选最优礼物.mp4",
   "chars": 0,
   "status": "error",
-  "error": "RuntimeError: ffmpeg failed: [in#0 @ 0000024a2b7d7280] moov atom not found\r\n[in#0 @ 0000024a2b7d7040] Error opening input: Invalid data found when processing input\r\nError opening input file G:\\BaiduNetdiskDownload\\高情商话术\\送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第02课 礼物海选法：买贵不如买对，多元切入筛选最优礼物.mp4.\r\nError opening input files: Invalid data found w"
+  "error": "RuntimeError: ffmpeg failed: [in#0 @ 0000018e52c585c0] moov atom not found\r\n[in#0 @ 0000018e52c47000] Error opening input: Invalid data found when processing input\r\nError opening input file G:\\BaiduNetdiskDownload\\高情商话术\\送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第02课 礼物海选法：买贵不如买对，多元切入筛选最优礼物.mp4.\r\nError opening input files: Invalid data found w"
  },
  "送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第03课 礼物美颜术：Get走心包装技巧，KO“土豪”大礼.mp4": {
   "idx": "7454b59838",
   "path": "送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第03课 礼物美颜术：Get走心包装技巧，KO“土豪”大礼.mp4",
   "chars": 0,
   "status": "error",
-  "error": "RuntimeError: ffmpeg failed: [in#0 @ 000001bdba267000] moov atom not found\r\n[in#0 @ 000001bdba266dc0] Error opening input: Invalid data found when processing input\r\nError opening input file G:\\BaiduNetdiskDownload\\高情商话术\\送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第03课 礼物美颜术：Get走心包装技巧，KO“土豪”大礼.mp4.\r\nError opening input files: Invalid data found "
+  "error": "RuntimeError: ffmpeg failed: [in#0 @ 00000208f8096e80] moov atom not found\r\n[in#0 @ 00000208f8096c40] Error opening input: Invalid data found when processing input\r\nError opening input file G:\\BaiduNetdiskDownload\\高情商话术\\送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第03课 礼物美颜术：Get走心包装技巧，KO“土豪”大礼.mp4.\r\nError opening input files: Invalid data found "
  },
  "送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第04课 得体“礼”语：送礼说话有一套，让礼物更高级.mp4": {
   "idx": "dfe628b886",
@@ -465,7 +465,7 @@
   "path": "送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第06课_送礼战术：戏精的献礼7绝计巧妙送礼收人情.mp4",
   "chars": 0,
   "status": "error",
-  "error": "RuntimeError: ffmpeg failed: [in#0 @ 000002091f346ec0] moov atom not found\r\n[in#0 @ 000002091f346d40] Error opening input: Invalid data found when processing input\r\nError opening input file G:\\BaiduNetdiskDownload\\高情商话术\\送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第06课_送礼战术：戏精的献礼7绝计巧妙送礼收人情.mp4.\r\nError opening input files: Invalid data found when"
+  "error": "RuntimeError: ffmpeg failed: [in#0 @ 000001d6ea066bc0] moov atom not found\r\n[in#0 @ 000001d6ea066980] Error opening input: Invalid data found when processing input\r\nError opening input file G:\\BaiduNetdiskDownload\\高情商话术\\送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第06课_送礼战术：戏精的献礼7绝计巧妙送礼收人情.mp4.\r\nError opening input files: Invalid data found when"
  },
  "送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第07课_机智应拒：送礼被拒应对法自搭台阶化解尴尬.mp4": {
   "idx": "0ea7bfe123",
@@ -482,28 +482,28 @@
   "path": "送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第08课_礼尚往来：好感爆棚的收礼回赠术一件深化交情.mp4",
   "chars": 0,
   "status": "error",
-  "error": "RuntimeError: ffmpeg failed: [in#0 @ 0000027cffd58200] moov atom not found\r\n[in#0 @ 0000027cffd57fc0] Error opening input: Invalid data found when processing input\r\nError opening input file G:\\BaiduNetdiskDownload\\高情商话术\\送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第08课_礼尚往来：好感爆棚的收礼回赠术一件深化交情.mp4.\r\nError opening input files: Invalid data found whe"
+  "error": "RuntimeError: ffmpeg failed: [in#0 @ 000001f5a3e59340] moov atom not found\r\n[in#0 @ 000001f5a3e59100] Error opening input: Invalid data found when processing input\r\nError opening input file G:\\BaiduNetdiskDownload\\高情商话术\\送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第08课_礼尚往来：好感爆棚的收礼回赠术一件深化交情.mp4.\r\nError opening input files: Invalid data found whe"
  },
  "送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第09课_有礼有拒：高情商拒礼法则撕掉不近人情标签.mp4": {
   "idx": "c75855ccf3",
   "path": "送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第09课_有礼有拒：高情商拒礼法则撕掉不近人情标签.mp4",
   "chars": 0,
   "status": "error",
-  "error": "RuntimeError: ffmpeg failed: [in#0 @ 0000028508f37880] moov atom not found\r\n[in#0 @ 0000028508f37640] Error opening input: Invalid data found when processing input\r\nError opening input file G:\\BaiduNetdiskDownload\\高情商话术\\送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第09课_有礼有拒：高情商拒礼法则撕掉不近人情标签.mp4.\r\nError opening input files: Invalid data found when"
+  "error": "RuntimeError: ffmpeg failed: [in#0 @ 0000027f70ae6b00] moov atom not found\r\n[in#0 @ 0000027f70ae68c0] Error opening input: Invalid data found when processing input\r\nError opening input file G:\\BaiduNetdiskDownload\\高情商话术\\送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第09课_有礼有拒：高情商拒礼法则撕掉不近人情标签.mp4.\r\nError opening input files: Invalid data found when"
  },
  "送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第10课_家人暖心术：长幼同辈三维送礼法含蓄表白也动人.mp4": {
   "idx": "11e95a0f40",
   "path": "送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第10课_家人暖心术：长幼同辈三维送礼法含蓄表白也动人.mp4",
   "chars": 0,
   "status": "error",
-  "error": "RuntimeError: ffmpeg failed: [in#0 @ 000001ef36486e80] moov atom not found\r\n[in#0 @ 000001ef36486c40] Error opening input: Invalid data found when processing input\r\nError opening input file G:\\BaiduNetdiskDownload\\高情商话术\\送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第10课_家人暖心术：长幼同辈三维送礼法含蓄表白也动人.mp4.\r\nError opening input files: Invalid data found wh"
+  "error": "RuntimeError: ffmpeg failed: [in#0 @ 0000021af2007240] moov atom not found\r\n[in#0 @ 0000021af2006e80] Error opening input: Invalid data found when processing input\r\nError opening input file G:\\BaiduNetdiskDownload\\高情商话术\\送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第10课_家人暖心术：长幼同辈三维送礼法含蓄表白也动人.mp4.\r\nError opening input files: Invalid data found wh"
  },
  "送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第11课_友情巩固术：从单身到结婚生娃送礼攻略为友谊保鲜.mp4": {
   "idx": "dbd91c44bb",
   "path": "送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第11课_友情巩固术：从单身到结婚生娃送礼攻略为友谊保鲜.mp4",
   "chars": 0,
   "status": "error",
-  "error": "RuntimeError: ffmpeg failed: [in#0 @ 0000026421786d80] moov atom not found\r\n[in#0 @ 0000026421786b40] Error opening input: Invalid data found when processing input\r\nError opening input file G:\\BaiduNetdiskDownload\\高情商话术\\送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第11课_友情巩固术：从单身到结婚生娃送礼攻略为友谊保鲜.mp4.\r\nError opening input files: Invalid data found w"
+  "error": "RuntimeError: ffmpeg failed: [in#0 @ 00000219b92d6ec0] moov atom not found\r\n[in#0 @ 00000219b92d6c80] Error opening input: Invalid data found when processing input\r\nError opening input file G:\\BaiduNetdiskDownload\\高情商话术\\送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第11课_友情巩固术：从单身到结婚生娃送礼攻略为友谊保鲜.mp4.\r\nError opening input files: Invalid data found w"
  },
  "送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第12课_职场买心术：办公室全员送礼策略做个懂事的职场人.mp4": {
   "idx": "5af99c1bd0",
@@ -519,12 +519,11 @@
   "idx": "64388ae2ac",
   "path": "送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第13课_商场攻心术：小礼物刷新大商机如何用礼带动利.mp4",
   "chars": 0,
-  "status": "error",
+  "status": "empty",
   "duration_sec": 955,
-  "elapsed_sec": 1,
+  "elapsed_sec": 0,
   "lang": "zh",
-  "plain": "",
-  "err": "audio track physically damaged (decodes to 0 bytes)"
+  "plain": ""
  },
  "送礼话术技巧全攻略\\送礼指南（视频）\\中国式送礼指南\\第14课_情场俘心术：甜蜜有爱的好礼助攻法用礼物征服ta的心.mp4": {
   "idx": "d11b9a2e2c",
@@ -561,7 +560,7 @@
   "path": "送礼话术技巧全攻略\\送礼指南（视频）\\礼尚往来实用指南\\11_第11节  情侣之间—重感觉，有仪式让爱情更甜蜜_1080p.mp4",
   "chars": 0,
   "status": "error",
-  "error": "RuntimeError: ffmpeg failed: [in#0 @ 000002cd80f67300] moov atom not found\r\n[in#0 @ 000002cd80f670c0] Error opening input: Invalid data found when processing input\r\nError opening input file G:\\BaiduNetdiskDownload\\高情商话术\\送礼话术技巧全攻略\\送礼指南（视频）\\礼尚往来实用指南\\11_第11节  情侣之间—重感觉，有仪式让爱情更甜蜜_1080p.mp4.\r\nError opening input files: Invalid data f"
+  "error": "RuntimeError: ffmpeg failed: [in#0 @ 0000021962ad8140] moov atom not found\r\n[in#0 @ 0000021962ad7f00] Error opening input: Invalid data found when processing input\r\nError opening input file G:\\BaiduNetdiskDownload\\高情商话术\\送礼话术技巧全攻略\\送礼指南（视频）\\礼尚往来实用指南\\11_第11节  情侣之间—重感觉，有仪式让爱情更甜蜜_1080p.mp4.\r\nError opening input files: Invalid data f"
  },
  "送礼话术技巧全攻略\\送礼指南（视频）\\礼尚往来实用指南\\1_第1节  正确心态—走出心态误区，树立正确的价值观_1080p.mp4": {
   "idx": "e49ce86fb2",
@@ -618,28 +617,28 @@
   "path": "送礼话术技巧全攻略\\送礼指南（视频）\\礼尚往来实用指南\\6_第6节  得体话术—送的时候怎么说，说什么？被拒后怎么化解？_1080p.mp4",
   "chars": 0,
   "status": "error",
-  "error": "RuntimeError: ffmpeg failed: [in#0 @ 0000015ff6466a40] moov atom not found\r\n[in#0 @ 0000015ff6466800] Error opening input: Invalid data found when processing input\r\nError opening input file G:\\BaiduNetdiskDownload\\高情商话术\\送礼话术技巧全攻略\\送礼指南（视频）\\礼尚往来实用指南\\6_第6节  得体话术—送的时候怎么说，说什么？被拒后怎么化解？_1080p.mp4.\r\nError opening input files: Invalid d"
+  "error": "RuntimeError: ffmpeg failed: [in#0 @ 0000023dd4586f40] moov atom not found\r\n[in#0 @ 0000023dd4586d00] Error opening input: Invalid data found when processing input\r\nError opening input file G:\\BaiduNetdiskDownload\\高情商话术\\送礼话术技巧全攻略\\送礼指南（视频）\\礼尚往来实用指南\\6_第6节  得体话术—送的时候怎么说，说什么？被拒后怎么化解？_1080p.mp4.\r\nError opening input files: Invalid d"
  },
  "送礼话术技巧全攻略\\送礼指南（视频）\\礼尚往来实用指南\\7_第7节  有来有往—有来有往才能深化交情_1080p.mp4": {
   "idx": "b2ef605541",
   "path": "送礼话术技巧全攻略\\送礼指南（视频）\\礼尚往来实用指南\\7_第7节  有来有往—有来有往才能深化交情_1080p.mp4",
   "chars": 0,
   "status": "error",
-  "error": "RuntimeError: ffmpeg failed: [in#0 @ 00000186133282c0] moov atom not found\r\n[in#0 @ 0000018613328080] Error opening input: Invalid data found when processing input\r\nError opening input file G:\\BaiduNetdiskDownload\\高情商话术\\送礼话术技巧全攻略\\送礼指南（视频）\\礼尚往来实用指南\\7_第7节  有来有往—有来有往才能深化交情_1080p.mp4.\r\nError opening input files: Invalid data found "
+  "error": "RuntimeError: ffmpeg failed: [in#0 @ 0000027a31648840] moov atom not found\r\n[in#0 @ 0000027a31648600] Error opening input: Invalid data found when processing input\r\nError opening input file G:\\BaiduNetdiskDownload\\高情商话术\\送礼话术技巧全攻略\\送礼指南（视频）\\礼尚往来实用指南\\7_第7节  有来有往—有来有往才能深化交情_1080p.mp4.\r\nError opening input files: Invalid data found "
  },
  "送礼话术技巧全攻略\\送礼指南（视频）\\礼尚往来实用指南\\8_第8节  商务客户—事半功倍，助力获得商机_1080p.mp4": {
   "idx": "e4aa92f263",
   "path": "送礼话术技巧全攻略\\送礼指南（视频）\\礼尚往来实用指南\\8_第8节  商务客户—事半功倍，助力获得商机_1080p.mp4",
   "chars": 0,
   "status": "error",
-  "error": "RuntimeError: ffmpeg failed: [in#0 @ 0000019c58a36e40] moov atom not found\r\n[in#0 @ 0000019c58a36c00] Error opening input: Invalid data found when processing input\r\nError opening input file G:\\BaiduNetdiskDownload\\高情商话术\\送礼话术技巧全攻略\\送礼指南（视频）\\礼尚往来实用指南\\8_第8节  商务客户—事半功倍，助力获得商机_1080p.mp4.\r\nError opening input files: Invalid data found"
+  "error": "RuntimeError: ffmpeg failed: [in#0 @ 00000213ea8e9d80] moov atom not found\r\n[in#0 @ 00000213ea8e9b40] Error opening input: Invalid data found when processing input\r\nError opening input file G:\\BaiduNetdiskDownload\\高情商话术\\送礼话术技巧全攻略\\送礼指南（视频）\\礼尚往来实用指南\\8_第8节  商务客户—事半功倍，助力获得商机_1080p.mp4.\r\nError opening input files: Invalid data found"
  },
  "送礼话术技巧全攻略\\送礼指南（视频）\\礼尚往来实用指南\\9_第9节   职场同事—助力职场关系更融洽_1080p.mp4": {
   "idx": "13ca233acc",
   "path": "送礼话术技巧全攻略\\送礼指南（视频）\\礼尚往来实用指南\\9_第9节   职场同事—助力职场关系更融洽_1080p.mp4",
   "chars": 0,
   "status": "error",
-  "error": "RuntimeError: ffmpeg failed: [in#0 @ 00000169a1e86e80] moov atom not found\r\n[in#0 @ 00000169a1e86c40] Error opening input: Invalid data found when processing input\r\nError opening input file G:\\BaiduNetdiskDownload\\高情商话术\\送礼话术技巧全攻略\\送礼指南（视频）\\礼尚往来实用指南\\9_第9节   职场同事—助力职场关系更融洽_1080p.mp4.\r\nError opening input files: Invalid data found "
+  "error": "RuntimeError: ffmpeg failed: [in#0 @ 0000019282246f40] moov atom not found\r\n[in#0 @ 0000019282246d00] Error opening input: Invalid data found when processing input\r\nError opening input file G:\\BaiduNetdiskDownload\\高情商话术\\送礼话术技巧全攻略\\送礼指南（视频）\\礼尚往来实用指南\\9_第9节   职场同事—助力职场关系更融洽_1080p.mp4.\r\nError opening input files: Invalid data found "
  },
  "高情商话术\\580好好接话电子版\\赠送：读心术课程视频\\第00先导课 微表情探秘：两个步骤,让你透过一张脸看穿一个人.mp4": {
   "idx": "0ffa91fee4",
@@ -822,5 +821,35 @@
   "elapsed_sec": 66,
   "lang": "zh",
   "plain": "好我们来看这个问题啊这是我们怎么判断客户对一件商品他是否感兴趣我们\n最简单的一个判断方法,如果他对一个商品感兴趣,那么他停留在这件商品,他的视线停留在这件商品上的时间一定是长的,如果他不感兴趣,那么他不会一直注视这件商品,如果同时他在长时间注视的同时呢,我们看他的眼睛,如果眼睛是放光的,那其实就代表了一种兴趣。\n这是我们对于视线对于眼神的一个很重要的一个观察微表情心理学呢有一个非常重要的应用领域就是在销售领域就是怎么把我们的产品推销给\n我们的客户比如说我是卖汽车的卖房子的卖保险的或者卖化妆品的等等就是你任何的销售其实都会用到我们的微表情绪力学因为你都要跟人打交道你都要去判断客户是不是对你的产品他是感兴趣的这是一个最基本的判断\n所以我也经常做一些给销售人员的这种培训经过我们培训之后它的销售人员的业绩会大幅的增长同时销售人员又会少做很多无用功因为销售人员要去向很多的客户介绍产品和推广推销他的产"
+ },
+ "版块12--礼仪培训大全集 共11个模块 （182套）\\##网络播放器\\01、苹果手机，ipad\\苹果手机平板操作教学视频.mp4": {
+  "idx": "9f807b5dcf",
+  "path": "版块12--礼仪培训大全集 共11个模块 （182套）\\##网络播放器\\01、苹果手机，ipad\\苹果手机平板操作教学视频.mp4",
+  "chars": 506,
+  "status": "ok",
+  "duration_sec": 136,
+  "elapsed_sec": 13,
+  "lang": "zh",
+  "plain": "看一下我们下载一个这个视频我们把第一个视频给它下载下来然后我们看最上方就是三个点的旁边最上方最右上方三个点的旁边有两个箭头我们点进去这个是下载列表也就是你下载的东西都在这我们可以把它点击打开然后用其他应用打开然后选择这个播放器\n这个时候呢你点击最上方这个inbox进去就可以看到这个文件了你点一下然后呢这个时候出来你需要输入用户名和密码那我们返回到这个版盘上用户名和密码我会给大家发过去的然后呢我是把它存在这个聊天记录里面复制一下粘贴一下密码复制这个以上操作啊\n到这一步所有的操作啊他只需要做一遍就第一次播放的时候之后都不用操作了你看现在就可以正常播放了所有的好了我们返回好了我们看一下在最下面这个播放器最下面有一个清除密码这四个字大家不要点到点到呢这个密码就失效了啊然后呢我们返回我们看一下的百度网盘\n你可以把这些通通给它下载下来然后在这里可以管理就是如果说你的内存不够了你就可以把这个比如说这个下"
+ },
+ "版块12--礼仪培训大全集 共11个模块 （182套）\\##网络播放器\\02、安卓手机\\买家必看安卓专用播放器使用视频.mp4": {
+  "idx": "3df25d496f",
+  "path": "版块12--礼仪培训大全集 共11个模块 （182套）\\##网络播放器\\02、安卓手机\\买家必看安卓专用播放器使用视频.mp4",
+  "chars": 1516,
+  "status": "ok",
+  "duration_sec": 397,
+  "elapsed_sec": 4,
+  "lang": "zh",
+  "plain": "我们尊敬的各位客户大家好那么我来录一个视频来向大家介绍就是我给大家发的很多课程资料比如说这里的这个套餐2阿里巴巴高端课那么我点开那么里面的视频几乎都是这种\nVIP格式的那么这种VIP格式的视频呢如何播放呢因为它需要特殊的播放器才能播放那么接下来呢我就给大家介绍一下如何来播放这个视频那么首先呢第一点我们先把这个视频呢下载下来比如说第一个管理的意识我们给它\n选中然后点击最下面最下面的有一个下载键我们给它下载下来然后我们看到上面有一个1就是有一个表中间有两个箭头然后旁边有三个点中间两个箭头我们点进去最上面中间两个箭头我们点上去这块就是下载列表也就是说你下载的东西都在这里然后我们返回\n我给大家发了一个什么东西呢就是VIP播放器我们把它打开里面呢有四种不同的操作系统的播放器有安卓的操作系统有一般电脑的操作系统还有这个苹果手机的操作系统还有苹果电脑的操作系统那么这四个呢分别我都给大家介绍了怎么去播放的"
+ },
+ "版块12--礼仪培训大全集 共11个模块 （182套）\\##网络播放器\\02、安卓手机\\新版安卓手机百度网盘下载后的课程删除方法.mp4": {
+  "idx": "d4768f0ddc",
+  "path": "版块12--礼仪培训大全集 共11个模块 （182套）\\##网络播放器\\02、安卓手机\\新版安卓手机百度网盘下载后的课程删除方法.mp4",
+  "chars": 178,
+  "status": "ok",
+  "duration_sec": 38,
+  "elapsed_sec": 1,
+  "lang": "zh",
+  "plain": "手机百度网盘下载的文件在哪?该视频通过OPPO R9 Plus手机操作所演示。首先,点击百度网盘软件进入界面,再点击右下角更多选项,下拉界面。\n接着点击下方的设置,跳转页面后再点击默认下载位置。这时即可看到我们手机里百度网盘的下载文件夹。我们返回到桌面,点击文件管理,选择所有文件。进入之后,找到刚才的百度云文件夹即可。"
  }
 }
