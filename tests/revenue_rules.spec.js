@@ -68,7 +68,9 @@ test('奖励、每日额度和解锁状态遵守统一规则', async ({ page }) 
 
 test('会员购买入口明确不会扣款或开通', async ({ page }) => {
   await page.goto(BASE_URL, { waitUntil: 'domcontentloaded' });
-  await page.getByRole('button', { name: /演示账号登录/ }).click();
+  await page.locator('#login-phone').fill('13800138000');
+  await page.locator('#login-password').fill('123456');
+  await page.getByRole('button', { name: '登 录' }).click();
   await page.waitForTimeout(300);
   // 本用例只验证会员购买入口；关闭引导层，避免引导/首选场景的交互干扰会员弹窗断言。
   await page.evaluate(() => {

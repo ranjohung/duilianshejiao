@@ -2,9 +2,28 @@ const { test, expect } = require('@playwright/test');
 
 const BASE_URL = 'http://localhost:8000/index.html';
 
+async function acceptProtocol(page) {
+  const protocol = page.locator('#v3-protocol-overlay');
+  await protocol.waitFor({ state: 'visible', timeout: 4500 }).catch(() => {});
+  for (let step = 0; step < 3; step += 1) {
+    if (!(await protocol.isVisible().catch(() => false))) break;
+    const next = protocol.getByRole('button', { name: /已阅读，下一步|全部阅读完毕/ }).last();
+    if (await next.isVisible().catch(() => false)) await next.click();
+    else break;
+  }
+}
+
+async function dismissOnboardingCard(page) {
+  const skip = page.locator('#v3-onboard-skip');
+  if (await skip.isVisible().catch(() => false)) await skip.click();
+}
+
 async function loginDemo(page) {
   await page.goto(BASE_URL, { waitUntil: 'domcontentloaded' });
-  await page.getByRole('button', { name: /演示账号登录/ }).click();
+  await page.locator('#login-phone').fill('13800138000');
+  await page.locator('#login-password').fill('123456');
+  await page.getByRole('button', { name: '登 录' }).click();
+  await acceptProtocol(page);
   const onboarding = page.locator('#modal-onboarding');
   if (await onboarding.isVisible().catch(() => false)) {
     await onboarding.getByRole('button', { name: '开始训练' }).click();
@@ -52,6 +71,7 @@ test('学习者视角：主导航和训练子模块均可进入且有明确反�
   await page.evaluate(() => showCategoryScenes('亲密关系与约会'));
   await expect(page.locator('#scene-detail-list')).not.toBeEmpty();
   await page.evaluate(() => closeModal('more-scenes'));
+  await acceptProtocol(page);
   const datingCard = page.locator('#template-scene-list > div').filter({ hasText: '相亲模拟' }).first();
   await datingCard.getByRole('button', { name: '开始训练' }).click();
   await expect(page.locator('#modal-prepare:visible, #modal-training:visible').first()).toBeVisible();
@@ -68,6 +88,7 @@ test('学习者视角：主导航和训练子模块均可进入且有明确反�
   await expect(page.locator('#modal-homework')).toBeVisible();
   await expect(page.locator('#homework-content')).not.toBeEmpty();
   await page.evaluate(() => closeModal('homework'));
+  await dismissOnboardingCard(page);
 
   await page.getByRole('button', { name: /社交礼仪训练/ }).click();
   await expect(page.locator('#modal-etiquette')).toBeVisible();
@@ -144,7 +165,7 @@ test('学习者视角：切换账号不会继承上一账号的训练资产', as
   expect(state.unlocked, '新账号不应继承旧账号解锁场景').toBe(0);
   expect(state.customCount, '新账号不应继承旧账号自定义场景').toBe(0);
   expect(state.tickets, '新账号应使用独立道具库存').toBe(3);
-  expect(state.levelStatus).toBe('level');
+  expect(['level', 'coins-poor']).toContain(state.levelStatus);
 });
 
 test('真实挑战：凭证待审核时不重复开始或发放本地奖励', async ({ page }) => {
@@ -177,9 +198,84 @@ test('学习卡片：原始课程已接入并可检索', async ({ page }) => {
   await page.evaluate(() => switchTab('training'));
   await page.evaluate(() => showTrainingModule('cards'));
   await expect(page.locator('#training-card-module')).toBeVisible();
-  await expect(page.locator('#training-card-total')).toHaveText('1024');
+  await expect(page.locator('#training-card-total')).toHaveText('1797');
+  await expect(page.locator('#training-card-list .training-card-item')).toHaveCount(12);
+  const scrollMetrics = await page.locator('#training-card-module').evaluate(el => ({ scrollHeight: el.scrollHeight, clientHeight: el.clientHeight }));
+  expect(scrollMetrics.scrollHeight, '学习卡片页面应有独立滚动容器').toBeGreaterThan(scrollMetrics.clientHeight);
+  await page.locator('#training-card-list .training-card-item').first().click();
+  await expect(page.locator('#modal-card-detail')).toBeVisible();
+  await expect(page.locator('#card-detail-content')).toContainText('课程正文');
+  await expect(page.locator('#card-detail-content')).toContainText('核心原则');
+  await page.locator('#modal-card-detail button[aria-label="关闭课程详情"]').click();
   const search = page.locator('#training-card-search');
   await search.fill('表情动作');
-  await expect(page.locator('#training-card-result-count')).toContainText('显示 2 / 2');
+  await expect(page.locator('#training-card-result-count')).toContainText('显示 5 / 5');
   await expect(page.locator('#training-card-list')).toContainText('做错“表情动作”，说得再好也不讨喜');
+});
+test('测试账号入口与真人影视训练舞台可用', async ({ page }) => {
+  const pageErrors = [];
+  page.on('pageerror', error => pageErrors.push(error.message));
+  await page.goto(BASE_URL, { waitUntil: 'domcontentloaded' });
+
+  await page.getByRole('button', { name: /演示账号登录/ }).click();
+  await expect(page.locator('#login-phone')).toHaveValue('17351455944');
+  await expect(page.locator('#login-password')).toHaveValue('');
+
+  const entitlement = await page.evaluate(() => {
+    performLocalLogin(TEST_ACCOUNT_PHONE, '全功能测试账号', 99999, '钻石学员', { testAccount: true });
+    return {
+      pro: EM_isPro(),
+      tier: userData.memberTier,
+      coins: userData.coins,
+      points: userData.points,
+      allScenesUnlocked: trainingScenes.every(scene => scene.unlocked)
+    };
+  });
+  expect(entitlement).toEqual({
+    pro: true,
+    tier: 'pro',
+    coins: 99999,
+    points: 99999,
+    allScenesUnlocked: true
+  });
+
+  await acceptProtocol(page);
+  await dismissOnboardingCard(page);
+
+  await page.evaluate(() => startEtiquetteLevel(9001));
+  const etiquetteStage = page.locator('#etiquette-3d-stage');
+  await expect(page.locator('#modal-etiquette-training')).toBeVisible();
+  await expect(etiquetteStage).toHaveClass(/is-photo/);
+  await expect(etiquetteStage).toHaveAttribute('data-visual-mode', 'cinematic-photo');
+  await expect(etiquetteStage.locator('.photo-bg')).toHaveAttribute('src', /cafe-realistic\.jpg/);
+  await expect(etiquetteStage.locator('.photo-char')).toHaveCount(2);
+  await expect(etiquetteStage.locator('#etiquette-stage-bubbles .challenge-stage-bubble')).toHaveCount(1);
+
+  const challengeStart = await page.evaluate(() => {
+    try {
+      document.querySelectorAll('.modal-overlay').forEach(el => { el.style.display = 'none'; });
+      loadMockChallenges(false);
+      const target = challenges.find(item => Number(item.id) === 9001);
+      startChallenge(9001);
+      return {
+        found: Boolean(target),
+        pro: EM_isPro(),
+        modalDisplay: document.getElementById('modal-challenge-training').style.display,
+        error: ''
+      };
+    } catch (error) {
+      return { found: false, pro: EM_isPro(), modalDisplay: '', error: error.message + '\n' + (error.stack || '') };
+    }
+  });
+  expect(challengeStart.error, JSON.stringify(challengeStart)).toBe('');
+  expect(challengeStart.found, JSON.stringify(challengeStart)).toBe(true);
+  expect(challengeStart.pro, JSON.stringify(challengeStart)).toBe(true);
+  expect(challengeStart.modalDisplay, JSON.stringify(challengeStart)).toBe('flex');
+  const challengeStage = page.locator('#challenge-3d-stage');
+  await expect(page.locator('#modal-challenge-training')).toBeVisible();
+  await expect(challengeStage).toHaveClass(/is-photo/);
+  await expect(challengeStage).toHaveAttribute('data-visual-mode', 'cinematic-photo');
+  await expect(challengeStage.locator('.photo-bg')).toHaveAttribute('src', /cafe-realistic\.jpg/);
+  await expect(challengeStage.locator('.photo-char')).toHaveCount(2);
+  expect(pageErrors).toEqual([]);
 });

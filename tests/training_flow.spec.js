@@ -14,9 +14,9 @@ test('训练流程测试 - 场景模板市场点击开始训练', async ({ page 
 
   // 2. Login with demo account
   console.log('2. 使用演示账号登录...');
-  const demoBtn = page.getByRole('button', { name: /演示账号登录/ }).first();
-  await demoBtn.waitFor({ state: 'visible', timeout: 5000 });
-  await demoBtn.click();
+  await page.locator('#login-phone').fill('13800138000');
+  await page.locator('#login-password').fill('123456');
+  await page.getByRole('button', { name: '登 录' }).click();
   await page.waitForTimeout(1000);
   await page.screenshot({ path: `${SCREENSHOT_DIR}/02_after_login.png` });
   console.log('   登录完成');

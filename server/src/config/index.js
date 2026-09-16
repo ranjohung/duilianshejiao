@@ -62,9 +62,9 @@ module.exports = {
         priority: 5,
       },
       zhipu: {
-        apiKey: process.env.ZHIPU_API_KEY,
+        apiKey: process.env.ZHIPUAI_API_KEY || process.env.ZHIPU_API_KEY,
         baseUrl: process.env.ZHIPU_BASE_URL || 'https://open.bigmodel.cn/api/paas/v4',
-        model: process.env.ZHIPU_MODEL || 'glm-4',
+        model: process.env.ZHIPUAI_MODEL || process.env.ZHIPU_MODEL || 'glm-4-flash',
         maxTokens: 1024,
         temperature: 0.7,
         enabled: true,
