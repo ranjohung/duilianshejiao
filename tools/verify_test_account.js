@@ -2,6 +2,9 @@
 const { chromium } = require('playwright');
 const path = require('path');
 
+const testPassword = process.env.DUILIAN_TEST_PASSWORD;
+if (!testPassword) throw new Error('请先设置 DUILIAN_TEST_PASSWORD（变量名去掉空格）环境变量后再运行');
+
 (async () => {
   const browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: 480, height: 900 } });
@@ -12,10 +15,10 @@ const path = require('path');
   await page.waitForTimeout(1500);
 
   // 走真实 UI：点演示账号按钮 → 填手机号 → 手动输密码 → 登录
-  await page.evaluate(() => {
-    document.querySelector('[onclick*="fillTestAccount"]').click();
-    document.getElementById('login-password').value = 'yjj880905';
-  });
+  await page.evaluate((password) => {
+    demoLogin();
+    document.getElementById('login-password').value = password;
+  }, testPassword);
   await page.evaluate(() => doLogin());
   await page.waitForFunction(() => {
     const k = Object.keys(localStorage).find(x => x === 'dl_user_17351455944');

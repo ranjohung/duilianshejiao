@@ -9,6 +9,8 @@ test('真实挑战：每个项目都有场景背景并绑定对应教练角色',
 
   const state = await page.evaluate(async () => {
     loadMockChallenges(true);
+    userData.memberTier = 'pro';
+    userData.memberTierExpiresAt = new Date(Date.now() + 86400000).toISOString();
     const cards = Array.from(document.querySelectorAll('#modal-challenge-list > div'));
     const cardBackgrounds = cards.map(card => card.style.backgroundImage);
     const assetUrls = [...new Set(challenges.map(challenge => (challenge.sceneMeta || getChallengeSceneMeta(challenge)).image))];
@@ -20,15 +22,18 @@ test('真实挑战：每个项目都有场景背景并绑定对应教练角色',
 
     const first = challenges.find(challenge => challenge.unlocked) || challenges[0];
     startChallenge(first.id);
+    const kitSkip = document.getElementById('v3-kit-skip');
+    if (kitSkip) kitSkip.click();
     return {
       challengeCount: challenges.length,
       allMapped,
       cardCount: cards.length,
       backgroundCount: cardBackgrounds.filter(value => value.includes('assets/images/challenges/')).length,
       assetsLoad: assetResults.every(Boolean),
-      sceneImage: $('challenge-training-surface').style.backgroundImage,
+      sceneImage: $('challenge-training-surface').style.backgroundImage || (($('challenge-3d-stage').querySelector('.photo-bg') || {}).getAttribute || (() => ''))('src'),
       roleLabel: $('challenge-coach-role').textContent,
-      roleMessage: $('challenge-messages').innerText.includes('扮演'),
+      preTrainingText: $('challenge-messages').innerText,
+      evaluationText: $('challenge-coach-evaluation').innerText,
       coachAvatar: $('challenge-coach-avatar').src
     };
   });
@@ -40,7 +45,8 @@ test('真实挑战：每个项目都有场景背景并绑定对应教练角色',
   expect(state.assetsLoad).toBe(true);
   expect(state.sceneImage).toContain('assets/images/challenges/');
   expect(state.roleLabel).toMatch(/·/);
-  expect(state.roleMessage).toBe(true);
+  expect(state.preTrainingText).not.toContain('参考回答');
+  expect(state.evaluationText).toContain('不提供选项或示范答案');
   expect(state.coachAvatar).toContain('/assets/images/coaches/');
   expect(pageErrors).toEqual([]);
 });

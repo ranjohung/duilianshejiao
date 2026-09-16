@@ -2674,24 +2674,16 @@ h1,h2,h3 { text-wrap:balance; }
         <button onclick="closeModal('etiquette')" class="text-gray-400 hover:text-gray-600 text-xl" data-page-node-id="3hUARQhJFr4NOnQgdwfHGH">✕</button>
       </div>
       <div class="flex-1 overflow-auto p-4" data-page-node-id="w2qOZdWD3QLoXARqGyhUhu">
-        <div id="etiquette-world-map" class="mb-4 rounded-2xl bg-gradient-to-br from-amber-500 via-orange-500 to-rose-500 p-4 text-white shadow-md" data-page-node-id="ywkcmcZfuYHJKUdytEYCrY">
-          <div class="flex items-start justify-between gap-3" data-page-node-id="ZhYDDbLgMp6MOFDi9YMRxP">
-            <div data-page-node-id="G3KeppyLadfHiOYWSzDD13">
-              <div class="text-[11px] uppercase tracking-[.18em] text-amber-100" data-page-node-id="dtgDu5rYzgFnBl86ww3nNd">ETIQUETTE LAB</div>
-              <h4 class="text-base font-semibold mt-1" data-page-node-id="YgZZjBQo4UCc3GezZfDj7x">三世界 · 九关卡</h4>
-              <p class="text-[11px] text-amber-50/90 mt-1" data-page-node-id="hw4n60atJ66KId33bR6P3o">每个关卡都会先给出 A/B/C 参考选项供你选择，也可自由发挥；提交后由教练评价。</p>
-            </div>
-            <span class="text-2xl" data-page-node-id="S2gLZrKvoDaYzHYZmXKOch">🤝</span>
-          </div>
-          <div id="etiquette-world-map-list" class="grid grid-cols-3 gap-2 mt-3" data-page-node-id="5OAolnvBf8a26VqshxR8aE"></div>
+        <div class="etiquette-course-intro">
+          <div><h4>选择今天要练的场景</h4><p>每个场景都从真人示范开始，再逐步进入跟练与自主应对。</p></div>
+          <span aria-hidden="true">🤝</span>
         </div>
-        <div class="text-xs text-gray-400 mb-2 border-b border-gray-100 pb-2" data-page-node-id="CE5krCEcGsZHrJXmCck4jH">选择关卡开始社交礼仪训练：</div>
-        <div class="space-y-3" id="etiquette-level-list" data-page-node-id="lfxrFsHZtAzwS9h77Nlv9J"></div>
+        <div class="etiquette-course-grid" id="etiquette-level-list" data-page-node-id="lfxrFsHZtAzwS9h77Nlv9J"></div>
       </div>
     </div>
   </div>
 
-  <!-- ===== 社交礼仪训练对话框（3D场景 + 头顶气泡 + 输入前A/B/C选项） ===== -->
+  <!-- ===== 社交礼仪课堂：真人场景 + 逐步教学 + 文字/语音跟练 ===== -->
   <div class="modal-overlay" id="modal-etiquette-training" style="display:none" data-page-node-id="PnnoO8O2sLMZZw4VndQMNk">
     <div class="modal-content h-[72vh] challenge-training-surface" id="etiquette-training-surface" data-page-node-id="1QPOm7SBvHV0tGMnepYlXk">
       <div class="flex items-center justify-between p-4 border-b border-gray-100 bg-white" data-page-node-id="yWSACOU5nTFiwoX526xZSW">
@@ -2716,12 +2708,12 @@ h1,h2,h3 { text-wrap:balance; }
       </div>
       <div class="ct-fixed ct-input-fixed" data-page-node-id="sBLBIOdJ2fKBGzPlTgqSRT">
         <div class="flex gap-2 ct-input-row" data-page-node-id="vnlFrtsBG5nXaDR4U8UTtM">
-          <input type="text" id="etiquette-input" placeholder="输入你会说的话或会做的动作…" class="flex-1 px-4 py-2 rounded-full border border-gray-200 text-sm focus:outline-none focus:border-amber-500" data-page-node-id="BkfYkHv2sO5CwPfivW2eEE">
-          <button onclick="openActionPanel({kind:'input', id:'etiquette-input', stageId:'etiquette-stage', who:'user'})" class="btn-action-trigger" title="动作指令" aria-label="动作指令">🎬</button><button onclick="sendEtiquetteMessage()" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-full text-sm font-medium hover:opacity-90 transition-opacity" data-page-node-id="P68AqiKBFmBA8qsToWe5VK">发送</button>
+          <input type="text" id="etiquette-input" placeholder="用自己的话完成本轮跟练…" class="flex-1 px-4 py-2 rounded-full border border-gray-200 text-sm focus:outline-none focus:border-amber-500" data-page-node-id="BkfYkHv2sO5CwPfivW2eEE">
+          <button id="etiquette-voice-btn" onclick="startEtiquetteVoiceInput()" class="btn-action-trigger" title="语音输入" aria-label="语音输入">🎙️</button><button onclick="openActionPanel({kind:'input', id:'etiquette-input', stageId:'etiquette-stage', who:'user'})" class="btn-action-trigger" title="动作练习" aria-label="动作练习">动作</button><button onclick="sendEtiquetteMessage()" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-full text-sm font-medium hover:opacity-90 transition-opacity" data-page-node-id="P68AqiKBFmBA8qsToWe5VK">提交跟练</button>
         </div>
       </div>
       <div class="ct-scroll">
-        <div id="etiquette-coach-evaluation" class="challenge-coach-evaluation is-empty" data-page-node-id="NJCG35BP5PGveP6jXuUV4r">每轮输入都会在这里得到教练评价；本模式会先给出 A/B/C 参考选项。</div>
+        <div id="etiquette-coach-evaluation" class="challenge-coach-evaluation is-empty" data-page-node-id="NJCG35BP5PGveP6jXuUV4r">先阅读教学提示，再用文字或语音完成跟练；提交后查看教练评价。</div>
         <div id="etiquette-options" class="space-y-2" data-page-node-id="lU91V2HzFOcpyqQdl5KdVY"></div>
         <div id="etiquette-messages" class="space-y-3" data-page-node-id="MakbcTlVXQ9RHoTfw1YERA"></div>
         <div id="etiquette-scene-goal" class="challenge-scene-goal" data-page-node-id="hYQWcVZIMG7lesGE1cNgpC">本关目标加载中</div>
@@ -5276,15 +5268,15 @@ async function sendRegSms() {
 const TEST_ACCOUNT_PHONE = '17351455944';
 const TEST_ACCOUNT_PASSWORD_HASH = '0bbc86f081714d7e9e1ba06110209a2b95ae1a00552216f38d98d9c61733d512';
 
-// 演示账号入口：仅供开发验收。不回填、不一键登录，必须手动输入演示账号和密码才能进入（防白嫖）。
+// 测试账号入口只填入手机号；密码仍须验收人员手动输入，不在页面或源码中暴露明文。
 function demoLogin() {
   loginMode = 'password';
   switchLoginMode('password');
-  $('login-phone').value = '';
+  $('login-phone').value = TEST_ACCOUNT_PHONE;
   $('login-password').value = '';
   $('login-error').style.display = 'none';
-  showToast('请输入演示账号和密码后登录');
-  $('login-phone').focus();
+  showToast('测试账号已填入，请手动输入密码后登录');
+  $('login-password').focus();
 }
 
 function applyTestAccountEntitlements() {
@@ -5308,6 +5300,21 @@ function applyTestAccountEntitlements() {
     isTestAccount: true
   };
   trainingScenes = trainingScenes.map(scene => ({ ...scene, unlocked: true }));
+  // 同步新版三币/能量档案，防止最高会员被 V3 能量守卫误判为不可训练。
+  if (window.V3Economy) {
+    const currency = window.V3Economy.getCurrency();
+    window.V3Economy.saveCurrency({
+      ...currency,
+      growth: Math.max(Number(currency.growth) || 0, 99999),
+      energy: 99,
+      energyMax: 99,
+      socialCoin: 99999,
+      memberTier: 'companion',
+      energyLastRefresh: new Date().toLocaleDateString('sv-SE')
+    });
+    const profile = window.V3Economy.getProfile();
+    window.V3Economy.saveProfile({ ...profile, nickname: '全功能测试账号', phone: TEST_ACCOUNT_PHONE, hasCompletedOnboarding: true, isTestAccount: true });
+  }
   saveData();
 }
 
@@ -16422,9 +16429,8 @@ function applyUiSemantics() {
 
 initApp();
 
-// ===== 社交礼仪训练系统（复用真实挑战的三世界九关卡与3D场景组件） =====
-// 与真实挑战的区别：本模式在输入前提供 A/B/C 参考选项（可点选填入也可自由输入），
-// 提交后由教练评价；真实挑战则完全不提供提示，仅记录自然表达。
+// ===== 社交礼仪课堂系统（九个课程直接入口） =====
+// 礼仪课堂先教方法、再由用户用文字或语音跟练、提交后评价；真实挑战输入前不提供提示。
 const etiquetteLevels = [
   { id: 9001, title: '咖啡厅的邂逅', icon: '☕', world: 'basic', worldName: '基础社交', sceneKey: 'cafe', category: '社交场合与人际交往',
     story: '你刚搬到新城市，在咖啡厅排队时遇到一位住在同小区的邻居小雨，你们见过彼此但从未交谈。', relation: '同小区邻居 · 小雨（设计师）',
@@ -16516,7 +16522,6 @@ let etiquetteBusy = false;
 
 function showEtiquetteTraining() {
   showModal('etiquette');
-  renderEtiquetteWorldMap();
   renderEtiquetteLevelList();
 }
 
@@ -16534,37 +16539,31 @@ function renderEtiquetteWorldMap() {
 function renderEtiquetteLevelList() {
   const root = $('etiquette-level-list');
   if (!root) return;
-  const badge = (quality) => quality === 'good' ? 'bg-green-100 text-green-600' : quality === 'neutral' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-600';
   const isProUser = EM_isPro();
   root.innerHTML = etiquetteLevels.map((level, i) => {
     const isTrial = EM_isTrial3DProject('etiquette', level.id);
-    // v2.5.1（§18.3）：体验项目免费可玩（消耗每日次数）；其余项目高级会员专属
-    const trialTag = isTrial && !isProUser ? '<span class="px-1.5 py-0.5 bg-green-100 text-green-700 text-[10px] rounded-full">🎁 免费体验</span>' : '';
-    const actionBtn = (isTrial || isProUser)
-      ? `<button onclick="startEtiquetteLevel(${level.id})" class="w-full py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium rounded-xl hover:opacity-90 transition-opacity">${isTrial && !isProUser ? '免费体验（每日 3 次）' : '开始训练'}</button>`
-      : `<button onclick="goToMember()" class="w-full py-2.5 bg-purple-100 text-purple-600 text-sm font-medium rounded-xl hover:bg-purple-200 transition-colors">👑 高级会员专属</button>`;
-    return `
-    <div class="bg-white rounded-2xl p-4 shadow-sm border border-amber-100">
-      <div class="flex items-center justify-between mb-2">
-        <div class="flex items-center gap-2">
-          <span class="text-xl">${level.icon}</span>
-          <div>
-            <div class="font-semibold text-gray-800">${i + 1}. ${level.title}</div>
-            <div class="text-xs text-gray-500 mt-0.5">${level.relation}</div>
-          </div>
-        </div>
-        <span class="px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] rounded-full">${level.worldName}</span>
+    const canStart = isTrial || isProUser;
+    const status = isTrial && !isProUser ? '免费体验' : (canStart ? '可学习' : '高级会员');
+    const button = canStart
+      ? `<button onclick="startEtiquetteLevel(${level.id})" class="etiquette-course-action">开始学习</button>`
+      : `<button onclick="goToMember()" class="etiquette-course-action is-locked">了解会员权益</button>`;
+    return `<article class="etiquette-course-card" data-level-id="${level.id}">
+      <div class="etiquette-course-number">${String(i + 1).padStart(2, '0')}</div>
+      <div class="etiquette-course-icon" aria-hidden="true">${level.icon}</div>
+      <div class="etiquette-course-copy">
+        <div class="etiquette-course-meta"><span>${escapeCardText(level.focus)}</span><span>${status}</span></div>
+        <h4>${escapeCardText(level.title)}</h4>
+        <p>${escapeCardText(level.goal)}</p>
+        <div class="etiquette-course-relation">你将面对：${escapeCardText(level.relation)}</div>
       </div>
-      <div class="text-xs text-gray-600 mb-2">🎯 ${level.goal}</div>
-      <div class="flex items-center gap-3 text-xs text-gray-400 mb-3 flex-wrap">
-        <span>📌 ${level.focus}</span>
-        <span class="flex items-center gap-1">${level.options.map(o => `<span class="px-1.5 py-0.5 rounded ${badge(o.quality)}">${o.label}</span>`).join('')} 选项参考</span>
-      </div>
-      <div class="flex items-center gap-1.5 mb-2">${trialTag}${!isTrial && !isProUser ? '<span class="text-[10px] text-gray-400">开通高级会员解锁全部礼仪训练</span>' : ''}</div>
-      ${actionBtn}
-    </div>`;
+      ${button}
+    </article>`;
   }).join('');
 }
+
+window.getEtiquetteLevelById = function(levelId) {
+  return etiquetteLevels.find(level => Number(level.id) === Number(levelId)) || null;
+};
 
 function getEtiquetteSceneMeta(level) {
   const meta = getChallengeSceneMeta({ title: level.title, category: level.category, sceneKey: level.sceneKey });
@@ -16598,6 +16597,7 @@ function startEtiquetteLevel(levelId) {
   window.etiquetteRound = 0;
   window.etiquetteScore = 0;
   window.etiquetteBusy = false;
+  window.etiquetteActionPracticed=false;
 
   const coach = getEtiquetteCoach(level);
   const meta = getEtiquetteSceneLabel(level);
@@ -16638,9 +16638,9 @@ function startEtiquetteLevel(levelId) {
   const progress = $('etiquette-stage-progress');
   if (progress) progress.textContent = '0 / 3';
   const goal = $('etiquette-scene-goal');
-  if (goal) goal.textContent = '🎭 ' + coach.name + ' 将扮演' + (meta.role || '场景角色') + '。\n本关目标：' + level.goal + '。\n人物关系：' + level.relation + '。\n教学重点：' + level.focus + '。\n先看 A/B/C 参考选项（可点选也可自由输入），提交后由教练评价。';
+  if (goal) goal.textContent = '🎭 ' + coach.name + ' 将扮演' + (meta.role || '场景角色') + '。\n本关目标：' + level.goal + '。\n人物关系：' + level.relation + '。\n教学重点：' + level.focus + '。\n先阅读本轮教学提示，再用文字或语音完成跟练；提交后由教练逐项评价。';
   const evaluation = $('etiquette-coach-evaluation');
-  if (evaluation) { evaluation.className = 'challenge-coach-evaluation is-empty'; evaluation.textContent = '每轮输入都会在这里得到教练评价；本模式会先给出 A/B/C 参考选项，可点选也可自由输入。'; }
+  if (evaluation) { evaluation.className = 'challenge-coach-evaluation is-empty'; evaluation.textContent = '先按下方教学提示完成跟练；提交后，教练会说明做对了什么、哪里需要调整以及怎样表达更自然。'; }
   $('etiquette-messages').innerHTML = '';
   const bubbleLayer = $('etiquette-stage-bubbles');
   if (bubbleLayer) bubbleLayer.innerHTML = '';
@@ -16664,7 +16664,7 @@ function addEtiquetteBubble(role, text) {
   bubble.textContent = text;
   bubble.setAttribute('aria-label', `${isUser ? '用户' : ((window.etiquetteCoach && window.etiquetteCoach.name) || '场景角色')}：${text}`);
   layer.appendChild(bubble);
-  while (layer.children.length > 3) layer.removeChild(layer.firstElementChild);
+  while (layer.children.length > 2) layer.removeChild(layer.firstElementChild);
   if (window.Stage3D && document.getElementById('etiquette-3d-stage')?.classList.contains('is-3d')) {
     Stage3D.setSpeaking('etiquette-3d-stage', isUser ? 'user' : 'npc');
   }
@@ -16675,19 +16675,60 @@ function addEtiquetteBubble(role, text) {
   }
 }
 
-function renderEtiquetteOptions(level) {
-  const options = $('etiquette-options');
-  if (!options) return;
-  options.innerHTML = `
-    <div class="teach-label">📋 <b>教学提示：</b>先看参考方案再开口，也可自由输入 <span class="ml-auto text-[10px] opacity-70">点选可填入输入框</span></div>
-    ${level.options.map(o => `
-      <div onclick="pickEtiquetteOption('${o.text.replace(/'/g, "\\'")}', this)" data-quality="${o.quality}" class="option-card px-3 py-2.5 rounded-xl border border-amber-100 bg-amber-50/50 cursor-pointer hover:border-amber-300 transition-all">
-        <div class="flex items-start gap-2">
-          <span class="w-5 h-5 rounded-full bg-amber-500 text-white text-[10px] flex items-center justify-center font-medium flex-shrink-0 mt-0.5">${o.label}</span>
-          <div><div class="option-text text-xs text-gray-700 leading-relaxed">${o.text}</div></div>
-          <span class="q-badge ${o.quality === 'good' ? 'q-good' : (o.quality === 'cold' ? 'q-cold' : 'q-mid')}">${o.quality === 'good' ? '得体' : (o.quality === 'cold' ? '欠妥' : '一般')}</span>
-        </div>
-      </div>`).join('')}`;
+
+const ETIQUETTE_TURN_CONTENT={
+9001:[['共同点展开','小雨：我叫小雨，是做设计的。你常来这里吗？','nod','自然点头','回应信息、分享自己，再问开放式问题。','我偶尔会来。你平时最常点什么？'],['接住细节','小雨：工作累时喝咖啡很放松。你呢？','listen','倾听姿态','先回应感受，再分享相近经历。','听起来设计工作挺费脑。你最近在做什么设计？'],['自然告别','小雨：我的咖啡好了，今天认识你很开心。','wave','微笑告别','表达愉快，加一个可拒绝的轻邀请。','我也很高兴认识你。愿意的话下次一起喝咖啡。']],
+9002:[['观察座次','李阿姨：饭菜好了，随便坐。','listen','观察座次','等主人示意，不抢主位。','谢谢阿姨，我坐哪里合适？你们先坐。'],['餐桌交流','王叔叔：最近工作还适应吗？','nod','停筷回应','简要回答、感谢关心，再自然回问。','谢谢叔叔关心。听说您喜欢摄影？'],['告别感谢','李阿姨：以后常来玩。','bow','起身道谢','感谢具体到招待，再礼貌告别。','谢谢叔叔阿姨招待，菜特别好吃。']],
+9003:[['确认方法','邻居：里面有易碎品，要小心。','listen','停下倾听','复述风险，再确认配合方式。','明白。我们从两边慢慢抬，可以吗？'],['搬运沟通','邻居：前面有台阶。','nod','停稳确认','用明确口令确认节奏。','收到，先停一下。准备好后一起抬。'],['接受感谢','邻居：太感谢了，我请你吃饭吧。','wave','微笑回应','婉拒重礼，保持自然边界。','不用客气，邻里之间搭把手应该的。']],
+9004:[['记住同事','王姐：我负责产品，小刘负责数据。','listen','专注倾听','复述姓名与分工确认。','产品问题向王姐请教，数据问题找小刘，对吗？'],['确认任务','王姐：资料在共享盘，你先看看。','nod','记录确认','复述任务并询问优先级。','今天优先熟悉哪部分，下午同步一次可以吗？'],['结束沟通','李经理：有困难及时说。','nod','点头致谢','感谢、下一步、反馈时间。','谢谢李经理。我先熟悉项目，四点同步进展。']],
+9005:[['依据观点','陈总：为什么先改这里？','listen','听完再答','观点、依据、不确定项。','从反馈看用户卡在步骤多，数据还需核对。'],['处理敬酒','陈总：第一次见面，喝一杯。','raise','举杯示意','可用茶替代，真诚表达尊重。','谢谢陈总，我用茶敬您，祝合作顺利。'],['确认后续','陈总：材料下周能给我吗？','nod','记录确认','内部确认后给回复节点。','我今晚确认范围，明天上午准确回复。']],
+9006:[['数据成果','领导：增长具体体现在哪？','listen','看向提问者','结论、数据、个人与团队贡献。','月活同比提升18%，我负责召回，其他来自团队协作。'],['现场追问','同事：预算缩减还能执行吗？','nod','停顿思考','先答核心，再给备选。','可以调整，先保留高转化渠道验证。'],['简洁收束','主持人：还剩三十秒。','wave','面向听众','总结、下一步、致谢。','以上是年度复盘。明年聚焦留存，谢谢大家。']],
+9007:[['安全话题','小雅：你休息时喜欢做什么？','listen','认真倾听','分享细节，再邀请对方分享。','我周末喜欢逛展。你更喜欢安静还是户外活动？'],['尊重边界','小雅：感情经历今天不想细聊。','nod','接受边界','接受边界，再换轻松话题。','当然可以，按你舒服的节奏。'],['结束约会','小雅：今天聊得开心，我要回去了。','wave','微笑告别','接受结束信号，邀请可拒绝。','路上注意安全；愿意的话下次一起看展。']],
+9008:[['承认影响','小杰：你没问我就告诉了别人。','nod','认真道歉','说清行为和影响。','对不起，我没征得同意，侵犯了你的边界。'],['不推责任','小杰：你为什么那样做？','listen','用我表达','说明考虑并承担责任。','我担心来不及，但应该先问你。'],['修复约定','小杰：以后怎么办？','nod','确认约定','条件、行动、对方确认。','以后涉及你的信息，我先问，得到同意再说。']],
+9009:[['合适回忆','新人笑着等你继续。','listen','关注新人','一个片段，不揭短不讲私密。','他第一次认真说起她时特别温柔。'],['焦点归还新人','新娘看向你。','nod','看向两人','肯定两人的关系。','他们始终愿意听见彼此、支持彼此。'],['祝福收尾','主持人示意时间将到。','raise','举杯祝福','具体祝福后及时结束。','祝你们有商有量、有笑有爱。新婚快乐！']]};
+function getEtiquetteCurriculum(level){const g=(level.options||[]).find(function(o){return o.quality==='good';});const first={title:'先看现场，完成第一步',npc:level.opening,action:'turn',actionName:'转身微笑',guide:'身体朝向对方，目光自然停留，表情放松。',method:(g&&g.why)||level.refReason,reference:(g&&g.text)||level.coachAnswer};return [first].concat((ETIQUETTE_TURN_CONTENT[level.id]||[]).map(function(x){return{title:x[0],npc:x[1],action:x[2],actionName:x[3],guide:x[4],method:x[4],reference:x[5]};}));}
+
+function getEtiquetteTeachingSteps(level){return getEtiquetteCurriculum(level);}
+
+function renderEtiquetteOptions(level){const root=$('etiquette-options'),steps=getEtiquetteTeachingSteps(level),i=Math.min(Number(window.etiquetteRound||0),steps.length-1),x=steps[i];window.currentEtiquetteStep=x;root.innerHTML='<section class="etiquette-teaching-card"><div class="etiquette-teaching-progress"><span>本课第 '+(i+1)+' / '+steps.length+' 步</span><span>教练示范 · 你来跟做</span></div><h4>'+escapeCardText(x.title)+'</h4><div class="etiquette-action-lesson"><div><b>本轮动作：'+escapeCardText(x.actionName)+'</b><p>'+escapeCardText(x.guide)+'</p></div><button onclick="replayEtiquetteActionDemo()">▶ 看教练示范</button><button class="practice" onclick="practiceEtiquetteAction()">跟着做一次</button></div><div class="etiquette-teaching-block"><b>说话方法</b><p>'+escapeCardText(x.method)+'</p></div><div class="etiquette-reference-dialogue"><div class="etiquette-reference-title"><b>参考对话</b><span>理解结构后换成自己的话</span></div><div class="reference-line npc"><span>对方</span><p>'+escapeCardText(x.npc)+'</p></div><div class="reference-line user"><span>你可以说</span><p>'+escapeCardText(x.reference)+'</p></div></div><div class="etiquette-practice-task">轮到你：先跟做动作，再用文字或语音表达。</div><div id="etiquette-voice-status" class="etiquette-voice-status">可以打字，也可以点 🎙️ 说话。</div></section>';setTimeout(replayEtiquetteActionDemo,220);}
+function replayEtiquetteActionDemo(){const x=window.currentEtiquetteStep;if(!x)return;playCinematicPhotoAction('etiquette-3d-stage','npc',x.action);}
+function practiceEtiquetteAction(){const x=window.currentEtiquetteStep;if(!x)return;window.etiquetteActionPracticed=true;playCinematicPhotoAction('etiquette-3d-stage','user',x.action);}
+
+function startEtiquetteVoiceInput() {
+  const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const status = $('etiquette-voice-status');
+  const button = $('etiquette-voice-btn');
+  if (!Recognition) {
+    if (status) status.textContent = '当前浏览器不支持语音识别，请使用文字输入；在支持语音识别的浏览器中可直接说话。';
+    showToast('当前浏览器不支持语音识别，请改用文字输入');
+    return;
+  }
+  const recognition = new Recognition();
+  recognition.lang = 'zh-CN';
+  recognition.interimResults = true;
+  recognition.continuous = false;
+  let finalText = '';
+  if (button) { button.classList.add('is-listening'); button.textContent = '停止'; }
+  if (status) status.textContent = '正在听，请自然说出你的回答…';
+  recognition.onresult = event => {
+    let interim = '';
+    for (let i = event.resultIndex; i < event.results.length; i += 1) {
+      const transcript = event.results[i][0].transcript;
+      if (event.results[i].isFinal) finalText += transcript;
+      else interim += transcript;
+    }
+    const input = $('etiquette-input');
+    if (input) input.value = (finalText || interim).trim();
+  };
+  recognition.onerror = event => {
+    if (status) status.textContent = event.error === 'not-allowed' ? '未获得麦克风权限，请允许后重试，或改用文字输入。' : '没有识别清楚，请再说一次或改用文字输入。';
+  };
+  recognition.onend = () => {
+    if (button) { button.classList.remove('is-listening'); button.textContent = '🎙️'; }
+    if (status && finalText) status.textContent = '语音已转成文字，请检查输入框内容，确认后提交跟练。';
+  };
+  window.currentEtiquetteRecognition = recognition;
+  recognition.start();
 }
 
 function pickEtiquetteOption(content, element) {
@@ -16704,110 +16745,26 @@ function pickEtiquetteOption(content, element) {
   else { element.classList.add('bg-yellow-100'); const t = element.querySelector('.option-text'); if (t) t.style.color = '#ca8a04'; }
 }
 
-function sendEtiquetteMessage() {
-  const input = $('etiquette-input');
-  const text = input.value.trim();
-  if (!text || window.etiquetteBusy) return;
-  input.value = '';
-  window.etiquetteBusy = true;
-  document.querySelectorAll('#etiquette-options .option-card').forEach(opt => {
-    const quality = opt.getAttribute('data-quality');
-    opt.classList.remove('bg-green-100', 'bg-red-100', 'bg-yellow-100');
-    const t = opt.querySelector('.option-text');
-    if (t) t.style.color = '#1f2937';
-    // 标记已选
-    opt.style.opacity = quality ? '0.4' : '';
-  });
-  addEtiquetteBubble('user', text);
-  window.etiquetteRound = (window.etiquetteRound || 0) + 1;
-  const round = window.etiquetteRound;
-  const progress = $('etiquette-stage-progress');
-  if (progress) progress.textContent = `${round} / 3`;
+function sendEtiquetteMessage(){const input=$('etiquette-input'),text=input.value.trim();if(!text||window.etiquetteBusy)return;input.value='';window.etiquetteBusy=true;addEtiquetteBubble('user',text);const level=window.currentEtiquetteLevel,steps=getEtiquetteTeachingSteps(level),i=Number(window.etiquetteRound||0),x=steps[i],a=analyzeEtiquette(text,level,x);$('etiquette-options').innerHTML='';setTimeout(function(){const e=$('etiquette-coach-evaluation');e.className='challenge-coach-evaluation';e.innerHTML='<strong>🎓 教练评价</strong><div><b>为什么：</b>'+escapeCardText(a.why)+'</div><div><b>怎么做：</b>'+escapeCardText(x.method)+'</div><div><b>参考回答：</b>'+escapeCardText(x.reference)+'</div><div class="etiquette-npc-reason"><b>对方为什么这样回应：</b>'+escapeCardText(a.replyReason)+'</div><div><b>下一步怎么接：</b>'+escapeCardText(a.next)+'</div>';playCinematicPhotoAction('etiquette-3d-stage','npc',a.action);setTimeout(function(){addEtiquetteBubble('npc',a.reply);window.etiquetteRound=i+1;const p=$('etiquette-stage-progress');if(p)p.textContent=window.etiquetteRound+' / '+steps.length;window.etiquetteBusy=false;if(window.etiquetteRound<steps.length)renderEtiquetteOptions(level);else showEtiquetteResult();},600);},450);}
 
-  const level = window.currentEtiquetteLevel;
-  const options = $('etiquette-options');
-  if (options) options.innerHTML = '';
-
-  setTimeout(() => {
-    const analysis = analyzeEtiquette(text, level);
-    window.etiquetteScore = Number(window.etiquetteScore || 0) + Number(analysis.scoreDelta || 0);
-    const evaluation = $('etiquette-coach-evaluation');
-    const scoreDelta = Number(analysis.scoreDelta || 0);
-    const scoreLabel = scoreDelta >= 0 ? `本轮 +${scoreDelta}分` : `本轮 ${scoreDelta}分`;
-    if (evaluation) {
-      evaluation.className = 'challenge-coach-evaluation';
-      const coach = window.etiquetteCoach;
-      evaluation.innerHTML = `<strong>🎓 ${escapeCardText(coach ? coach.name : '教练')}评价</strong><br><span class="font-medium">${escapeCardText(scoreLabel)} · ${escapeCardText(analysis.comment)}</span><div class="mt-2"><b>为什么：</b>${escapeCardText(analysis.why)}</div><div class="mt-1"><b>怎么做：</b>${escapeCardText(analysis.method)}</div><div class="mt-1"><b>参考回答：</b>${escapeCardText(analysis.reference)}</div>`;
-    }
-    setTimeout(() => {
-      addEtiquetteBubble('npc', analysis.reply);
-      window.etiquetteBusy = false;
-      if (round < 3) setTimeout(() => renderEtiquetteOptions(level), 700);
-      else setTimeout(showEtiquetteResult, 900);
-    }, 700);
-  }, 700);
-}
-
-function analyzeEtiquette(text, level) {
-  if (!level) return { scoreDelta: 0, comment: '', why: '', method: '', reference: '', reply: '' };
-  const len = text.length;
-  const hasNegative = ['烦', '累', '压力', '讨厌', '不行', '算了', '懒得', '不想', '无聊'].some(w => text.includes(w));
-  const hasQuestion = text.includes('?') || text.includes('？') || text.includes('你呢') || text.includes('怎么样') || text.includes('你觉得') || text.includes('为什么') || text.includes('怎么');
-  const hasEmpathy = text.includes('理解') || text.includes('感受') || text.includes('不好意思') || text.includes('抱歉') || text.includes('对不起');
-  const hasDetail = len > 14 && (text.includes('因为') || text.includes('所以') || text.includes('比如') || text.includes('具体') || text.includes('其实'));
-  const hasGreeting = text.includes('您好') || text.includes('你好') || text.includes('大家好') || text.includes('谢谢') || text.includes('感谢') || text.includes('叔叔') || text.includes('阿姨') || text.includes('经理');
-
-  let score = 0;
-  let comment = '';
-  if (hasNegative) { score -= 8; } 
-  if (hasEmpathy) score += 4;
-  if (hasQuestion) score += 4;
-  if (hasDetail) score += 4;
-  if (hasGreeting) score += 3;
-  if (len < 6) score -= 3;
-
-  score = Math.max(-10, Math.min(10, score));
-  // 若输入命中了任一选项文本，按对应质量给分
-  if (level.options && level.options.length) {
-    const hit = level.options.find(o => text.trim() === o.text.trim());
-    if (hit) {
-      const base = hit.quality === 'good' ? 8 : hit.quality === 'neutral' ? 3 : -6;
-      score = base;
-    }
-  }
-
-  const good = level.options && level.options.find(o => o.quality === 'good');
-  const why = score >= 5
-    ? (good ? good.why : '你的表达与当前场景目标基本一致，给了对方继续回应的空间。')
-    : (score >= 0 ? (good ? good.why : '回应到位，但还可以更有温度一些。') : (level.options && level.options.find(o => o.quality === 'cold') ? level.options.find(o => o.quality === 'cold').why : '这次表达没有充分回应场景目标，可能让对方难以继续接话。'));
-  const method = good ? good.why : '先确认对方的身份与处境，再用一句自然的开场共情对方，最后给出一个开放式问题或可执行的行动。';
-  const reference = good ? good.text : (level.coachAnswer || '');
-  const reply = level.opening && window.etiquetteRound < 2
-    ? '（对方微微点头）嗯，我明白了。'
-    : good && score >= 5
-      ? '（对方笑了笑）谢谢你这么说，感觉和你聊天很舒服。'
-      : '（对方表情有些迟疑）这样啊……我们再聊聊吧。';
-  return { scoreDelta: score, comment: score >= 5 ? '表现很得体' : score >= 0 ? '基本得体，还有提升空间' : '这次有些失礼，注意表达方式', why, method, reference, reply };
-}
+function analyzeEtiquette(text,level,step){const n=text.replace(/\s+/g,''),bad=/闭嘴|烦死|随便|关你什么事|滚|必须/.test(n),good=n.length>=10&&!bad,partial=n.length>=5&&!bad,steps=getEtiquetteTeachingSteps(level),next=steps[Math.min(Number(window.etiquetteRound||0)+1,steps.length-1)];return{reply:good?'（对方放松下来）你说得很自然，我愿意继续聊。':partial?'（对方点点头）我听到了，你可以再具体一点吗？':'（对方显得迟疑）这种说法让我有些不舒服。',action:good?'nod':partial?'listen':'shake',why:good?'回应了现场信息，也给了对方继续交流的空间。':partial?'态度基本合适，但信息还不够完整。':'表达过于敷衍、强迫或越界。',replyReason:good?'对方感到被听见和尊重，因此愿意展开。':partial?'对方不确定你的意图，所以邀请你补充。':'对方感到压力，用迟疑保护边界。',next:Number(window.etiquetteRound||0)+1<steps.length?'下一轮“'+next.title+'”：'+next.method:'用得体的话收尾，不追加压力。'};}
 
 function showEtiquetteResult() {
-  const score = Number(window.etiquetteScore || 0);
-  const rating = score >= 12 ? '⭐⭐⭐' : score >= 4 ? '⭐⭐' : '⭐';
-  const title = score >= 12 ? '表现极佳' : score >= 4 ? '完成得不错' : '建议复习';
-  const msg = `<div class="text-center py-6">
-    <div class="text-3xl mb-2">${rating}</div>
-    <div class="text-lg font-bold text-gray-800 mb-1">${title}</div>
-    <div class="text-sm text-gray-500 mb-4">本关累计得分：${score} 分</div>
-    <div class="space-y-2 text-xs text-gray-600 max-w-[85%] mx-auto">
-      <div class="px-3 py-2 rounded-lg bg-gray-50">🌸 微笑与真诚表达，永远是社交礼仪的第一课。</div>
-      <div class="px-3 py-2 rounded-lg bg-gray-50">✨ 同伴关系与公共场合的边界感，需要在一次次练习中积累。</div>
-    </div>
+  const level = window.currentEtiquetteLevel;
+  const good = level && (level.options || []).find(option => option.quality === 'good');
+  const summary = `<div class="etiquette-lesson-summary">
+    <div class="etiquette-summary-mark">完成</div>
+    <h4>本课跟练已完成</h4>
+    <p>你已经完成了三次“看提示—自己表达—查看反馈”的练习。重点不是背标准答案，而是把方法换成自己的语言。</p>
+    <div><b>本课要记住</b><span>${escapeCardText(level ? level.focus : '观察、回应和表达')}</span></div>
+    <div><b>推荐结构</b><span>${escapeCardText((good && good.why) || (level && level.refReason) || '先回应现场，再表达态度，最后自然推进。')}</span></div>
   </div>`;
   const options = $('etiquette-options');
-  if (options) options.innerHTML = `<div class="mt-2"><button onclick="closeModal('etiquette-training');showEtiquetteTraining()" class="w-full py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium rounded-xl hover:opacity-90 transition-opacity">返回社交礼仪训练</button></div>`;
+  if (options) options.innerHTML = `<button onclick="closeModal('etiquette-training');showEtiquetteTraining()" class="w-full py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium rounded-xl">返回课程列表</button>`;
   const evaluation = $('etiquette-coach-evaluation');
-  if (evaluation) { evaluation.className = 'challenge-coach-evaluation'; evaluation.innerHTML = msg; }
+  if (evaluation) { evaluation.className = 'challenge-coach-evaluation'; evaluation.innerHTML = summary; }
 }
+
 
 /* ============================================================
  * Stage3D —— 真·3D游戏舞台：主角与NPC站位真实建筑场景
@@ -17347,7 +17304,7 @@ initApp();
     });
   }
 
-  // 教学提示：现在 A/B/C 选项已固定在输入框下方，无需再滚动舞台
+  // 教学提示与提交后评价都固定在输入框下方，便于边看场景边学习
   // （保留 MutationObserver 接口，仅把新内容所在滚动区滚到顶部，确保「分析」可见）
   function autoRevealOptions() {
     var opt = document.getElementById('etiquette-options');
@@ -18577,6 +18534,17 @@ function useAvatarDetail() {
 })(window);
 </script>
 
+
+
+<style id="etiquette-classroom-redesign">
+  .etiquette-teaching-card{padding:16px;border:1px solid #f1dcc4;border-radius:18px;background:#fffaf3;color:#2e2934}.etiquette-teaching-progress{display:flex;justify-content:space-between;gap:12px;color:#9a6a38;font-size:10px;font-weight:700}.etiquette-teaching-card h4{margin:10px 0 12px;font-size:16px;line-height:1.35;font-weight:750;color:#27212b}.etiquette-teaching-block{padding:11px 12px;margin-top:8px;border-radius:13px;background:white;border:1px solid #f2e8dc}.etiquette-teaching-block b{display:block;margin-bottom:4px;color:#a35d17;font-size:11px}.etiquette-teaching-block p{font-size:12px;line-height:1.7;color:#57505e}.etiquette-reference-dialogue{margin-top:10px;padding:12px;border:1px solid #e8ddcf;border-radius:14px;background:#fff}.etiquette-reference-title{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:9px}.etiquette-reference-title b{font-size:12px;color:#8b4c12}.etiquette-reference-title span{font-size:9px;color:#91877c}.reference-line{display:grid;grid-template-columns:56px 1fr;gap:8px;align-items:start;margin-top:7px}.reference-line>span{padding:4px 5px;border-radius:7px;background:#f1eee9;color:#6d6257;font-size:9px;text-align:center}.reference-line.user>span{background:#fff0d9;color:#9a570f}.reference-line p{font-size:12px;line-height:1.65;color:#423b46}.reference-line.user p{font-weight:600;color:#2f2933}#etiquette-3d-stage.is-photo .challenge-stage-bubble-layer.anchored .challenge-stage-bubble{max-width:44%;max-height:70px;padding:7px 9px;font-size:10px;line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}.etiquette-practice-task{margin-top:11px;padding:11px 12px;border-left:3px solid #f59e0b;background:#fff;color:#3f3845;font-size:12px;line-height:1.65}.etiquette-voice-status{margin-top:9px;color:#8a8490;font-size:10px;line-height:1.5}.btn-action-trigger.is-listening{min-width:52px;background:#fee2e2;color:#b91c1c;animation:pulse 1s infinite}.etiquette-lesson-summary{text-align:left;padding:4px}.etiquette-summary-mark{display:inline-block;padding:4px 9px;border-radius:999px;background:#e8f5ed;color:#237449;font-size:10px;font-weight:700}.etiquette-lesson-summary h4{margin:9px 0 5px;font-size:17px;color:#282330}.etiquette-lesson-summary p{font-size:12px;line-height:1.7;color:#686170}.etiquette-lesson-summary>div:not(.etiquette-summary-mark){display:grid;gap:3px;margin-top:10px;padding:10px;border-radius:12px;background:#f8f7fa}.etiquette-lesson-summary b{font-size:10px;color:#746c7e}.etiquette-lesson-summary span{font-size:12px;line-height:1.55;color:#37313e}
+</style>
+
+<style id="etiquette-course-redesign">
+  .etiquette-course-intro{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 14px;padding:4px 2px 14px;border-bottom:1px solid #ecebf3}.etiquette-course-intro h4{font-size:18px;line-height:1.3;font-weight:750;color:#171527}.etiquette-course-intro p{font-size:12px;line-height:1.65;color:#77758a;margin-top:5px;max-width:34em}.etiquette-course-intro>span{display:grid;place-items:center;width:42px;height:42px;border-radius:14px;background:#fff4e7;font-size:21px}.etiquette-course-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.etiquette-course-card{position:relative;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto 1fr auto;gap:0 12px;min-height:220px;padding:17px;border:1px solid #ebe9f3;border-radius:20px;background:#fff;box-shadow:0 8px 24px rgba(39,31,74,.06);overflow:hidden}.etiquette-course-card:focus-within{outline:3px solid rgba(99,102,241,.18);outline-offset:2px}.etiquette-course-number{position:absolute;right:14px;top:12px;color:#d8d5e2;font-size:12px;font-weight:750;letter-spacing:.08em}.etiquette-course-icon{grid-row:1/3;display:grid;place-items:center;width:43px;height:43px;border-radius:15px;background:#f7f5ff;font-size:21px}.etiquette-course-copy{min-width:0;padding-right:18px}.etiquette-course-meta{display:flex;flex-wrap:wrap;gap:5px;margin:1px 0 7px}.etiquette-course-meta span{font-size:9px;line-height:1;padding:5px 7px;border-radius:999px;background:#f4f2f9;color:#6c687c}.etiquette-course-meta span:last-child{background:#eef7f2;color:#33805b}.etiquette-course-copy h4{font-size:15px;line-height:1.35;font-weight:750;color:#1f1c2e}.etiquette-course-copy p{font-size:11px;line-height:1.6;color:#646174;margin-top:6px}.etiquette-course-relation{font-size:10px;line-height:1.5;color:#918da0;margin-top:8px}.etiquette-course-action{grid-column:1/-1;align-self:end;width:100%;margin-top:16px;padding:10px 13px;border:0;border-radius:12px;background:#5f5bf6;color:white;font-size:12px;font-weight:700;cursor:pointer}.etiquette-course-action:hover{background:#4d49e8}.etiquette-course-action.is-locked{background:#f0eef7;color:#655e7a}.v4-stage.is-photo .photo-bg{filter:saturate(.88) contrast(1.03) brightness(.72)}
+  @media(max-width:520px){.etiquette-course-grid{grid-template-columns:1fr}.etiquette-course-card{min-height:188px}}
+</style>
+
 <!-- ===== V3.0 模块加载 ===== -->
 <script src="libs/v3_economy_loop.js"></script>
 <script src="libs/v3_ui_components.js"></script>
@@ -18586,7 +18554,6 @@ function useAvatarDetail() {
 <script src="libs/v3_ai_mutations.js"></script>
 <script src="libs/v3_evidence_library.js"></script>
 <script src="libs/v3_protocol_ui.js"></script>
-<!-- ===== V4.0 教学闭环模块（四级教学 + 行为时间线 + 边说边做） ===== -->
-<script src="libs/v4_teaching_closed_loop.js"></script>
 
+<style id="etiquette-branching-classroom">.etiquette-action-lesson{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:12px;border:1px solid #fed7aa;border-radius:14px;background:#fff7ed}.etiquette-action-lesson p{margin:4px 0;font-size:12px}.etiquette-action-lesson button{border:0;border-radius:9px;padding:8px;background:white;color:#9a3412;font-weight:700}.etiquette-action-lesson .practice{background:#f97316;color:white}.photo-char.animating-listen{animation:etListen 1.3s}@keyframes etListen{50%{transform:translateY(-2%) scale(1.03)}}.etiquette-npc-reason{padding-top:6px;border-top:1px dashed #c4b5fd}</style>
 </body></html>

@@ -198,7 +198,7 @@ test('学习卡片：原始课程已接入并可检索', async ({ page }) => {
   await page.evaluate(() => switchTab('training'));
   await page.evaluate(() => showTrainingModule('cards'));
   await expect(page.locator('#training-card-module')).toBeVisible();
-  await expect(page.locator('#training-card-total')).toHaveText('1797');
+  await expect(page.locator('#training-card-total')).toHaveText('1822');
   await expect(page.locator('#training-card-list .training-card-item')).toHaveCount(12);
   const scrollMetrics = await page.locator('#training-card-module').evaluate(el => ({ scrollHeight: el.scrollHeight, clientHeight: el.clientHeight }));
   expect(scrollMetrics.scrollHeight, '学习卡片页面应有独立滚动容器').toBeGreaterThan(scrollMetrics.clientHeight);
@@ -270,7 +270,9 @@ test('测试账号入口与真人影视训练舞台可用', async ({ page }) => 
   expect(challengeStart.error, JSON.stringify(challengeStart)).toBe('');
   expect(challengeStart.found, JSON.stringify(challengeStart)).toBe(true);
   expect(challengeStart.pro, JSON.stringify(challengeStart)).toBe(true);
-  expect(challengeStart.modalDisplay, JSON.stringify(challengeStart)).toBe('flex');
+  expect(challengeStart.modalDisplay, JSON.stringify(challengeStart)).toBe('none');
+  await expect(page.locator('#v3-kit-prompt')).toBeVisible();
+  await page.locator('#v3-kit-skip').click();
   const challengeStage = page.locator('#challenge-3d-stage');
   await expect(page.locator('#modal-challenge-training')).toBeVisible();
   await expect(challengeStage).toHaveClass(/is-photo/);

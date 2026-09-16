@@ -88,6 +88,49 @@
     { at: 5, who: 'npc', action: 'nod',      text: '松手，恢复自然距离', why: '握完轻收自然站立，恢复社交距离，不黏着也不生硬。' }
   ];
 
+  function courseFromLevel(level) {
+    if (!level) return COURSES['first-meeting-client'];
+    var best = (level.options || []).filter(function (item) { return item.quality === 'good'; })[0];
+    var answer = (best && best.text) || level.coachAnswer || '你好，很高兴认识你。';
+    var focus = String(level.focus || '观察、回应、表达').split(/[、，,]/).filter(Boolean);
+    var scene = {
+      id: 'ETQ-' + level.id,
+      levelId: level.id,
+      env: level.sceneKey || 'public',
+      npcLabel: level.relation || '场景角色',
+      userLabel: '我',
+      goal: level.goal,
+      opening: level.opening,
+      expected: focus,
+      reference: answer,
+      explanation: (best && best.why) || level.refReason || '先回应对方当下的信息，再自然推进交流。',
+      allowedActions: ['微笑', '点头', '握手', '鞠躬', '挥手'],
+      randomEvents: [
+        { label: '对方回应简短', prompt: '对方只简短回应了一句，停下来等你继续。', hint: '先接住对方已经说出的信息，再用一个具体、容易回答的问题继续。' },
+        { label: '对方临时分心', prompt: '对方突然看了一眼手机，没有马上接话。', hint: '给对方短暂停顿，不急着追问；等注意力回来后再自然续上。' },
+        { label: '对方提出不同意见', prompt: '对方没有顺着你的话说，而是表达了不同看法。', hint: '先确认你听懂了对方的观点，再表达自己的看法，避免立刻反驳。' }
+      ],
+      sourceLevel: level
+    };
+    return {
+      lesson: { id: 'L-' + level.id, title: level.title, chapter: '社交礼仪训练', knowledgePoints: focus },
+      rule: { id: 'R-' + level.id, situation: level.story, recommendedActions: focus, explain: scene.explanation },
+      scenario: scene
+    };
+  }
+
+  function demoTimelineFor(course) {
+    var sc = course.scenario;
+    var focus = sc.expected || [];
+    return [
+      { at: 0, who: 'npc', action: 'step', text: '先观察现场与对方状态', why: '先看清人物关系和当下情境，再决定如何靠近，能减少冒失和机械套话。' },
+      { at: 1, who: 'npc', action: 'nod', text: focus[0] || '身体朝向对方', why: '身体朝向和目光先到位，对方才能感受到你是在认真与TA交流。' },
+      { at: 2, who: 'npc', action: 'nod', text: focus[1] || '用自然表情回应', why: '表情和动作要与关系、场合匹配，不需要夸张表演。' },
+      { at: 3, who: 'npc', action: 'nod', text: '示范表达：' + sc.reference, speak: true, why: sc.explanation },
+      { at: 4, who: 'npc', action: 'nod', text: '停下来观察对方反应', why: '说完后留出回应空间，根据对方的表情和语言再决定下一步。' }
+    ];
+  }
+
   /* ---------------- 会话状态 ---------------- */
   var state = {
     mode: null,          // 'demo' | 'follow' | 'open' | 'sim'
@@ -97,6 +140,8 @@
     demoIdx: -1,
     followIdx: -1,
     demoTimer: null,
+    demoTimeline: DEMO_TIMELINE,
+    currentMutation: null,
     over: false
   };
 
@@ -108,6 +153,20 @@
     if (!st) return false;
     var cfg = state.scenario ? state.scenario : COURSES['first-meeting-client'].scenario;
     try {
+      if (cfg.sourceLevel && typeof window.mountCinematicPhotoStage === 'function') {
+        var level = cfg.sourceLevel;
+        var meta = typeof window.getEtiquetteSceneLabel === 'function' ? window.getEtiquetteSceneLabel(level) : { location: level.title, sceneKey: level.sceneKey };
+        return window.mountCinematicPhotoStage(sid(), {
+          env: level.sceneKey || cfg.env || 'public',
+          background: window.getCinematicSceneImage(meta),
+          backgroundAlt: (meta.location || level.title) + '真人影视场景',
+          npcSrc: window.getCinematicNpcSrc(level.sceneKey || cfg.env || 'public', level.id),
+          npcLabel: cfg.npcLabel || '场景角色',
+          npcAlt: (cfg.npcLabel || '场景角色') + '真人全身形象',
+          userSrc: window.getCinematicUserSrc(),
+          table: true
+        });
+      }
       window.Stage3D.mount(sid(), {
         env: cfg.env || 'office',
         npc: { label: cfg.npcLabel || '客户', image: 'assets/images/chars/npc-wang.png', fullBody: 'assets/images/chars/npc-wang-full.png' },
@@ -123,7 +182,10 @@
     var item = acts[actionKey];
     var cls = item && item.cls ? item.cls : actionKey; // '微笑'→nod；demo 用 'step'/'nod'/'handshake' 直接作 cls
     var label = item ? item.label : actionKey;
-    if (window.Stage3D && window.Stage3D.setAction) {
+    var stage = $(sid());
+    if (stage && stage.classList.contains('is-photo') && typeof window.playCinematicPhotoAction === 'function') {
+      window.playCinematicPhotoAction(sid(), who === 'npc' ? 'npc' : 'user', cls);
+    } else if (window.Stage3D && window.Stage3D.setAction) {
       window.Stage3D.setAction(sid(), who === 'npc' ? 'npc' : 'user', cls);
     }
     pushTimeline({ type: 'action', who: who, value: label, action: cls });
@@ -166,6 +228,10 @@
     b.textContent = text;
     layer.appendChild(b);
     while (layer.children.length > 3) layer.removeChild(layer.firstElementChild);
+    var stage = $(sid());
+    if (stage && stage.classList.contains('is-photo') && typeof window.layoutCinematicBubbles === 'function') {
+      window.layoutCinematicBubbles(sid(), 'v4-stage-bubbles');
+    }
   }
 
   /* ---------------- 行为时间轴渲染 ---------------- */
@@ -197,6 +263,7 @@
     }
     if (!syncLine) syncLine = '本次动作与语言基本分步进行；下次可以在开口的同时点动作图标，让两者同步，更贴近真实社交。';
     lines.push(syncLine);
+    if (state.currentMutation && state.currentMutation.hint) lines.push('这次临场情况可以这样处理：' + state.currentMutation.hint);
     if (acts.length === 0) lines.push('没有触发任何动作。可以试试在训练中点一下底部的 [微笑] [握手] 等图标，让身体表达配合语言。');
     else if (acts.length >= 2) lines.push('你触发了 ' + acts.length + ' 个动作，动作表达比较丰富。');
     if (msgs.length === 0) lines.push('没有留下文字/语音内容。试着说一句问候，AI 才能帮你复盘语言表达。');
@@ -235,7 +302,7 @@
     } catch (e) { console.error('[V4] saveToLog failed:', e); }
   }
 
-  function seedProfileCourses() {
+  function seedProfileCourses(course) {
     try {
       var raw = localStorage.getItem(PROFILE_KEY);
       var p = raw ? JSON.parse(raw) : {};
@@ -243,7 +310,7 @@
       if (!p.lesson) p.lesson = [];
       if (!p.etiquetteRules) p.etiquetteRules = [];
       if (!p.trainingScenarios) p.trainingScenarios = [];
-      var root = COURSES['first-meeting-client'];
+      var root = course || COURSES['first-meeting-client'];
       if (!p.lesson.some(function (l) { return l.id === root.lesson.id; })) p.lesson.push(root.lesson);
       if (!p.etiquetteRules.some(function (r) { return r.id === root.rule.id; })) p.etiquetteRules.push(root.rule);
       if (!p.trainingScenarios.some(function (s) { return s.id === root.scenario.id; })) p.trainingScenarios.push(root.scenario);
@@ -251,11 +318,44 @@
     } catch (e) { console.warn('[V4] seedProfileCourses:', e); }
   }
 
+  /* ---------------- 语音输入（Web Speech API，纯前端 · Chrome/Edge） ----------------
+   * 点击 🎙 开始语音识别，把语音转成文字填入输入框；再点一次停止。
+   * 语音输入与文字输入并存、且都不打断底下动作快捷面板 —— 正是\"边说边做\"。 */
+  function voice() {
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) {
+      alert('当前浏览器不支持语音识别，可用文字输入。建议使用 Chrome / Edge。');
+      return;
+    }
+    if (state._sr && state._srRecognizing) { // 正在识别 → 停止
+      try { state._sr.stop(); } catch (e) {}
+      state._sr = null; state._srRecognizing = false;
+      var mic = $('v4-mic'); if (mic) mic.style.background = 'rgba(255,255,255,.14)';
+      return;
+    }
+    var sr = new SR();
+    sr.lang = 'zh-CN';
+    sr.interimResults = false;
+    sr.continuous = false;
+    sr.onresult = function (ev) {
+      var t = '';
+      for (var i = 0; i < ev.results.length; i++) t += ev.results[i][0].transcript;
+      var inp = $('v4-input');
+      if (inp) inp.value = (inp.value ? inp.value + ' ' : '') + t;
+    };
+    sr.onerror = function (e) { console.warn('[V4] 语音识别错误：', e && e.error); state._sr = null; state._srRecognizing = false; };
+    sr.onend = function () { state._sr = null; state._srRecognizing = false; var mic = $('v4-mic'); if (mic) mic.style.background = 'rgba(255,255,255,.14)'; };
+    state._sr = sr; state._srRecognizing = true;
+    var mic = $('v4-mic'); if (mic) mic.style.background = 'rgba(244,63,94,.6)';
+    try { sr.start(); } catch (e) { state._sr = null; state._srRecognizing = false; }
+  }
+
   /* ---------------- 看示范：暂停式播放 ---------------- */
   function playDemoNode(idx) {
     state.demoIdx = idx;
-    if (idx >= DEMO_TIMELINE.length) { demoDone(); return; }
-    var node = DEMO_TIMELINE[idx];
+    var demo = state.demoTimeline || DEMO_TIMELINE;
+    if (idx >= demo.length) { demoDone(); return; }
+    var node = demo[idx];
     // 动作与语音并行触发
     if (node.speak) setSpeaking(node.who);
     triggerAction(node.who, node.action);
@@ -266,7 +366,7 @@
     if (p) {
       p.className = 'v4-demo-panel show';
       p.innerHTML =
-        '<div class="v4-demo-step">节点 ' + (idx + 1) + '/' + DEMO_TIMELINE.length + ' · ' + MODE_LABEL.demo + '</div>' +
+        '<div class="v4-demo-step">节点 ' + (idx + 1) + '/' + demo.length + ' · ' + MODE_LABEL.demo + '</div>' +
         '<div class="v4-demo-text">' + esc(node.text) + '</div>' +
         '<div class="v4-demo-why"><b>为什么这么做：</b>' + esc(node.why) + '</div>' +
         '<button class="v4-btn" onclick="V4Teaching.nextDemo()">继续（' + fmtTS(node.at) + '）</button>';
@@ -342,13 +442,13 @@
       p.className = 'v4-demo-panel show';
       p.innerHTML =
         '<div class="v4-demo-step">半开放训练 · 自主决策</div>' +
-        '<div class="v4-demo-text">' + esc(sc.goal) + '</div>' +
-        '<div class="v4-demo-why">' + esc(sc.expected.join(' → ')) + '</div>' +
+        '<div class="v4-demo-text">' + esc(sc.opening || sc.goal) + '</div>' +
+        '<div class="v4-demo-why">这一步不显示标准答案。请根据现场自行决定说什么、做什么，结束后再看复盘。</div>' +
         '<div class="v4-btn-row"><button class="v4-btn" onclick="V4Teaching.review()">结束并复盘</button></div>';
     }
-    addBubble('npc', '（客户）你好，我是李总。你是小张吧？今天主要想聊聊项目的进展。');
+    addBubble('npc', sc.opening || '你好，我们开始吧。');
     setSpeaking('npc');
-    pushTimeline({ type: 'message', who: 'npc', value: '客户开场：你好，我是李总。…' });
+    pushTimeline({ type: 'message', who: 'npc', value: sc.opening || '场景角色开始交流' });
   }
 
   /* ---------------- 真实模拟：随机突变 ---------------- */
@@ -360,12 +460,13 @@
     if (p) {
       p.className = 'v4-demo-panel show';
       p.innerHTML =
-        '<div class="v4-demo-step">真实模拟 · 对方会随机反应</div>' +
-        '<div class="v4-demo-text">⚠ 意外触发：' + esc(ev.label) + '</div>' +
-        '<div class="v4-demo-why">' + esc(ev.prompt) + '<br><span style="opacity:.75">应对参考：</span>' + esc(ev.hint) + '</div>' +
+        '<div class="v4-demo-step">真实模拟 · 临场应对</div>' +
+        '<div class="v4-demo-text">' + esc(ev.prompt) + '</div>' +
+        '<div class="v4-demo-why">系统不会提前告诉你应对方法。请像真实现场一样观察、表达和行动，复盘时再查看建议。</div>' +
         '<div class="v4-btn-row"><button class="v4-btn" onclick="V4Teaching.review()">结束并复盘</button></div>';
     }
-    addBubble('npc', '（客户）' + ev.prompt);
+    state.currentMutation = ev;
+    addBubble('npc', ev.prompt);
     setSpeaking('npc');
     pushTimeline({ type: 'mutation', who: 'npc', value: 'AI 随机突变：' + ev.label });
   }
@@ -406,6 +507,7 @@
     if (!state.scenario) state.scenario = COURSES['first-meeting-client'].scenario;
     state.startedAt = now();
     state.timeline = [];
+    state.currentMutation = null;
     state.over = false;
     state.mode = m;
     updateModeTabs();
@@ -451,7 +553,8 @@
         '<div id="v4-timeline" class="v4-timeline" style="margin:10px 12px 0;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.05);max-height:120px;overflow-y:auto;font-size:12px;border:1px solid rgba(255,255,255,.07);"></div>' +
         '<div class="v4-input-hint" id="v4-input-hint" style="margin:8px 16px 0;font-size:10px;opacity:.6;"></div>' +
         '<div class="v4-inputrow" style="display:flex;gap:8px;align-items:center;margin:8px 14px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);">' +
-          '<input id="v4-input" style="flex:1;background:none;border:none;outline:none;color:#fff;font-size:13px;min-width:0;" placeholder="输入/说一句话（可边说边点动作）" onkeydown="if(event.key===\'Enter\')V4Teaching.send()">' +
+          '<input id="v4-input" style="flex:1;background:none;border:none;outline:none;color:#fff;font-size:13px;min-width:0;" placeholder="输入或用语音说一句话（可边说边点动作）" onkeydown="if(event.key===\'Enter\')V4Teaching.send()">' +
+          '<button id="v4-mic" onclick="V4Teaching.voice()" title="语音输入" style="border:none;border-radius:10px;background:rgba(255,255,255,.14);color:#fff;padding:6px 10px;font-size:14px;cursor:pointer;">🎙</button>' +
           '<button onclick="V4Teaching.send()" style="border:none;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;padding:6px 12px;font-size:12px;cursor:pointer;">发送</button>' +
         '</div>' +
         '<div class="v4-dock" style="display:flex;gap:8px;justify-content:center;align-items:center;padding:10px 12px 16px;flex-wrap:wrap;background:rgba(8,5,20,.5);border-top:1px solid rgba(255,255,255,.08);">' +
@@ -469,9 +572,38 @@
 
   var openState = { mounted: false };
 
+  function openLevel(levelId) {
+    var level = typeof window.getEtiquetteLevelById === 'function' ? window.getEtiquetteLevelById(levelId) : null;
+    if (!level) return open('first-meeting-client');
+    if (typeof window.EM_gate3DProject === 'function' && !window.EM_gate3DProject('etiquette', level.id, function () { openLevel(level.id); })) return;
+    if (typeof window.EM_accountTrainStart === 'function') window.EM_accountTrainStart();
+    if (typeof window.closeModal === 'function') window.closeModal('etiquette');
+    var course = courseFromLevel(level);
+    return openCourse(course);
+  }
+
+  function openCourse(course) {
+    state.scenario = course.scenario;
+    state.demoTimeline = demoTimelineFor(course);
+    state.mode = null;
+    state.timeline = [];
+    state.startedAt = now();
+    state.over = false;
+    seedProfileCourses(course);
+    var m = ensureModal();
+    m.style.display = 'flex';
+    $('v4-title').textContent = course.lesson.title;
+    $('v4-sub').textContent = course.scenario.goal;
+    $('v4-input').value = '';
+    renderTimeline();
+    openState.mounted = mountStage();
+    mode('demo');
+  }
+
   function open(scenarioKey) {
     var course = COURSES[scenarioKey] || COURSES['first-meeting-client'];
     state.scenario = course.scenario;
+    state.demoTimeline = DEMO_TIMELINE;
     state.mode = null;
     state.timeline = [];
     state.startedAt = now();
@@ -505,10 +637,10 @@
 
   /* ---------------- 公开接口 ---------------- */
   window.V4Teaching = {
-    open: open, close: close, mode: mode,
+    open: open, openLevel: openLevel, close: close, mode: mode,
     action: function (k) { triggerAction('user', k); },
     send: sendText,
-    nextDemo: function () { if (state.demoIdx >= 0 && state.demoIdx < DEMO_TIMELINE.length) playDemoNode(state.demoIdx + 1); },
+    nextDemo: function () { if (state.demoIdx >= 0 && state.demoIdx < (state.demoTimeline || DEMO_TIMELINE).length) playDemoNode(state.demoIdx + 1); },
     followDoAction: function () { nextFollow(); },
     nextFollow: nextFollow,
     review: showReview,
@@ -518,20 +650,7 @@
   window.startV4Teaching = open;
 
   /* ---------------- 运行时包装：礼仪训练模态框注入四级教学入口 ---------------- */
-  function injectEtiquetteEntry() {
-    var root = $('etiquette-world-map-list');
-    if (!root) return;
-    if (root.querySelector('.v4-entry-btn')) return;
-    var b = document.createElement('div');
-    b.style.cssText = 'margin:12px 0 4px;padding:14px;border:1px solid rgba(124,58,237,.28);border-radius:16px;background:linear-gradient(135deg,rgba(124,58,237,.16),rgba(236,72,153,.10));';
-    b.innerHTML =
-      '<div style="font-weight:700;font-size:13px;color:#241d4a;">🎓 四级教学 · 第一次见客户</div>' +
-      '<div style="font-size:11px;color:#5b4a7a;margin:4px 0 10px;">看示范 → 跟练 → 半开放 → 真实模拟；动作与语言同步发生的完整闭环。</div>' +
-      '<button class="v4-entry-btn" onclick="V4Teaching.open(\'first-meeting-client\')" style="width:100%;padding:10px;border:none;border-radius:12px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-size:13px;font-weight:600;cursor:pointer;">📖 进入跟练模式</button>' +
-      '<div style="font-size:9px;opacity:.55;margin-top:8px;">文案：无"检验/考核/不及格"，只有尝试与复盘。受挫时你的感受是被尊重的。</div>';
-    // 插到关卡列表上方
-    root.insertBefore(b, root.firstElementChild);
-  }
+  function injectEtiquetteEntry() { /* 九个课程卡片本身就是教学入口，不再插入重复总览。 */ }
 
   var origShowEtiquetteTraining = window.showEtiquetteTraining;
   if (typeof origShowEtiquetteTraining === 'function') {
