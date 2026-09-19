@@ -9,10 +9,7 @@
       "category": "商务社交",
       "difficulty": 2,
       "status": "✅ 完整",
-      "size_bytes": 17855,
-      "actions_count": 8,
-      "dialogues_count": 3,
-      "practices_count": 4
+      "file": "ST-001_first_visit_client.json"
     },
     {
       "scene_id": "ST-002",
@@ -37,10 +34,11 @@
     },
     {
       "scene_id": "ST-005",
-      "title": "求职面试",
-      "category": "商务社交",
+      "title": "求职面试首轮",
+      "category": "职场与事业",
       "difficulty": 3,
-      "status": "todo"
+      "status": "✅ 完整",
+      "file": "ST-005_job_interview.json"
     },
     {
       "scene_id": "ST-006",

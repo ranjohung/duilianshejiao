@@ -1350,14 +1350,88 @@ h1,h2,h3 { text-wrap:balance; }
             </div>
           </button>
 
-          <!-- V5 SceneTemplate 入口（2026-09-19 审查修复：新架构可视化） -->
-          <button onclick="openV5SceneTemplate('ST-001')" class="w-full text-left bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all ring-2 ring-yellow-300/50" style="position:relative">
+          <!-- V5 SceneTemplate 入口（2026-09-20 扩展：多模板选择器） -->
+          <button onclick="openV5TemplatePicker()" class="w-full text-left bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all ring-2 ring-yellow-300/50" style="position:relative">
             <span style="position:absolute;top:-8px;right:10px;background:#fbbf24;color:#78350f;font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;">V5 新架构</span>
             <div class="flex items-center justify-between">
-              <div class="flex items-center gap-3"><span class="text-2xl">📋</span><div><h3 class="font-semibold text-lg">V5 场景模板训练</h3><p class="text-xs opacity-80 mt-1">SceneTemplate 分步卡片 · 看示范→跟练→半开放→真实模拟</p></div></div>
+              <div class="flex items-center gap-3"><span class="text-2xl">📋</span><div><h3 class="font-semibold text-lg">V5 场景模板训练</h3><p class="text-xs opacity-80 mt-1" id="v5-template-count">加载中…</p></div></div>
               <span class="text-sm opacity-80">进入 →</span>
             </div>
           </button>
+
+<script>
+/** V5 模板选择器入口 — 列出所有已加载的完整模板 */
+function openV5TemplatePicker() {
+  var ST = window.SceneTemplates;
+  if (!ST || Object.keys(ST.loaded).length === 0) {
+    // 还没加载完，等 1.5s 重试一次
+    showToast('模板加载中，请稍候再试…');
+    setTimeout(openV5TemplatePicker, 1500);
+    return;
+  }
+  var templates = Object.values(ST.loaded);
+  if (templates.length === 0) {
+    showToast('暂无可训练的 V5 模板，敬请期待');
+    return;
+  }
+
+  // 移除旧选择器
+  var old = document.getElementById('modal-v5-picker');
+  if (old) old.remove();
+
+  var cards = templates.map(function(t){
+    var d = t.data;
+    var m = t.meta || {};
+    var diff = '⭐'.repeat(d.difficulty || m.difficulty || 1);
+    return '<button onclick="document.getElementById(\'modal-v5-picker\').remove();openV5SceneTemplate(\'' + d.scene_id + '\')" ' +
+      'style="width:100%;text-align:left;padding:14px;margin-bottom:8px;border:1px solid #e5e7eb;border-radius:12px;background:white;cursor:pointer;transition:all .15s;" ' +
+      'onmouseover="this.style.borderColor=\'#0d9488\';this.style.background=\'#f0fdfa\'" ' +
+      'onmouseout="this.style.borderColor=\'#e5e7eb\';this.style.background=\'white\'">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;">' +
+        '<div style="flex:1;">' +
+          '<div style="font-size:14px;font-weight:600;color:#1f2937;">' + (d.title || m.title || t.scene_id) + '</div>' +
+          '<div style="font-size:11px;color:#64748b;margin-top:3px;">' + (d.category || m.category || '') + ' · ' + diff + '</div>' +
+          '<div style="font-size:11px;color:#9ca3af;margin-top:4px;line-height:1.4;">' + (d.scenario_goal || '').slice(0, 60) + '…</div>' +
+        '</div>' +
+        '<span style="color:#0d9488;font-size:18px;margin-left:10px;">›</span>' +
+      '</div>' +
+    '</button>';
+  }).join('');
+
+  var modal = document.createElement('div');
+  modal.id = 'modal-v5-picker';
+  modal.className = 'modal-overlay';
+  modal.style.cssText = 'z-index:9985;';
+  modal.innerHTML =
+    '<div class="modal-content" style="max-width:400px;padding:0;overflow:hidden;">' +
+      '<div style="padding:16px 20px;background:linear-gradient(135deg,#0d9488,#7c3aed);color:white;display:flex;align-items:center;justify-content:space-between;">' +
+        '<div><div style="font-size:15px;font-weight:700;">📋 V5 场景模板</div>' +
+          '<div style="font-size:11px;opacity:.8;margin-top:2px;">' + templates.length + ' 个可训练模板</div></div>' +
+        '<button onclick="document.getElementById(\'modal-v5-picker\').remove()" style="width:28px;height:28px;border:none;background:rgba(255,255,255,.2);border-radius:50%;cursor:pointer;font-size:14px;color:white;">✕</button>' +
+      '</div>' +
+      '<div style="padding:16px;max-height:65vh;overflow-y:auto;">' + cards + '</div>' +
+    '</div>';
+  document.body.appendChild(modal);
+}
+</script>
+
+<script>
+// V5 模板数量动态更新（在 SceneTemplates 加载完成后更新入口按钮文字）
+(function(){
+  var _updateCount = function(){
+    var el = document.getElementById('v5-template-count');
+    if (!el) return;
+    var ST = window.SceneTemplates;
+    if (ST && Object.keys(ST.loaded).length > 0) {
+      el.textContent = Object.keys(ST.loaded).length + ' 个模板可选 · 分步卡片';
+    }
+  };
+  // 立即试一次，然后延迟试几次
+  _updateCount();
+  setTimeout(_updateCount, 1000);
+  setTimeout(_updateCount, 3000);
+})();
+</script>
 
           <button onclick="openKnowledgeLibrary()" class="w-full text-left bg-gradient-to-r from-purple-500 to-indigo-600 rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all" data-page-node-id="dZOxGysfoc0vgndGGCAeHz">
             <div class="flex items-center justify-between" data-page-node-id="99uvd2G5RTI9mvhBD3tWsQ">
@@ -16640,8 +16714,39 @@ function submitChallengeEvidence() {
     status: 'local_demo_pending_review'
   };
   saveData();
+
+  // ★ 同步写入 duilian_challenge_log — 勇气证据库数据源
+  // v3_evidence_library.js 读这个 key，之前 submitChallengeEvidence 只写了 userData.challengeEvidence，导致证据库永远为空
+  try {
+    var logKey = 'duilian_challenge_log';
+    var log = JSON.parse(localStorage.getItem(logKey) || '[]');
+    var challengeMeta = (window.currentChallenge || {});
+    log.unshift({
+      id: 'CHG_' + challengeId + '_' + Date.now(),
+      challenge_id: challengeId,
+      challenge_title: challengeMeta.title || challengeMeta.name || ('挑战 #' + challengeId),
+      text: text,
+      timestamp: Date.now(),
+      submitted_at: new Date().toISOString(),
+      // 用户自我评估（默认值，后续可在打卡 UI 中采集）
+      feeling: challengeMeta.default_feeling || 'nervous_but_did',
+      fear_predicted: true,
+      outcome_negative: false,
+      reaction: challengeMeta.default_reaction || 'friendly',
+      completed: true
+    });
+    localStorage.setItem(logKey, JSON.stringify(log.slice(0, 500)));
+    // 刷新勇气证据库入口（如果存在）
+    if (window.V3Evidence && typeof window.V3Evidence.refreshEntry === 'function') {
+      window.V3Evidence.refreshEntry();
+    }
+    console.log('[Evidence] 挑战记录已写入 duilian_challenge_log, 共 ' + log.length + ' 条');
+  } catch (err) {
+    console.warn('[Evidence] 写入 challenge_log 失败:', err.message);
+  }
+
   closeModal('challenge-checkin');
-  showToast('✅ 打卡记录已保存，当前为本地演示待审核；暂不发放积分');
+  showToast('✅ 打卡记录已保存！勇气证据库 +1');
   loadChallenges();
 }
 
