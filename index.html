@@ -1832,6 +1832,18 @@ h1,h2,h3 { text-wrap:balance; }
 
         <div id="delete-account-button" data-page-node-id="zarAgcUY4F8gGbmZAUJS4I"></div>
 
+        <!-- 危机热线（2026-09-19 审查修复：ISSUE-002） -->
+        <a href="tel:12356" class="w-full bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4 shadow-sm flex items-center justify-between hover:from-amber-100 hover:to-orange-100 transition-all" style="text-decoration:none" data-page-node-id="crisis-hotline">
+          <div class="flex items-center gap-3">
+            <span class="text-xl">📞</span>
+            <div class="flex-1">
+              <div class="text-amber-800 text-sm font-medium">心理危机？拨打 12356</div>
+              <div class="text-amber-600 text-xs mt-0.5">全国统一心理援助热线 · 24 小时免费</div>
+            </div>
+          </div>
+          <span class="text-amber-500">→</span>
+        </a>
+
         <button onclick="logout()" class="w-full bg-red-50 rounded-xl p-4 shadow-sm flex items-center justify-between hover:bg-red-100 transition-all" data-page-node-id="SkuzZarDteMNVg0cWZEaZo">
           <div class="flex items-center gap-3" data-page-node-id="T6OM9nl5iZdErlsVEYXv9e">
             <span class="text-xl" data-page-node-id="UwsfxnjfHNK7Z664uRsezE">🚪</span>
@@ -18770,6 +18782,72 @@ function useAvatarDetail() {
 <script src="libs/v3_ai_mutations.js"></script>
 <script src="libs/v3_evidence_library.js"></script>
 <script src="libs/v3_protocol_ui.js"></script>
+
+<!-- V3 增强模块（2026-09-19 审查修复：之前漏加载） -->
+<script src="libs/v3_learning_enhance.js"></script>
+<script src="libs/v3_sudden_change.js"></script>
+<!-- V4.0 四级教学闭环（依赖 window.Stage3D 已在 L3253 加载） -->
+<script src="libs/v4_teaching_closed_loop.js"></script>
+<!-- SceneTemplate 轻量加载器（V5 架构数据层入口） -->
+<script>
+/**
+ * SceneTemplate Loader — 轻量数据加载器（V5 架构数据层）
+ * 从 knowledge_base/scene_templates/_index.json 读取模板索引，
+ * 过滤 status=todo 项，逐个 fetch 完整 JSON，注册到 window.SceneTemplates
+ */
+(function(){
+  'use strict';
+  if (window.__sceneTemplateLoaderReady) return;
+  window.__sceneTemplateLoaderReady = true;
+
+  var EMOJI_MAP = {
+    'cafe':'☕','cafe_meeting':'☕','office':'🧑‍💼','office_meeting':'🖥️',
+    'handshake':'🤝','greet':'👋','bow':'🙇','sit':'💺','stand':'🧍',
+    'speak':'💬','listen':'👂','leave':'👋','reflect':'💭','smile':'😊',
+    'door':'🚪','elevator':'🛗','desk':'🪑','file':'📄','phone':'📱'
+  };
+  function emojiFor(name){
+    if(!name) return '📸';
+    var key = name.toLowerCase().replace(/\.(svg|png|jpg)$/,'');
+    if(EMOJI_MAP[key]) return EMOJI_MAP[key];
+    for(var k in EMOJI_MAP){ if(key.indexOf(k)>=0) return EMOJI_MAP[k]; }
+    return '📸';
+  }
+
+  window.SceneTemplates = {
+    index: null,      // 原始索引
+    loaded: {},       // scene_id -> {meta, data}
+    get: function(id){ return this.loaded[id] || null; },
+    list: function(){ return Object.values(this.loaded); },
+    _emoji: emojiFor
+  };
+
+  fetch('knowledge_base/scene_templates/_index.json')
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .then(function(idx){
+      window.SceneTemplates.index = idx;
+      var toLoad = (idx.templates || []).filter(function(t){ return t.status && t.status.indexOf('完整')>=0; });
+      return Promise.all(toLoad.map(function(t){
+        var base = 'knowledge_base/scene_templates/' + t.file;
+        return fetch(base).then(function(r){
+          if(!r.ok) throw new Error('HTTP '+r.status+' '+base);
+          return r.json();
+        }).then(function(data){
+          window.SceneTemplates.loaded[t.scene_id || t.id || data.scene_id] = { meta: t, data: data };
+        }).catch(function(err){
+          console.warn('[SceneTemplate] 跳过 '+base+': '+err.message);
+        });
+      }));
+    })
+    .then(function(){
+      var count = Object.keys(window.SceneTemplates.loaded).length;
+      console.log('[SceneTemplate] 加载完成: '+count+' 个模板可用');
+    })
+    .catch(function(err){
+      console.warn('[SceneTemplate] 索引加载失败: '+err.message+'（站点可能非服务器模式）');
+    });
+})();
+</script>
 
 <style id="etiquette-branching-classroom">.etiquette-action-lesson{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:12px;border:1px solid #fed7aa;border-radius:14px;background:#fff7ed}.etiquette-action-lesson p{margin:4px 0;font-size:12px}.etiquette-action-lesson button{border:0;border-radius:9px;padding:8px;background:white;color:#9a3412;font-weight:700}.etiquette-action-lesson .practice{background:#f97316;color:white}.photo-char.animating-listen{animation:etListen 1.3s}@keyframes etListen{50%{transform:translateY(-2%) scale(1.03)}}.etiquette-npc-reason{padding-top:6px;border-top:1px dashed #c4b5fd}</style>
 <style id="knowledge-detail-readable-fix">
