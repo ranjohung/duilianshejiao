@@ -12870,19 +12870,68 @@ function renderProgressChart() {
   const days = progressDays;
   const data = [];
   const today = new Date();
-  const baseScore = 50;
+  today.setHours(0,0,0,0);
+
+  // 从真实 localStorage 读取训练记录
+  var log = [];
+  try { log = JSON.parse(localStorage.getItem('duilian_challenge_log') || '[]'); } catch(e) {}
+  // 也扫一下 trade records（金币变动 = 训练过）
+  var tradeLog = [];
+  try { tradeLog = JSON.parse(localStorage.getItem('em_trade_records') || '[]'); } catch(e) {}
+  // 合并：任何时间戳的记录都算"训练过该日"
+  var trainedDates = {};
+  log.forEach(function(e){
+    if (e.timestamp) {
+      var d = new Date(e.timestamp); d.setHours(0,0,0,0);
+      trainedDates[d.toISOString().slice(0,10)] = (trainedDates[d.toISOString().slice(0,10)]||0) + 1;
+    }
+  });
+  tradeLog.forEach(function(e){
+    if (e.created_at) {
+      var d = new Date(e.created_at); d.setHours(0,0,0,0);
+      trainedDates[d.toISOString().slice(0,10)] = (trainedDates[d.toISOString().slice(0,10)]||0) + 1;
+    }
+  });
+
   for (let i=days-1; i>=0; i--) {
     const d = new Date(today); d.setDate(d.getDate()-i);
     const label = days===7 ? ['日','一','二','三','四','五','六'][d.getDay()] : (d.getMonth()+1)+'/'+d.getDate();
-    const score = Math.min(100, Math.max(30, baseScore + Math.floor(i*3) + Math.floor(Math.random()*15)-5));
-    data.push({ label, score });
+    const key = d.toISOString().slice(0,10);
+    const count = trainedDates[key] || 0;
+    // 分数 = 40 基准 + 训练次数 * 8（每次 +8，上限 100）
+    const score = Math.min(100, 40 + count * 8);
+    data.push({ label, score, count });
   }
-  const maxScore = Math.max(...data.map(d => d.score));
-  $('progress-chart').innerHTML = data.map(d => `<div class="flex-1 flex flex-col items-center gap-1 h-full"><div class="w-full bg-gradient-to-t from-indigo-500 to-purple-400 rounded-t-md transition-all" style="height:${(d.score / maxScore) * 100}%"></div><span class="text-xs text-gray-400">${d.label}</span></div>`).join('');
 
-  if (data.length >= 2) {
-    const avg = Math.round((data[data.length-1].score - data[0].score) / data.length * 10) / 10;
-    $('avg-improvement').textContent = '平均提升 +' + avg + '%';
+  const maxScore = Math.max(...data.map(d => d.score), 60);
+  const chartEl = $('progress-chart');
+  if (data.every(function(d){ return d.count === 0; })) {
+    // 完全没训练记录 — 空状态
+    chartEl.innerHTML = '<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#94a3b8;font-size:12px;"><div style="font-size:28px;margin-bottom:8px;">🌱</div>还没有训练记录<br>开始第一次训练吧！</div>';
+    $('avg-improvement').textContent = '开始训练后这里会显示你的进步曲线';
+    return;
+  }
+
+  chartEl.innerHTML = data.map(d => {
+    var barColor = d.count > 0
+      ? 'background:linear-gradient(to top,#6366f1,#a78bfa);'
+      : 'background:#e5e7eb;';
+    var barHeight = d.count > 0 ? ((d.score / maxScore) * 100) + '%' : '20%';
+    var tooltip = d.count > 0 ? ('训练 ' + d.count + ' 次') : '未训练';
+    return '<div class="flex-1 flex flex-col items-center gap-1 h-full" style="justify-content:flex-end;">' +
+      '<div class="w-full rounded-t-md transition-all" title="'+tooltip+'" style="'+barColor+'height:'+barHeight+';min-height:4px;"></div>' +
+      '<span class="text-xs text-gray-400" style="font-size:10px;">'+d.label+'</span>' +
+    '</div>';
+  }).join('');
+
+  // 有数据时算平均提升
+  var first = data.find(function(d){ return d.count > 0; });
+  var last = data[data.length-1];
+  if (first && last && last.score >= first.score) {
+    var diff = Math.round((last.score - first.score) / Math.max(1, days) * 10) / 10;
+    $('avg-improvement').textContent = '近 ' + days + ' 天训练 ' + data.reduce(function(a,b){return a+b.count;},0) + ' 次 · 进步 +' + Math.max(0,diff*10) + '%';
+  } else {
+    $('avg-improvement').textContent = '近 ' + days + ' 天训练 ' + data.reduce(function(a,b){return a+b.count;},0) + ' 次';
   }
 }
 

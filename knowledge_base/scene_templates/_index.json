@@ -78,10 +78,11 @@
     },
     {
       "scene_id": "ST-011",
-      "title": "相亲模拟",
+      "title": "相亲模拟（长辈介绍）",
       "category": "亲密关系与约会",
       "difficulty": 2,
-      "status": "todo"
+      "status": "✅ 完整",
+      "file": "ST-011_blind_date.json"
     },
     {
       "scene_id": "ST-012",
