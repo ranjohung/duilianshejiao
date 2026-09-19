@@ -70,10 +70,11 @@
     },
     {
       "scene_id": "ST-010",
-      "title": "初次约会",
+      "title": "初次约会（咖啡店）",
       "category": "亲密关系与约会",
       "difficulty": 2,
-      "status": "todo"
+      "status": "✅ 完整",
+      "file": "ST-010_first_date.json"
     },
     {
       "scene_id": "ST-011",

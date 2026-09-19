@@ -1416,22 +1416,120 @@ function openV5TemplatePicker() {
 </script>
 
 <script>
-// V5 模板数量动态更新（在 SceneTemplates 加载完成后更新入口按钮文字）
-(function(){
-  var _updateCount = function(){
-    var el = document.getElementById('v5-template-count');
-    if (!el) return;
-    var ST = window.SceneTemplates;
-    if (ST && Object.keys(ST.loaded).length > 0) {
-      el.textContent = Object.keys(ST.loaded).length + ' 个模板可选 · 分步卡片';
-    }
-  };
-  // 立即试一次，然后延迟试几次
-  _updateCount();
-  setTimeout(_updateCount, 1000);
-  setTimeout(_updateCount, 3000);
-})();
+/** 🔥 临场突变选择器 — 从 V3Mutation.getMutationTypes() 列出可选的突发状况
+ *  点击后会：① 在对话区注入对方的"突发"消息 ② 教练给出应对建议 ③ 挑战日志 +1 金币
+ */
+function showSuddenMutationPicker() {
+  var M = window.V3Mutation;
+  if (!M || typeof M.getMutationTypes !== 'function') {
+    showToast('临场突变模块还在加载，请稍候…');
+    setTimeout(showSuddenMutationPicker, 800);
+    return;
+  }
+  var types = M.getMutationTypes();
+  if (!types || types.length === 0) {
+    showToast('暂无可触发的突发状况');
+    return;
+  }
+  var old = document.getElementById('modal-mutation-picker');
+  if (old) old.remove();
+
+  var cards = types.map(function(t, idx){
+    return '<button onclick="fireMutation('+idx+')" ' +
+      'style="width:100%;text-align:left;padding:12px 14px;margin-bottom:6px;border:1px solid #fed7aa;border-radius:10px;background:#fff7ed;cursor:pointer;transition:all .15s;font-size:13px;" ' +
+      'onmouseover="this.style.background=\'#fed7aa\'" ' +
+      'onmouseout="this.style.background=\'#fff7ed\'">' +
+      '<div style="font-weight:600;color:#9a3412;">🔥 ' + t.label + '</div>' +
+      '<div style="color:#78350f;font-size:11px;margin-top:3px;line-height:1.4;">' + t.description + '</div>' +
+    '</button>';
+  }).join('');
+
+  var modal = document.createElement('div');
+  modal.id = 'modal-mutation-picker';
+  modal.className = 'modal-overlay';
+  modal.style.cssText = 'z-index:9987;';
+  modal.innerHTML =
+    '<div class="modal-content" style="max-width:380px;padding:0;overflow:hidden;">' +
+      '<div style="padding:14px 18px;background:linear-gradient(135deg,#ea580c,#dc2626);color:white;display:flex;align-items:center;justify-content:space-between;">' +
+        '<div><div style="font-size:14px;font-weight:700;">🔥 临场突变训练</div>' +
+          '<div style="font-size:10px;opacity:.85;margin-top:2px;">模拟对方突然做了出乎意料的事，训练你的应急反应</div></div>' +
+        '<button onclick="document.getElementById(\'modal-mutation-picker\').remove()" style="width:26px;height:26px;border:none;background:rgba(255,255,255,.2);border-radius:50%;cursor:pointer;font-size:13px;color:white;">✕</button>' +
+      '</div>' +
+      '<div style="padding:14px;max-height:60vh;overflow-y:auto;background:#fffbeb;">' + cards + '</div>' +
+      '<div style="padding:10px 14px;background:#fef3c7;border-top:1px solid #fde68a;font-size:11px;color:#92400e;line-height:1.5;">' +
+        '💡 选好后，对方会突然"翻脸/沉默/打断…"，你需要即时给出得体回应。应对得好有金币奖励。' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(modal);
+}
+
+/** 触发指定 index 的临场突变 */
+function fireMutation(idx) {
+  var M = window.V3Mutation;
+  if (!M) return;
+  var types = M.getMutationTypes();
+  var t = types[idx];
+  if (!t) return;
+
+  document.getElementById('modal-mutation-picker').remove();
+
+  // 在对话区注入突变消息（模拟对方突然发难）
+  injectMutantMessage(t);
+
+  // 触发 V3Mutation 自身的逻辑（埋点等）
+  try { M.triggerMutation(t, 'challenge'); } catch(e) {}
+
+  // 挑战日志 + 金币
+  if (window.V3Economy && typeof window.V3Economy.addCoins === 'function') {
+    var reward = 30 + Math.floor(Math.random()*20); // 30-50
+    window.V3Economy.addCoins(reward, '临场突变·'+t.label, 'mutation');
+  }
+
+  // 教练给应对策略建议
+  setTimeout(function(){
+    showMutationCoachAdvice(t);
+  }, 600);
+
+  showToast('🔥 突变触发：'+t.label+'！快想想怎么应对～');
+}
+
+/** 把突变消息注入对话区（作为对方的一条发言） */
+function injectMutantMessage(mutation) {
+  // 挑战模式对话区
+  var mBox = document.getElementById('challenge-messages') || document.getElementById('chat-messages') || document.querySelector('[id*="messages"],[class*="message"]');
+  if (!mBox) return;
+
+  var wrap = document.createElement('div');
+  wrap.style.cssText = 'margin-bottom:10px;';
+
+  var label = document.createElement('div');
+  label.style.cssText = 'font-size:10px;color:#dc2626;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:6px;';
+  label.innerHTML = '<span style="background:#fee2e2;color:#dc2626;padding:2px 6px;border-radius:4px;font-size:10px;">🔥 临场突变</span><span style="color:#991b1b;">'+mutation.label+'</span>';
+
+  var msg = document.createElement('div');
+  msg.style.cssText = 'background:#fef2f2;border:1px solid #fecaca;border-left:3px solid #ef4444;border-radius:10px;padding:10px 12px;font-size:13px;color:#7f1d1d;';
+  msg.textContent = mutation.description || '（对方突然做了出乎意料的事）';
+
+  wrap.appendChild(label);
+  wrap.appendChild(msg);
+  mBox.appendChild(wrap);
+  mBox.scrollTop = mBox.scrollHeight;
+}
+
+/** 教练给应对策略 */
+function showMutationCoachAdvice(mutation) {
+  var coach = document.getElementById('challenge-coach-evaluation');
+  if (!coach) return;
+  var tips = (mutation.responses || [])[0] ||
+    '面对这种突发状况，先深呼吸 1 秒，不要急着辩解或示弱。选择"把球踢回去"或"幽默化解"通常比直接应对更有效。';
+  coach.innerHTML =
+    '<div style="background:#fff7ed;border-left:3px solid #f97316;border-radius:8px;padding:10px 12px;">' +
+      '<div style="font-size:11px;font-weight:700;color:#c2410c;margin-bottom:6px;">🔥 教练紧急应对建议</div>' +
+      '<div style="font-size:12px;color:#431407;line-height:1.6;">' + tips + '</div>' +
+    '</div>';
+}
 </script>
+
 
           <button onclick="openKnowledgeLibrary()" class="w-full text-left bg-gradient-to-r from-purple-500 to-indigo-600 rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all" data-page-node-id="dZOxGysfoc0vgndGGCAeHz">
             <div class="flex items-center justify-between" data-page-node-id="99uvd2G5RTI9mvhBD3tWsQ">
@@ -2746,7 +2844,7 @@ function openV5TemplatePicker() {
       <div class="ct-fixed ct-input-fixed" data-page-node-id="Q4aC9oQEE9mu601R5A1g2v">
         <div class="flex gap-2 ct-input-row" data-page-node-id="P2y2uXO5Bs35kRZwsCQhJo">
           <input type="text" id="challenge-input" placeholder="输入你会说的话或会做的动作…" class="flex-1 px-4 py-2 rounded-full border border-gray-200 text-sm focus:outline-none focus:border-indigo-500" data-page-node-id="PSWNuJwdGLquAK121nSl3W">
-          <button onclick="openActionPanel({kind:'input', id:'challenge-input', stageId:'challenge-stage', who:'user'})" class="btn-action-trigger" title="动作指令" aria-label="动作指令">🎬</button><button onclick="sendChallengeMessage()" class="px-4 py-2 bg-indigo-500 text-white rounded-full text-sm font-medium hover:bg-indigo-600 transition-colors" data-page-node-id="eoxBDZ9YEG4ci4bN0mujna">发送</button>
+          <button onclick="openActionPanel({kind:'input', id:'challenge-input', stageId:'challenge-stage', who:'user'})" class="btn-action-trigger" title="动作指令" aria-label="动作指令">🎬</button><button onclick="showSuddenMutationPicker()" title="🔥 临场突变：模拟对方突然做了出乎意料的事" style="padding:6px 10px;border:1px solid #fb923c;background:#fff7ed;color:#c2410c;border-radius:999px;font-size:12px;cursor:pointer;transition:all .15s;" onmouseover="this.style.background='#fed7aa'" onmouseout="this.style.background='#fff7ed'">🔥 突发</button><button onclick="sendChallengeMessage()" class="px-4 py-2 bg-indigo-500 text-white rounded-full text-sm font-medium hover:bg-indigo-600 transition-colors" data-page-node-id="eoxBDZ9YEG4ci4bN0mujna">发送</button>
         </div>
       </div>
       <div class="ct-scroll">
