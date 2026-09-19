@@ -246,16 +246,11 @@
       if (row._v3Enhanced) return;
       row._v3Enhanced = true;
 
-      // 点击打开详情页
-      row.addEventListener('click', function (e) {
-        // 从 data 或文本中提取卡片信息
-        var card = extractCardFromRow(row);
-        if (card) {
-          showLessonDetail(card);
-        }
-      });
+      // ★ 修复：lesson-row 已有内联 onclick="KL_openDetailByAttr(this)"，
+      // 不要再叠加 addEventListener('click')，否则会双弹窗。
+      // 让原有的 KL_openDetailByAttr 正常工作，这里只追加演练按钮。
 
-      // 在行尾添加演练按钮
+      // 在行尾添加演练按钮（独立点击，不冒泡）
       var existingBtn = row.querySelector('.v3-inline-practice-btn');
       if (!existingBtn) {
         var btn = document.createElement('button');
@@ -272,6 +267,7 @@
         });
         btn.addEventListener('click', function (e) {
           e.stopPropagation();
+          e.preventDefault();
           var card = extractCardFromRow(row);
           if (card) goToPractice(card);
         });

@@ -236,8 +236,16 @@
   function hookPostAction() {
     var origPostAction = window.postAction;
     if (typeof origPostAction !== 'function') {
-      // 如果 postAction 尚未加载，延迟 hook
-      setTimeout(hookPostAction, 1000);
+      // ★ 修复：postAction 不存在，不要无限重试。
+      // 改为注册公开接口，等后续代码实现了 postAction 再手动调用 hook。
+      console.log('[V3Mutation] postAction 尚未就绪，延迟 3s 后再尝试（仅重试 3 次）');
+      if (!window.__v3HookRetries) window.__v3HookRetries = 0;
+      window.__v3HookRetries++;
+      if (window.__v3HookRetries <= 3) {
+        setTimeout(hookPostAction, 3000);
+      } else {
+        console.warn('[V3Mutation] postAction hook 放弃（重试耗尽），模块仍可用 executeMutation()');
+      }
       return;
     }
 
@@ -312,8 +320,12 @@
   // ============================================================
 
   function addDowngradeButton() {
-    // 在现实挑战区域添加降级按钮
-    var challengeArea = document.getElementById('page-challenge') || 
+    // 在训练中心区域（真实挑战入口旁）添加降级按钮
+    // ★ 修复：页面用 page-training 而不是 page-challenge
+    var challengeArea = document.getElementById('page-challenge') ||
+                        document.getElementById('page-training') ||
+                        document.getElementById('training-center') ||
+                        document.querySelector('[id*="training"]') ||
                         document.querySelector('[id*="challenge"]');
     if (!challengeArea) return;
 
