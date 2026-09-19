@@ -63,10 +63,11 @@
     },
     {
       "scene_id": "ST-009",
-      "title": "职场拒绝请求",
-      "category": "商务社交",
+      "title": "职场拒绝额外请求",
+      "category": "职场与事业",
       "difficulty": 3,
-      "status": "todo"
+      "status": "✅ 完整",
+      "file": "ST-009_workplace_decline.json"
     },
     {
       "scene_id": "ST-010",
@@ -89,7 +90,8 @@
       "title": "亲戚问敏感问题",
       "category": "家庭与亲友",
       "difficulty": 2,
-      "status": "todo"
+      "status": "✅ 完整",
+      "file": "ST-012_family_questions.json"
     },
     {
       "scene_id": "ST-013",
