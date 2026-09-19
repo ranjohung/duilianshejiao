@@ -1423,18 +1423,36 @@ function _GS3D_init() {
   function mount(stageId, cfg) {
     var stage = document.getElementById(stageId);
     if (!stage) return false;
-    // modal 刚打开时可能仍 display:none（clientWidth=0）→ 延迟到可见后再挂载
+    // modal 刚打开时可能仍 display:none（clientWidth=0）→ 轮询+ResizeObserver 等尺寸就绪
     if (!stage.clientWidth) {
-      var tries = 0;
-      (function retry() {
-        var st = document.getElementById(stageId);
-        var inst = instances[stageId];
-        if (inst || !st) return;
-        if (st.clientWidth || tries++ > 12) { mount(stageId, cfg); return; }
-        setTimeout(retry, 90);
-      })();
+      const cfgCapture = cfg;
+      let ro, timerId;
+      const tryMount = () => {
+        const st = document.getElementById(stageId);
+        if (!st) { cleanup(); return; }
+        if (instances[stageId]) { cleanup(); return; } // 已挂过
+        if (st.clientWidth > 0) { cleanup(); _doRealMount(stageId, cfgCapture); }
+      };
+      const cleanup = () => { if (ro) ro.disconnect(); if (timerId) clearInterval(timerId); };
+      // ResizeObserver 为主（精准）
+      if (typeof ResizeObserver !== 'undefined') {
+        ro = new ResizeObserver(tryMount);
+        ro.observe(stage);
+      }
+      // setInterval 兜底：每 120ms 检查一次，最多等 20s
+      timerId = setInterval(tryMount, 120);
+      setTimeout(function () {
+        if (!instances[stageId]) { cleanup(); _doRealMount(stageId, cfgCapture); }
+      }, 20000);
       return true;
     }
+    _doRealMount(stageId, cfg);
+    return true;
+  }
+
+  function _doRealMount(stageId, cfg) {
+    var stage = document.getElementById(stageId);
+    if (!stage) return;
     dispose(stageId);
 
     cfg = cfg || {};

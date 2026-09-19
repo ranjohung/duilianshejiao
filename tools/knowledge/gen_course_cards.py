@@ -388,6 +388,11 @@ def main():
         elif t and t.get("status") == "empty":
             source_kind, status = "音视频无有效语音", "scanned"
 
+        # 不可学习资料不进入客户端课程树：保留在 manifest/审计报告，不把目录伪装成课程。
+        if status != "ok" or not text.strip():
+            stat["__unavailable__"] = stat.get("__unavailable__", 0) + 1
+            return
+
         # --- 内容级去重：同一份资料在多个目录下重复存放时合并为一张卡片 ---
         if status == "ok" and text.strip():
             th = hashlib.md5(text.encode("utf-8")).hexdigest()

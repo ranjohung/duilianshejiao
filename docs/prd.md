@@ -1,20 +1,54 @@
 # 产品需求文档（PRD）：「对练社交」—— AI社交技能教学与现实迁移训练系统
 
-**版本：v2.6.0（社交技能教学闭环重构版）**
+**版本：v5.0.0（知识-动作-话术三合一教学引擎 + 3D降级为增强器）**
 
-**文档日期：2026-09-16**
+**文档日期：2026-09-19**
 
 **文档性质：产品规则基准；功能完成状态以 `docs/development-plan.md` 及验收记录为准**
 
-**v2.5.0 校准说明：** 按 2026-09-13 商业决策完成经济体系重构：新增**社交币（硬通货）**与**成长积分（软通货）隔离墙**；会员改为免费/基础（¥39月·¥298年）/高级（¥99月·¥698年）三档阶梯（v2.4 的日卡/周卡/月卡/年卡价格表废弃，保留于 §18.7 供追溯）；每日免费训练 5→3 次；学习卡片课程库改为"试读引流 + VIP 畅学 + 单章解锁"门控；新增深度复盘（15 社交币）、去对练扣训练次数、签到/训练积分封顶与答错扣分规则。第 18 章为本次重构基准，与之冲突的旧条款一律以 v2.5 为准。
+**v2.5.0 校准说明（历史·经济体系重构）：** 按 2026-09-13 商业决策完成经济体系重构：新增**社交币（硬通货）**与**成长积分（软通货）隔离墙**；会员改为免费/基础（¥39月·¥298年）/高级（¥99月·¥698年）三档阶梯（v2.4 的日卡/周卡/月卡/年卡价格表废弃，保留于 §18.7 供追溯）；每日免费训练 5→3 次；学习卡片课程库改为"试读引流 + VIP 畅学 + 单章解锁"门控；新增深度复盘（15 社交币）、去对练扣训练次数、签到/训练积分封顶与答错扣分规则。第 18 章为本次重构基准，与之冲突的旧条款一律以 v2.5 为准。
 
 **v2.4.5 校准说明（历史）：** 已回写营收方案、会员有效期、积分双账本、奖励/惩罚、好感度负向规则、场景折扣、解锁确认、结算幂等和服务端奖励字段的实现状态；真实支付回调、服务端好感度审核/流水、场景永久解锁/原子扣费账本和跨设备权益同步仍未完成，不能按原型状态对外收费。
 
-> 本文中的界面图、接口和数据表包含目标设计。除非开发计划标为“✅ 已验证”，不得据此宣称功能已经生产可用。当前 `index.html` 是可运行的 Web 原型；语音训练仍属后期更新，社交礼仪训练已提供 Web 原型但摄像头/语音和服务端闭环仍待开发。
+> 本文中的界面图、接口和数据表包含目标设计
+
+**v5.0.0 校准说明（本次重构基准·三层架构 + 3D降级）：** 按 ChatGPT 2026-09-19 完整方案（24章）完成产品架构转向。**3D人物从"教学地基"降级为"沉浸式演示组件"**——不再是礼仪训练的核心依赖。产品定位从"AI聊天+3D动作展示"升级为**"把社交知识训练成现实行为能力的软件"**。三层架构：① 第一层·核心教学（文字知识+动作示范卡+话术示范+跟练+AI反馈）→ ② 第二层·AI训练（文字/语音+AI角色+场景模拟）→ ③ 第三层·3D沉浸（3D人物+场景动画→保留但不强依赖）。v5.0.0 与 v3.0.0 §0 冲突时**一律以本说明 + 新增的 §0.8/§0.9/§0.10 为准**。基线要点：
+
+- **§0 十步教学引擎中被 v5.0.0 覆盖的条款清单**（见下文表格）。
+- **保留继续沿用的条款**：§0.0 AI边界红线、§0.1 十步教学闭环的"学→评→变→再练→现实→复盘"六步流程框架、§0.2 Scenario/Node/EtiquetteRule 数据结构（升级见 §0.8）、§0.2 四级评价机制、§0.4 LocalStorage 键名、§0.5 安全合规、经济体系。
+- **废弃不再依赖的条款**：§0.3.1 AnimationMixer 队列管理机制、§0.3.2 教练示范播放器（3D动画）、§0.3.3 诊断层、§0.6 3D朝向修正代码、§0.7 冒烟测试中所有 3D AnimationMixer 相关项。
+- **替换为**：§0.8 场景训练模板（SceneTemplate）、§0.9 动作素材库分级规范、§0.10 礼仪训练界面规范。
+- **三种评价**（§0.0 已暗示但未明确）：① 知识评价（选择题/场景匹配→课程规则判断）② 语言评价（AI语义分析→意图匹配度）③ 行为评价（第一阶段：用户勾选动作清单自我确认；第二阶段以后：摄像头姿态识别作为高级功能，**当前不承诺**）。
+- **真实挑战重新定义**：从"任务清单"升级为**"课堂→现实迁移训练"**——完成场景训练自动解锁对应挑战，用户提交3秒记录卡后系统**复盘并推荐下一训练素材**（不再只是"挑战完成→给积分"）。
+- **场景模板市场**：从"AI聊天Prompt池"升级为**"完整教学包"**（含知识点/礼仪规则/动作示范/话术示范/跟练/AI角色扮演/分支情况/常见错误/评价标准/真实挑战）。
+
+**v5.0.0 覆盖 v3.0.0 §0 十步教学引擎条款清单**：
+
+| §0 原始条款 | 原设计 | v5.0.0 替代方案 |
+|---|---|---|
+| 第二步：看（3D老师示范） | 播放 GLB 动画 + 行为时间轴 + 暂停讲解 | **动作示范卡时间轴**（连续步骤图 3-6 张 + "为什么这么做" + 反例） |
+| 第四步：跟（跟练模式） | 底部常驻 3D 动作快捷面板 + 边说边做 | **跟练引导卡**（分步提示卡 + 用户勾选"我完成了动作" + 语音/文字输入） |
+| 第六步：评（AI分级评价） | 四级评价 + 3D 正确反应示范重播 | 保留四级评价；**3D重播替换为文字+动作示范卡改进建议** |
+| §0.3.1 AnimationMixer 队列 | action_library + quaternion slerp | **废弃**——保留 3D 作为可选增强，不阻塞教学 |
+| §0.3.3 诊断层 | console 输出 GLB clip 扫描结果 | **废弃**——3D 不作为 P0 依赖 |
+| §0.6 3D朝向修正 | 四元数互视 | **保留**——若启用 3D 仍需朝向正确；但不作为 P0 冒烟测试项 |
+
+。除非开发计划标为“✅ 已验证”，不得据此宣称功能已经生产可用。当前 `index.html` 是可运行的 Web 原型；语音训练仍属后期更新，社交礼仪训练已提供 Web 原型但摄像头/语音和服务端闭环仍待开发。
 
 ---
 
-> **v2.6.0 校准说明（本次重构基准）：** 产品核心定位从"AI 聊天 + 3D 动作展示"升级为 **"AI 社交技能教学与现实迁移训练系统"**。核心理念：社交训练不能是"点动作→打字→点下一步"的回合制游戏，必须支持**语音连续输入 + 动作时间线**，让动作与语言同步发生。本次重构确立的基线，与旧条款（§6 场景训练、§18 商业变现、§19 3D 礼仪教学）冲突时**一律以本文档新增的【§0 社交技能教学闭环】为准**。基线要点：
+> **v3.0.0 校准说明（本次重构基准·知识库驱动的十步教学引擎）：** 彻底告别"AI 自由发挥"的游戏引擎思维，确立**"知识库驱动的教学引擎"架构**。AI 不是礼仪老师，AI 是互动教练——只返回文本和 `behavior_sequence`，前端严格按照时间轴调度 3D 动画。教学标准全部来源于 `Lesson / EtiquetteRule / Scenario / Node` 数据结构，严禁 AI 自行创造礼仪规则。v3.0.0 与旧条款冲突时**一律以本文档新增的【§0 十步教学引擎】为准**。基线要点：
+> - **十步教学闭环**：学（知识导入卡）→ 看（3D 示范 + 行为时间轴 + 暂停讲解）→ 拆（分步教学卡片）→ 跟（边说边做，动作+语音并发）→ 练（半开放自主决策 + 时间线记录）→ 评（四级分级评价 + 原因解释 + 3D 改进示范）→ 变（AI 随机事件）→ 再练（针对薄弱节点重训）→ 现实（与课程强绑定的挑战 + 降级选项）→ 复盘（3 秒记录卡 + 勇气证据库）。
+> - **AI 边界红线**：AI 绝不能自行决定"什么是正确的礼仪"、绝不能选择与课程不符的 3D 动画、绝不能修改课程知识。前端必须建立 `AnimationMixer` 队列管理机制，按 `behavior_sequence.time` 严格调度，**禁止 setTimeout 硬编码动画**。
+> - **核心数据结构升级**：新增 `Scenario & Node`（场景拆分为多个情境节点，如初次见面→问候→握手→入座→交流→告别）、细化 `BehaviorSequence`（每步带 time/action/text 字段）；课程库数据模型升级为 `Lesson → EtiquetteRule[] → Scenario → Node[]` 四层绑定。
+> - **分级评价机制**：严禁"对/错"二元评价。四级：✅符合场景 / 🟡基本合适 / 🟠可以更自然 / 🔴与礼仪知识不一致；每级必须附原因解释 + 3D 正确反应示范重播。
+> - **3D 朝向修正**：删除所有 `lookAt(camera.position)`；用 `quaternion.slerp(targetQuat, 0.1)` 让角色平滑面向彼此（代码见 §0.6）。
+> - **LocalStorage 键名约定**：`duilian_lesson_library / duilian_profile / duilian_training_log / duilian_challenge_log / duilian_evidence / duilian_settings`（新增 `duilian_lesson_library` 替代原 `duilian_profile` 内嵌结构）。
+> - **安全合规 P0**：危机热线 `<a href="tel:12356">` 必须在移动端设悬浮快捷入口 + 免责声明页 + 关于我们页三处出现。新用户首次直接推送"30 秒和 AI 说一句问候"卡片进入跟练模式。
+> - **v4_teaching_closed_loop.js 状态**：development-plan-v3.md 曾于 2026-09-17 标记"已停止加载"，本次 v3.0.0 决定**重启重构**——保留文件名作为运行时注入模块，但内部逻辑完全重写为十步教学引擎，不侵入 index.html 基础对话逻辑。
+> - 其余经济体系、商业变现、3D 礼仪教学等条款无变更，继续沿用 v2.6.0 基线。
+
+> **v2.6.0 校准说明（历史·四级教学闭环）：** 产品核心定位从"AI 聊天 + 3D 动作展示"升级为 **"AI 社交技能教学与现实迁移训练系统"**。核心理念：社交训练不能是"点动作→打字→点下一步"的回合制游戏，必须支持**语音连续输入 + 动作时间线**，让动作与语言同步发生。本次重构确立的基线，与旧条款（§6 场景训练、§18 商业变现、§19 3D 礼仪教学）冲突时**一律以本文档新增的【§0 社交技能教学闭环】为准**。基线要点：
 > - 四级教学闭环：看示范（行为时间轴+暂停讲解）→ 跟练（低压力模仿）→ 半开放（自主决策+AI 记录+复盘）→ 真实模拟（AI 随机突变）。
 > - 行为时间线：训练中"动作触发时间点"与"语音/文字内容"记录在同一条时间轴，写入 `duilian_training_log`。
 > - 动作快捷面板（边说边做）：训练时底部常驻动作图标（微笑/点头/握手/鞠躬/挥手），点击立即触发 3D 动作并打时间戳，**不打断**当前语音/文字输入。
@@ -25,57 +59,458 @@
 
 ---
 
-## §0 社交技能教学闭环（本次重构规格）
+## §0 十步教学引擎（v3.0.0 核心规格）
 
-> **2026-09-17 最高优先级校准（覆盖旧“四模式/游戏化”描述）：** 礼仪训练是教学课堂，不是闯关游戏。每个课程固定采用“教练讲方法并直接展示完整参考对话（对方台词 + 学员参考回答）→学员用文字或语音跟练→提交后教练按做对之处/原因/改进方法/参考表达评价→进入下一教学步骤”的顺序；界面不展示星级、回合得分、模式标签或关卡时间轴。真实挑战是学习后的模拟检验，输入前不得显示教学提示、参考答案或优劣选项，只在提交后给教练评价。礼仪课堂与真实挑战都可使用真人影视场景，但视觉只能服务教学，不得喧宾夺主。
+> **v3.0.0 核心声明（覆盖 v2.6.0 §0 四级闭环）：** AI 绝不是礼仪老师，AI 是互动教练。所有礼仪标准来源于课程知识库（Lesson / EtiquetteRule / Scenario / Node），AI 只返回文本 + behavior_sequence，前端按时间轴调度 3D 动画。评价从"对/错"二元升级为四级分级 + 原因解释 + 3D 改进示范重播。
 
+### §0.0 AI 边界红线（绝对禁止）
 
-> 功能入口：礼仪训练（社交礼仪训练）与真实挑战功能区，作为 V4 模块 `libs/v4_teaching_closed_loop.js` 独立注入（遵循既有 v3 运行时补丁模式，不侵入 index.html 基础对话逻辑）。
+| ❌ 禁止行为 | ✅ 正确做法 |
+|---|---|
+| AI 自行判断"什么是正确的礼仪" | 所有礼仪标准从 Lesson / EtiquetteRule / Scenario / Node 中提取 |
+| AI 自行选择 3D 动画/表情 | AI 只返回 behavior_sequence（time + action 字段），前端从预定义 action_library 映射 |
+| AI 修改课程知识库内容 | 知识库是只读数据，AI 只负责按数据组织教学流程 |
+| 前端 setTimeout 硬编码动画时序 | 建立 AnimationMixer 队列管理器，严格按 behavior_sequence.time 调度 |
+| 评价用"对/错/不及格/答错"字眼 | 用四级分级（✅符合 / 🟡基本合适 / 🟠可以更自然 / 🔴不一致）+ 原因解释 + 3D 示范重播 |
+| lookAt(camera.position) 让角色看向镜头 | 角色用 quaternion.slerp 平滑面向对方 |
 
-### §0.1 教学场景示例《第一次见客户》
+> 功能入口：礼仪训练（社交礼仪训练）与真实挑战功能区，作为 V4 模块 `libs/v4_teaching_closed_loop.js` **重启重构**——保留文件名，内部逻辑完全重写为十步教学引擎，遵循运行时补丁模式，不侵入 index.html 基础对话逻辑。
 
-> **2026-09-16 界面与入口校准：** 礼仪训练首页不再重复展示“基础社交 / 职场社交 / 深度社交”世界说明，也不设置独立的“四级教学”总入口。九个训练项目就是九个直接入口，用户选择想练的场景后进入该场景的四阶段教学。正式教学入口不得先展示 A/B/C 优劣标签或标准答案；答案与方法只在“看示范”或训练后复盘中按阶段出现。礼仪训练与真实挑战统一使用真人影视场景背景和真人全身角色图，Three.js 舞台只作兼容降级，不作为目标视觉。
+### §0.1 十步教学闭环（核心流程）
 
+当用户进入任意课程场景时，**系统不能直接开始自由对话**，必须严格按以下十步运行。每完成一步自动进入下一步，也支持用户主动跳步或返回重练：
 
-当用户进入该场景训练时，**系统不能直接开始自由对话**，必须按以下流程运行：
+#### 第一步：学（知识导入）
+- 界面弹出**高分应对卡**，展示该场景的核心知识点列表（来自 Lesson.knowledge_points）和关键话术示例（来自 EtiquetteRule.speech）。
+- 卡片下方是"我已掌握，开始训练"和"先看看示范"两个入口。
 
-**① 看示范（观看模式）**
-- 播放 3D 动画：人物靠近 → 目光看向对方 → 微笑 → 伸手 → 说话 → 握手 → 松手 → 自然站立。
-- 同步显示"行为时间轴"：
-  - 00:00 对方靠近　00:01 视线看向对方　00:02 微笑，同时伸手　00:03 说"您好，很高兴认识您"　00:04 握手　00:05 松手，恢复自然距离
-- 每到一个关键节点，**暂停并弹出文字提示**，解释"为什么这么做"（例："视线先到位，能传达真诚与自信，避免侧身或背对对方"）。
+#### 第二步：看（3D 老师示范）
+- 播放一段完整的 3D 动画：人物走进 → 面向对方 → 微笑 → 问候 → 握手 → 入座。
+- 屏幕下方**同步显示行为时间轴**（00:00 转身 → 00:01 微笑 → 00:02 说话 → 00:03 握手）。
+- **每到关键节点暂停**，弹窗解释"为什么这么做"（引用 EtiquetteRule 中的解释文本）。
 
-**② 跟练模式（低压力模仿）**
-- 用户点【开始跟练】。
-- 系统逐步提示："现在请看向对方"、"现在请微笑并伸手"、"现在请说'您好，很高兴认识您'"。
-- 用户通过点击动作图标（[微笑] [伸手] [握手]）和语音输入来完成。**动作不需要等语音结束，可以在说话的同时触发。**
+#### 第三步：拆（分步教学）
+- 将示范动作拆分为单个步骤卡片（如：①身体转向 ②自然问候 ③回应握手）。
+- 每个卡片展示**推荐表达**和**注意事项**（来自 EtiquetteRule 的 avoid 字段）。
 
-**③ 半开放训练（自主决策）**
-- 系统只给场景："你第一次见到一位客户，对方主动向你走来。"
-- 不提示具体步骤；用户自行决定说什么、做什么动作。
-- AI 记录用户的行为时间线，结束后复盘："你注意到了对方并回应、选择了握手，与场景匹配。下次可以注意动作与语言的衔接。"
+#### 第四步：跟（跟练模式）
+- 系统提示："现在轮到你了。"
+- 底部常驻**动作快捷面板**（[微笑] [点头] [握手] [鞠躬] [挥手]），点击立即触发 3D 动画并打时间戳，**不打断**当前语音/文字输入。
+- 用户可以**同时说话 + 点击动作**（边说边做），两者数据分别打时间戳。
 
-**④ 真实模拟（高自由度，AI 随机突变）**
-- 不告诉答案；AI 角色完全自由反应。
-- AI 随机触发意外事件：对方声音小 / 对方没回应 / 对方插话 / 对方表现冷淡 / 对方距离很近 / 对方主动伸手或没有伸手。
-- 用户必须自己处理，训练临场应变能力。
+#### 第五步：练（半开放训练）
+- 只给场景，不提示具体步骤："你第一次见到客户，对方主动向你走来。"
+- 用户自行决定说什么、做什么动作。
+- 系统记录**完整行为时间线**（语音/文字内容 + 每个动作的触发时间点）。
 
-### §0.2 系统级功能要求
-- **行为时间线记录**：每次练习的"动作触发时间点"与"语音内容"须记录在同一条时间轴，写入 `duilian_training_log`。
+#### 第六步：评（AI 分级评价与讲解）
+- AI 根据 EtiquetteRule 的 **standard_intent 语义匹配度**（embedding 相似度），将用户表达映射到五层答案体系，再转化为**四级分级评价**：
+  | 五层答案层级 | → 四级分级 | 典型反馈 |
+  |---|---|---|
+  | recommended_expressions 匹配 | ✅ 符合场景 | "很好的处理，动作和语言都很得体。" |
+  | acceptable_expressions 匹配 | 🟡 基本合适 | "回答没问题，但稍微有些生硬，可以更自然一点。" |
+  | not_recommended 匹配 | 🟠 可以更自然 | "对方已经邀请你入座了，你可以直接说'谢谢'然后坐下。" |
+  | severely_inappropriate 匹配 | 🔴 与礼仪知识不一致 | "在这个正式拜访场景中，对方让座时你直接站着说'你先坐'会让交流显得不自然。可以这样处理：'谢谢'或'好的，谢谢'。" |
+- **严禁字符串硬比**：AI 必须用语义理解（embedding 相似度）判断意图匹配度，不能拿用户输入和 recommended_expressions 做精确字符串比较。
+- **必须提供改进示范**：AI 解释完后，立即调用 3D 动画播放一次"正确反应"的**动作+语音示范**。
+
+#### 第七步：变（情境变化训练）
+- 引入 AI 随机事件（来自 Scenario.random_events）：客户突然质疑价格、客户声音很小、客户突然插话、客户没有伸手、客户表现冷淡、客户距离过近。
+- 用户必须自己处理，训练真正的临场应变能力。
+
+#### 第八步：再练（针对薄弱点重训）
+- 如果用户在某个 Node 节点表现不佳（第六步评价为 🔴 或 🟠），系统自动引导用户**回到该节点**再次训练，而不是从头开始。
+
+#### 第九步：现实（现实挑战）
+- 完成场景训练后，**自动解锁对应的现实挑战**（来自 Lesson.challenge_mapping）。
+- 挑战文案固定为："今天和同事/客户打招呼时，练习自然微笑并看着对方眼睛。"
+- **防挫败机制**：提供【换个更简单的】降级选项；未完成文案固定为："今天没准备好也没关系，机会永远都在。"
+
+#### 第十步：复盘（现实记录与迭代）
+- 用户提交**3 秒记录卡**，必须勾选选项并自动打上标签：`fear_predicted`（如"紧张"）和 `outcome_negative`（如"没注意"、"不太热情"）。
+- 写入 `duilian_challenge_log`，勇气证据库统计规则：`fear_predicted=true && outcome_negative=false`（即"预想坏事未发生"）的次数。
+- **数据流通约束**：勇气证据库页面**只从 `duilian_challenge_log` 读取统计**，不存副本。
+
+### §0.2 核心数据结构（四层绑定）
+
+#### Lesson 课程
+```json
+{
+  "lesson_id": "L001",
+  "title": "第一次正式拜访客户",
+  "scenario_ids": ["S001"],
+  "knowledge_points": ["提前到达", "主动问候", "身体面向对方", "根据场景决定是否握手", "对方邀请再就座", "自然目光交流"],
+  "challenge_mapping": "今天和同事/客户打招呼时，练习自然微笑并看着对方眼睛。"
+}
+```
+
+#### EtiquetteRule 礼仪规则（含五层答案匹配，禁止字符串硬比）
+```json
+{
+  "rule_id": "R001",
+  "situation": "对方主动向你走来并准备握手",
+  "recommended_action": "伸手握手",
+  "timing": "对方伸出手时同步进行",
+  "body_position": "身体自然面向对方",
+  "facial_expression": "自然微笑",
+  "gaze": "看向对方的眼睛，但不要持续盯着",
+  "distance": "保持一臂距离",
+  "voice_tone": "自然、平稳、不需要过度热情",
+  "standard_intent": "接受对方的入座邀请，表示感谢并配合就座",
+  "recommended_expressions": ["谢谢。", "好的，谢谢。", "好的，谢谢您。"],
+  "acceptable_expressions": ["嗯，好。", "好的。", "感谢。"],
+  "not_recommended": ["你先坐，我站着就行。", "不用了，我不坐。", "随便。"],
+  "severely_inappropriate": ["你让我坐我就坐呗。", "干嘛那么客气。", "直接拒绝/带有冒犯语气的表达"],
+  "avoid": "侧身、背对对方、过早或过晚伸手",
+  "explanation": "视线先到位，能传达真诚与自信。侧身或背对对方会让对方感觉不被尊重。"
+}
+```
+> **评价算法说明**：AI 用语义匹配（embedding 相似度）判断用户表达属于哪一层——standard_intent 匹配度最高的归入推荐层，语义相近但措辞生硬的归入可接受层，与场景意图相反的归入不推荐层，带明显冒犯/拒绝的归入严重不合适。**严禁**直接把用户输入和 recommended_expressions 做字符串精确比较。
+
+#### Scenario 场景 + Node 节点（节点串联线性推进，每个节点含双训练维度）
+```json
+{
+  "scenario_id": "S001",
+  "title": "第一次拜访客户",
+  "scenario_goal": "让学员掌握第一次正式拜访客户的完整礼仪流程",
+  "related_lesson": "L001",
+  "random_events": ["客户突然质疑价格", "客户声音很小", "客户突然插话", "客户表现冷淡", "客户距离很近"],
+  "nodes": [
+    {
+      "node_id": "N001",
+      "node_title": "初次见面",
+      "trigger": "客户坐着，学员进入办公室",
+      "bind_etiquette_rule": "R001",
+      "behavior_dimension": {
+        "body_orientation": "自然面向对方，不要侧身",
+        "gaze": "看向对方的眼睛，但不要持续盯着",
+        "facial_expression": "自然微笑，不要僵硬",
+        "posture": "站立自然，双手放松下垂或轻握在前",
+        "distance": "保持一臂距离（约 60-80cm）",
+        "gesture": "不要交叉抱胸"
+      },
+      "language_dimension": {
+        "opening": "您好，我是XX公司的小王，很高兴认识您。",
+        "voice_tone": "自然、平稳、不需要过度热情"
+      },
+      "allow_handshake": false,
+      "next_node": "N002"
+    },
+    {
+      "node_id": "N002",
+      "node_title": "问候回应",
+      "trigger": "客户回答'你好，请坐'",
+      "bind_etiquette_rule": "R002",
+      "behavior_dimension": {
+        "body_orientation": "保持面向对方",
+        "gaze": "保持自然目光交流",
+        "facial_expression": "保持微笑"
+      },
+      "language_dimension": {
+        "response": "谢谢。（或'好的，谢谢'）",
+        "standard_intent": "接受对方的入座邀请，表示感谢并配合就座",
+        "recommended_expressions": ["谢谢。", "好的，谢谢。", "好的，谢谢您。"],
+        "acceptable_expressions": ["嗯，好。", "好的。"],
+        "not_recommended": ["你先坐，我站着就行。", "不用了，我不坐。", "随便。"],
+        "severely_inappropriate": ["你让我坐我就坐呗。", "干嘛那么客气。"]
+      },
+      "next_node": "N003"
+    },
+    {
+      "node_id": "N003",
+      "node_title": "握手礼仪",
+      "trigger": "客户回答后，主动伸出手",
+      "bind_etiquette_rule": "R003",
+      "behavior_dimension": {
+        "gesture": "对方伸手时同步伸手，虎口对虎口",
+        "gaze": "看向对方眼睛",
+        "facial_expression": "自然微笑",
+        "distance": "自然缩短到 50cm 左右"
+      },
+      "language_dimension": {
+        "greeting": "您好，很高兴认识您。"
+      },
+      "allow_handshake": true,
+      "next_node": "N004"
+    },
+    {
+      "node_id": "N004",
+      "node_title": "入座礼仪",
+      "trigger": "对方邀请就座后，走到椅子旁",
+      "bind_etiquette_rule": "R004",
+      "behavior_dimension": {
+        "posture": "走到椅子旁，转身，从左侧入座",
+        "gaze": "入座前看一下椅子，不要摔坐",
+        "distance": "入座后保持与桌子一拳距离"
+      },
+      "language_dimension": {
+        "response": "好的，谢谢。"
+      },
+      "next_node": "N005"
+    },
+    {
+      "node_id": "N005",
+      "node_title": "告别礼仪",
+      "trigger": "交流结束，学员准备离开",
+      "bind_etiquette_rule": "R005",
+      "behavior_dimension": {
+        "body_orientation": "起身时面向对方",
+        "gesture": "握手告别（如对方伸手）",
+        "gaze": "保持目光交流",
+        "facial_expression": "微笑致意"
+      },
+      "language_dimension": {
+        "ending": "今天非常感谢您的时间，希望之后有机会继续交流。",
+        "voice_tone": "真诚、自然"
+      },
+      "next_node": null
+    }
+  ]
+}
+```
+> **节点串联规则**：场景严格按 `nodes` 数组顺序线性推进，每个节点的 `trigger` 是上一节点完成后自动触发的条件（如 AI 对话推进到某句台词）。`next_node` 字段指向下一节点 ID，`null` 表示场景结束。每个节点**必须同时定义 behavior_dimension 和 language_dimension 双训练维度**——社交礼仪不是只有话术或只有动作，而是两者联合训练。
+
+#### BehaviorSequence 行为时间轴（核心，支持条件分支）
+```json
+"behavior_sequence": [
+  { "time": "0.0s", "action": "turn_to_person" },
+  { "time": "0.5s", "action": "smile" },
+  { "time": "0.8s", "action": "speak_start", "text": "您好，很高兴认识您。" },
+  { "time": "1.5s", "action": "extend_hand", "condition": "handshake_allowed == true" },
+  { "time": "2.0s", "action": "handshake", "condition": "handshake_allowed == true && partner_extended_hand == true" },
+  { "time": "2.5s", "action": "release_hand", "condition": "handshake_active == true" }
+]
+```
+- 前端**必须建立 AnimationMixer 队列管理机制**，按 `time` 字段严格调度 3D 动画。
+- **禁止 setTimeout 硬编码时序**。
+- **condition 可选字段**：条件表达式在运行时求值（来自当前 Scenario Node 的 `allow_handshake` 等状态变量），条件不满足则跳过该动作。这解决了"对方没伸手时学员不应该伸手"的分支判断问题。
+
+### §0.3 系统级功能要求
+- **行为时间线记录**：每次练习的"动作触发时间点"与"语音/文字内容"须记录在同一条时间轴，写入 `duilian_training_log`。
 - **动作快捷面板**：在语音/打字输入时，底部常驻悬浮动作图标（[微笑] [点头] [握手] [鞠躬] [挥手]），点击立即触发 3D 动作，**无需打断当前输入**。
+- **边说边做并发**：用户点击动作图标不阻断语音/文字输入，两者数据合并存入时间线。
 
-### §0.3 学-练-战-评闭环与课程绑定
-- 学习卡片升级：每张卡片包含**知识点、礼仪规则、动作拆解、话术示例**；底部按钮由【一键去 AI 演练此场景】改为【进入跟练模式】。
-- 课程库结构：`duilian_profile` 建立 `Lesson`（课程名/章节/知识点）、`EtiquetteRule`（情境/推荐动作/时机/身体朝向/面部表情/眼神/距离/语言/语气/避免行为/解释）、`TrainingScenario`（场景 ID/环境/人物/目标/允许动作/预期行为/对话/随机事件/评价规则）。学习某课程时，AI 调用绑定好的 EtiquetteRule 与 TrainingScenario 指导训练。
-- 现实挑战与原"作业"绑定当前学习场景；示例：学完"初次见面"，现实挑战是"今天见到同事/客户时主动微笑并说'你好'，观察对方反应"；不要求完美，做到即算完成；保留 3 秒记录卡与勇气证据库统计（`fear_predicted` / `outcome_negative` 判定"预想坏事未发生"）。
+#### §0.3.1 教学动作 → GLB Animation Clip 映射层（核心修复，解决"找不到动画/转圈"）
 
-### §0.4 技术修正与红线
-- 3D 朝向：使用 `quaternion.slerp(targetQuat, 0.1)`，禁止 `quaternion.slerp(自身 quaternion)`；若模型初始朝向轴不匹配，直接修改初始旋转校正（如 `character.rotation.y += Math.PI`）。
-- 严禁 Blender 自动骨骼绑定脚本；严禁 Three.js 内实现 IK 解算器（用现有 GLB 预设动画 + AnimationMixer / GameStage3D 程序化动作）。
-- 纯前端 GitHub Pages + Three.js；数据持久化统一 LocalStorage，键名：`duilian_profile / duilian_training_log / duilian_challenge_log / duilian_currency / duilian_evidence / duilian_settings`。
+> **根本原因**：之前代码把教学动作名称（如 `"转身微笑"`）直接传给 `AnimationMixer.clipAction()`，期待 GLB 里有一个同名动画。但 GLB 里的 clip 名称是引擎生成的（`Turn_Left / Smile / Idle / Walk` 等），根本不存在"转身微笑"这个 clip，导致 `clipAction()` 返回 null → 静默失败 → 人物一直转圈。
+
+**必须建立两层映射**：
+
+```javascript
+// ===== 第一层：教学动作ID → GLB Animation Clip 映射表 =====
+// 运行时加载 GLB 后，扫描所有 clip 名称，建立这个表
+window.KNOWN_ANIMATION_CLIPS = [];   // 扫描后填入：["Idle","TurnLeft","Smile","Walk","Handshake","Nod","Wave","Sit","Stand","Bow",...]
+
+// ===== 第二层：教学动作ID → 动作序列（可能由多个 GLB clip 组成） =====
+const ACTION_LIBRARY = {
+  // 单一 GLB clip 映射
+  turn_to_person:   { clip: 'TurnLeft',     duration: 0.8,  note: '身体转向对方（平滑旋转）' },
+  smile:            { clip: 'Smile',        duration: 1.2,  note: '自然微笑表情' },
+  nod:              { clip: 'Nod',          duration: 0.8,  note: '点头致意' },
+  wave:             { clip: 'Wave',         duration: 1.5,  note: '挥手打招呼' },
+  bow:              { clip: 'Bow',          duration: 1.2,  note: '鞠躬' },
+  handshake:        { clip: 'Handshake',    duration: 1.5,  note: '握手' },
+  extend_hand:      { clip: 'ExtendHand',   duration: 0.6,  note: '伸手准备握手' },
+  sit:              { clip: 'Sit',          duration: 1.0,  note: '坐下' },
+  stand:            { clip: 'Stand',        duration: 0.8,  note: '站起' },
+  walk_toward:      { clip: 'Walk',         duration: 2.0,  note: '走向对方' },
+  speak_start:      { clip: 'Talking',      duration: null,  note: '说话循环（配合 TTS）' },
+  speak_end:        { clip: 'Idle',         duration: 0.3,  note: '回到待机' },
+  stand_neutral:    { clip: 'Idle',         duration: null,  note: '自然站姿（默认循环）' },
+
+  // 复合动作：由多个 GLB clip 串联播放（这是"转身微笑"等不存在单一 clip 时的正确做法）
+  turn_smile: {
+    sequence: [
+      { clip: 'TurnLeft',  duration: 0.8 },     // 第 0.0s：转身
+      { clip: 'Smile',     duration: 1.2, delay_after: 0.2 },  // 第 0.8s：微笑 + 停留
+      { clip: 'Idle',      duration: 0.5 }      // 第 2.2s：恢复待机
+    ],
+    note: '转身 → 微笑 → 恢复（教学动作"转身微笑"的正确实现）'
+  }
+};
+
+// ===== 第三层：动作序列播放器（解决复合动作串联） =====
+function playActionSequence(character, mixer, actionEntry, onComplete) {
+  if (actionEntry.sequence) {
+    // 复合动作：按顺序播放，每段结束后播下一段
+    playNextInSequence(character, mixer, actionEntry.sequence, 0, onComplete);
+  } else if (actionEntry.clip) {
+    // 单一动作：直接播放
+    playSingleClip(character, mixer, actionEntry.clip, actionEntry.duration, onComplete);
+  } else {
+    console.error('[DemoAction ERROR] actionEntry 无 clip 也无 sequence:', actionEntry);
+  }
+}
+
+function playSingleClip(character, mixer, clipName, duration, onComplete) {
+  // ✅ 必须检查 GLB 里是否真的有这个 clip
+  var clip = mixer.root.animations.find(function(a) { return a.name === clipName; });
+  if (!clip) {
+    console.error('[DemoAction ERROR] Animation clip not found:', clipName, '现有 clips:', mixer.root.animations.map(function(a){return a.name;}));
+    if (onComplete) onComplete();
+    return;
+  }
+  var action = mixer.clipAction(clip);
+  action.reset().fadeIn(0.2).play();
+  if (duration) {
+    setTimeout(function() {
+      action.fadeOut(0.3);
+      if (onComplete) onComplete();
+    }, duration * 1000);
+  } else {
+    // 循环动作（如 Idle / Talking），由外部控制停止
+    action.setLoop(THREE.LoopRepeat, Infinity);
+  }
+}
+```
+
+#### §0.3.2 教练示范播放器（"看教练示范"按钮的正确执行流程）
+
+点击「看教练示范」按钮后，系统必须执行以下步骤，**每步带诊断日志**：
+
+```
+[DemoAction] lessonId=L001 stepId=step_turn_smile
+  → requestedAction: turn_smile
+  → resolvedEntry: ACTION_LIBRARY.turn_smile (sequence: 3 段)
+  → clip1: TurnLeft ✅ (found, duration=0.8s)
+  → clip2: Smile ✅ (found, duration=1.2s) + 停留 0.2s
+  → clip3: Idle ✅ (found, duration=0.5s)
+  → animationPlaying: true
+  → totalDuration: 2.7s
+  → 播放完成 ✅ → 回到待机
+```
+
+**严禁**：
+- 把教学动作名称直接传给 `clipAction()` 而不做映射
+- 找不到 clip 时进入无限 loading/旋转状态
+- 用 CSS 动画或假旋转冒充 3D 动作
+
+#### §0.3.3 诊断层（开发模式下强制输出）
+
+开发模式（`DUILIAN_DEBUG = true`）下，每次播放动作必须在 console 输出完整诊断信息：
+
+```javascript
+function debugLog(actionId, mixer) {
+  console.groupCollapsed('[DemoAction] ' + actionId);
+  console.log('  resolvedClip:', mixer.root.animations.find(...).name);
+  console.log('  allAvailableClips:', mixer.root.animations.map(a => a.name));
+  console.log('  animationFound:', !!mixer.root.animations.find(...));
+  console.groupEnd();
+}
+```
+
+如果找不到 clip，必须输出 `[DemoAction ERROR] Animation clip not found: xxx` 并停止 loading，**不能静默失败**。
+
+### §0.4 LocalStorage 键名约定（v3.0 新增）
+
+| 键名 | 内容 | 写入方 |
+|---|---|---|
+| `duilian_lesson_library` | 课程知识库（Lesson + EtiquetteRule + Scenario） | 产品预置 + 导入 |
+| `duilian_profile` | 用户基本资料与学习进度 | 用户操作 |
+| `duilian_training_log` | AI 对练记录（含 behavior_sequence、动作触发时间、语音内容、评价结果） | 训练引擎 |
+| `duilian_challenge_log` | 现实挑战记录（含 fear_predicted、outcome_negative、时间） | 挑战提交 |
+| `duilian_evidence` | 勇气证据库聚合数据（只读，从 challenge_log 聚合） | 从 challenge_log 统计 |
+| `duilian_settings` | 设置与协议确认状态 | 用户操作 |
+
+### §0.5 安全合规与冷启动（P0 必做）
+- **危机热线一键拨号**：在免责声明页、关于我们页、移动端悬浮快捷入口三处，使用 `<a href="tel:12356">一键拨打全国统一心理援助热线 12356</a>`。**禁止 AI 自行查找或改动该号码**。
+- **冷启动引导**：新用户第一次进入，直接推送"30 秒和 AI 说一句问候"卡片，点击进入跟练模式。
+- **课程内容版权合规**：知识库内容来源必须可追溯。若原始资料（淘宝课程、付费音频等）未授权商业数字化改编，开发时必须采用"知识点结构化 + 原创表达"方式，而非原文照搬。每个 Lesson / EtiquetteRule 条目必须标注 `source_author` 和 `license_scope` 字段。生产上线前必须完成法务审核。
+
+### §0.6 3D 朝向修正代码（必改）
+
+**删除所有** `lookAt(camera.position)` 调用。在动画循环中，使用以下代码让角色平滑面向彼此：
+
+```javascript
+// 让角色面向 target（对方角色）
+const direction = new THREE.Vector3().subVectors(target.position, character.position).normalize();
+// 模型默认朝向轴可能不同，若转反了请在加载时校正初始旋转
+const targetQuaternion = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), direction);
+character.quaternion.slerp(targetQuaternion, 0.1);
+```
+
+**严禁** `quaternion.slerp(自身 quaternion)` 造成自我旋转抖动。若模型初始朝向轴不匹配，直接修改初始旋转校正（如 `character.rotation.y += Math.PI`）。
 
 ---
 
+### §0.7 P0 冒烟测试清单（改完后逐一自测）
+
+1. 进入"第一次拜访客户"场景，是否正确按"学→看→拆→跟"的顺序运行。
+2. 跟练模式中，是否能在语音/文字输入的同时点击动作图标（边说边做）。
+3. AI 评价是否给出四级分级（✅/🟡/🟠/🔴），并附带原因解释和 3D 改进示范。
+4. 场景结束后，是否按 behavior_sequence 正确播放 3D 动画（动作与礼仪规则库匹配）。
+5. 现实挑战是否与课程场景强绑定，3 秒记录卡是否正确打上 fear_predicted / outcome_negative 标签。
+6. 3D 两个角色是否面向彼此（而非摄像机），转身是否平滑。
+7. `tel:12356` 在移动端能否一键呼出。
+8. AnimationMixer 是否按队列调度（无 setTimeout 硬编码）。
+9. 勇气证据库是否只从 `duilian_challenge_log` 聚合（无副本）。
+10. v4_teaching_closed_loop.js 是否重启加载而非停止状态。
+11. **「看教练示范」按钮点击后，人物是否真正执行动作（不是转圈/等待）**——关键修复项。
+12. **打开浏览器 console，是否能看到 `[DemoAction]` 诊断日志**——包含 requestedAction / resolvedClip / allAvailableClips 字段。
+13. **GLB 扫描是否输出完整 clip 列表**——在 console 中能看到 `KNOWN_ANIMATION_CLIPS` 数组，不是空数组。
+14. **复合动作（如"转身微笑"）是否正确串联播放**——转身 → 微笑 → 恢复待机，每段平滑过渡。
+15. **找不到 clip 时是否输出 ERROR 并停止 loading**——不会无限转圈，console 有 `[DemoAction ERROR]` 日志。
+16. **`clipAction()` 调用前是否先检查 clip 是否存在**——没有 `clipAction(null)` 调用。
+17. **`playSingleClip` 函数是否存在且正确实现 fadeIn/动作/fadeOut 三件套**。
+
+---
+
+### §0.8 场景训练模板（SceneTemplate）—— v5.0.0 新增核心数据结构
+
+替代 v3 Scenario/Node 中的 3D 依赖字段。一个 SceneTemplate 就是一个完整的教学包。详细 JSON schema 与字说明见本文档线上版本；此处给出顶层结构：
+
+`json
+{
+  "scene_id": "ST-001",
+  "title": "第一次拜访客户",
+  "category": "商务社交",
+  "scenario_goal": "让学员掌握第一次正式拜访客户的完整礼仪流程",
+  "learning_objectives": ["正确进入正式社交场合", "掌握初次见面的礼仪", "学会自然开场", "学会等待入座", "学会倾听和回应"],
+  "knowledge_source": ["LESSON-023"],
+  "related_rules": ["R001","R002","R003","R004","R005"],
+  "scenario_illustration": "cafe-room.svg",
+  "total_steps": 8,
+  "estimated_minutes": 12,
+  "action_steps": [ /* 动作示范卡序列，含 instruction / why_this_way / checklist / wrong_examples / assets */ ],
+  "dialogue_steps": [ /* 话术示范，含 recommended / acceptable / not_recommended / severely_inappropriate / voice_tone */ ],
+  "practice_steps": [ /* 跟练 + 自主练习，含 action_checklist + input_mode + ai_evaluation_dimensions */ ],
+  "ai_roleplay": { /* 完整场景树 + 随机事件 */ },
+  "challenge": { /* 课堂→现实迁移训练 + 复盘回链 */ }
+}
+`
+
+---
+
+### §0.9 动作素材库分级规范（v5.0.0 新增）
+
+四级素材库，P0 只做 A/B 两级。3D 不阻塞教学。
+
+| 级别 | 素材类型 | 适用动作 | 格式规范 | 优先级 |
+|---|---|---|---|---|
+| **A. 单图动作** | 一张静态人物示意图 | 站立/坐下/起身/面向/点头/微笑/挥手 | SVG/PNG 512×512px | P0 |
+| **B. 连续步骤图** | 3～6 张连续步骤图一组 | 转身/握手/递名片/入座/离座/引导 | SVG/PNG，统一尺寸 | P0 |
+| **C. 复杂动作** | 短视频/GIF/Canvas 2D | 鞠躬全过程/正式握手完整流程 | MP4 5-15s / GIF / 2D 帧动画 | P2 后期 |
+| **D. 高级功能** | 摄像头+姿态识别 | 真实姿态评估（转身角度/手位置） | WebRTC + TensorFlow.js | P4 远期 |
+
+素材文件：knowledge_base/action_assets/{single|sequences}/，SVG 扁平化插画风格，同一动作的 3-6 张步骤图必须是同一个人物模型。
+
+---
+
+### §0.10 礼仪训练界面规范（v5.0.0 完整页）
+
+替代原有 3D 礼仪训练页面。固定 7 个区域从上到下线性推进：
+
+1. **顶部**：场景标题 + 学习目标 + 进度指示器（●●●●○○○○ + 上一步/下一步）
+2. **中间场景插画**：SVG 插画/人物示意图（替代 3D 场景）
+3. **情境描述**：现在发生了什么
+4. **教学区**：当前步骤的知识 + 动作示范卡（3-6 张连续步骤图 + 时间轴标签）+ 话术参考表达 + 为什么 + 不要这样做
+5. **练习区**：跟练勾选清单（用户自我确认动作完成）+ 🎤/⌨ 输入
+6. **AI 反馈区**：知识评价（对/错二元·课程规则）/ 语言评价（四级分级）/ 行为评价（自我勾选计数）+ 改进参考
+7. **场景继续→AI角色扮演**：完成所有教学步骤后才出现
+
+核心 UI 规则：线性推进不跳步；动作自我确认不用假 AI 视觉判断；三种评价分开展示；AI 对话模式只在完成教学后出现；3D 默认不加载，用户手动点击"🎬 切换到 3D 沉浸式"才启用。
+
+---
 ## 1. 文档概述与产品定位
 
 ### 1.1 产品定位

@@ -198,7 +198,7 @@ test('学习卡片：原始课程已接入并可检索', async ({ page }) => {
   await page.evaluate(() => switchTab('training'));
   await page.evaluate(() => showTrainingModule('cards'));
   await expect(page.locator('#training-card-module')).toBeVisible();
-  await expect(page.locator('#training-card-total')).toHaveText('1822');
+  await expect(page.locator('#training-card-total')).toHaveText('1614');
   await expect(page.locator('#training-card-list .training-card-item')).toHaveCount(12);
   const scrollMetrics = await page.locator('#training-card-module').evaluate(el => ({ scrollHeight: el.scrollHeight, clientHeight: el.clientHeight }));
   expect(scrollMetrics.scrollHeight, '学习卡片页面应有独立滚动容器').toBeGreaterThan(scrollMetrics.clientHeight);

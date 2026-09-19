@@ -3244,7 +3244,8 @@ h1,h2,h3 { text-wrap:balance; }
 
 <script src="knowledge_base/learning_cards.js"></script>
 <script src="knowledge_base/raw_course_cards.js"></script>
-<script src="knowledge_base/extra_course_cards.js"></script>
+<script src="knowledge_base/extra_course_cards_all.js?v=20250704"></script>
+
 <script src="libs/three.min.js"></script>
 <script src="libs/GLTFLoader.js"></script>
 <script src="libs/SkeletonUtils.js"></script>
@@ -4278,9 +4279,17 @@ const fallbackLearningCards = [
 const structuredLearningCards = Array.isArray(window.knowledgeLearningCards) ? window.knowledgeLearningCards : [];
 const rawCourseLearningCards = Array.isArray(window.rawCourseLearningCards) ? window.rawCourseLearningCards : [];
 // 资料库课程目录全量纳入（音视频课 / 话术资料 / 电子书），不做删减
-const extraCourseCards = Array.isArray(window.extraCourseCards) ? window.extraCourseCards : [];
+const extraCourseCards = Array.isArray(window.extraCourseCards)
+  ? window.extraCourseCards.filter(function(card) {
+      return card && card.status === 'ok' && card.bundle && Number(card.chars || 0) > 0;
+    })
+  : [];
 let learningCards = [...structuredLearningCards, ...rawCourseLearningCards, ...extraCourseCards];
 if (!learningCards.length) learningCards = fallbackLearningCards;
+setTimeout(function () {
+  var total = document.getElementById('training-hub-card-total');
+  if (total) total.textContent = learningCards.length;
+}, 0);
 
 // 教练动态模板（PRD §15.2）
 // 动态类型：生活分享(40%)、心情表达(30%)、训练鼓励(30%)
@@ -14729,7 +14738,14 @@ const realChallengeLevels = [
   { id: 9006, title: '年终述职演讲', description: '在公开汇报中清楚表达、回应追问', icon: '🎤', category: '职场与事业', difficulty: 'hard', difficultyStars: 4, reward_points: 35, sceneKey: 'public', world: 'work', worldName: '职场社交', story: '年终述职会上，领导和同事都在听你的汇报。', relation: '领导与同事', goal: '完成结构化表达并稳住现场互动', focus: '站姿、节奏、眼神、结束语' },
   { id: 9007, title: '约会中的试探', description: '在第一次线下见面中让对方感到舒适', icon: '❤️', category: '亲密关系与约会', difficulty: 'medium', difficultyStars: 3, reward_points: 30, sceneKey: 'cafe', world: 'deep', worldName: '深度社交', story: '你与在社交软件上聊了很久的人第一次线下见面。', relation: '初次见面的约会对象', goal: '展现真诚，同时尊重对方节奏和边界', focus: '场景选择、话题分寸、结束方式' },
   { id: 9008, title: '朋友间的冲突', description: '表达立场，同时不伤害长期关系', icon: '🫶', category: '突发与冲突', difficulty: 'hard', difficultyStars: 4, reward_points: 35, sceneKey: 'home', world: 'deep', worldName: '深度社交', story: '你和最好的朋友产生分歧，双方都有些情绪。', relation: '最好的朋友', goal: '先倾听和表达感受，再讨论可执行的解决方式', focus: '非暴力沟通、倾听、边界' },
-  { id: 9009, title: '婚礼上的致辞', description: '在重要人生时刻用得体的话语表达祝福', icon: '💍', category: '社交场合与人际交往', difficulty: 'hard', difficultyStars: 5, reward_points: 40, sceneKey: 'public', world: 'deep', worldName: '深度社交', story: '你受邀在好友婚礼上作为伴郎或伴娘致辞。', relation: '好友及其家人', goal: '准备、表达、控制节奏并适时结束', focus: '公开致辞、分寸、祝福' }
+  { id: 9009, title: '婚礼上的致辞', description: '在重要人生时刻用得体的话语表达祝福', icon: '💍', category: '社交场合与人际交往', difficulty: 'hard', difficultyStars: 5, reward_points: 40, sceneKey: 'public', world: 'deep', worldName: '深度社交', story: '你受邀在好友婚礼上作为伴郎或伴娘致辞。', relation: '好友及其家人', goal: '准备、表达、控制节奏并适时结束', focus: '公开致辞、分寸、祝福' },
+
+  { id: 9010, title: '商务接待全流程', icon: '🤝', world: 'work', worldName: '职场社交', sceneKey: 'office', category: '职场与事业', story: '你负责接待第一次来访的重要客户。', relation: '接待人员与重要客户', goal: '完成迎候、称呼、握手、名片、引领和送别', focus: '接待顺序、动作距离、称呼与送别', opening: '客户：您好，我是预约来访的李明。', options: [{label:'A',quality:'good',text:'李总您好，欢迎您！一路辛苦了，我是今天的接待人小陈，这边请。',why:'先核对身份、正确称呼、自我介绍，再明确引导。'},{label:'B',quality:'neutral',text:'您好，请进。',why:'有礼貌但缺少身份确认与清晰引导。'},{label:'C',quality:'cold',text:'你先等一下。',why:'忽视称呼和说明，会让来访者感到被怠慢。'}], coachAnswer:'李总您好，欢迎您！一路辛苦了，我是今天的接待人小陈，这边请。', refReason:'接待要让对方第一时间确认自己被识别、被欢迎并知道下一步。' },
+  { id: 9011, title: '乘车座次礼仪', icon: '🚗', world: 'work', worldName: '职场社交', sceneKey: 'auto', category: '社交场合与人际交往', story: '你陪同客户乘坐有专职司机的商务车。', relation: '陪同人员与重要客户', goal: '根据驾驶者和车型安排座次并协助上下车', focus: '专职司机、主人驾车、商务车座次', opening: '客户：车到了，我坐哪个位置合适？', options: [{label:'A',quality:'good',text:'王总，请坐右后座，方便上下车。我来帮您扶一下车门。',why:'有专职司机时通常请主宾坐右后座，同时注意上下车安全。'},{label:'B',quality:'neutral',text:'您随意坐就好。',why:'把判断压力交给客户，不够周到。'},{label:'C',quality:'cold',text:'坐副驾驶吧。',why:'未区分驾驶者与接待关系。'}], coachAnswer:'王总，请坐右后座，方便上下车，我来帮您扶门。', refReason:'先判断谁驾驶、车型和主客关系，再安排座位。' },
+  { id: 9012, title: '商务宴请座次与话题', icon: '🍽️', world: 'work', worldName: '职场社交', sceneKey: 'family', category: '职场与事业', story: '你协助组织一次正式商务宴请。', relation: '主方陪同与客户主宾', goal: '安排座次、点菜、话题、敬酒与离席', focus: '主宾位置、饮食禁忌、话题边界', opening: '客户：今晚怎么坐？我有没有需要注意的地方？', options: [{label:'A',quality:'good',text:'您是主宾，请坐主陪右侧。菜品已避开您提到的禁忌，今晚以交流为主，请按自己节奏来。',why:'说明座次并照顾饮食和饮酒边界。'},{label:'B',quality:'neutral',text:'您坐上座就行。',why:'方向基本正确但信息不清楚。'},{label:'C',quality:'cold',text:'随便坐，今晚一定要喝尽兴。',why:'座次不清且以酒施压。'}], coachAnswer:'您是主宾，请坐主陪右侧；饮食禁忌已经确认，饮酒按您的意愿。', refReason:'宴请礼仪的核心是尊重而非劝酒。' },
+  { id: 9013, title: '引导与电梯礼仪', icon: '🚪', world: 'work', worldName: '职场社交', sceneKey: 'office', category: '职场与事业', story: '你需要把来访客户从大堂引导到会议室。', relation: '引导人员与来访客户', goal: '完成引路、开门、电梯与入座', focus: '方位、步距、电梯安全、开门顺序', opening: '客户：会议室在哪边？', options: [{label:'A',quality:'good',text:'这边请，我走在您左前方为您引路。前面乘电梯，我先进去为您按住门。',why:'提前说明路线并把安全动作讲清楚。'},{label:'B',quality:'neutral',text:'跟我来吧。',why:'能完成引路但缺少提醒。'},{label:'C',quality:'cold',text:'在楼上，您自己找。',why:'没有履行接待职责。'}], coachAnswer:'这边请，我走在您左前方；电梯到了我先按住门，请您后进先出。', refReason:'引导礼仪首先服务于安全和方向清晰。' },
+  { id: 9014, title: '门店服务接待礼仪', icon: '🏪', world: 'work', worldName: '职场社交', sceneKey: 'service', category: '日常生活消费', story: '顾客走进门店浏览，但暂时没有主动求助。', relation: '服务人员与顾客', goal: '欢迎、观察需求、提供帮助、处理异议并欢送', focus: '服务距离、询问方式、致歉与欢送', opening: '顾客：我先随便看看。', options: [{label:'A',quality:'good',text:'好的，您慢慢看。我就在这边，需要了解尺寸或功能时随时叫我。',why:'尊重顾客浏览空间，同时说明可提供的帮助。'},{label:'B',quality:'neutral',text:'好的。',why:'不施压但服务信息不足。'},{label:'C',quality:'cold',text:'不买就别乱碰。',why:'带有敌意，会直接破坏服务关系。'}], coachAnswer:'好的，您慢慢看。我就在附近，需要帮助随时叫我。', refReason:'好的门店服务既不紧逼，也不消失。' },
+  { id: 9015, title: '涉外商务交往', icon: '🌍', world: 'work', worldName: '职场社交', sceneKey: 'office', category: '职场与事业', story: '你第一次与海外客户正式会面。', relation: '商务合作双方', goal: '守时、称呼准确、避免隐私话题并确认合同信息', focus: '跨文化边界、守时、专业表达', opening: '客户：很高兴见到你，我们可以直接开始谈项目吗？', options: [{label:'A',quality:'good',text:'当然，很高兴见到您。议程和英文资料已经准备好，我们先确认今天的三个目标。',why:'简洁问候后直接进入清晰议程，符合专业预期。'},{label:'B',quality:'neutral',text:'可以，我们开始吧。',why:'直接但缺少议程确认。'},{label:'C',quality:'cold',text:'先别急，先聊聊你结婚没有。',why:'把私人问题放在正式商务开场，容易越界。'}], coachAnswer:'很高兴见到您。资料已经准备好，我们先确认今天的议程和目标。', refReason:'跨文化商务优先守时、清晰和边界。' },
 ];
 window.realChallengeLevels = realChallengeLevels;
 
@@ -15005,22 +15021,24 @@ function startChallenge(challengeId) {
     challengeSurface.style.backgroundImage = "linear-gradient(rgba(7,5,18,.76),rgba(10,8,22,.92)), url('" + cinematicImage + "')";
     challengeSurface.dataset.visualMode = 'cinematic-photo';
   }
-  const cinematicMounted = typeof window.mountCinematicPhotoStage === 'function' && window.mountCinematicPhotoStage('challenge-3d-stage', {
+  // ===== 3D 优先：先尝试 GameStage3D.mount，失败才 fallback 到照片模式 =====
+  const stage3dOk = mountStage3DForChallenge('challenge-3d-stage', {
     env: getStage3DEnvKey(window.challengeSceneMeta, challenge.title),
-    background: cinematicImage,
-    backgroundAlt: (window.challengeSceneMeta.location || '真实场景') + ' 真人影视背景',
-    npcSrc: getCinematicNpcSrc(getStage3DEnvKey(window.challengeSceneMeta, challenge.title)),
-    npcLabel: window.challengeCoach.name + ' 饰 ' + (window.challengeSceneMeta.role || '场景角色'),
-    npcAlt: window.challengeCoach.name + '，' + window.challengeSceneMeta.role + '，真人全身形象',
-    userSrc: getCinematicUserSrc(),
-    table: true
+    npcLabel: window.challengeCoach.name + ' 饰 ' + (window.challengeSceneMeta.role || '场景角色')
   });
-  if (!cinematicMounted) {
-    const stage3dOk = mountStage3DForChallenge('challenge-3d-stage', {
+  if (!stage3dOk) {
+    // fallback: 照片模式
+    const cinematicMounted = typeof window.mountCinematicPhotoStage === 'function' && window.mountCinematicPhotoStage('challenge-3d-stage', {
       env: getStage3DEnvKey(window.challengeSceneMeta, challenge.title),
-      npcLabel: window.challengeCoach.name + ' 饰 ' + (window.challengeSceneMeta.role || '场景角色')
+      background: cinematicImage,
+      backgroundAlt: (window.challengeSceneMeta.location || '真实场景') + ' 真人影视背景',
+      npcSrc: getCinematicNpcSrc(getStage3DEnvKey(window.challengeSceneMeta, challenge.title)),
+      npcLabel: window.challengeCoach.name + ' 饰 ' + (window.challengeSceneMeta.role || '场景角色'),
+      npcAlt: window.challengeCoach.name + '，' + window.challengeSceneMeta.role + '，真人全身形象',
+      userSrc: getCinematicUserSrc(),
+      table: true
     });
-    if (!stage3dOk) {
+    if (!cinematicMounted) {
       const stageBackdrop = $('challenge-stage-backdrop');
       if (stageBackdrop) { stageBackdrop.src = getChallenge3DImage(window.challengeSceneMeta); stageBackdrop.alt = (window.challengeSceneMeta.location || '真实场景') + ' 3D 背景'; }
       const stageCharacter = $('challenge-stage-character');
@@ -16512,7 +16530,14 @@ const etiquetteLevels = [
       { label: 'B', quality: 'neutral', text: '祝你们新婚快乐，早生贵子。', why: '祝福到位，但较为套路，缺少与这对新人的具体连接。' },
       { label: 'C', quality: 'cold', text: '（长篇大论讲自己往事，迟迟不进入祝福）', why: '把舞台变成自己的主场，会让新人尴尬，也违背致辞的目的。' }
     ],
-    coachAnswer: '我是看着你们一路走来的。祝你们从今往后，每一天都值得纪念，愿你们永远把彼此放在心上。新婚快乐！', refReason: '公共致辞控制好「真情+具体回忆+简短祝福」的配比，体面又动人。' }
+    coachAnswer: '我是看着你们一路走来的。祝你们从今往后，每一天都值得纪念，愿你们永远把彼此放在心上。新婚快乐！', refReason: '公共致辞控制好「真情+具体回忆+简短祝福」的配比，体面又动人。' },
+
+  { id: 9010, title: '商务接待全流程', icon: '🤝', world: 'work', worldName: '职场社交', sceneKey: 'office', category: '职场与事业', story: '你负责接待第一次来访的重要客户。', relation: '接待人员与重要客户', goal: '完成迎候、称呼、握手、名片、引领和送别', focus: '接待顺序、动作距离、称呼与送别', opening: '客户：您好，我是预约来访的李明。', options: [{label:'A',quality:'good',text:'李总您好，欢迎您！一路辛苦了，我是今天的接待人小陈，这边请。',why:'先核对身份、正确称呼、自我介绍，再明确引导。'},{label:'B',quality:'neutral',text:'您好，请进。',why:'有礼貌但缺少身份确认与清晰引导。'},{label:'C',quality:'cold',text:'你先等一下。',why:'忽视称呼和说明，会让来访者感到被怠慢。'}], coachAnswer:'李总您好，欢迎您！一路辛苦了，我是今天的接待人小陈，这边请。', refReason:'接待要让对方第一时间确认自己被识别、被欢迎并知道下一步。' },
+  { id: 9011, title: '乘车座次礼仪', icon: '🚗', world: 'work', worldName: '职场社交', sceneKey: 'auto', category: '社交场合与人际交往', story: '你陪同客户乘坐有专职司机的商务车。', relation: '陪同人员与重要客户', goal: '根据驾驶者和车型安排座次并协助上下车', focus: '专职司机、主人驾车、商务车座次', opening: '客户：车到了，我坐哪个位置合适？', options: [{label:'A',quality:'good',text:'王总，请坐右后座，方便上下车。我来帮您扶一下车门。',why:'有专职司机时通常请主宾坐右后座，同时注意上下车安全。'},{label:'B',quality:'neutral',text:'您随意坐就好。',why:'把判断压力交给客户，不够周到。'},{label:'C',quality:'cold',text:'坐副驾驶吧。',why:'未区分驾驶者与接待关系。'}], coachAnswer:'王总，请坐右后座，方便上下车，我来帮您扶门。', refReason:'先判断谁驾驶、车型和主客关系，再安排座位。' },
+  { id: 9012, title: '商务宴请座次与话题', icon: '🍽️', world: 'work', worldName: '职场社交', sceneKey: 'family', category: '职场与事业', story: '你协助组织一次正式商务宴请。', relation: '主方陪同与客户主宾', goal: '安排座次、点菜、话题、敬酒与离席', focus: '主宾位置、饮食禁忌、话题边界', opening: '客户：今晚怎么坐？我有没有需要注意的地方？', options: [{label:'A',quality:'good',text:'您是主宾，请坐主陪右侧。菜品已避开您提到的禁忌，今晚以交流为主，请按自己节奏来。',why:'说明座次并照顾饮食和饮酒边界。'},{label:'B',quality:'neutral',text:'您坐上座就行。',why:'方向基本正确但信息不清楚。'},{label:'C',quality:'cold',text:'随便坐，今晚一定要喝尽兴。',why:'座次不清且以酒施压。'}], coachAnswer:'您是主宾，请坐主陪右侧；饮食禁忌已经确认，饮酒按您的意愿。', refReason:'宴请礼仪的核心是尊重而非劝酒。' },
+  { id: 9013, title: '引导与电梯礼仪', icon: '🚪', world: 'work', worldName: '职场社交', sceneKey: 'office', category: '职场与事业', story: '你需要把来访客户从大堂引导到会议室。', relation: '引导人员与来访客户', goal: '完成引路、开门、电梯与入座', focus: '方位、步距、电梯安全、开门顺序', opening: '客户：会议室在哪边？', options: [{label:'A',quality:'good',text:'这边请，我走在您左前方为您引路。前面乘电梯，我先进去为您按住门。',why:'提前说明路线并把安全动作讲清楚。'},{label:'B',quality:'neutral',text:'跟我来吧。',why:'能完成引路但缺少提醒。'},{label:'C',quality:'cold',text:'在楼上，您自己找。',why:'没有履行接待职责。'}], coachAnswer:'这边请，我走在您左前方；电梯到了我先按住门，请您后进先出。', refReason:'引导礼仪首先服务于安全和方向清晰。' },
+  { id: 9014, title: '门店服务接待礼仪', icon: '🏪', world: 'work', worldName: '职场社交', sceneKey: 'service', category: '日常生活消费', story: '顾客走进门店浏览，但暂时没有主动求助。', relation: '服务人员与顾客', goal: '欢迎、观察需求、提供帮助、处理异议并欢送', focus: '服务距离、询问方式、致歉与欢送', opening: '顾客：我先随便看看。', options: [{label:'A',quality:'good',text:'好的，您慢慢看。我就在这边，需要了解尺寸或功能时随时叫我。',why:'尊重顾客浏览空间，同时说明可提供的帮助。'},{label:'B',quality:'neutral',text:'好的。',why:'不施压但服务信息不足。'},{label:'C',quality:'cold',text:'不买就别乱碰。',why:'带有敌意，会直接破坏服务关系。'}], coachAnswer:'好的，您慢慢看。我就在附近，需要帮助随时叫我。', refReason:'好的门店服务既不紧逼，也不消失。' },
+  { id: 9015, title: '涉外商务交往', icon: '🌍', world: 'work', worldName: '职场社交', sceneKey: 'office', category: '职场与事业', story: '你第一次与海外客户正式会面。', relation: '商务合作双方', goal: '守时、称呼准确、避免隐私话题并确认合同信息', focus: '跨文化边界、守时、专业表达', opening: '客户：很高兴见到你，我们可以直接开始谈项目吗？', options: [{label:'A',quality:'good',text:'当然，很高兴见到您。议程和英文资料已经准备好，我们先确认今天的三个目标。',why:'简洁问候后直接进入清晰议程，符合专业预期。'},{label:'B',quality:'neutral',text:'可以，我们开始吧。',why:'直接但缺少议程确认。'},{label:'C',quality:'cold',text:'先别急，先聊聊你结婚没有。',why:'把私人问题放在正式商务开场，容易越界。'}], coachAnswer:'很高兴见到您。资料已经准备好，我们先确认今天的议程和目标。', refReason:'跨文化商务优先守时、清晰和边界。' },
 ];
 
 let currentEtiquetteLevel = null;
@@ -16614,19 +16639,21 @@ function startEtiquetteLevel(levelId) {
     surface.style.backgroundImage = "linear-gradient(rgba(7,5,18,.76),rgba(10,8,22,.92)), url('" + cinematicImage + "')";
     surface.dataset.visualMode = 'cinematic-photo';
   }
-  const cinematicMounted = typeof window.mountCinematicPhotoStage === 'function' && window.mountCinematicPhotoStage('etiquette-3d-stage', {
-    env: getStage3DEnvKey(meta, level.title),
-    background: cinematicImage,
-    backgroundAlt: (meta.location || '礼仪场景') + ' 真人影视背景',
-    npcSrc: getCinematicNpcSrc(getStage3DEnvKey(meta, level.title), level.id),
-    npcLabel: coach.name + ' 饰 ' + (meta.role || '场景角色'),
-    npcAlt: coach.name + '，' + meta.role + '，真人全身形象',
-    userSrc: getCinematicUserSrc(),
-    table: true
-  });
-  if (!cinematicMounted) {
-    const stage3dOk = mountStage3DForEtiquette('etiquette-3d-stage', level);
-    if (!stage3dOk) {
+  // ===== 3D 优先：先尝试 GameStage3D.mount，失败才 fallback 到照片模式 =====
+  const stage3dOk = mountStage3DForEtiquette('etiquette-3d-stage', level);
+  if (!stage3dOk) {
+    // fallback: 照片模式
+    const cinematicMounted = typeof window.mountCinematicPhotoStage === 'function' && window.mountCinematicPhotoStage('etiquette-3d-stage', {
+      env: getStage3DEnvKey(meta, level.title),
+      background: cinematicImage,
+      backgroundAlt: (meta.location || '礼仪场景') + ' 真人影视背景',
+      npcSrc: getCinematicNpcSrc(getStage3DEnvKey(meta, level.title), level.id),
+      npcLabel: coach.name + ' 饰 ' + (meta.role || '场景角色'),
+      npcAlt: coach.name + '，' + meta.role + '，真人全身形象',
+      userSrc: getCinematicUserSrc(),
+      table: true
+    });
+    if (!cinematicMounted) {
       const backdrop = $('etiquette-stage-backdrop');
       if (backdrop) { backdrop.src = getChallenge3DImage(meta); backdrop.alt = (meta.location || '礼仪场景') + ' 3D 背景'; }
       const character = $('etiquette-stage-character');
@@ -16636,7 +16663,7 @@ function startEtiquetteLevel(levelId) {
   const location = $('etiquette-stage-location');
   if (location) location.textContent = meta.location || '礼仪场景';
   const progress = $('etiquette-stage-progress');
-  if (progress) progress.textContent = '0 / 3';
+  if (progress) progress.textContent = '0 / ' + getEtiquetteTeachingSteps(level).length;
   const goal = $('etiquette-scene-goal');
   if (goal) goal.textContent = '🎭 ' + coach.name + ' 将扮演' + (meta.role || '场景角色') + '。\n本关目标：' + level.goal + '。\n人物关系：' + level.relation + '。\n教学重点：' + level.focus + '。\n先阅读本轮教学提示，再用文字或语音完成跟练；提交后由教练逐项评价。';
   const evaluation = $('etiquette-coach-evaluation');
@@ -16686,6 +16713,16 @@ const ETIQUETTE_TURN_CONTENT={
 9007:[['安全话题','小雅：你休息时喜欢做什么？','listen','认真倾听','分享细节，再邀请对方分享。','我周末喜欢逛展。你更喜欢安静还是户外活动？'],['尊重边界','小雅：感情经历今天不想细聊。','nod','接受边界','接受边界，再换轻松话题。','当然可以，按你舒服的节奏。'],['结束约会','小雅：今天聊得开心，我要回去了。','wave','微笑告别','接受结束信号，邀请可拒绝。','路上注意安全；愿意的话下次一起看展。']],
 9008:[['承认影响','小杰：你没问我就告诉了别人。','nod','认真道歉','说清行为和影响。','对不起，我没征得同意，侵犯了你的边界。'],['不推责任','小杰：你为什么那样做？','listen','用我表达','说明考虑并承担责任。','我担心来不及，但应该先问你。'],['修复约定','小杰：以后怎么办？','nod','确认约定','条件、行动、对方确认。','以后涉及你的信息，我先问，得到同意再说。']],
 9009:[['合适回忆','新人笑着等你继续。','listen','关注新人','一个片段，不揭短不讲私密。','他第一次认真说起她时特别温柔。'],['焦点归还新人','新娘看向你。','nod','看向两人','肯定两人的关系。','他们始终愿意听见彼此、支持彼此。'],['祝福收尾','主持人示意时间将到。','raise','举杯祝福','具体祝福后及时结束。','祝你们有商有量、有笑有爱。新婚快乐！']]};
+
+Object.assign(ETIQUETTE_TURN_CONTENT,{
+9010:[['交换名片','客户：这是我的名片，请多关照。','listen','双手接递','双手接名片，快速确认姓名职务，再妥善收好。','谢谢李总。我确认一下您的姓名和职务，这是我的名片，请您指教。'],['引导入室','客户：会议室在哪边？','step','左前方引导','提前说明路线，保持一到一点五米距离。','这边请，我走在您左前方，前面有一级台阶。'],['送别客户','客户：今天交流很顺利，我先回去了。','wave','送至离开点','送到电梯或车旁，确认后续并目送离开。','李总慢走，今天确认的材料我明早发您，期待下次见。']],
+9011:[['确认驾驶关系','客户：如果是你们领导亲自开车呢？','listen','先判断再安排','主人亲自驾驶时，主宾通常坐副驾驶便于交流。','如果领导亲自驾驶，请您坐副驾驶；有专职司机时坐右后座。'],['协助上车','客户：我的行李有些多。','step','扶门放行李','先确认贵重和易碎物，再协助放置。','我先帮您放大件行李，贵重物品请您随身带好。'],['安全下车','车辆到达，客户准备下车。','wave','观察来车','先确认外侧交通，再协助开门。','请稍等，我先确认后方安全，再为您开门。']],
+9012:[['确认饮食边界','客户：我不喝酒，也不吃海鲜。','listen','认真确认','复述禁忌并说明已安排替代。','明白，不饮酒、不吃海鲜。我为您准备茶和其他菜品。'],['选择餐桌话题','客户：最近项目压力很大。','nod','适度回应','可聊项目和行业，不追问隐私或劝酒。','辛苦了。我们先把关键问题理清，其他安排按您的节奏。'],['离席与结账','客户：今天差不多了。','wave','自然收尾','主方提前处理结账，不在席间争抢。','好的，感谢您今晚交流。我送您到门口，后续要点明天确认。']],
+9013:[['进入电梯','电梯门打开，里面没人。','step','先入按门','引导者先进入按住开门键，再请客户进入。','我先为您按住门，请进。'],['走廊引路','客户：前面要转弯吗？','turn','回身提示','在转弯和台阶前提前提示。','是的，前面右转，我会在转角处等您跟上。'],['进入会议室','会议室门关闭着。','bow','敲门开门','先敲门确认，再开门请客人进入。','我先确认会议室准备好了，请您稍等。']],
+9014:[['识别需求','顾客：我想找一件正式但不老气的衣服。','listen','保持服务距离','先询问使用场合、预算和偏好。','明白。主要用于上班还是正式活动？颜色和预算有偏好吗？'],['处理异议','顾客：这件价格有点高。','nod','接纳异议','先确认顾虑，再解释价值或提供替代。','理解您的预算考虑。我可以说明面料差异，也可以给您看同风格的其他价位。'],['欢送顾客','顾客：我再考虑一下。','wave','不施压欢送','尊重暂不购买，提供必要信息后欢送。','当然可以，我把款号写给您。谢谢到店，慢走。']],
+9015:[['确认称呼','客户：你可以叫我 Alex。','nod','尊重称呼','按对方提供的称呼使用，不擅自改变。','好的，Alex，也请叫我 Chen。'],['避免隐私越界','客户：我们先聊项目背景吧。','listen','聚焦议题','围绕业务、行业和公开兴趣，不询问婚姻收入。','好的。我先用两分钟介绍背景，再听听您最关注的风险。'],['确认行动项','客户：今天先讨论到这里。','wave','复述确认','明确责任人、交付物和时间。','感谢。我们确认三项行动：我方周五发方案，您方下周反馈，之后再约会议。']]
+});
+
 function getEtiquetteCurriculum(level){const g=(level.options||[]).find(function(o){return o.quality==='good';});const first={title:'先看现场，完成第一步',npc:level.opening,action:'turn',actionName:'转身微笑',guide:'身体朝向对方，目光自然停留，表情放松。',method:(g&&g.why)||level.refReason,reference:(g&&g.text)||level.coachAnswer};return [first].concat((ETIQUETTE_TURN_CONTENT[level.id]||[]).map(function(x){return{title:x[0],npc:x[1],action:x[2],actionName:x[3],guide:x[4],method:x[4],reference:x[5]};}));}
 
 function getEtiquetteTeachingSteps(level){return getEtiquetteCurriculum(level);}
@@ -18097,16 +18134,37 @@ function useAvatarDetail() {
       html += '</div>';
     }
 
-    // 原始资料出处（资料库课程可溯源）—— v2.5：高级会员专属福利（§18.4）
-    if (card.source) {
-      var srcLocked = (typeof EM_canAccessSource === 'function') ? !EM_canAccessSource() : false;
+    // 场景对话流程：直接渲染卡片自带的 content（完整话术）+ principle + tips
+        var cardContent = card.content || '';
+    var srcPath = (card.source || '').replace(/\\/g, '/');
+    var isMdSource = /\.md$/i.test(srcPath);
+    var ftContainerId = 'kd-fulltext-' + (card.id || 'card');
+
+    if (cardContent && cardContent !== card.source) {
       html += '<div class="knowledge-formula">';
-      html += '  <div class="formula-label">📎 原始资料</div>';
-      if (srcLocked) {
-        html += '  <div style="font-size:11px;color:#6b6488;line-height:1.7;background:#faf9ff;padding:10px 12px;border-radius:8px;margin-top:6px;text-align:center;">👑 原始资料为高级会员专属福利<br><button onclick="goToMember()" style="margin-top:6px;padding:6px 14px;border:none;border-radius:8px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:12px;font-weight:700;cursor:pointer;">开通高级会员查看</button></div>';
-      } else {
-        html += '  <div style="font-size:11px;color:#6b6488;line-height:1.6;word-break:break-all;background:#faf9ff;padding:8px 10px;border-radius:8px;margin-top:6px;">' + escapeHTML(card.source) + '</div>';
+      html += '  <div class="formula-label">📖 参考话术原文（摘要）</div>';
+      html += '  <div style="font-size:13px;color:#3a3754;line-height:1.8;background:#fff;padding:12px 14px;border-radius:10px;margin-top:8px;border-left:3px solid #6655ee;white-space:pre-wrap;">' + escapeHTML(cardContent.trim()) + '</div>';
+      if (isMdSource) {
+        html += '  <div id="' + ftContainerId + '"></div>';
+        html += '  <button class="kt-fulltext-btn" onclick="KL_loadFullText(\'' + escapeHTML(srcPath) + '\', \'' + ftContainerId + '\', this)" style="width:100%;padding:10px;border:1px dashed #c4bfff;background:#f5f3ff;border-radius:10px;color:#6655ee;font-size:12px;font-weight:600;cursor:pointer;margin-top:10px;">📖 查看完整全文（约 ' + (card.chars ? Math.round(card.chars/10000) + '万字' : '原始全文') + '）</button>';
       }
+      html += '</div>';
+    } else if (isMdSource) {
+      html += '<div class="knowledge-formula">';
+      html += '  <div class="formula-label">📖 原始资料全文</div>';
+      html += '  <div id="' + ftContainerId + '"></div>';
+      html += '  <button class="kt-fulltext-btn" onclick="KL_loadFullText(\'' + escapeHTML(srcPath) + '\', \'' + ftContainerId + '\', this)" style="width:100%;padding:10px;border:1px dashed #c4bfff;background:#f5f3ff;border-radius:10px;color:#6655ee;font-size:12px;font-weight:600;cursor:pointer;margin-top:8px;">📖 查看完整全文（约 ' + (card.chars ? Math.round(card.chars/10000) + '万字' : '原始全文') + '）</button>';
+      html += '</div>';
+    }
+// 完整场景对话（scenes JSON 里的多轮 scripts）—— 异步 fetch 后渲染
+    if (card.source && /scenes[\\\/].+\.json$/i.test(card.source)) {
+      var srcPath = card.source.replace(/\\/g, '/');
+      var srcCacheKey = srcPath;
+      html += '<div class="knowledge-formula">';
+      html += '  <div class="formula-label">🎭 完整「' + escapeHTML(card.scene || '') + '」场景对话（' + (card.round || '—') + ' 轮）</div>';
+      html += '  <div id="kd-scene-' + escapeHTML(card.id || card.scene || 'unknown') + '" style="margin-top:8px;">';
+      html += '    <button onclick="KL_loadSceneDialog(\'' + escapeHTML(srcPath) + '\', \'' + escapeHTML(card.id || card.scene || '') + '\', this)" style="width:100%;padding:10px;border:1px dashed #c4bfff;background:#f5f3ff;border-radius:10px;color:#6655ee;font-size:12px;font-weight:600;cursor:pointer;">▼ 点击展开完整 ' + escapeHTML(card.scene || '') + ' 场景对话（共 6 轮）</button>';
+      html += '  </div>';
       html += '</div>';
     }
 
@@ -18329,6 +18387,163 @@ function useAvatarDetail() {
     if (arrow) arrow.textContent = open ? '展开 ▾' : '收起 ▴';
   }
 
+  // 缓存 fetch 过的 scenes JSON 内容
+  window.__kdSceneCache = window.__kdSceneCache || {};
+  window.__kdFullTextCache = window.__kdFullTextCache || {};
+
+  function KL_loadFullText(srcPath, containerId, btn) {
+    var container = document.getElementById(containerId);
+    if (!container) return;
+
+    // 已展开就折叠
+    if (container.dataset.expanded === 'true') {
+      container.innerHTML = '';
+      container.dataset.expanded = 'false';
+      btn.textContent = '📖 查看完整全文（' + (window.__kdFullTextCache[srcPath] ? '已缓存' : '按需加载') + '）';
+      return;
+    }
+
+    if (window.__kdFullTextCache[srcPath]) {
+      KL_renderFullText(window.__kdFullTextCache[srcPath], container, btn);
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '⏳ 加载全文中...';
+    container.innerHTML = '<div style="font-size:12px;color:#9ca3af;text-align:center;padding:20px;">📥 正在从服务器拉取完整文本...</div>';
+
+    fetch(srcPath)
+      .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.text();
+      })
+      .then(function (text) {
+        window.__kdFullTextCache[srcPath] = text;
+        KL_renderFullText(text, container, btn);
+      })
+      .catch(function (err) {
+        container.innerHTML = '<div style="font-size:12px;color:#ef4444;background:#fff5f5;padding:12px;border-radius:8px;">⚠ 全文加载失败：' + err.message + '<br>本地请用 HTTP server 预览（file:// 协议无法 fetch）。</div>';
+        btn.disabled = false;
+        btn.textContent = '📖 查看完整全文';
+      });
+  }
+
+  function KL_renderFullText(text, container, btn) {
+    // 跳过 YAML header
+    var body = text;
+    var hdrIdx = body.indexOf('---');
+    if (hdrIdx > 0) body = body.substring(hdrIdx + 3);
+    body = body.trim();
+
+    // 清理重复水印行
+    var wmPats = [/更多.{0,10}电子书.{0,5}微信.{0,10}/, /朋友圈.{0,10}电子版.{0,10}微信/, /kc58567|sm99878|tushu959/, /课程网址.{0,20}https?:/];
+    var lines = body.split('\n');
+    var cleaned = [];
+    var skip = 0;
+    var curRun = 0, maxRun = 0, maxEnd = -1;
+    for (var j = 0; j < lines.length; j++) {
+      var st = lines[j].trim();
+      if (!st) continue;
+      var isWm = false;
+      for (var p = 0; p < wmPats.length; p++) { if (wmPats[p].test(st)) { isWm = true; break; } }
+      if (isWm) { curRun++; if (curRun > maxRun) { maxRun = curRun; maxEnd = j; } } else { curRun = 0; }
+    skip = (maxRun > 3) ? maxEnd + 1 : 0;
+    for (var j = skip; j < lines.length; j++) cleaned.push(lines[j]);
+    body = cleaned.join('\n').trim();
+
+    var totalChars = text.length;
+    var readTime = Math.max(1, Math.round(totalChars / 500)); // 按 500 字/分钟
+
+    container.innerHTML =
+      '<div style="background:#fafbff;border:1px solid #e5e7ff;border-radius:12px;padding:16px;margin-top:12px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
+      '<span style="font-size:12px;color:#888;">📄 完整原文 · 约 ' + totalChars.toLocaleString() + ' 字 · 阅读 ' + readTime + ' 分钟</span>' +
+      '<button onclick="document.getElementById(\'' + container.id + '\').dataset.expanded=\'false\';document.getElementById(\'' + container.id + '\').innerHTML=\'\';this.closest(\'.knowledge-formula\').querySelector(\'.kt-fulltext-btn\').textContent=\'📖 查看完整全文\';" style="font-size:11px;color:#888;background:none;border:none;cursor:pointer;">收起</button>' +
+      '</div>' +
+      '<div style="font-size:13px;color:#2d2a4a;line-height:1.9;white-space:pre-wrap;max-height:600px;overflow-y:auto;padding-right:8px;">' + escapeHTML(body) + '</div>' +
+      '</div>';
+
+    container.dataset.expanded = 'true';
+    btn.disabled = false;
+    btn.textContent = '📖 收起全文';
+  }
+
+  function KL_loadSceneDialog(scenePath, cardId, btn) {
+    var container = document.getElementById('kd-scene-' + (cardId || 'unknown'));
+    if (!container) return;
+
+    // 如果缓存有，直接渲染
+    if (window.__kdSceneCache[scenePath]) {
+      KL_renderSceneDialog(window.__kdSceneCache[scenePath], container, btn);
+      return;
+    }
+
+    // 显示 loading
+    btn.disabled = true;
+    btn.textContent = '⏳ 加载中...';
+
+    fetch(scenePath)
+      .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function (data) {
+        window.__kdSceneCache[scenePath] = data;
+        KL_renderSceneDialog(data, container, btn);
+      })
+      .catch(function (err) {
+        container.innerHTML = '<div style="font-size:12px;color:#9ca3af;background:#f9f9f9;padding:10px;border-radius:8px;">⚠ 场景对话加载失败：' + err.message + '<br>请确认 GitHub Pages 已部署最新版本。</div>';
+        btn.disabled = false;
+        btn.textContent = '▼ 重试';
+      });
+  }
+
+  function KL_renderSceneDialog(data, container, btn) {
+    var scripts = data && data.scripts || [];
+    var sceneName = data && data.scene_name || '';
+
+    // 如果已经渲染过，收起/展开
+    var existing = container.querySelector('.kd-scene-dialog');
+    if (existing) {
+      var isHidden = existing.style.display === 'none';
+      existing.style.display = isHidden ? 'block' : 'none';
+      btn.textContent = isHidden ? '▲ 收起场景对话' : '▼ 展开完整对话（' + scripts.length + ' 轮）';
+      return;
+    }
+
+    // 渲染完整场景对话
+    var html = '<div class="kd-scene-dialog" style="margin-top:10px;">';
+    html += '<div style="font-size:12px;font-weight:700;color:#3a3258;margin-bottom:8px;border-bottom:1px dashed #e5e0ff;padding-bottom:6px;">🎬 「' + escapeHTML(sceneName) + '」完整对话流程（' + scripts.length + ' 轮）</div>';
+
+    scripts.forEach(function (s, i) {
+      var tags = (s.tags || []).map(function (t) {
+        return '<span style="display:inline-block;font-size:10px;background:#ede9fe;color:#6b46c1;padding:1px 7px;border-radius:99px;margin-right:4px;">' + escapeHTML(t) + '</span>';
+      }).join('');
+
+      html += '<div style="background:' + (i % 2 === 0 ? '#fff' : '#fbfaff') + ';border:1px solid #ecebff;border-radius:10px;padding:10px 12px;margin-bottom:8px;">';
+      html += '  <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
+      html += '    <span style="flex-shrink:0;width:22px;height:22px;background:linear-gradient(135deg,#6655ee,#9671ff);color:#fff;border-radius:50%;font-size:11px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;">' + (i + 1) + '</span>';
+      html += '    <span style="font-size:13px;font-weight:600;color:#3a3258;">' + escapeHTML(s.purpose || '') + '</span>';
+      html += '    <span style="font-size:10px;color:#a39ec0;margin-left:auto;">第 ' + s.round + ' 轮</span>';
+      html += '  </div>';
+      html += '  <div style="font-size:13px;color:#3a3754;line-height:1.8;background:#faf9ff;padding:8px 12px;border-radius:8px;border-left:3px solid #6655ee;white-space:pre-wrap;margin-bottom:6px;">' + escapeHTML(s.text || '') + '</div>';
+      html += '  <div style="font-size:11px;color:#8b86a6;display:flex;flex-wrap:wrap;gap:6px;align-items:center;">';
+      html += '    <span>情绪: ' + (s.user_emotion || []).join('/') + '</span>';
+      html += '    <span>·</span>';
+      html += '    <span>教练风格: ' + (s.coach_style || []).join('/') + '</span>';
+      html += '    <span>·</span>';
+      html += '    <span>层级: ' + (s.level || '') + '</span>';
+      html += '    <div style="margin-left:auto;">' + tags + '</div>';
+      html += '  </div>';
+      html += '</div>';
+    });
+
+    html += '</div>';
+
+    container.insertAdjacentHTML('beforeend', html);
+    btn.textContent = '▲ 收起场景对话';
+  }
+
   // 兼容旧调用名
   function KL_goSceneStep(direction) { KL_goStep(direction); }
   function KL_goSceneStepByAttr(el) { KL_goStepByAttr(el); }
@@ -18344,6 +18559,7 @@ function useAvatarDetail() {
   global.KL_toggleOutlineByAttr = KL_toggleOutlineByAttr;
   global.KL_openDetail = KL_openDetail;
   global.KL_openDetailByAttr = KL_openDetailByAttr;
+  global.KL_loadSceneDialog = KL_loadSceneDialog;
   global.KL_goStep = KL_goStep;
   global.KL_goStepTo = KL_goStepTo;
   global.KL_goStepByAttr = KL_goStepByAttr;
@@ -18556,4 +18772,9 @@ function useAvatarDetail() {
 <script src="libs/v3_protocol_ui.js"></script>
 
 <style id="etiquette-branching-classroom">.etiquette-action-lesson{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:12px;border:1px solid #fed7aa;border-radius:14px;background:#fff7ed}.etiquette-action-lesson p{margin:4px 0;font-size:12px}.etiquette-action-lesson button{border:0;border-radius:9px;padding:8px;background:white;color:#9a3412;font-weight:700}.etiquette-action-lesson .practice{background:#f97316;color:white}.photo-char.animating-listen{animation:etListen 1.3s}@keyframes etListen{50%{transform:translateY(-2%) scale(1.03)}}.etiquette-npc-reason{padding-top:6px;border-top:1px dashed #c4b5fd}</style>
+<style id="knowledge-detail-readable-fix">
+#modal-knowledge-detail .kd-scroll{overflow-x:hidden!important}
+#modal-knowledge-detail .kd-scroll *{max-width:100%;box-sizing:border-box}
+#modal-knowledge-detail .rawtxt,#modal-knowledge-detail pre,#modal-knowledge-detail .formula-card{white-space:pre-wrap!important;overflow-wrap:anywhere;word-break:break-word}
+</style>
 </body></html>

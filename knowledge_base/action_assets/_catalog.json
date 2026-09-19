@@ -1,0 +1,103 @@
+{
+  "version": "5.0.0",
+  "created": "2026-09-19",
+  "levels": {
+    "A": "单张静态图（SVG）",
+    "B": "3-6 张连续步骤图（SVG）",
+    "C": "短视频 / GIF（< 3s）",
+    "D": "摄像头姿态识别（远期）"
+  },
+  "style_guide": {
+    "character": "统一扁平插画风格，火柴人/简洁人物，肤色服装一致",
+    "canvas": "16:9 横版，375x211px",
+    "background": "纯色或极简线条，无干扰",
+    "annotations": "箭头标注动作方向（如 ↓ 身体前倾 15°）"
+  },
+  "assets": [
+    {
+      "action_id": "ACT-SMILE",
+      "name": "微笑",
+      "level": "A",
+      "steps": 1,
+      "file": "single/smile.svg"
+    },
+    {
+      "action_id": "ACT-GREET",
+      "name": "问候挥手",
+      "level": "A",
+      "steps": 1,
+      "file": "single/greet.svg"
+    },
+    {
+      "action_id": "ACT-HANDSHAKE-READY",
+      "name": "握手准备",
+      "level": "A",
+      "steps": 1,
+      "file": "single/handshake_ready.svg"
+    },
+    {
+      "action_id": "ACT-HANDSHAKE-MID",
+      "name": "握手中",
+      "level": "A",
+      "steps": 1,
+      "file": "single/handshake_mid.svg"
+    },
+    {
+      "action_id": "ACT-BOW",
+      "name": "鞠躬",
+      "level": "A",
+      "steps": 1,
+      "file": "single/bow.svg"
+    },
+    {
+      "action_id": "BOW-3STEP",
+      "name": "鞠躬序列",
+      "level": "B",
+      "steps": 3,
+      "file": "sequences/bow_3step.svg"
+    },
+    {
+      "action_id": "HANDSHAKE-7STEP",
+      "name": "握手序列",
+      "level": "B",
+      "steps": 7,
+      "file": "sequences/handshake_7step.svg"
+    },
+    {
+      "action_id": "ENTER-4STEP",
+      "name": "进房间序列",
+      "level": "B",
+      "steps": 4,
+      "file": "sequences/enter_room_4step.svg"
+    },
+    {
+      "action_id": "GREET-READY-3STEP",
+      "name": "面向对方序列",
+      "level": "B",
+      "steps": 3,
+      "file": "sequences/greet_ready_3step.svg"
+    },
+    {
+      "action_id": "LISTEN-3STEP",
+      "name": "倾听回应序列",
+      "level": "B",
+      "steps": 3,
+      "file": "sequences/listen_3step.svg"
+    },
+    {
+      "action_id": "SIT-4STEP",
+      "name": "入座序列",
+      "level": "B",
+      "steps": 4,
+      "file": "sequences/sit_4step.svg"
+    },
+    {
+      "action_id": "LEAVE-5STEP",
+      "name": "告别序列",
+      "level": "B",
+      "steps": 5,
+      "file": "sequences/leave_5step.svg"
+    }
+  ],
+  "placeholder_note": "V5 Sprint 3 之前，上述 SVG 文件为占位符。实际素材将在 Sprint 3 中绘制生成。V5 P0 运行时可以正常渲染占位符（纯色方框+文字标签）。"
+}

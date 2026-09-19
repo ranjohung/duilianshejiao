@@ -7,7 +7,6 @@
       "name": "duilian_social",
       "version": "1.0.0+1",
       "dependencies": [
-        "agora_rtc_engine",
         "cached_network_image",
         "cupertino_icons",
         "dio",
@@ -35,7 +34,7 @@
     },
     {
       "name": "json_serializable",
-      "version": "6.14.0",
+      "version": "6.14.1",
       "dependencies": [
         "analyzer",
         "async",
@@ -137,21 +136,6 @@
       ]
     },
     {
-      "name": "agora_rtc_engine",
-      "version": "6.5.4",
-      "dependencies": [
-        "async",
-        "ffi",
-        "flutter",
-        "flutter_web_plugins",
-        "iris_method_channel",
-        "js",
-        "json_annotation",
-        "meta",
-        "web"
-      ]
-    },
-    {
       "name": "intl",
       "version": "0.19.0",
       "dependencies": [
@@ -191,7 +175,7 @@
     },
     {
       "name": "dio",
-      "version": "5.10.0",
+      "version": "5.11.0",
       "dependencies": [
         "async",
         "collection",
@@ -221,7 +205,7 @@
     },
     {
       "name": "source_helper",
-      "version": "1.3.12",
+      "version": "1.3.13",
       "dependencies": [
         "analyzer",
         "source_gen"
@@ -229,7 +213,7 @@
     },
     {
       "name": "source_gen",
-      "version": "4.2.3",
+      "version": "4.2.4",
       "dependencies": [
         "analyzer",
         "async",
@@ -244,7 +228,7 @@
     },
     {
       "name": "pubspec_parse",
-      "version": "1.5.0",
+      "version": "1.6.0",
       "dependencies": [
         "checked_yaml",
         "collection",
@@ -255,7 +239,7 @@
     },
     {
       "name": "pub_semver",
-      "version": "2.2.0",
+      "version": "2.2.1",
       "dependencies": [
         "collection"
       ]
@@ -286,7 +270,7 @@
     },
     {
       "name": "build_config",
-      "version": "1.3.1",
+      "version": "1.3.3",
       "dependencies": [
         "checked_yaml",
         "json_annotation",
@@ -334,7 +318,7 @@
     },
     {
       "name": "yaml",
-      "version": "3.1.3",
+      "version": "3.1.4",
       "dependencies": [
         "collection",
         "source_span",
@@ -362,7 +346,7 @@
     },
     {
       "name": "stream_transform",
-      "version": "2.1.1",
+      "version": "2.1.2",
       "dependencies": []
     },
     {
@@ -388,7 +372,7 @@
     },
     {
       "name": "pool",
-      "version": "1.5.2",
+      "version": "1.5.3",
       "dependencies": [
         "async",
         "stack_trace"
@@ -403,7 +387,7 @@
     },
     {
       "name": "mime",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "dependencies": []
     },
     {
@@ -413,7 +397,7 @@
     },
     {
       "name": "io",
-      "version": "1.0.5",
+      "version": "1.1.0",
       "dependencies": [
         "meta",
         "path",
@@ -436,7 +420,7 @@
     },
     {
       "name": "glob",
-      "version": "2.1.3",
+      "version": "2.2.0",
       "dependencies": [
         "async",
         "collection",
@@ -466,7 +450,7 @@
     },
     {
       "name": "built_value",
-      "version": "8.12.6",
+      "version": "8.13.0",
       "dependencies": [
         "built_collection",
         "collection",
@@ -481,20 +465,23 @@
     },
     {
       "name": "build_daemon",
-      "version": "4.1.2",
+      "version": "4.1.6",
       "dependencies": [
         "built_collection",
         "built_value",
         "crypto",
         "http_multi_server",
         "logging",
+        "package_config",
         "path",
         "pool",
+        "pub_semver",
         "shelf",
         "shelf_web_socket",
         "stream_transform",
         "watcher",
-        "web_socket_channel"
+        "web_socket_channel",
+        "yaml"
       ]
     },
     {
@@ -588,7 +575,7 @@
     },
     {
       "name": "flutter_cache_manager",
-      "version": "3.4.1",
+      "version": "3.4.2",
       "dependencies": [
         "clock",
         "collection",
@@ -618,41 +605,6 @@
       "dependencies": [
         "flutter",
         "flutter_cache_manager"
-      ]
-    },
-    {
-      "name": "web",
-      "version": "1.1.1",
-      "dependencies": []
-    },
-    {
-      "name": "js",
-      "version": "0.6.7",
-      "dependencies": [
-        "meta"
-      ]
-    },
-    {
-      "name": "iris_method_channel",
-      "version": "2.2.5",
-      "dependencies": [
-        "async",
-        "ffi",
-        "flutter",
-        "flutter_web_plugins",
-        "js"
-      ]
-    },
-    {
-      "name": "ffi",
-      "version": "2.2.0",
-      "dependencies": []
-    },
-    {
-      "name": "flutter_web_plugins",
-      "version": "0.0.0",
-      "dependencies": [
-        "flutter"
       ]
     },
     {
@@ -699,15 +651,16 @@
     },
     {
       "name": "shared_preferences_foundation",
-      "version": "2.5.6",
+      "version": "2.5.7",
       "dependencies": [
         "flutter",
+        "meta",
         "shared_preferences_platform_interface"
       ]
     },
     {
       "name": "shared_preferences_android",
-      "version": "2.4.27",
+      "version": "2.4.28",
       "dependencies": [
         "flutter",
         "meta",
@@ -723,7 +676,7 @@
     },
     {
       "name": "dio_web_adapter",
-      "version": "2.2.0",
+      "version": "2.2.1",
       "dependencies": [
         "dio",
         "http_parser",
@@ -797,6 +750,11 @@
       "dependencies": [
         "web"
       ]
+    },
+    {
+      "name": "web",
+      "version": "1.1.1",
+      "dependencies": []
     },
     {
       "name": "file",
@@ -918,6 +876,13 @@
       ]
     },
     {
+      "name": "flutter_web_plugins",
+      "version": "0.0.0",
+      "dependencies": [
+        "flutter"
+      ]
+    },
+    {
       "name": "plugin_platform_interface",
       "version": "2.1.8",
       "dependencies": [
@@ -937,7 +902,7 @@
     },
     {
       "name": "vm_service",
-      "version": "15.2.0",
+      "version": "15.3.0",
       "dependencies": []
     },
     {
@@ -1002,6 +967,11 @@
       ]
     },
     {
+      "name": "ffi",
+      "version": "2.2.0",
+      "dependencies": []
+    },
+    {
       "name": "platform",
       "version": "3.1.6",
       "dependencies": []
@@ -1016,12 +986,12 @@
     },
     {
       "name": "synchronized",
-      "version": "3.4.1",
+      "version": "3.4.1+2",
       "dependencies": []
     },
     {
       "name": "objective_c",
-      "version": "9.4.1",
+      "version": "9.5.0",
       "dependencies": [
         "code_assets",
         "collection",
@@ -1034,7 +1004,7 @@
     },
     {
       "name": "jni_flutter",
-      "version": "1.0.1",
+      "version": "1.0.3",
       "dependencies": [
         "flutter",
         "jni"
@@ -1042,11 +1012,12 @@
     },
     {
       "name": "jni",
-      "version": "1.0.0",
+      "version": "1.0.3",
       "dependencies": [
         "args",
         "collection",
         "ffi",
+        "jni_util",
         "meta",
         "package_config",
         "path",
@@ -1072,6 +1043,13 @@
       "dependencies": [
         "collection",
         "hooks"
+      ]
+    },
+    {
+      "name": "jni_util",
+      "version": "1.0.0",
+      "dependencies": [
+        "path"
       ]
     },
     {

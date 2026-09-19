@@ -1,8 +1,10 @@
 # 「对练社交」开发计划
 
-**版本：v2.6.0｜校准日期：2026-09-16**
+**版本：v3.0.0｜校准日期：2026-09-18**
 
 **产品基准：`docs/prd.md`｜当前可运行原型：`index.html`**
+
+> **v3.0.0 核心变更：** 社交礼仪训练和真实挑战功能区需按 PRD §0 十步教学引擎重构。关键变化：AI 角色从"半教练半老师"收敛为纯互动教练（只返回文本 + behavior_sequence）；评价从二元对错升级为四级分级；3D 朝向统一修 quaternion.slerp 代码；v4_teaching_closed_loop.js **重启重构**（development-plan-v3.md 2026-09-17 的"已停止加载"标记废止）。详见 PRD §0。
 
 > 本计划区分“原型已实现”和“生产已完成”。HTML 中可点击、可用本地数据演示，不等于后端、支付、推送、内容审核或多端同步已经达到上线标准。
 
@@ -37,7 +39,7 @@
 | 后端 API | 🔍 待核验 | Node/Express 路由、控制器、模型代码已存在 | 数据库迁移、接口测试、鉴权、部署和前后端联调证据不足 |
 | Flutter 客户端 | 🟡 原型可用 | 登录、首页首次项目选择/锁定、教练、训练场景、三轮演示训练、结果、成长和个人中心均可在 DEMO_MODE 下运行；Widget 测试、Debug APK 和 Android 模拟器流程已验证 | 真机权限/弱网/后台恢复、真实 API/支付联调、签名发布包待核验 |
 | 语音训练 | ⏳ 待开发 | 仅保留“即将上线”入口；历史演示代码不视为交付 | ASR、TTS、RTC、权限、录音隐私、弱网处理与测试 |
-| 社交礼仪训练 | 🟡 原型可用 | 九个课程卡直接入口；真人影视课堂；三步逐级教学；提示方法后支持文字/浏览器语音跟练；提交后输出原因、改法与参考表达 | 语音服务端兼容、摄像头动作识别、课程内容人工审核、服务端进度与生产数据闭环 |
+| 社交礼仪训练 | 🚧 待重构（按 v3.0.0 十步教学引擎） | 九个课程卡直接入口；真人影视课堂；三步逐级教学；提示方法后支持文字/浏览器语音跟练；提交后输出原因、改法与参考表达 | **需按 PRD §0 重构：** 十步闭环（学→看→拆→跟→练→评→变→再练→现实→复盘）、AI 只返回 text+behavior_sequence、AnimationMixer 队列调度、四级分级评价 + 3D 改进示范重播、Scenario&Node 数据结构、3D 朝向 quaternion.slerp 修正、边说边做并发 |
 | 消息推送/定时任务 | 🚧 开发中 | 文档与部分服务端结构 | 推送通道、授权、退订、频控、失败重试及线上验证 |
 | 合规与内容安全 | 🚧 开发中 | 协议页、基础敏感内容提示、未成年人规则文档 | 法务审核、实名供应商、数据删除证明、风控审计和应急流程 |
 
@@ -436,3 +438,70 @@
 - 九门课程各有四个连续教学节点，角色会根据回答继续回应。
 - 每轮含真人角色动作示范、用户跟做、参考对话、文字或语音输入、原因分析与下一步接法。
 - 真实挑战保持输入前无提示，仅在提交后评价。
+
+---
+
+## 附录 A：v3.0.0 P0 冒烟测试清单（十步教学引擎）
+
+> 以下测试需在 **v3.0.0 重构后逐一自测并回报结果**。任何一项未通过则 v3.0.0 视为未完成。
+
+| # | 测试项 | 验证方法 | 预期结果 |
+|---|---|---|---|
+| 1 | 十步闭环顺序 | 进入"第一次拜访客户"课程，观察流程 | 严格按 学→看→拆→跟→练→评→变→再练→现实→复盘 顺序运行；不跳步、不合并 |
+| 2 | 边说边做并发 | 跟练模式下，说话同时点击动作图标 | 动作立即触发并打时间戳，语音/文字输入不中断；两者数据分别存入时间线 |
+| 3 | 四级分级评价 | AI 评价用户回答 | 输出 ✅/🟡/🟠/🔴 四等级之一；附原因解释文本；评价后自动播放一次 3D 改进示范 |
+| 4 | BehaviorSequence 动画调度 | AI 返回含 behavior_sequence 的指令 | AnimationMixer 按 time 字段严格调度 3D 动画；无 setTimeout 硬编码；动作与礼仪规则库匹配 |
+| 5 | 课程-挑战强绑定 | 完成"拜访客户"课程后 | 自动解锁"今天和同事/客户打招呼时主动问候"挑战；无法跳到不相关挑战 |
+| 6 | 3D 角色朝向 | 观察两个 3D 角色的头部/身体方向 | 彼此面向对方（非摄像机）；转身平滑（quaternion.slerp 插值可见）；无 lookAt(camera.position) 残留 |
+| 7 | tel:12356 移动端拨号 | 手机浏览器点击 tel:12356 链接 | 呼出系统拨号界面；免责声明页、关于我们页、移动端悬浮入口三处均出现 |
+| 8 | 勇气证据库数据流通 | 完成一次挑战后查看勇气证据页 | 只从 duilian_challenge_log 聚合 fear_predicted=true && outcome_negative=false 的记录；无副本存储 |
+| 9 | AI 边界红线 | 检查 AI 返回数据结构 | AI 只返回 text + behavior_sequence 数组；绝不返回 animation_type 或自行选择的动作名 |
+| 10 | v4_teaching_closed_loop.js 重启 | 查看运行时加载状态 | 模块被加载（非 stopped）；内部导出十步教学引擎初始化函数 |
+
+---
+
+## 附录 B：十步教学引擎技术实现 checklist
+
+### 后端/AI 侧（text generation + behavior_sequence 输出规范）
+
+- [ ] AI 系统提示词注入：明确返回格式为 `{"text": "...", "behavior_sequence": [{"time":"0.0s","action":"turn_to_person"}, ...]}`
+- [ ] AI 系统提示词红线：严禁返回 animation_type / facial_expression_emoji 等动作选择字段；所有动作必须来自 `PRD §0.2 action_library`
+- [ ] AI 系统提示词知识边界：回复时只能引用当前 Lesson/EtiquetteRule 的内容；不得扩展或修改
+- [ ] 十步教学各节点 AI 角色：每步 role 固定为 coach，不允许切换到 expert/examiner
+
+### 前端运行时（AnimationMixer 队列管理）
+
+- [ ] **第一步：诊断现有 GLB**——在 Three.js 加载 GLB 后立即跑 `mixer.root.animations` 扫描 console.log 输出所有 clip 名称，确认实际有哪些动画可用（不是脑补的 TurnLeft/Smile）
+- [ ] **扫描后建立 KNOWN_ANIMATION_CLIPS 数组**——运行时自动填充 `window.KNOWN_ANIMATION_CLIPS = mixer.root.animations.map(a => a.name)`
+- [ ] 检查当前 animationLoop 中是否有 `lookAt(camera.position)` 残留 → 全部替换为 `quaternion.slerp(targetQuat, 0.1)`
+- [ ] 建立 BehaviorQueue 管理器：每次收到 behavior_sequence → 扫描 time 字段 → 用 requestAnimationFrame 或独立定时器按秒数调度
+- [ ] 删除所有 `setTimeout` 硬编码的动画触发；统一走 BehaviorQueue
+- [ ] **建立 ACTION_LIBRARY 两层映射（关键修复，见 PRD §0.3.1）**：
+  - 第一层：教学动作 ID → GLB clip 名（如 `turn_to_person → "TurnLeft"`）
+  - 第二层：复合动作 → 序列（如 `turn_smile → [TurnLeft 0.8s, Smile 1.2s+停留, Idle 0.5s]`）
+  - ⚠️ 映射表中每个 clip 必须在 `KNOWN_ANIMATION_CLIPS` 中真实存在，不存在的动作必须标记为"缺失"而不是伪造
+- [ ] **实现 playSingleClip 函数**——每次调用前先 `mixer.root.animations.find(a => a.name === clipName)` 检查 clip 存在性，找不到则输出 `[DemoAction ERROR] Animation clip not found: xxx` 并停止 loading
+- [ ] **实现 playActionSequence 函数**——复合动作串联播放器，每段 fadeIn 动作 fadeOut 后播下一段
+- [ ] **开发模式诊断日志**——`DUILIAN_DEBUG = true` 时每次播放动作输出 `[DemoAction]` console.groupCollapsed，包含 requestedAction / resolvedClip / allAvailableClips / duration / animationFound
+- [ ] **删除"找不到 clip 就转圈/无限 loading"的逻辑**——错误时必须立即停止 loading 并显示友好错误提示
+- [ ] 预定义 action_library：`{ turn_to_person, smile, nod, extend_hand, handshake, bow, wave, speak_start, speak_end, stand_neutral, walk_toward, seated }` 全部映射到现有 GLB 预设动画 clip 名
+- [ ] 动作快捷面板 10 个图标：[微笑] [点头] [伸手] [握手] [鞠躬] [挥手] [坐下] [起身] [转向] [站立]
+
+### LocalStorage 结构升级
+
+- [ ] 新增 `duilian_lesson_library` 键；课程、规则、场景从该键读取（替代 duilian_profile.lessons 内嵌结构）
+- [ ] `duilian_training_log` 记录升级：每条包含 `{ steps: [{text, behavior_sequence, eval_level}], total_ms }`
+- [ ] `duilian_challenge_log` 保持不变，但勇气证据库页面改为只读此键聚合
+
+### 真实挑战 + 勇气证据库
+
+- [ ] 3 秒记录卡：勾选选项自动打 `fear_predicted`（如"紧张"）和 `outcome_negative`（如"没注意"）标签
+- [ ] 勇气证据库统计规则：只统计 `fear_predicted=true && outcome_negative=false`（预想坏事未发生）的次数
+- [ ] 防挫败机制：每个挑战带【换个更简单的】降级按钮；未完成文案固定为"今天没准备好也没关系，机会永远都在"
+- [ ] 断签惩罚移除：未完成不扣任何积分/奖励
+
+### 安全合规 P0
+
+- [ ] 免责声明页、关于我们页、移动端悬浮入口三处添加 `<a href="tel:12356">`
+- [ ] 冷启动引导：新用户首次进入直接推送"30 秒和 AI 说一句问候"卡片进入跟练模式
+- [ ] 协议确认状态写入 duilian_settings.agreed_at

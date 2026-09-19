@@ -1,0 +1,548 @@
+{
+  "scene_id": "ST-001",
+  "version": "5.0.0",
+  "created": "2026-09-19",
+  "title": "第一次拜访客户",
+  "category": "商务社交",
+  "scenario_goal": "让学员掌握第一次正式拜访客户的完整礼仪流程：从进门到告别，每一步都得体自然。",
+  "learning_objectives": [
+    "正确进入正式商务场合",
+    "掌握初次见面的问候礼仪",
+    "学会自然的握手时机与力度",
+    "学会等待入座的礼仪顺序",
+    "学会简短得体的开场白",
+    "学会在交谈中适时回应"
+  ],
+  "knowledge_source": [
+    "LESSON-023",
+    "LESSON-045"
+  ],
+  "related_rules": [
+    "R001",
+    "R002",
+    "R003",
+    "R004",
+    "R005",
+    "R006"
+  ],
+  "scenario_illustration": "cafe_meeting.svg",
+  "total_steps": 8,
+  "estimated_minutes": 12,
+  "difficulty": 2,
+  "entry_question": "想象你第一次去客户公司拜访，约好了下午3点在对方会议室见面。你会怎么做？",
+  "context_knowledge": [
+    "正式商务场合礼仪更严谨",
+    "客户主动迎接时应先示意问候",
+    "握手礼仪：等对方先伸手虎口对虎口",
+    "入座顺序：请客户/长辈先坐",
+    "开场白不宜过长简明扼要"
+  ],
+  "action_steps": [
+    {
+      "action_id": "ACT-001",
+      "title": "进入会议室 / 面向对方",
+      "step_order": 1,
+      "instruction": "身体自然站定，转向对方，保持开放姿态，不要双手抱胸或插口袋。表情放松，眼神自然看向对方。",
+      "why_this_way": "正式初次见面需要先建立基本的注意与尊重。侧身或背对会让对方感觉不被尊重。",
+      "checklist": [
+        "身体已完全转向对方",
+        "站姿自然没有抱胸或插口袋",
+        "眼神自然看向对方",
+        "表情放松不紧绷"
+      ],
+      "wrong_examples": [
+        "侧身站立只给半个身子",
+        "背对对方整理东西",
+        "双手抱胸",
+        "盯着地面或手机"
+      ],
+      "assets": {
+        "type": "sequence_images",
+        "images": [
+          "greet_ready_01.svg",
+          "greet_ready_02.svg",
+          "greet_ready_03.svg"
+        ],
+        "timeline_label": "① 原始站姿 → ② 转向对方 → ③ 面向对方+微笑"
+      },
+      "knowledge_check": {
+        "question": "第一次见客户时哪种站姿更合适？",
+        "options": [
+          "双手抱胸显自信",
+          "双手自然下垂",
+          "一只手插口袋",
+          "靠着桌子"
+        ],
+        "answer": 1,
+        "explanation": "商务场合需展现尊重开放，双手自然下垂或交叠身前是标准站姿。"
+      }
+    },
+    {
+      "action_id": "ACT-002",
+      "title": "点头 / 微微欠身致意",
+      "step_order": 2,
+      "instruction": "头部微微点一下，或上半身轻轻欠身约15度，同时说问候语。动作要同步。",
+      "why_this_way": "点头或微微欠身是非语言的'我注意到你了'信号，比单纯站着说话更有礼貌。",
+      "checklist": [
+        "头部有轻微点头",
+        "动作和说话同步",
+        "幅度适中"
+      ],
+      "wrong_examples": [
+        "完全不点头直接说话",
+        "大幅度鞠躬",
+        "点头太快太夸张"
+      ],
+      "assets": {
+        "type": "sequence_images",
+        "images": [
+          "bow_nod_01.svg",
+          "bow_nod_02.svg",
+          "bow_nod_03.svg"
+        ],
+        "timeline_label": "① 准备 → ② 微微欠身15度 → ③ 恢复"
+      }
+    },
+    {
+      "action_id": "ACT-003",
+      "title": "握手（等对方先伸手）",
+      "step_order": 3,
+      "timing": "对方主动伸手时同步进行",
+      "instruction": "看到对方伸手后，自然伸出右手。虎口对虎口，力度适中，持续2-3秒后自然松手。",
+      "why_this_way": "握手是商务社交的标志性动作。关键是等对方先伸手——谁先伸手代表谁主动或地位更高。",
+      "checklist": [
+        "等待对方先伸手",
+        "虎口对虎口",
+        "力度适中",
+        "2-3秒后自然松手",
+        "只用右手"
+      ],
+      "wrong_examples": [
+        "对方没伸手就自己抓过去",
+        "用力过大捏白",
+        "软如面条",
+        "握住不放",
+        "用左手握手"
+      ],
+      "assets": {
+        "type": "sequence_images",
+        "images": [
+          "handshake_01.svg",
+          "handshake_02.svg",
+          "handshake_03.svg",
+          "handshake_04.svg",
+          "handshake_05.svg",
+          "handshake_06.svg",
+          "handshake_07.svg"
+        ],
+        "timeline_label": "① 面向 → ② 目光交流 → ③ 对方伸手回应 → ④ 虎口对虎口 → ⑤ 简短握手 → ⑥ 自然松手 → ⑦ 站姿"
+      },
+      "knowledge_check": {
+        "question": "握手时谁应该先伸手？",
+        "options": [
+          "我先伸手显热情",
+          "等对方先伸手",
+          "同时伸手",
+          "地位低的先伸手"
+        ],
+        "answer": 1,
+        "explanation": "握手主动权在对方。等对方先伸手传达尊重对方的节奏。"
+      }
+    },
+    {
+      "action_id": "ACT-004",
+      "title": "等待入座",
+      "step_order": 4,
+      "timing": "对方示意你坐的时候",
+      "instruction": "等对方先坐下后，再轻轻拉开椅子，从椅子侧面入座。坐姿端正但不僵硬。",
+      "why_this_way": "入座顺序体现尊重。从侧面入座避免背对桌子。",
+      "checklist": [
+        "等对方先坐下",
+        "从椅子侧面入座",
+        "坐姿端正",
+        "身体微微前倾"
+      ],
+      "wrong_examples": [
+        "自己抢先坐下",
+        "从椅子正面倒着坐",
+        "瘫坐靠椅背",
+        "跷二郎腿晃脚"
+      ],
+      "assets": {
+        "type": "sequence_images",
+        "images": [
+          "sit_01.svg",
+          "sit_02.svg",
+          "sit_03.svg",
+          "sit_04.svg"
+        ],
+        "timeline_label": "① 站立等待 → ② 拉椅子 → ③ 侧面入座 → ④ 端正坐姿"
+      }
+    },
+    {
+      "action_id": "ACT-005",
+      "title": "自我介绍 + 开场白",
+      "step_order": 5,
+      "instruction": "入座后，用简明的方式介绍自己（姓名+公司+来意），语速平稳，声音清晰。",
+      "why_this_way": "开场白不宜过长。对方已知道你是谁，快速确认身份+自然过渡正题即可。",
+      "checklist": [
+        "说出自己的名字",
+        "提及公司/单位",
+        "简短说明来意",
+        "语速平稳"
+      ],
+      "wrong_examples": [
+        "长篇大论3分钟",
+        "只说你好不说名字",
+        "声音太小",
+        "紧张结巴"
+      ],
+      "assets": {
+        "type": "single_image",
+        "images": [
+          "speak_calm.svg"
+        ],
+        "timeline_label": "平稳开口"
+      }
+    },
+    {
+      "action_id": "ACT-006",
+      "title": "交谈中适时回应",
+      "step_order": 6,
+      "instruction": "对方说话时，用点头、嗯、是的等简短回应表示你在认真听。眼神有交流但不一直盯。",
+      "why_this_way": "适时回应是'我在听'的信号。沉默会让对方不确定你是否接收了信息。",
+      "checklist": [
+        "偶尔点头",
+        "有简短语言回应",
+        "眼神有交流",
+        "不打断对方"
+      ],
+      "wrong_examples": [
+        "全程面无表情",
+        "一直盯着不挪开",
+        "对方没说完就插嘴",
+        "东张西望"
+      ],
+      "assets": {
+        "type": "sequence_images",
+        "images": [
+          "listen_01.svg",
+          "listen_02.svg",
+          "listen_03.svg"
+        ],
+        "timeline_label": "① 对方说话 → ② 点头+嗯 → ③ 继续听"
+      }
+    },
+    {
+      "action_id": "ACT-007",
+      "title": "告别（起身 + 握手 + 道别）",
+      "step_order": 7,
+      "instruction": "结束时先起身，等对方也起身（或示意）后再伸手告别。转身离开前回头微笑。",
+      "why_this_way": "告别是收尾。起身顺序、短促告别握手、最后的回头微笑构成完整礼仪闭环。",
+      "checklist": [
+        "起身推椅子",
+        "告别握手短促",
+        "道别语简洁得体",
+        "离开前最后回头微笑"
+      ],
+      "wrong_examples": [
+        "起身椅子哗啦响",
+        "道别时长篇大论",
+        "转身就走不回头",
+        "告别握手又聊起来"
+      ],
+      "assets": {
+        "type": "sequence_images",
+        "images": [
+          "leave_01.svg",
+          "leave_02.svg",
+          "leave_03.svg",
+          "leave_04.svg",
+          "leave_05.svg"
+        ],
+        "timeline_label": "① 起身 → ② 推椅子 → ③ 告别握手 → ④ 道别语 → ⑤ 离开+回头微笑"
+      }
+    },
+    {
+      "action_id": "ACT-008",
+      "title": "整体回顾",
+      "step_order": 8,
+      "instruction": "花30秒回顾整个流程：进门→问候→握手→入座→开场白→交谈→告别。哪一步你觉得最容易紧张？",
+      "why_this_way": "自我复盘是巩固学习的关键。知道哪里容易紧张才能重点关注。",
+      "checklist": [
+        "能完整回忆8步顺序",
+        "识别最紧张的1-2个环节"
+      ],
+      "wrong_examples": [
+        "回忆不起来怎么走的",
+        "觉得完全没问题不需要改进"
+      ],
+      "assets": {
+        "type": "single_image",
+        "images": [
+          "reflect.svg"
+        ],
+        "timeline_label": "自我复盘"
+      }
+    }
+  ],
+  "dialogue_steps": [
+    {
+      "dialogue_id": "D-001",
+      "action_step_binding": "ACT-001",
+      "when_to_say": "刚进入房间面向对方后",
+      "recommended": [
+        "您好，我是XX公司的小王。",
+        "您好，我是XX，很高兴见到您。"
+      ],
+      "acceptable": [
+        "您好。",
+        "你好。"
+      ],
+      "not_recommended": [
+        "嘿",
+        "哟呵",
+        "咋"
+      ],
+      "severely_inappropriate": [
+        "你就是那个谁吧",
+        "听说你们公司不太行"
+      ],
+      "voice_tone": "自然、平稳、不过度热情，音量适中让对方听清"
+    },
+    {
+      "dialogue_id": "D-002",
+      "action_step_binding": "ACT-005",
+      "when_to_say": "入座后正式开始交谈",
+      "recommended": [
+        "感谢您抽时间，我们今天主要想和您聊聊...",
+        "好的，那我们今天的议程是..."
+      ],
+      "acceptable": [
+        "那我们开始吧。",
+        "好的。"
+      ],
+      "not_recommended": [
+        "那啥，我今天过来主要是...",
+        "你知道吗其实我之前..."
+      ],
+      "severely_inappropriate": [
+        "你们这个项目说实在问题挺多的",
+        "说实话我不太看好你们"
+      ],
+      "voice_tone": "平稳、清晰、语速中等"
+    },
+    {
+      "dialogue_id": "D-003",
+      "action_step_binding": "ACT-007",
+      "when_to_say": "告别时",
+      "recommended": [
+        "今天聊得很有收获，谢谢您的时间。",
+        "好的，那就先这样，保持联系。",
+        "谢谢您，期待下次见面。"
+      ],
+      "acceptable": [
+        "好，那就这样。",
+        "好的，谢谢您。"
+      ],
+      "not_recommended": [
+        "行就这样吧。",
+        "我走了啊。"
+      ],
+      "severely_inappropriate": [
+        "哎呀终于聊完了累死了",
+        "下次你找我吧我懒得跑"
+      ],
+      "voice_tone": "温暖、略带感激，不要太随意"
+    }
+  ],
+  "practice_steps": [
+    {
+      "practice_id": "P-001",
+      "type": "knowledge_quiz",
+      "title": "知识小测：先练基础",
+      "instruction": "先来答3道选择题，确认你对商务社交礼仪基础知识的掌握。答错不会扣分。",
+      "input_mode": [
+        "tap"
+      ],
+      "questions": [
+        {
+          "q": "第一次见客户时哪种站姿更合适？",
+          "options": [
+            "双手抱胸显自信",
+            "双手自然下垂",
+            "一只手插口袋",
+            "靠着桌子"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "握手时谁应该先伸手？",
+          "options": [
+            "我先伸手显热情",
+            "等对方先伸手",
+            "同时伸手",
+            "地位低的先伸手"
+          ],
+          "answer": 1
+        },
+        {
+          "q": "入座顺序应该是？",
+          "options": [
+            "我先坐",
+            "让对方先坐",
+            "同时坐",
+            "谁快谁先坐"
+          ],
+          "answer": 1
+        }
+      ]
+    },
+    {
+      "practice_id": "P-002",
+      "type": "follow_along",
+      "title": "跟练：问候 + 握手",
+      "instruction": "想象面前站着你的客户。先完成 checklist 的动作，然后说一句问候。",
+      "action_checklist": [
+        "身体转向对方",
+        "点头/微微欠身",
+        "等对方伸手后再握手"
+      ],
+      "input_mode": [
+        "voice",
+        "text"
+      ],
+      "ai_evaluation_dimensions": [
+        "language",
+        "behavior_self_check"
+      ],
+      "example_input": "您好，我是XX公司的小李，很高兴见到您。"
+    },
+    {
+      "practice_id": "P-003",
+      "type": "follow_along",
+      "title": "跟练：开场白",
+      "instruction": "对方请你坐下了。入座后试着说一句开场白，30秒以内就好。",
+      "action_checklist": [
+        "等待对方先坐下",
+        "从侧面轻轻入座",
+        "坐姿端正身体微微前倾"
+      ],
+      "input_mode": [
+        "voice",
+        "text"
+      ],
+      "ai_evaluation_dimensions": [
+        "language",
+        "behavior_self_check"
+      ]
+    },
+    {
+      "practice_id": "P-004",
+      "type": "self_check",
+      "title": "自我确认：你完成了吗？",
+      "instruction": "回顾整个流程，勾选你已经可以自然做到的动作。不确定的留空就好。",
+      "action_checklist": [
+        "进入房间后自然面向对方",
+        "会微微点头致意",
+        "知道握手要等对方先伸手",
+        "会让对方先入座",
+        "能做30秒以内的开场白",
+        "交谈中会适时回应",
+        "知道告别时要做什么"
+      ],
+      "input_mode": [
+        "tap"
+      ],
+      "ai_evaluation_dimensions": [
+        "behavior_self_check"
+      ]
+    }
+  ],
+  "ai_roleplay": {
+    "npc_persona": {
+      "name": "陈总",
+      "role": "客户方负责人",
+      "traits": [
+        "商务",
+        "专业",
+        "不冷不热",
+        "注重效率"
+      ],
+      "initial_greeting": "你好，请坐吧。我知道你的来意，我们直接进入正题吧。"
+    },
+    "ai_prompt": "你是陈总，注重效率不喜欢闲聊的商务人士。用户第一次来拜访你。用符合你身份的语气对话，引导他们自然完成整个拜访流程。用户表现得体时自然推进对话；表现生硬时稍微调整话题引导，但不要直接说你这里做得不对。",
+    "difficulty_level": 2,
+    "min_rounds": 4,
+    "max_rounds": 10,
+    "random_events": [
+      {
+        "event": "对方临时来了个电话",
+        "trigger_condition": "对话进行到一半",
+        "effect": "需要等待对方处理完，保持礼貌不要不耐烦",
+        "resolution": "对方回来后说不好意思我们继续吧"
+      },
+      {
+        "event": "对方问你一个不太确定的问题",
+        "trigger_condition": "用户主动问专业问题",
+        "effect": "不需要强行回答，可以说这个问题我需要回去确认一下",
+        "resolution": "自然承认不确定也是一种得体"
+      }
+    ]
+  },
+  "challenge": {
+    "title": "找一个相对正式的场合，练一次完整的问候到告别流程",
+    "prompt": "现实中找一个机会（不一定是真拜访客户，可以是约见导师、学长学姐、比较正式场合见新朋友），完整走完问候到入座到简短交流到告别流程。",
+    "requirements": [
+      "完整走一次8步流程",
+      "特别注意握手等对方先伸手",
+      "告别时说一句得体道别语"
+    ],
+    "difficulty": 2,
+    "fallback_option": {
+      "title": "降级选项：在星巴克麦当劳等半正式场合约朋友",
+      "reason": "如果你觉得拜访客户压力太大，可以从低风险场景开始。",
+      "description": "约一个不太熟但认识的朋友（同学、同事），在相对正式的公共场合见面。重点练习问候加握手加告别。"
+    },
+    "record_form": {
+      "where_options": [
+        "商务拜访",
+        "约见导师学长",
+        "半正式公共场合",
+        "其他"
+      ],
+      "feeling_options": [
+        "不紧张(1-3)",
+        "有点紧张(4-6)",
+        "很紧张(7-10)"
+      ],
+      "outcome_options": [
+        "没敢开口",
+        "尝试了但很生硬",
+        "还不错",
+        "很自然"
+      ]
+    },
+    "review_loop": {
+      "description": "根据你的挑战记录，系统会推荐下一个 SceneTemplate。",
+      "rules": [
+        {
+          "condition": "outcome_negative = true",
+          "recommendation": "回到 ST-001 重练薄弱步骤"
+        },
+        {
+          "condition": "outcome = 尝试了但很生硬",
+          "recommendation": "ST-003 握手礼仪专项练习"
+        },
+        {
+          "condition": "outcome = 还不错",
+          "recommendation": "同 category 下更难一级的 SceneTemplate"
+        },
+        {
+          "condition": "outcome = 很自然",
+          "recommendation": "不同 category 的新场景"
+        }
+      ]
+    }
+  }
+}

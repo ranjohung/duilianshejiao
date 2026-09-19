@@ -1,0 +1,54 @@
+{
+  "total": 9,
+  "ok": 9,
+  "fail": 0,
+  "total_chars": 125187,
+  "ok_list": [
+    {
+      "title": "礼仪就在你身边",
+      "chars": 12446,
+      "file": "f:\\开发软件项目文件\\对练社交\\knowledge_base\\markdown\\礼仪规范\\金正昆_礼仪就在你身边.md"
+    },
+    {
+      "title": "节庆礼仪",
+      "chars": 9829,
+      "file": "f:\\开发软件项目文件\\对练社交\\knowledge_base\\markdown\\礼仪规范\\金正昆_节庆礼仪.md"
+    },
+    {
+      "title": "座次礼仪",
+      "chars": 17307,
+      "file": "f:\\开发软件项目文件\\对练社交\\knowledge_base\\markdown\\礼仪规范\\金正昆_座次礼仪.md"
+    },
+    {
+      "title": "握手礼仪",
+      "chars": 16734,
+      "file": "f:\\开发软件项目文件\\对练社交\\knowledge_base\\markdown\\礼仪规范\\金正昆_握手礼仪.md"
+    },
+    {
+      "title": "涉外礼仪",
+      "chars": 12105,
+      "file": "f:\\开发软件项目文件\\对练社交\\knowledge_base\\markdown\\礼仪规范\\金正昆_涉外礼仪.md"
+    },
+    {
+      "title": "西餐礼仪",
+      "chars": 18150,
+      "file": "f:\\开发软件项目文件\\对练社交\\knowledge_base\\markdown\\礼仪规范\\金正昆_西餐礼仪.md"
+    },
+    {
+      "title": "服饰礼仪",
+      "chars": 10202,
+      "file": "f:\\开发软件项目文件\\对练社交\\knowledge_base\\markdown\\礼仪规范\\金正昆_服饰礼仪.md"
+    },
+    {
+      "title": "介绍礼仪",
+      "chars": 18290,
+      "file": "f:\\开发软件项目文件\\对练社交\\knowledge_base\\markdown\\礼仪规范\\金正昆_介绍礼仪.md"
+    },
+    {
+      "title": "身边的礼仪一",
+      "chars": 10124,
+      "file": "f:\\开发软件项目文件\\对练社交\\knowledge_base\\markdown\\礼仪规范\\金正昆_身边的礼仪一.md"
+    }
+  ],
+  "fail_list": []
+}

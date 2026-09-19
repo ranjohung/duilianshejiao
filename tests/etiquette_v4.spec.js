@@ -10,7 +10,7 @@ test('礼仪训练是先教后练课堂，真实挑战保持无提示', async ({
     userData.memberTierExpiresAt = new Date(Date.now() + 86400000).toISOString();
     showEtiquetteTraining();
   });
-  await expect(page.locator('.etiquette-course-card')).toHaveCount(9);
+  await expect(page.locator('.etiquette-course-card')).toHaveCount(15);
   await page.locator('.etiquette-course-card[data-level-id="9001"] .etiquette-course-action').click();
   await expect(page.locator('#modal-etiquette-training')).toBeVisible();
   await expect(page.locator('#modal-v4-teaching')).toHaveCount(0);

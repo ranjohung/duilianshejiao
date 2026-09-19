@@ -1,0 +1,130 @@
+{
+  "version": "5.0.0",
+  "created": "2026-09-19",
+  "total": 17,
+  "templates": [
+    {
+      "scene_id": "ST-001",
+      "title": "第一次拜访客户",
+      "category": "商务社交",
+      "difficulty": 2,
+      "status": "✅ 完整",
+      "size_bytes": 17855,
+      "actions_count": 8,
+      "dialogues_count": 3,
+      "practices_count": 4
+    },
+    {
+      "scene_id": "ST-002",
+      "title": "初次见面问候",
+      "category": "日常社交",
+      "difficulty": 1,
+      "status": "todo"
+    },
+    {
+      "scene_id": "ST-003",
+      "title": "握手礼仪专项",
+      "category": "商务社交",
+      "difficulty": 1,
+      "status": "todo"
+    },
+    {
+      "scene_id": "ST-004",
+      "title": "用餐祝酒",
+      "category": "商务社交",
+      "difficulty": 2,
+      "status": "todo"
+    },
+    {
+      "scene_id": "ST-005",
+      "title": "求职面试",
+      "category": "商务社交",
+      "difficulty": 3,
+      "status": "todo"
+    },
+    {
+      "scene_id": "ST-006",
+      "title": "兴趣社群自我介绍",
+      "category": "日常社交",
+      "difficulty": 1,
+      "status": "todo"
+    },
+    {
+      "scene_id": "ST-007",
+      "title": "被朋友误解(NVC)",
+      "category": "日常社交",
+      "difficulty": 2,
+      "status": "todo"
+    },
+    {
+      "scene_id": "ST-008",
+      "title": "共情沟通训练",
+      "category": "日常社交",
+      "difficulty": 2,
+      "status": "todo"
+    },
+    {
+      "scene_id": "ST-009",
+      "title": "职场拒绝请求",
+      "category": "商务社交",
+      "difficulty": 3,
+      "status": "todo"
+    },
+    {
+      "scene_id": "ST-010",
+      "title": "初次约会",
+      "category": "亲密关系与约会",
+      "difficulty": 2,
+      "status": "todo"
+    },
+    {
+      "scene_id": "ST-011",
+      "title": "相亲模拟",
+      "category": "亲密关系与约会",
+      "difficulty": 2,
+      "status": "todo"
+    },
+    {
+      "scene_id": "ST-012",
+      "title": "亲戚问敏感问题",
+      "category": "家庭与亲友",
+      "difficulty": 2,
+      "status": "todo"
+    },
+    {
+      "scene_id": "ST-013",
+      "title": "朋友借钱",
+      "category": "家庭与亲友",
+      "difficulty": 3,
+      "status": "todo"
+    },
+    {
+      "scene_id": "ST-014",
+      "title": "酒店入住沟通",
+      "category": "公共服务与办事",
+      "difficulty": 1,
+      "status": "todo"
+    },
+    {
+      "scene_id": "ST-015",
+      "title": "医院挂号问诊",
+      "category": "公共服务与办事",
+      "difficulty": 2,
+      "status": "todo"
+    },
+    {
+      "scene_id": "ST-016",
+      "title": "政务大厅办事",
+      "category": "公共服务与办事",
+      "difficulty": 1,
+      "status": "todo"
+    },
+    {
+      "scene_id": "ST-017",
+      "title": "快递物流沟通",
+      "category": "公共服务与办事",
+      "difficulty": 1,
+      "status": "todo"
+    }
+  ]
+}

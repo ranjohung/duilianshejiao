@@ -1,27 +1,96 @@
-.vercel
-.env*
+﻿# === Flutter / Dart ===
+.dart_tool/
+.flutter
+.flutter_plugins
+flutter_*.log
+.packages
+.pub-cache/
+.pub/
+build/
+.build/
+.build_runner/
+
+# === Node.js ===
 node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# === Python ===
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# === IDE ===
+.idea/
+.vscode/
+*.iml
+.vim/
+.workbuddy/
+
+# === 部署 ===
+.vercel/
+.env.local
+.env.*.local
+
+# === 测试 ===
 playwright-report/
 test-results/
 test_screenshots/
 screenshots/
-.dart_tool/
-build/
-build_android_*.log
 parsed_output/
-__pycache__/
+build_android_*.log
 
-# 本地 IDE/Flutter 状态
-.flutter
-.flutter_tool_state
-.idea/
-.workbuddy/
+# === 模型大文件 ===
+*.onnx
+*.glb
+*.gltf
+assets/models/source/
 
-# 本地模型/资产（不提交）
-libs/u2net.onnx
+# === 临时脚本和中间产物 ===
+_batch*.py
+_diff_*.py
+_dst_*.json
+_extract_*.json
+_extract_*.py
+_full_scan*.py
+_inspect_*.py
+_mass_*.py
+_merge_*.py
+_scan_*.py
+_extracted_full/
+_src_*.json
+_progress_*.json
+_lo_*.py
+_lo_converted/
+_lo_restart.py
+_inventory_*.py
+_regen_*.py
+_split_*.py
+_cleanup.py
+_fix_*.py
+_pipeline.py
+_check_*.py
+_diag.py
+_verify.py
+_qc.py
+_quick_check.py
+_classify*.py
+_rebuild*.py
 
-# 知识库中间产物（体积大且站点不加载）
-knowledge_base/extracted/
+# === 分类输出 ===
+knowledge_base/分类全文/
+knowledge_base/分类清单.json
+knowledge_base/_cards_manifest.json
+knowledge_base/_分类清单.json
 
-# GLB 换装管线原始源（30MB 未压缩，站点不加载）
-assets/models/source/Ch14.glb
+# === 写小说/PPT模板原始目录 ===
+知识库里只保留高情商话术 + CBT，其他源目录不要。写小说/PPT模板不要 push。
+
+# 临时文件
+*.tmp
+*.bak
+# Audio cache - too large for GitHub push
+tools/_audio_cache/
