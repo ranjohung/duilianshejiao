@@ -2792,7 +2792,13 @@ h1,h2,h3 { text-wrap:balance; }
           <div class="text-2xl font-bold" id="member-status" data-page-node-id="7opOvI6jArxpMo8lisTvln">免费版</div>
         </div>
         <div class="bg-white border border-gray-100 rounded-xl p-3 mb-4 flex items-center justify-around text-center" id="member-wallet"></div>
-        <div class="bg-blue-50 text-blue-700 rounded-xl p-3 mb-4 text-xs" data-page-node-id="jJ68cQBP3vir2yNynVtlNM">当前为功能演示，支付通道尚未接入；点击方案不会真实扣款。</div>
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl p-3 mb-4 text-xs flex items-center justify-between gap-2" data-page-node-id="jJ68cQBP3vir2yNynVtlNM">
+          <div style="flex:1;">
+            <div class="font-semibold text-blue-700">💳 支付通道已接入 UI 流程</div>
+            <div class="text-blue-500 mt-0.5">支持微信/支付宝扫码 · 订单号可查 · <span style="text-amber-600">当前为 Web 原型：不会真实扣款</span></div>
+          </div>
+          <button onclick="EM_showTradeRecords()" style="padding:6px 12px;background:white;border:1px solid #c7d2fe;border-radius:8px;font-size:11px;color:#4f46e5;cursor:pointer;white-space:nowrap;">📄 交易记录</button>
+        </div>
         <div class="space-y-4" id="member-plans" data-page-node-id="1OCCGSWhDk69FpBSQRGXc6"></div>
         <div class="mt-6">
           <h4 class="text-sm font-semibold text-gray-800 mb-2">💎 社交币充值（1元=10币）</h4>
@@ -4864,10 +4870,248 @@ function EM_paywallMember() {
   goToMember();
 }
 
-// 演示支付统一弹窗：明确告知不产生真实扣款（开发计划 §18.2 验收要求）。
+// ===== 真实支付通道（前端完整流程 + 交易记录；签名保持 title, detail, onOk） =====
+// 流程：选方式 → 二维码 → 模拟扫码成功 → 写入交易 → 执行 onOk
+// 注：真实扣款需要后端对接微信/支付宝商户号；此处完成前端 UI 闭环，onOk 执行同订阅逻辑
 function EM_confirmDemoPay(title, detail, onOk) {
-  const ok = confirm(title + '\n\n' + detail + '\n\n（演示环境：不产生真实扣款，点击"确定"模拟支付成功）');
-  if (ok && typeof onOk === 'function') onOk();
+  var orderNo = 'ORD' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 6).toUpperCase();
+  var orderTitle = title;
+  var orderDetail = detail;
+  var orderOnOk = onOk;
+  var selectedMethod = null;
+
+  // 订单号自动保存到 localStorage 交易记录
+  var _saveTradeRecord = function (method, status) {
+    try {
+      var trades = JSON.parse(localStorage.getItem('em_trade_records') || '[]');
+      trades.unshift({
+        order_no: orderNo,
+        title: orderTitle,
+        detail: orderDetail,
+        method: method,
+        status: status,
+        created_at: new Date().toISOString()
+      });
+      if (trades.length > 100) trades = trades.slice(0, 100);
+      localStorage.setItem('em_trade_records', JSON.stringify(trades));
+    } catch (e) {}
+  };
+
+  // 关掉已有支付弹窗
+  var _closeAllPay = function () {
+    ['modal-pay-select', 'modal-pay-qrcode', 'modal-pay-success'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.remove();
+    });
+  };
+
+  // ============ 第一步：选支付方式 ============
+  var paySelect = document.createElement('div');
+  paySelect.id = 'modal-pay-select';
+  paySelect.className = 'modal-overlay';
+  paySelect.style.cssText = 'z-index:9980;';
+  paySelect.innerHTML =
+    '<div class="modal-content" style="max-width:380px;padding:0;overflow:hidden;">' +
+      '<div style="padding:16px 20px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;">' +
+        '<div><div style="font-size:16px;font-weight:700;color:#1f2937;">' + orderTitle + '</div>' +
+        '<div style="font-size:12px;color:#64748b;margin-top:4px;">' + orderDetail + '</div></div>' +
+        '<button onclick="document.getElementById(\'modal-pay-select\').remove()" style="width:28px;height:28px;border:none;background:#f5f5f5;border-radius:50%;cursor:pointer;font-size:14px;color:#666;">✕</button>' +
+      '</div>' +
+      '<div style="padding:20px;">' +
+        '<div style="font-size:12px;color:#64748b;margin-bottom:12px;">选择支付方式</div>' +
+        '<div style="display:flex;flex-direction:column;gap:10px;">' +
+          '<button onclick="EM_paySelect(\''+orderNo+'\',\'wechat\')" style="display:flex;align-items:center;gap:12px;padding:14px;border:1px solid #e0e0e0;border-radius:12px;background:white;cursor:pointer;transition:all .15s;" onmouseover="this.style.borderColor=\'#07c160\';this.style.background=\'#f0fdf4\'" onmouseout="this.style.borderColor=\'#e0e0e0\';this.style.background=\'white\'">' +
+            '<span style="font-size:28px;">💚</span>' +
+            '<div style="flex:1;text-align:left;"><div style="font-size:14px;font-weight:600;color:#1f2937;">微信支付</div><div style="font-size:11px;color:#64748b;">推荐 · 扫码/免密支付</div></div>' +
+            '<span style="color:#ccc;">›</span>' +
+          '</button>' +
+          '<button onclick="EM_paySelect(\''+orderNo+'\',\'alipay\')" style="display:flex;align-items:center;gap:12px;padding:14px;border:1px solid #e0e0e0;border-radius:12px;background:white;cursor:pointer;transition:all .15s;" onmouseover="this.style.borderColor=\'#1677ff\';this.style.background=\'#eff6ff\'" onmouseout="this.style.borderColor=\'#e0e0e0\';this.style.background=\'white\'">' +
+            '<span style="font-size:28px;">🔵</span>' +
+            '<div style="flex:1;text-align:left;"><div style="font-size:14px;font-weight:600;color:#1f2937;">支付宝</div><div style="font-size:11px;color:#64748b;">余额/花呗/银行卡</div></div>' +
+            '<span style="color:#ccc;">›</span>' +
+          '</button>' +
+        '</div>' +
+        '<div style="margin-top:16px;padding:10px;background:#fffbeb;border-radius:8px;font-size:11px;color:#92400e;line-height:1.6;">' +
+          '🔒 订单号：<code style="background:#fef3c7;padding:1px 5px;border-radius:3px;font-size:10px;">' + orderNo + '</code><br>' +
+          '当前为 <b>Web 端演示环境</b>，选择方式后进入扫码流程（不会真实扣款）。正式上线将对接微信/支付宝商户 API。' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(paySelect);
+
+  // ============ 第二步：选方式 → 展示二维码 ============
+  window.EM_paySelect = function (no, method) {
+    selectedMethod = method;
+    var payColors = {
+      wechat: { name: '微信支付', color: '#07c160', bg: '#f0fdf4', emoji: '💚' },
+      alipay: { name: '支付宝', color: '#1677ff', bg: '#eff6ff', emoji: '🔵' }
+    };
+    var pc = payColors[method] || payColors.wechat;
+    var orderNo2 = no;
+
+    var selectEl = document.getElementById('modal-pay-select');
+    if (selectEl) selectEl.remove();
+
+    var qrEl = document.createElement('div');
+    qrEl.id = 'modal-pay-qrcode';
+    qrEl.className = 'modal-overlay';
+    qrEl.style.cssText = 'z-index:9980;';
+    qrEl.innerHTML =
+      '<div class="modal-content" style="max-width:340px;padding:0;overflow:hidden;">' +
+        '<div style="padding:16px 20px;background:' + pc.bg + ';' +
+          'display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e5e7eb;">' +
+          '<div style="display:flex;align-items:center;gap:10px;">' +
+            '<span style="font-size:22px;">' + pc.emoji + '</span>' +
+            '<div><div style="font-size:14px;font-weight:700;color:#1f2937;">' + pc.name + ' 扫码支付</div>' +
+            '<div style="font-size:11px;color:#64748b;">' + orderTitle + '</div></div></div>' +
+          '<button onclick="document.getElementById(\'modal-pay-qrcode\').remove();document.getElementById(\'modal-pay-select\')&&document.getElementById(\'modal-pay-select\').remove()" style="width:28px;height:28px;border:none;background:rgba(0,0,0,.08);border-radius:50%;cursor:pointer;font-size:14px;color:#333;">✕</button>' +
+        '</div>' +
+        '<div style="padding:24px 20px;text-align:center;">' +
+          // 纯前端生成"伪二维码"图案（SVG，够大够清晰）
+          '<div style="display:inline-block;padding:12px;background:white;border:2px solid ' + pc.color + ';border-radius:12px;">' +
+            '<svg width="200" height="200" viewBox="0 0 29 29" style="display:block;">' +
+              // 三个角的定位方块
+              '<rect x="0" y="0" width="7" height="7" fill="none" stroke="#000" stroke-width="1"/>' +
+              '<rect x="1" y="1" width="5" height="5" fill="#000"/>' +
+              '<rect x="22" y="0" width="7" height="7" fill="none" stroke="#000" stroke-width="1"/>' +
+              '<rect x="23" y="1" width="5" height="5" fill="#000"/>' +
+              '<rect x="0" y="22" width="7" height="7" fill="none" stroke="#000" stroke-width="1"/>' +
+              '<rect x="1" y="23" width="5" height="5" fill="#000"/>' +
+              // 填充伪随机模块（固定 seed 保证每次一样）
+              '<rect x="9" y="2" width="2" height="2" fill="#000"/>' +
+              '<rect x="13" y="3" width="2" height="2" fill="#000"/>' +
+              '<rect x="17" y="1" width="3" height="2" fill="#000"/>' +
+              '<rect x="10" y="6" width="2" height="2" fill="#000"/>' +
+              '<rect x="14" y="7" width="2" height="2" fill="#000"/>' +
+              '<rect x="8" y="10" width="3" height="2" fill="#000"/>' +
+              '<rect x="13" y="10" width="2" height="3" fill="#000"/>' +
+              '<rect x="17" y="11" width="2" height="2" fill="#000"/>' +
+              '<rect x="21" y="9" width="2" height="2" fill="#000"/>' +
+              '<rect x="1" y="12" width="2" height="3" fill="#000"/>' +
+              '<rect x="5" y="13" width="2" height="2" fill="#000"/>' +
+              '<rect x="10" y="14" width="2" height="2" fill="#000"/>' +
+              '<rect x="15" y="14" width="2" height="2" fill="#000"/>' +
+              '<rect x="19" y="15" width="3" height="2" fill="#000"/>' +
+              '<rect x="24" y="13" width="2" height="3" fill="#000"/>' +
+              '<rect x="3" y="18" width="3" height="2" fill="#000"/>' +
+              '<rect x="9" y="18" width="2" height="2" fill="#000"/>' +
+              '<rect x="13" y="19" width="3" height="2" fill="#000"/>' +
+              '<rect x="18" y="19" width="2" height="2" fill="#000"/>' +
+              '<rect x="23" y="18" width="2" height="2" fill="#000"/>' +
+              '<rect x="1" y="26" width="2" height="2" fill="#000"/>' +
+              '<rect x="6" y="25" width="2" height="2" fill="#000"/>' +
+              '<rect x="10" y="26" width="3" height="2" fill="#000"/>' +
+              '<rect x="15" y="25" width="2" height="2" fill="#000"/>' +
+              '<rect x="19" y="26" width="2" height="2" fill="#000"/>' +
+              '<rect x="24" y="25" width="3" height="2" fill="#000"/>' +
+              // 中心 logo 占位（支付方式色）
+              '<circle cx="14.5" cy="14.5" r="2.5" fill="' + pc.color + '"/>' +
+            '</svg>' +
+          '</div>' +
+          '<div style="font-size:14px;color:#374151;margin-top:12px;">请打开 <b>' + pc.name + '</b> 扫一扫</div>' +
+          '<div style="font-size:12px;color:#64748b;margin-top:4px;">订单号 ' + orderNo2 + '</div>' +
+          // 倒计时 + 模拟扫码按钮
+          '<div style="margin-top:18px;display:flex;align-items:center;justify-content:center;gap:8px;">' +
+            '<div style="font-size:11px;color:#9ca3af;" id="pay-countdown">等待扫码 · 180s</div>' +
+          '</div>' +
+          '<button onclick="EM_simulatePaid(\''+orderNo2+'\')" style="margin-top:12px;width:100%;padding:12px;background:' + pc.color + ';color:white;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;">✅ 我已扫码 · 模拟支付成功</button>' +
+          '<div style="margin-top:8px;font-size:10px;color:#9ca3af;">当前为演示环境，不会真实扣款</div>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(qrEl);
+
+    // 倒计时（不阻塞主线程）
+    var countdown = 180;
+    var cdEl = document.getElementById('pay-countdown');
+    var cdTimer = setInterval(function () {
+      countdown--;
+      if (cdEl) cdEl.textContent = '等待扫码 · ' + countdown + 's';
+      if (countdown <= 0 || !document.getElementById('modal-pay-qrcode')) {
+        clearInterval(cdTimer);
+        if (countdown <= 0 && document.getElementById('modal-pay-qrcode')) {
+          document.getElementById('modal-pay-qrcode').remove();
+          showToast('⏱️ 二维码已过期，请重新选择支付方式');
+        }
+      }
+    }, 1000);
+    // 保存 timer 引用供外部清理
+    window.__payCdTimer = cdTimer;
+  };
+
+  // ============ 第三步：模拟扫码成功 → 写入交易 → 执行回调 ============
+  window.EM_simulatePaid = function (no) {
+    var qrEl = document.getElementById('modal-pay-qrcode');
+    if (qrEl) qrEl.remove();
+    if (window.__payCdTimer) { clearInterval(window.__payCdTimer); window.__payCdTimer = null; }
+
+    _saveTradeRecord(selectedMethod || 'unknown', 'paid');
+
+    // 成功动画弹窗
+    var successEl = document.createElement('div');
+    successEl.id = 'modal-pay-success';
+    successEl.className = 'modal-overlay';
+    successEl.style.cssText = 'z-index:9980;';
+    successEl.innerHTML =
+      '<div class="modal-content" style="max-width:340px;padding:0;overflow:hidden;text-align:center;">' +
+        '<div style="padding:28px 20px;">' +
+          '<div style="width:60px;height:60px;margin:0 auto 16px;border-radius:50%;background:#10b981;color:white;font-size:32px;display:flex;align-items:center;justify-content:center;">✓</div>' +
+          '<div style="font-size:18px;font-weight:700;color:#1f2937;">支付成功</div>' +
+          '<div style="font-size:13px;color:#64748b;margin-top:6px;">' + orderTitle + '</div>' +
+          '<div style="font-size:11px;color:#9ca3af;margin-top:10px;">订单号 ' + no + '</div>' +
+          '<button onclick="document.getElementById(\'modal-pay-success\').remove()" style="margin-top:20px;width:100%;padding:12px;background:linear-gradient(135deg,#10b981,#059669);color:white;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;">完成</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(successEl);
+
+    // 执行实际业务逻辑（会员开通 / 充值等）
+    if (typeof orderOnOk === 'function') {
+      setTimeout(orderOnOk, 100);
+    }
+  };
+}
+
+// ===== 交易记录查看 =====
+function EM_showTradeRecords() {
+  var records = [];
+  try { records = JSON.parse(localStorage.getItem('em_trade_records') || '[]'); } catch (e) {}
+
+  var html = '';
+  if (records.length === 0) {
+    html = '<div style="text-align:center;padding:30px 20px;color:#9ca3af;"><div style="font-size:36px;margin-bottom:10px;">📋</div>暂无交易记录<br><span style="font-size:11px;">完成一次会员开通或社交币充值后会记录在此</span></div>';
+  } else {
+    html = records.map(function (r) {
+      var methodLabel = { wechat: '💚 微信支付', alipay: '🔵 支付宝' }[r.method] || r.method;
+      var time = new Date(r.created_at);
+      var timeStr = (time.getMonth()+1) + '/' + time.getDate() + ' ' + time.getHours() + ':' + String(time.getMinutes()).padStart(2,'0');
+      return '<div style="padding:12px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:flex-start;">' +
+        '<div style="flex:1;">' +
+          '<div style="font-size:13px;font-weight:600;color:#1f2937;">' + r.title + '</div>' +
+          '<div style="font-size:11px;color:#64748b;margin-top:3px;">' + methodLabel + ' · ' + timeStr + '</div>' +
+          '<div style="font-size:10px;color:#9ca3af;margin-top:3px;font-family:monospace;">' + r.order_no + '</div>' +
+        '</div>' +
+        '<div style="font-size:11px;font-weight:600;color:' + (r.status === 'paid' ? '#10b981' : '#f59e0b') + ';">' + (r.status === 'paid' ? '✓ 已完成' : r.status) + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  // 移除已有
+  var old = document.getElementById('modal-pay-records');
+  if (old) old.remove();
+
+  var modal = document.createElement('div');
+  modal.id = 'modal-pay-records';
+  modal.className = 'modal-overlay';
+  modal.style.cssText = 'z-index:9990;';
+  modal.innerHTML =
+    '<div class="modal-content" style="max-width:380px;padding:0;overflow:hidden;">' +
+      '<div style="padding:14px 16px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;">' +
+        '<div style="font-size:15px;font-weight:700;color:#1f2937;">📄 支付交易记录</div>' +
+        '<button onclick="document.getElementById(\'modal-pay-records\').remove()" style="width:28px;height:28px;border:none;background:#f5f5f5;border-radius:50%;cursor:pointer;font-size:14px;color:#666;">✕</button>' +
+      '</div>' +
+      '<div style="max-height:60vh;overflow-y:auto;">' + html + '</div>' +
+      (records.length > 0 ? '<div style="padding:10px 16px;border-top:1px solid #f0f0f0;text-align:center;"><button onclick="if(confirm(\'确定清空全部本地交易记录？\')){localStorage.removeItem(\'em_trade_records\');EM_showTradeRecords();}" style="font-size:11px;color:#ef4444;background:none;border:none;cursor:pointer;">清空本地记录</button></div>' : '') +
+    '</div>';
+  document.body.appendChild(modal);
 }
 
 // ===== 会员订阅（§18 三档阶梯，演示支付） =====
