@@ -2,9 +2,17 @@
 
 **版本：v5.0.0（知识-动作-话术三合一教学引擎 + 3D降级为增强器）**
 
-**文档日期：2026-09-19**
+**文档日期：2026-09-19（v5.0.0 基线 + 2026-09-19 审查修复确认）**
 
 **文档性质：产品规则基准；功能完成状态以 `docs/development-plan.md` 及验收记录为准**
+
+**2026-09-19 审查修复摘要**（详见 `docs/code-review-v5-2026-09-19.md`）：
+- ✅ 补加载 libs/v3_learning_enhance.js / v3_sudden_change.js / v4_teaching_closed_loop.js（原代码完整但从未接入）
+- ✅ 个人页新增 `tel:12356` 全国心理援助热线入口（原缺失）
+- ✅ SceneTemplate 轻量加载器接入（`window.SceneTemplates` API + fetch _index.json + emoji fallback）
+- ✅ 已清理 _index.json 中 status=todo 条目加载逻辑（404 时 console.warn 跳过）
+- ⚠️ 已知遗留：v5_etiquette_training.js / v5_action_renderer.js / v5_evaluator.js 尚未创建（V5 重构中期目标）；three.min.js / game_stage3d.js 仍无条件加载（与 v5.0.0 "3D 降级为可选" 架构存在短期矛盾，需后续按需动态加载）
+- ⚠️ ST-002~ST-017 SceneTemplate 仅声明无 JSON 文件
 
 **v2.5.0 校准说明（历史·经济体系重构）：** 按 2026-09-13 商业决策完成经济体系重构：新增**社交币（硬通货）**与**成长积分（软通货）隔离墙**；会员改为免费/基础（¥39月·¥298年）/高级（¥99月·¥698年）三档阶梯（v2.4 的日卡/周卡/月卡/年卡价格表废弃，保留于 §18.7 供追溯）；每日免费训练 5→3 次；学习卡片课程库改为"试读引流 + VIP 畅学 + 单章解锁"门控；新增深度复盘（15 社交币）、去对练扣训练次数、签到/训练积分封顶与答错扣分规则。第 18 章为本次重构基准，与之冲突的旧条款一律以 v2.5 为准。
 
