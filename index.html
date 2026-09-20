@@ -17542,6 +17542,7 @@ Object.assign(ETIQUETTE_TURN_CONTENT,{
 9015:[['确认称呼','客户：你可以叫我 Alex。','nod','尊重称呼','按对方提供的称呼使用，不擅自改变。','好的，Alex，也请叫我 Chen。'],['避免隐私越界','客户：我们先聊项目背景吧。','listen','聚焦议题','围绕业务、行业和公开兴趣，不询问婚姻收入。','好的。我先用两分钟介绍背景，再听听您最关注的风险。'],['确认行动项','客户：今天先讨论到这里。','wave','复述确认','明确责任人、交付物和时间。','感谢。我们确认三项行动：我方周五发方案，您方下周反馈，之后再约会议。']]
 });
 
+window.ETIQUETTE_TURN_CONTENT = ETIQUETTE_TURN_CONTENT; // 导出给 libs/v5_scene_training.js 构建多轮对话
 function getEtiquetteCurriculum(level){const g=(level.options||[]).find(function(o){return o.quality==='good';});const first={title:'先看现场，完成第一步',npc:level.opening,action:'turn',actionName:'转身微笑',guide:'身体朝向对方，目光自然停留，表情放松。',method:(g&&g.why)||level.refReason,reference:(g&&g.text)||level.coachAnswer};return [first].concat((ETIQUETTE_TURN_CONTENT[level.id]||[]).map(function(x){return{title:x[0],npc:x[1],action:x[2],actionName:x[3],guide:x[4],method:x[4],reference:x[5]};}));}
 
 function getEtiquetteTeachingSteps(level){return getEtiquetteCurriculum(level);}

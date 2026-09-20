@@ -78,11 +78,44 @@
     { type: 'evaluation', title: '综合评价', dimensions: ['知识评价（你知不知道应该怎么做）', '语言评价（AI 分析你的表达）', '行为确认（你完成了哪些动作）'] }
   ];
 
-  // Adapter: 从 etiquetteLevels 通用生成 6 步训练流程（除 9001 外）
+  // ──────────────────────────────────────────────────────────────────────
+  // Adapter: 从 etiquetteLevels + ETIQUETTE_TURN_CONTENT 构建 8 步完整流程
+  // 9001 保留手动 TEMPLATE_9001（最详细），其余走 adapter 但现在也生成多轮 dialogue
+  // ──────────────────────────────────────────────────────────────────────
+
+  // action_id → emoji + label 的映射（用于构建动作时间轴）
+  const ACTION_ICON_MAP = {
+    'turn':  { icon: '↩️', label: '身体转向对方', tip: '上半身微转，不要背对，保持半侧身' },
+    'nod':   { icon: '🤝', label: '自然点头示意', tip: '轻点 1-2 下，不要像捣蒜' },
+    'listen':{ icon: '👂', label: '认真倾听姿态', tip: '看着对方，不要低头或玩手机，适时点头' },
+    'wave':  { icon: '👋', label: '微笑告别/举手示意', tip: '自然挥一下，不要夸张' },
+    'bow':   { icon: '🙇', label: '起身微微鞠躬/致谢', tip: '长辈或正式场合，幅度不需要太大' },
+    'raise': { icon: '🥂', label: '举杯示意', tip: '杯沿低于对方，说祝福语再喝/碰一下' },
+    'step':  { icon: '🚶', label: '站位引导/上前', tip: '保持 1-1.5 米安全距离，不要贴太近' },
+    'clap':  { icon: '👏', label: '鼓掌回应', tip: '节奏自然，不要太刻意' },
+    'stand': { icon: '🧍', label: '保持正确站姿', tip: '双脚与肩同宽，不要抱胸或插兜' },
+    'hand':  { icon: '🤲', label: '双手递接物品', tip: '名片/文件用双手，文字朝上对方易读' },
+  };
+
+  // 根据 action id 获取 icon 配置，未知的给一个通用默认
+  function getActionMeta(actionId, fallbackLabel) {
+    if (ACTION_ICON_MAP[actionId]) return ACTION_ICON_MAP[actionId];
+    // 根据 id 猜一下
+    const guess = {
+      'sit':   { icon: '🪑', label: '等待/入座', tip: '等主人示意再坐，不要抢主位' },
+      'greet': { icon: '👋', label: '礼貌问候', tip: '称呼 + 问候语，语气自然' },
+      'smile': { icon: '😊', label: '微笑放松', tip: '嘴角上扬，表情自然不僵硬' },
+      'speak': { icon: '💬', label: '清晰表达', tip: '语速适中，咬字清楚，声音洪亮' },
+      'think': { icon: '🤔', label: '停顿思考', tip: '不要急着回答，3 秒沉默比草率回答好' },
+      'leave': { icon: '👋', label: '礼貌告别', tip: '感谢 + 道别语 + 礼貌退出' },
+    };
+    if (guess[actionId]) return guess[actionId];
+    return { icon: '🎯', label: fallbackLabel || actionId, tip: '注意动作的力度和时机' };
+  }
+
   function buildStepsFromLevel(level) {
     if (level.id === 9001) return TEMPLATE_9001.slice();
 
-    // 基于 level 数据生成
     const steps = [];
     const focus = level.focus || '';
     const goal = level.goal || '';
@@ -91,49 +124,145 @@
     const coachAns = level.coachAnswer || '';
     const refReason = level.refReason || '';
     const bestOption = (level.options || []).find(o => o.quality === 'good');
+    const coldOptions = (level.options || []).filter(o => o.quality === 'cold');
 
-    steps.push({ type: 'intro', title: '场景认识', content: level.story + '\n\n对方开口：' + opening, sceneHint: (level.icon || '🎭') + ' ' + level.title });
+    // ETIQUETTE_TURN_CONTENT 数据（可能没有的场景 fallback 到空数组）
+    const turnContent = (global.ETIQUETTE_TURN_CONTENT || {})[level.id] || [];
+    const npcName = relation.split('·')[1] || '对方';  // 从 relation 提取 NPC 名字
 
+    // ────────── Step 1: intro ──────────
+    steps.push({
+      type: 'intro', title: '场景 · ' + level.title,
+      content: level.story + '\n\n对方开口：' + opening,
+      sceneHint: (level.icon || '🎭') + ' ' + level.title + ' · ' + (level.category || '')
+    });
+
+    // ────────── Step 2: objectives ──────────
     const objItems = [];
-    if (focus) focus.split(/[、，,]/).forEach(s => s.trim() && objItems.push(s.trim()));
-    if (goal) objItems.push(goal);
-    if (objItems.length < 2) { objItems.push('顺利完成本次社交互动', '让对方感到被尊重和被看见'); }
-    steps.push({ type: 'objectives', title: '学习目标', items: objItems.slice(0, 4) });
-
-    steps.push({ type: 'why', title: '为什么要这样做', points: [
-      { q: '这个场景最容易踩的坑是什么？', a: (level.options || []).filter(o => o.quality === 'cold').map(o => o.text.substring(0, 40) + '…').join('、') || '回避对方 / 表达冷漠' },
-      { q: '核心原则是什么？', a: refReason || '在尊重对方的前提下，主动提供信息并推进话题。' },
-      { q: '为什么这样说更好？', a: bestOption ? bestOption.why : coachAns }
-    ] });
-
-    // 动作示范 — 根据 focus 推断通用动作（含 icon 时间轴风格）
-    const actionMap = {
-      '微笑': [{step:1,icon:'😊',label:'嘴角微微上扬',tip:'不要假笑或夸张'},{step:2,icon:'👀',label:'目光对视',tip:'看眼睛和鼻子之间，每次3-5秒'},{step:3,icon:'↩️',label:'身体朝向对方',tip:'上半身微转，不要背对'}],
-      '眼神': [{step:1,icon:'👀',label:'自然注视对方',tip:'不要盯着手机或天花板'},{step:2,icon:'😌',label:'3-5秒后可以移开',tip:'避免过长对视造成紧张'},{step:3,icon:'👂',label:'对方说话时保持注视',tip:'这是最基本的尊重信号'}],
-      '称呼': [{step:1,icon:'🔍',label:'找到合适的称呼',tip:'根据年龄和关系决定'},{step:2,icon:'👋',label:'称呼 + 问候',tip:'不要只称呼不问候'},{step:3,icon:'🎵',label:'语气自然',tip:'不要过于僵硬或谄媚'}],
-      '开场': [{step:1,icon:'👀',label:'看向对方',tip:'建立眼神连接再开口'},{step:2,icon:'😊',label:'微笑',tip:'放松的表情让对方也放松'},{step:3,icon:'💬',label:'说问候语',tip:'简短自然，不要长篇大论'},{step:4,icon:'❓',label:'给对方接话的钩子',tip:'问一个开放式问题'}]
-    };
-    let actions = actionMap['开场'] || [{step:1,icon:'↩️',label:'面向对方',tip:'上半身微转'},{step:2,icon:'😊',label:'微笑放松',tip:'表情自然'},{step:3,icon:'💬',label:'说问候',tip:'先打招呼再说话'}];
-    const focusIconMap = {};
-    for (const key of Object.keys(actionMap)) {
-      if (focus.includes(key)) { actions = actionMap[key]; break; }
+    // 从 turnContent 的 title 推导具体目标
+    if (turnContent.length > 0) {
+      const titles = turnContent.map(t => t[0]);
+      titles.forEach(t => { if (t.length >= 2) objItems.push('掌握"' + t + '"环节'); });
     }
-    steps.push({ type: 'action_demo', title: '动作示范',
-      whenToDo: '在对方说话或需要你回应的时刻',
-      commonMistakes: ['还没轮到你就开口', '一直低头不看人', '抱胸/插兜显得不投入', '表情过于僵硬'],
-      actions, why: '这是本场景中对方最先注意到的肢体信号。做对了，对方立刻会觉得你"会来事"；做错了，后面说什么都难救。' });
+    // 加上 focus 拆分的核心点
+    if (focus) focus.split(/[、，,]/).forEach(s => {
+      const t = s.trim();
+      if (t && !objItems.find(o => o.includes(t.substring(0, 3)))) objItems.push(t);
+    });
+    if (goal && !objItems.includes(goal)) objItems.push(goal);
+    // 保底
+    if (objItems.length < 2) { objItems.push('顺利完成本次社交互动', '让对方感到被尊重'); }
+    steps.push({ type: 'objectives', title: '今天要学会', items: objItems.slice(0, 4) });
 
+    // ────────── Step 3: why ──────────
+    const points = [
+      { q: '这个场景最容易踩的坑是什么？',
+        a: coldOptions.length ? coldOptions.map(o => o.text.substring(0, 45) + '…').join('、') : '回避对方 / 表达冷漠' },
+      { q: '核心原则是什么？',
+        a: refReason || '在尊重对方的前提下，主动提供信息并推进话题。' }
+    ];
+    if (bestOption) {
+      points.push({ q: '为什么"' + bestOption.label + '"是更好的回应？', a: bestOption.why });
+    }
+    steps.push({ type: 'why', title: '为什么要这样做', points });
+
+    // ────────── Step 4: action_demo（从 turnContent 构建） ──────────
+    const actActions = [];
+    // 开场固定 2 步
+    actActions.push({ step: 1, icon: '👀', label: '看向对方 + 微笑', tip: '先建立眼神连接，表情放松自然' });
+    actActions.push({ step: 2, icon: '💬', label: '问候/打招呼', tip: '称呼 + 问候语，不要上来就说正事' });
+    // 从 turnContent 追加每个环节的动作
+    turnContent.forEach((t, i) => {
+      const actionId = t[2];  // 第3项是 action id
+      const actionName = t[3]; // 第4项是 actionName
+      const meta = getActionMeta(actionId, actionName);
+      actActions.push({ step: actActions.length + 1, icon: meta.icon, label: actionName || meta.label, tip: meta.tip });
+    });
+    // 收尾动作（如果 turnContent 最后没有 wave/bow）
+    const lastAction = turnContent.length > 0 ? turnContent[turnContent.length - 1][2] : '';
+    if (!['wave', 'bow', 'raise'].includes(lastAction)) {
+      actActions.push({ step: actActions.length + 1, icon: '👍', label: '确认/收尾', tip: '完成关键环节后自然过渡到下一步' });
+    }
+    // whenToDo 从场景类别推断
+    const sceneCategory = (level.category || '');
+    const whenMap = {
+      '商务': '在迎接、交流、送别三个关键节点分别做对应的动作',
+      '家庭': '进门问候、入座、餐桌交流、告别四个环节',
+      '职场': '问候开场 + 提问/汇报 + 确认收尾',
+      '约会': '开场破冰 → 话题推进 → 礼貌结束',
+      '服务': '欢迎 → 观察需求 → 提供帮助 → 欢送',
+    };
+    let whenToDo = '在对方说话或需要你回应的时刻';
+    for (const kw of Object.keys(whenMap)) { if (sceneCategory.includes(kw)) { whenToDo = whenMap[kw]; break; } }
+
+    steps.push({
+      type: 'action_demo', title: '动作示范 · ' + (level.title || '') + ' 的完整动作链',
+      whenToDo,
+      commonMistakes: ['还没轮到你就提前开口', '眼睛一直盯着手机/不抬头', '身体背对对方说话', '表情太严肃或太夸张', '动作时机不对（太早/太晚）'],
+      actions: actActions,
+      why: '这些动作会在你说话之前就传递出信号：对方立刻会感觉"这个人会不会来事"。先做对动作，再说对内容。'
+    });
+
+    // ────────── Step 5: speech_demo ──────────
     const opts = (level.options || []).map(o => ({
       label: o.label + ' · ' + ({good:'最好',neutral:'还行',cold:'欠妥'}[o.quality] || ''),
       quality: o.quality, text: o.text, why: o.why
     }));
-    steps.push({ type: 'speech_demo', title: '话术示范 · 三档回应', options: opts, practicePrompt: '用你自己的话，给' + (relation.split('·')[1] || '对方') + '一个最好的回应。' });
+    steps.push({
+      type: 'speech_demo', title: '话术示范 · 三档回应', options: opts,
+      practicePrompt: '现在用你自己的话，给' + npcName + '一个 A 档的回应。不用逐字照搬，自然就好。'
+    });
 
-    steps.push({ type: 'follow_prac', title: '跟练 · 动作 + 话术', actionChecklist: actions.map(a => a.label), speechPlaceholder: '你的回应…', coachHint: '先做动作（在心里或小声说），再说出你的话。完成后勾选动作。' });
+    // ────────── Step 6: follow_prac ──────────
+    steps.push({
+      type: 'follow_prac', title: '跟练 · 动作 + 话术一起做',
+      actionChecklist: actActions.map(a => a.label),
+      speechPlaceholder: '在心里默念或小声说出来…',
+      coachHint: '先在脑子里或小声把动作做完，再说出你的回应。完成后勾选左边的动作。'
+    });
 
-    steps.push({ type: 'ai_roleplay', title: 'AI 角色扮演', npcOpening: opening, practicePrompt: '现在由 AI 扮演' + (relation.split('·')[1] || '对方') + '。你可以用文字或语音回应。' });
+    // ────────── Step 7: ai_roleplay（★ 多轮 dialogue！末轮强依赖上下文 ★） ──────────
+    const dialogue = [];
+    if (turnContent.length > 0) {
+      // 第 1 轮：level.opening（对方开场）
+      dialogue.push({
+        npc: opening,
+        practicePrompt: '这是开场。用你的话给' + npcName + '一个自然的回应。'
+      });
+      // 第 2-N 轮：从 turnContent 构建
+      turnContent.forEach((t, i) => {
+        const npcLine = t[1];  // npc 说的话
+        const guide = t[4];    // 方法/指导
+        const title = t[0];    // 环节名
+        const last = i === turnContent.length - 1;
+        if (last) {
+          // 末轮：practicePrompt 必须强依赖上文（按 Experience 2179623）
+          const prevTitles = turnContent.slice(0, i).map(x => x[0]).join('、');
+          dialogue.push({
+            npc: npcLine + '（前面已经聊过' + prevTitles + '了，现在到了关键的"' + title + '"环节）',
+            practicePrompt: '前面你已经回应过' + prevTitles + '了。现在' + npcName + '说这句话，你的回应要**衔接前面聊过的内容**，不能像第一次见面。想想之前你们说过什么，在回应里自然带出来。'
+          });
+        } else {
+          dialogue.push({
+            npc: npcLine,
+            practicePrompt: '这是"' + title + '"环节。' + guide + ' 你的回应要自然推进话题。'
+          });
+        }
+      });
+    } else {
+      // fallback: 单轮
+      dialogue.push({ npc: opening, practicePrompt: '用你的话给对方一个回应。' });
+    }
 
-    steps.push({ type: 'evaluation', title: '综合评价', dimensions: ['知识评价', '语言评价（AI 分析）', '行为确认（你完成了哪些动作）'] });
+    steps.push({
+      type: 'ai_roleplay', title: 'AI 角色扮演 · 多轮对话',
+      dialogue,
+      npcOpening: opening,
+      practicePrompt: '现在由 AI 扮演' + npcName + '。你可以用文字或语音回应。'
+    });
+
+    // ────────── Step 8: evaluation ──────────
+    steps.push({ type: 'evaluation', title: '综合评价', dimensions: ['知识评价（你知不知道应该怎么做）', '语言评价（AI 分析你的表达）', '行为确认（你完成了哪些动作）'] });
 
     return steps;
   }
