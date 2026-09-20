@@ -809,6 +809,27 @@ h1,h2,h3 { text-wrap:balance; }
             演示账号登录
           </button>
 
+          <!-- 第三方登录入口 -->
+          <div class="mt-5 flex items-center gap-3 text-gray-300 text-xs">
+            <div class="flex-1 h-px bg-gray-200"></div>
+            <span>其他登录方式</span>
+            <div class="flex-1 h-px bg-gray-200"></div>
+          </div>
+          <div class="mt-4 flex items-center justify-center gap-6">
+            <button onclick="socialLogin('wechat')" class="flex flex-col items-center gap-1 group" title="微信登录（当前为 Web 原型演示）">
+              <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#07c160,#06ad56);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(7,193,96,.25);transition:transform .15s;" class="group-hover:scale-110">
+                <span style="font-size:20px;color:#fff;">💬</span>
+              </div>
+              <span class="text-[11px] text-gray-500">微信</span>
+            </button>
+            <button onclick="socialLogin('qq')" class="flex flex-col items-center gap-1 group" title="QQ 登录（当前为 Web 原型演示）">
+              <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#12b7f5,#0e9dd3);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(18,183,245,.25);transition:transform .15s;" class="group-hover:scale-110">
+                <span style="font-size:20px;color:#fff;">🐧</span>
+              </div>
+              <span class="text-[11px] text-gray-500">QQ</span>
+            </button>
+          </div>
+
           <div class="flex items-center justify-center mt-6" data-page-node-id="HyhMWazJQBBWO45JqMLar7">
             <span class="text-gray-400 text-sm" data-page-node-id="BcrTx1OvuFzGae7hpe3lsf">还没有账号？</span>
             <button onclick="showRegister=true;renderRegister()" class="ml-1 text-indigo-600 text-sm font-medium hover:text-indigo-700" data-page-node-id="IPnn4UtmwPxpFjBEZc1Y1H">立即注册</button>
@@ -5835,6 +5856,64 @@ function demoLogin() {
   $('login-error').style.display = 'none';
   showToast('测试账号已填入，请手动输入密码后登录');
   $('login-password').focus();
+}
+
+// 第三方登录（微信 / QQ）— 当前为 Web 原型 mock，真实项目需接入 OAuth
+function socialLogin(provider) {
+  const providerName = provider === 'wechat' ? '微信' : 'QQ';
+  showToast(`${providerName}登录：Web 原型演示模式`);
+
+  // 生成模拟的第三方用户信息
+  const mockProfiles = {
+    wechat: { nickname: '微信用户_' + Math.floor(Math.random() * 9999), phone: '', member: 'free', socialBind: 'wechat' },
+    qq:     { nickname: 'QQ用户_' + Math.floor(Math.random() * 9999), phone: '', member: 'free', socialBind: 'qq' }
+  };
+  const profile = mockProfiles[provider];
+
+  // 检查是否已有绑定该平台的本地账号
+  const stored = safeLSGet('userData');
+  if (stored && stored.socialBind === provider) {
+    // 已有绑定 → 直接登录
+    userData = { ...stored, lastLoginTime: Date.now() };
+    safeLS('userData', userData);
+    enterAppAfterLogin();
+    showToast(`${providerName}登录成功：${userData.nickname}`);
+    return;
+  }
+
+  // 首次第三方登录 → 弹出绑定手机号弹窗（可选）或直接进入
+  // 原型简化：直接给一个"绑定手机号"提示
+  setTimeout(() => {
+    const shouldBind = confirm(
+      `${providerName}授权成功！\n\n昵称：${profile.nickname}\n\n为了账号安全，建议绑定一个手机号。\n点击"确定"现在绑定，点击"取消"先跳过。`
+    );
+    if (shouldBind) {
+      // 跳到密码 tab 并 focus 手机输入框
+      loginMode = 'password';
+      switchLoginMode('password');
+      const phoneInput = $('login-phone');
+      if (phoneInput) {
+        phoneInput.placeholder = '绑定手机号 — ' + profile.nickname;
+        phoneInput.focus();
+        showToast(`请输入手机号绑定 ${providerName} 账号`);
+        // 临时标记，登录成功后会自动写入 socialBind
+        window.pendingSocialBind = provider;
+      }
+    } else {
+      // 跳过绑定 — 临时身份进入（下次可以再绑）
+      userData = {
+        ...(stored || {}),
+        nickname: profile.nickname,
+        phone: stored?.phone || '',
+        member: stored?.member || 'free',
+        socialBind: provider,
+        lastLoginTime: Date.now()
+      };
+      safeLS('userData', userData);
+      enterAppAfterLogin();
+      showToast(`${providerName}登录成功（未绑定手机号）`);
+    }
+  }, 500);
 }
 
 function applyTestAccountEntitlements() {
