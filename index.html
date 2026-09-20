@@ -19005,16 +19005,45 @@ function useAvatarDetail() {
       html += '</div>';
     }
 
-    // 原始资料出处（资料库课程可溯源）—— v2.5：高级会员专属福利（§18.4）
-    if (card.source) {
-      var srcLocked = (typeof EM_canAccessSource === 'function') ? !EM_canAccessSource() : false;
+    // 资料提取状态：不再显示网盘源文件路径，改为内容提取说明 + 知识库归档位置
+    // 客户不需要关心原始网盘路径，只需要知道内容是否完整可用
+    {
+      var hasBody = !!(bodyText && bodyText.trim());
+      var isLocked = emLocked || !emUnlocked;
+      var cardStatus = card.status || (hasBody ? 'ok' : 'missing');
+      var bodyLen = (card.content || '').length;
+      var statusBadge = {
+        ok:       ['✅', '正文已完整提取', '本资料的文字内容已全部录入知识库，您现在看到的就是完整课程正文。'],
+        truncated:['📄', '正文较长，已完整收录', '本资料较长，当前卡片展示核心内容；完整正文已存入知识库对应分类文件夹，可随时查阅。'],
+        partial:  ['📝', '正文部分提取', '本资料的可识别文字已录入，部分图表/图片内容需人工整理后补入。'],
+        scanned:  ['🖼', '图片型资料', '这份资料以图片/扫描页为主，文字识别暂未覆盖；可查阅知识库原始文件归档。'],
+        corrupt:  ['⚠️', '原文件下载损坏', '网盘下载时该文件不完整，重新下载后可补入正文。'],
+        missing:  ['⏳', '正文待提取', '该条目正在排队进行文字提取，稍后刷新即可看到正文。']
+      }[cardStatus] || ['📚', '资料已归档', '本资料已录入知识库。'];
+      // 归档位置：尝试推断知识库分类路径
+      var archiveHint = '';
+      var src = (card.source || '').toString();
+      if (src.indexOf('580好好接话') >= 0) archiveHint = 'knowledge_base/01-高情商接话话术/';
+      else if (src.indexOf('销售话术300套') >= 0) archiveHint = 'knowledge_base/02-销售话术300套/';
+      else if (src.indexOf('送礼话术') >= 0) archiveHint = 'knowledge_base/03-送礼话术全攻略/';
+      else if (src.indexOf('职场社交') >= 0 || src.indexOf('职场处事') >= 0) archiveHint = 'knowledge_base/04-职场社交提升/';
+      else if (src.indexOf('版块12') >= 0 || src.indexOf('礼仪培训') >= 0) archiveHint = 'knowledge_base/05-礼仪培训/';
+      else if (src.indexOf('人性') >= 0 || src.indexOf('说话的艺术') >= 0 || src.indexOf('思维认知') >= 0) archiveHint = 'knowledge_base/06-人性认知思维/';
+      else if (src.indexOf('赚钱') >= 0 || src.indexOf('营销') >= 0 || src.indexOf('利他销售') >= 0) archiveHint = 'knowledge_base/07-赚钱营销提升/';
+      else if (src.indexOf('两性') >= 0 || src.indexOf('情感') >= 0) archiveHint = 'knowledge_base/08-两性情感/';
+      else if (src.indexOf('权谋') >= 0 || src.indexOf('做局') >= 0) archiveHint = 'knowledge_base/09-权谋思维/';
       html += '<div class="knowledge-formula">';
-      html += '  <div class="formula-label">📎 原始资料</div>';
-      if (srcLocked) {
-        html += '  <div style="font-size:11px;color:#6b6488;line-height:1.7;background:#faf9ff;padding:10px 12px;border-radius:8px;margin-top:6px;text-align:center;">👑 原始资料为高级会员专属福利<br><button onclick="goToMember()" style="margin-top:6px;padding:6px 14px;border:none;border-radius:8px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:12px;font-weight:700;cursor:pointer;">开通高级会员查看</button></div>';
-      } else {
-        html += '  <div style="font-size:11px;color:#6b6488;line-height:1.6;word-break:break-all;background:#faf9ff;padding:8px 10px;border-radius:8px;margin-top:6px;">' + escapeHTML(card.source) + '</div>';
+      html += '  <div class="formula-label">📚 资料状态</div>';
+      html += '  <div style="font-size:12px;line-height:1.7;background:#f0fdf4;border:1px solid #bbf7d0;padding:10px 12px;border-radius:8px;margin-top:6px;">';
+      html += '    <div style="font-weight:700;color:#15803d;margin-bottom:4px;">' + statusBadge[0] + ' ' + escapeHTML(statusBadge[1]) + '</div>';
+      html += '    <div style="color:#475569;">' + escapeHTML(statusBadge[2]) + '</div>';
+      if (archiveHint) {
+        html += '    <div style="font-size:11px;color:#64748b;margin-top:6px;padding-top:6px;border-top:1px dashed #e2e8f0;">📂 知识库归档: <code>' + escapeHTML(archiveHint) + '</code></div>';
       }
+      if (bodyLen > 0 && !isLocked) {
+        html += '    <div style="font-size:11px;color:#64748b;margin-top:4px;">📖 当前卡片正文: ' + bodyLen + ' 字</div>';
+      }
+      html += '  </div>';
       html += '</div>';
     }
 
