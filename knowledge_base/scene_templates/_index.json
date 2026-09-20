@@ -46,14 +46,16 @@
       "title": "兴趣社群自我介绍",
       "category": "日常社交",
       "difficulty": 1,
-      "status": "todo"
+      "status": "✅ 完整",
+      "file": "ST-006_community_intro.json"
     },
     {
       "scene_id": "ST-007",
-      "title": "被朋友误解(NVC)",
+      "title": "被朋友误解（NVC化解）",
       "category": "日常社交",
       "difficulty": 2,
-      "status": "todo"
+      "status": "✅ 完整",
+      "file": "ST-007_friend_misunderstanding.json"
     },
     {
       "scene_id": "ST-008",
