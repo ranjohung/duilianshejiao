@@ -95,3 +95,5 @@ knowledge_base/_分类清单.json
 # Audio cache - too large for GitHub push
 tools/_audio_cache/
 extracted_raw/
+_current.wav
+*.wav.tmp

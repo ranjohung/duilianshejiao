@@ -1,0 +1,9 @@
+﻿python : F:\开发软件项目文件\对练社交\transcribe_videos.py:5: SyntaxWarning: "\B" is an invalid escape sequence. Such sequences wil
+l not work in the future. Did you mean "\\B"? A raw string is also an option.
+At line:16 char:1
++ python transcribe_videos.py 2>&1 | Tee-Object -FilePath "knowledge_ba ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (F:\开发软件项目文件\对练社...also an option.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  输入: G:\BaiduNetdiskDownload\版块12 下所有 .rmvb/.rm/.avi/.flv/.wmv
