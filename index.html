@@ -1947,6 +1947,25 @@ function showMutationCoachAdvice(mutation) {
           <span class="text-gray-400" data-page-node-id="80Hry2xyvAYsi9EqusB4qh">→</span>
         </button>
 
+        <!-- v5.0.0 新增：显示与性能设置（3D 降级为可选增强器） -->
+        <div class="w-full bg-white rounded-xl p-4 shadow-sm mb-3">
+          <div class="flex items-center gap-3 mb-3">
+            <span class="text-xl">⚙️</span>
+            <div>
+              <div class="text-gray-700 text-sm font-medium">显示与性能</div>
+              <div class="text-xs text-gray-400">控制 3D 演示和性能偏好</div>
+            </div>
+          </div>
+          <label class="flex items-center justify-between cursor-pointer py-2">
+            <div class="flex-1">
+              <div class="text-sm text-gray-700">🎭 启用 3D 人物演示</div>
+              <div class="text-xs text-gray-400 mt-0.5" id="3d-load-hint">默认关闭（省 2-3MB 流量 + 加速首屏），开启后会在下次打开页面时加载 3D 库</div>
+            </div>
+            <input type="checkbox" id="toggle-enable3D" onchange="toggle3DSettings(this.checked)" style="width:40px;height:22px;accent-color:#6366f1;" />
+          </label>
+          <div id="3d-load-status" class="hidden text-xs text-emerald-600 mt-1"></div>
+        </div>
+
         <button onclick="showModal('invite')" class="w-full bg-white rounded-xl p-4 shadow-sm flex items-center justify-between hover:bg-gray-50 transition-all" data-page-node-id="h7XESRfisyF8e6yC87vSyu">
           <div class="flex items-center gap-3" data-page-node-id="X1d29IjD5wOh3nGG1pWXQh">
             <span class="text-xl" data-page-node-id="TWnShmrPqeVyKFHErM3AuH">👥</span>
@@ -3445,11 +3464,68 @@ function showMutationCoachAdvice(mutation) {
 <script src="knowledge_base/raw_course_cards.js"></script>
 <script src="knowledge_base/extra_course_cards_all.js?v=20250704"></script>
 
-<script src="libs/three.min.js"></script>
-<script src="libs/GLTFLoader.js"></script>
-<script src="libs/SkeletonUtils.js"></script>
-<script src="libs/etiquette_anim_data.js"></script>
-<script src="libs/game_stage3d.js"></script>
+<!-- three.js 5 个库 — v5.0.0 架构改为按需加载（3D 降级为可选增强器）
+  默认不加载；用户开启 3D 演示 或 进入需要 3D 的页面时才调用 load3D()
+  首次加载约 2-3MB，用户可在"我的页→3D 演示开关"里控制 -->
+<script>
+(function(){
+  window._threeLoader = window._threeLoader || {
+    _loaded: false,
+    _loading: false,
+    _queue: [],
+    _files: [
+      'libs/three.min.js',
+      'libs/GLTFLoader.js',
+      'libs/SkeletonUtils.js',
+      'libs/etiquette_anim_data.js',
+      'libs/game_stage3d.js'
+    ],
+    load: function(cb) {
+      var self = this;
+      if (self._loaded) { if(cb) cb(); return Promise.resolve(); }
+      if (self._loading) { if(cb) self._queue.push(cb); return; }
+      self._loading = true;
+      self._queue = self._queue || [];
+      if (cb) self._queue.push(cb);
+
+      return self._files.reduce(function(p, src){
+        return p.then(function(){
+          return new Promise(function(resolve, reject){
+            var s = document.createElement('script');
+            s.src = src;
+            s.onload = resolve;
+            s.onerror = function(){ console.warn('[3D] 加载失败: '+src); resolve(); }; // 单个失败不阻塞
+            document.head.appendChild(s);
+          });
+        });
+      }, Promise.resolve()).then(function(){
+        self._loaded = true;
+        self._loading = false;
+        // 触发所有等待回调
+        self._queue.forEach(function(c){ try { c(); } catch(e){} });
+        self._queue = [];
+        console.log('[3D] 动态加载完成：'+self._files.length+' 个库，Stage3D =', window.Stage3D || 'null');
+      });
+    }
+  };
+  window.load3D = function(cb){ return window._threeLoader.load(cb); };
+})();
+
+// 启动时根据用户设置自动决定是否加载（默认不加载，省流量/加快首屏）
+(function autoDecide3D(){
+  try {
+    var settings = JSON.parse(localStorage.getItem('duilian_settings') || '{}');
+    if (settings.enable3D) {
+      console.log('[3D] 用户已开启 3D 演示，自动加载…');
+      window.load3D();
+    } else {
+      console.log('[3D] 默认关闭 3D 演示（省流量+加速），用户开启后才加载');
+    }
+  } catch(e) {
+    console.log('[3D] 设置读取失败，默认不加载');
+  }
+})();
+</script>
 
 <script>
 // ===== 全局状态 =====
@@ -12943,6 +13019,32 @@ function setProgressDays(d) {
 }
 
 // ===== 我的页 =====
+
+/** v5.0.0 3D 演示设置开关回调 */
+function toggle3DSettings(enable) {
+  try {
+    var settings = JSON.parse(localStorage.getItem('duilian_settings') || '{}');
+    settings.enable3D = !!enable;
+    localStorage.setItem('duilian_settings', JSON.stringify(settings));
+    console.log('[3D] 设置已保存: enable3D =', settings.enable3D);
+  } catch(e) {
+    console.warn('[3D] 设置保存失败:', e.message);
+    return;
+  }
+  if (enable) {
+    // 立即加载 3D 库（而不是等下次打开）
+    showToast('🎭 正在加载 3D 演示库…');
+    window.load3D(function(){
+      showToast('✅ 3D 演示已启用，下次打开自动加载');
+      // 刷新状态显示
+      renderProfile();
+    });
+  } else {
+    showToast('已关闭 3D 演示（省流量+加速）');
+    renderProfile();
+  }
+}
+
 function renderProfile() {
   normalizeAccountPoints();
   syncSigninToday();
@@ -12958,6 +13060,35 @@ function renderProfile() {
   $('profile-points').textContent = userData.points;
   $('profile-streak').textContent = userData.streak;
   $('profile-scenes').textContent = getCompletedSceneCount();
+
+  // v5.0.0: 3D 演示开关初始化
+  try {
+    var _settings = JSON.parse(localStorage.getItem('duilian_settings') || '{}');
+    var _cb = $('toggle-enable3D');
+    if (_cb) {
+      _cb.checked = !!_settings.enable3D;
+      var _status = $('3d-load-status');
+      if (_status) {
+        if (_settings.enable3D && window._threeLoader && window._threeLoader._loaded) {
+          _status.textContent = '✅ 3D 库已加载，随时可用';
+          _status.classList.remove('hidden');
+          $('3d-load-hint').textContent = '3D 演示已启用，下次打开页面会自动加载';
+        } else if (_settings.enable3D) {
+          _status.textContent = '⏳ 3D 将在下次打开页面时自动加载（或现在点击立即加载）';
+          _status.classList.remove('hidden');
+          _status.style.cursor = 'pointer';
+          _status.onclick = function(){
+            window.load3D(function(){ showToast('✅ 3D 库加载完成！'); renderProfile(); });
+          };
+          $('3d-load-hint').textContent = '已开启，现在可以点击上方小字立即加载';
+        } else {
+          _status.classList.add('hidden');
+          $('3d-load-hint').textContent = '默认关闭（省 2-3MB 流量 + 加速首屏）';
+        }
+      }
+    }
+  } catch(e) {}
+
   $('profile-tickets').textContent = timeRewindTickets;
 
   const now = new Date();
