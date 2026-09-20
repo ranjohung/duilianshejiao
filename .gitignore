@@ -94,3 +94,4 @@ knowledge_base/_分类清单.json
 *.bak
 # Audio cache - too large for GitHub push
 tools/_audio_cache/
+extracted_raw/
