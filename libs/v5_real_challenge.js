@@ -1,464 +1,306 @@
 /* =========================================================================
  *  v5_real_challenge.js
- *  真实挑战 — 课堂→现实 迁移训练（ChatGPT 方案 R12 · 第 14-16 节）
+ *  真实挑战 — 纯文字对话模式适配器（2026-09-15 重构）
  *
  *  设计理念：
  *  ───────────────────────────────────────────────────────────────────────
- *  真实挑战不是"打勾任务清单"。它是：
+ *  真实挑战 = 场景介绍 → 用户主动输入话术+动作 → 教练评价
  *
- *    礼仪训练 → 挑战下发 → 现实记录 → 复盘 → 推荐下一训练
- *
- *  每个挑战 = 迁移训练包，包含：
- *    ① 挑战任务（今日在现实世界做一件事）
- *    ② 完成前 checklist（心理准备 / 观察点）
- *    ③ 现实记录表单（地点 + 行为 + 感受 + 结果 + 描述）
- *    ④ 复盘反馈（基于你做的 + 感受 + 结果）
- *    ⑤ 推荐下一训练（基于暴露的薄弱点）
+ *  和场景模板市场里的训练项目完全一样的文字对话体验：
+ *    - 没有 3D/照片场景装饰
+ *    - 没有选项卡，用户自由输入
+ *    - 教练根据礼仪规则给出"对/错 + 为什么 + 应该怎么做"
  *
  *  使用方式：
- *    RealChallenge.start(challengeId)      — 开始挑战（从已学的礼仪训练 level 迁移）
- *    RealChallenge.startFromLevel(levelId) — 从礼仪训练 level 自动推荐匹配的挑战
+ *    RealChallenge.start(challengeId)   — 直接开始对话挑战（纯文字模式）
  *
- *  挂载：
- *    window.RealChallenge  (IIFE 导出)
+ *  核心流程：
+ *    场景介绍弹窗 → 教练开场 → 多轮对话（用户输入 → 教练评价 → NPC回应）
+ *    → 完成 3 轮后结算 → 复盘反馈 → 推荐下一训练
+ *
+ *  挂载：window.RealChallenge
  * ========================================================================= */
 
-(function (global) {
+(function () {
   'use strict';
 
-  if (!global) return;
-
-  const RealChallenge = {
-    _challenge: null,      // 当前 challenge level
-    _stepIdx: 0,           // 当前步骤
-    _form: {},             // 用户填写的记录 { location, behavior, feeling, result, description }
-    _container: null,
+  // ===== 礼仪要素关键词库 =====
+  const ETIQUETTE_KEYWORDS = {
+    // 动作类
+    actions: ['微笑', '笑', '点头', '鞠躬', '欠身', '起立', '起身', '握手', '伸手', '眼神', '看着', '注视',
+              '眼神接触', '目光', '对视', '招手', '挥手', '让开', '侧身', '让路', '前倾', '身体前倾',
+              '坐直', '站直', '保持距离', '保持', '递', '接', '双手', '单手', '捧', '推'],
+    // 称呼类
+    greetings: ['你好', '您好', '早上好', '中午好', '下午好', '晚上好', '早安', '晚安',
+                '老师', '经理', '总', '老板', '阿姨', '叔叔', '哥', '姐', '小朋友',
+                '先生', '女士', '同学', '同事', '朋友', '亲爱的', '宝宝'],
+    // 礼貌用语
+    polite: ['请', '麻烦', '请问', '能不能', '可不可以', '谢谢', '感谢', '多谢', '辛苦',
+             '不好意思', '抱歉', '对不起', '打扰', '劳烦', '费心', '麻烦您'],
+    // 姿态描述
+    posture: ['礼貌', '得体', '自然', '放松', '大方', '诚恳', '真诚', '尊重', '谦逊',
+              '自信', '从容', '淡定', '热情', '友好', '温和', '轻柔', '语气平和'],
+    // 表达类
+    expression: ['开放式', '问题', '提问', '反问', '追问', '倾听', '共情', '理解', '感受',
+                 '感受如何', '觉得', '怎么样', '为什么', '怎么回事', '能说说', '具体说说',
+                 '我懂', '我明白', '我理解'],
+    // 禁忌类
+    forbidden: ['滚', '傻', '白痴', '笨蛋', '废物', '垃圾', '讨厌你', '烦死人', '滚开',
+                '有病', '脑残', '闭嘴', '走开', '讨厌', '够了', '懒得', '随便你', '跟我没关系',
+                '关我屁事', '关你屁事']
   };
 
-  // ──────────────────────────────────────────────────────────────────────
-  // 挑战模板适配器：从 realChallengeLevels / etiquetteLevels 生成挑战包
-  // ──────────────────────────────────────────────────────────────────────
+  // ===== 场景礼仪规则（场景-specific 的检查项）=====
+  const SCENE_RULES = {
+    '咖啡厅的邂逅': {
+      mustHave: ['微笑', '眼神接触', '开放式问题'],
+      niceToHave: ['称呼', '自我介绍'],
+      forbidden: ['身体接触', '追问隐私'],
+      tips: '咖啡馆是轻松的公共场景，核心是"破冰+不唐突"：微笑对视 + 简短问候 + 一个开放式问题（如"你常来这家吗？"）'
+    },
+    '朋友家的晚餐': {
+      mustHave: ['称呼长辈', '问候长辈', '入座等待'],
+      niceToHave: ['带礼物', '主动帮忙', '不先动筷'],
+      forbidden: ['直呼长辈姓名', '抢着吃', '玩手机'],
+      tips: '做客核心是"尊重边界"：先问候主人父母 + 等主人示意后入座 + 不先动筷 + 饭后主动帮忙'
+    },
+    '模拟面试': {
+      mustHave: ['称呼面试官', '坐姿端正', '眼神接触', '清晰表达'],
+      niceToHave: ['自我介绍结构化', '案例支撑'],
+      forbidden: ['说前公司坏话', '抱怨', '过度谦虚'],
+      tips: '面试核心是"专业+自信"：坐姿端正 + 条理清晰 + 用具体案例 + 结尾问1-2个问题'
+    },
+    '主动打招呼': {
+      mustHave: ['微笑', '眼神接触', '问候'],
+      niceToHave: ['自我介绍', '开场白'],
+      forbidden: ['无视对方', '太热情'],
+      tips: '打招呼核心是"友好+不尴尬"：微笑对视 + 简单问候 + 一句轻松的开场白'
+    },
+    '深度对话': {
+      mustHave: ['倾听', '共情', '眼神接触'],
+      niceToHave: ['开放式问题', '复述确认'],
+      forbidden: ['打断对方', '否定感受'],
+      tips: '深度对话核心是"先倾听后回应"：先共情 + 复述对方感受 + 问开放式问题引导深入'
+    },
+    '加薪谈判': {
+      mustHave: ['数据支撑', '语气平和', '先肯定后表达'],
+      niceToHave: ['结构化表达'],
+      forbidden: ['情绪化', '威胁', '拿离职要挟'],
+      tips: '谈判核心是"理性+有依据"：先肯定团队 + 用数据证明贡献 + 谈价值不谈需要'
+    },
+    '年终述职演讲': {
+      mustHave: ['结构化表达', '眼神环视', '站姿端正'],
+      niceToHave: ['数据支撑', '亮点突出'],
+      forbidden: ['念PPT', '太谦虚', '只讲自己'],
+      tips: '公开表达核心是"结构+亮点"：背景-目标-行动-结果 + 重点讲亮点 + 结尾感谢'
+    },
+    '朋友间的冲突': {
+      mustHave: ['表达感受', '先倾听', '非暴力'],
+      niceToHave: ['I-message（我觉得...）'],
+      forbidden: ['指责', '翻旧账', '情绪化'],
+      tips: '冲突处理核心是"表达感受+不指责"：先让对方说完 + 用"我觉得..."表达 + 讨论解决方式'
+    }
+  };
 
-  // 挑战步骤
-  // 0: intro      今天的挑战是什么
-  // 1: prep       完成前 checklist（心理准备 + 观察点）
-  // 2: record     现实记录表单
-  // 3: review     复盘反馈 + 推荐下一训练
+  // ===== 教练评价引擎 =====
+  function evaluateAnswer(answer, sceneTitle, round) {
+    const text = (answer || '').trim();
+    const rules = SCENE_RULES[sceneTitle] || {};
+    const mustHave = rules.mustHave || [];
+    const niceToHave = rules.niceToHave || [];
+    const forbidden = rules.forbidden || [];
 
-  function buildChallengeFromLevel(level) {
-    const challengeId = level.id;
-    const focus = level.focus || '';
-    const goal = level.goal || '';
-    const story = level.story || '';
-    const relation = level.relation || '';
+    const positives = [];
+    const improvements = [];
+    let scoreDelta = 0;
+    let pass = true;
 
-    // 匹配的现实场景地点选项
-    const locationMap = {
-      '咖啡厅': ['公司茶水间', '楼下咖啡厅', '朋友聚会', '地铁/公交'],
-      '社交': ['公司茶水间', '小区楼下', '朋友聚会', '购物结账'],
-      '职场': ['公司茶水间', '电梯里', '走廊遇到', '会议室门口'],
-      '家庭': ['家里', '朋友家', '家庭聚会', '社区活动'],
-      '公共': ['电梯里', '走廊遇到', '购物结账', '餐厅'],
-      '客户': ['电梯里', '公司前台', '走廊遇到', '会议室门口'],
-    };
-
-    let locations = ['公司茶水间', '小区楼下', '朋友聚会', '购物结账', '电梯里'];
-    for (const [key, locs] of Object.entries(locationMap)) {
-      if (level.title && level.title.includes(key)) { locations = locs; break; }
-      if (level.category && level.category.includes(key)) { locations = locs; break; }
+    // 1. 长度检查
+    if (text.length < 8) {
+      pass = false;
+      scoreDelta -= 5;
+      improvements.push('回应太简短（少于8个字），教练看不到你的礼仪动作或完整表达');
     }
 
-    // prep checklist（完成前心理准备）
-    const prepChecklist = [
-      { text: '找到一个合适的现实场景（上面的地点选一个）', tip: '不需要追求完美，"有机会就尝试"比"等到完美时机"好' },
-      { text: '回忆今天训练的核心动作：' + focus, tip: '不要想全套，抓 1-2 个最重要的动作' },
-      { text: '给自己一个"只练这一件事"的许可', tip: '不是让你在现实中演戏，而是让你更有意识地去做' },
-      { text: '接受"做得不好也没关系"', tip: '这是训练，不是考试。哪怕只做了一半，也是有价值的反馈' },
-    ];
+    // 2. 礼仪要素检测
+    const foundActions = ETIQUETTE_KEYWORDS.actions.filter(k => text.includes(k));
+    const foundGreetings = ETIQUETTE_KEYWORDS.greetings.filter(k => text.includes(k));
+    const foundPolite = ETIQUETTE_KEYWORDS.polite.filter(k => text.includes(k));
+    const foundPosture = ETIQUETTE_KEYWORDS.posture.filter(k => text.includes(k));
+    const foundExpression = ETIQUETTE_KEYWORDS.expression.filter(k => text.includes(k));
+    const foundForbidden = ETIQUETTE_KEYWORDS.forbidden.filter(k => text.includes(k));
 
-    // 观察点（完成前想好要注意什么）
-    const observePoints = focus ? focus.split(/[、，,]/).map(f => f.trim()).filter(Boolean).slice(0, 4) : ['对方的反应', '自己的紧张程度', '对话是否在继续'];
+    // 3. 场景必选项检查
+    mustHave.forEach(item => {
+      const hit = ETIQUETTE_KEYWORDS.actions.concat(ETIQUETTE_KEYWORDS.greetings, ETIQUETTE_KEYWORDS.polite).some(k => item.includes(k) || k.includes(item));
+      // 更智能的匹配
+      const simpleMatch = text.includes(item) || (item === '微笑' && text.includes('笑'));
+      if (simpleMatch) {
+        positives.push(`包含了"${item}"这个关键礼仪要素`);
+        scoreDelta += 3;
+      } else {
+        improvements.push(`缺少"${item}"——这是本场景的核心礼仪`);
+        scoreDelta -= 2;
+      }
+    });
+
+    // 4. 加分项检查
+    niceToHave.forEach(item => {
+      if (text.includes(item)) {
+        positives.push(`额外加分："${item}"做得很好！`);
+        scoreDelta += 2;
+      }
+    });
+
+    // 5. 禁忌检查
+    foundForbidden.forEach(word => {
+      pass = false;
+      scoreDelta -= 8;
+      improvements.push(`出现了不恰当的表达"${word}"，在当前场景中不合适`);
+    });
+
+    // 6. 有动作描述但没话术
+    const hasAction = foundActions.length > 0;
+    const hasSpeech = foundGreetings.length > 0 || foundPolite.length > 0 || text.length > 15;
+    if (hasAction && !hasSpeech && text.length < 20) {
+      improvements.push('你描述了动作，但可以补充一两句社交话术让场景更完整');
+      scoreDelta -= 1;
+    }
+    if (!hasAction && hasSpeech && text.length > 20) {
+      improvements.push('你说了话，但没描述会做的礼仪动作（如微笑、眼神接触等）');
+      scoreDelta -= 1;
+    }
+    if (hasAction && hasSpeech) {
+      positives.push('话术 + 动作都覆盖到了，很棒的完整度！');
+      scoreDelta += 2;
+    }
+
+    // 7. 肯定
+    if (foundActions.length > 0) {
+      positives.push(`你提到了动作: ${foundActions.slice(0, 3).join('、')}`);
+    }
+    if (foundPolite.length > 0) {
+      positives.push(`你用了礼貌用语: ${foundPolite.slice(0, 2).join('、')}`);
+    }
+    if (foundExpression.length > 0) {
+      positives.push(`你有${foundExpression.includes('开放式') ? '开放式问题' : '引导对话的意识'}`);
+    }
+
+    // 8. 收尾判断
+    if (round >= 3 && text.length > 20) {
+      positives.push('最后一轮了！保持自然收尾，不要太刻意');
+      scoreDelta += 1;
+    }
+
+    // 默认值
+    if (positives.length === 0) {
+      positives.push('你的回应切题，可以尝试描述更多礼仪动作（微笑、眼神、姿势等）');
+    }
+
+    // 生成建议（应该怎么做）
+    const tip = rules.tips || '先回应对方，再补充一个细节或反问，让对方有话可接。';
+
+    // 控制分数范围
+    scoreDelta = Math.max(-10, Math.min(10, scoreDelta));
 
     return {
-      challengeId,
-      level,
-      steps: [
-        {
-          type: 'intro',
-          title: '🎯 今日现实挑战',
-          content: `在${goal || level.title || '一次现实互动'}中，练习${focus || '一个小动作'}。`,
-          story: story,
-          relation: relation,
-          instructions: [
-            '选择一个合适的现实场景（见下一步）',
-            '找到一个可以练习的机会',
-            '做你能做的，不用完美',
-            '回来记录你的经历',
-          ],
-          locations: locations,
-          timeHint: '建议在 24 小时内完成',
-        },
-        {
-          type: 'prep',
-          title: '📝 完成前 · 准备好了吗？',
-          checklist: prepChecklist,
-          observePoints: observePoints,
-          coachHint: '勾选完就带着这些清单出门吧。你不需要演得像训练里一样，只要让自己有意识地去做，就是进步。',
-        },
-        {
-          type: 'record',
-          title: '📸 记录你的经历',
-          fields: [
-            { key: 'location', label: '在哪里？', type: 'choice', options: locations.concat(['其他（请在描述里说明）']), placeholder: '选择一个' },
-            { key: 'behavior', label: '你做了什么？', type: 'choice', options: ['完全按训练的动作和话术做了', '做了动作但话术是自己想的', '只做了部分动作', '没做 / 没找到机会'], placeholder: '选一个最接近的' },
-            { key: 'feeling', label: '当时感觉怎么样？', type: 'choice', options: ['😰 很紧张', '😐 一般', '🙂 比较自然', '😄 很轻松'], placeholder: '选一个' },
-            { key: 'result', label: '结果如何？', type: 'choice', options: ['✅ 对方有回应，对话继续了', '✅ 对方回应了但没继续', '⚠️ 有点尴尬但撑过去了', '❌ 我临阵退缩了'], placeholder: '选一个' },
-            { key: 'description', label: '描述一下（可选，越具体越好）', type: 'text', placeholder: '比如：在咖啡厅排队，我看到前面是同事小李。我做了眼神接触，微笑说"早啊小李，上周那个方案搞定了吗？"他说搞定了，还聊了两句周末的事。其实说出口之前我挺紧张的，但开口之后反而自然了。' },
-          ],
-        },
-        {
-          type: 'review',
-          title: '🔍 复盘 · 看看你暴露了什么',
-          // 根据 record 动态生成
-        },
-      ],
+      scoreDelta,
+      pass,
+      positives,
+      improvements,
+      tip,
+      comment: pass ? (scoreDelta >= 3 ? '做得很棒！继续保持' : scoreDelta >= 0 ? '基本合格，可以更好' : '勉强过关，注意改进') : '有些地方需要注意',
+      correctReason: improvements.length > 0 ? improvements.join('；') : '你的回应很好地匹配了当前场景的社交目标。',
+      suggestion: tip,
+      correctAnswer: null  // 纯文字模式不给固定答案
     };
   }
 
-  // ──────────────────────────────────────────────────────────────────────
-  // 渲染主入口
-  // ──────────────────────────────────────────────────────────────────────
+  // ===== 重写 sendChallengeMessage 里的教练评价逻辑 =====
+  function wrapExistingAnalyzer() {
+    // 如果 index.html 里已经有 analyzeChallengeAnswer，我们增强它
+    if (typeof window.analyzeChallengeAnswer === 'function') {
+      const originalAnalyzer = window.analyzeChallengeAnswer;
+      window.analyzeChallengeAnswer = function (answer, challengeId, round) {
+        const challenge = (window.challenges || []).find(c => c.id === challengeId);
+        const title = challenge ? challenge.title : '';
+
+        // 纯文字模式用我们的礼仪引擎
+        if (window.challengePlainChat) {
+          const evalResult = evaluateAnswer(answer, title, round);
+          return {
+            scoreDelta: evalResult.scoreDelta,
+            comment: evalResult.comment,
+            correctReason: evalResult.correctReason,
+            suggestion: evalResult.suggestion,
+            correctAnswer: evalResult.correctAnswer,
+            positives: evalResult.positives,       // ✅ 新增
+            improvements: evalResult.improvements  // ✅ 新增
+          };
+        }
+        // 非纯文字模式保持原有行为
+        return originalAnalyzer.apply(this, arguments);
+      };
+      return true;
+    }
+    return false;
+  }
+
+  // ===== 初始化：替换评价逻辑 + 导出 API =====
+  function init() {
+    // 等待 index.html 的 challenges 加载
+    const tryInit = () => {
+      if (typeof window.analyzeChallengeAnswer === 'function') {
+        wrapExistingAnalyzer();
+        return true;
+      }
+      return false;
+    };
+
+    if (!tryInit()) {
+      // 延迟重试
+      let retries = 0;
+      const timer = setInterval(() => {
+        retries++;
+        if (tryInit() || retries > 20) clearInterval(timer);
+      }, 200);
+    }
+  }
 
   function start(challengeId) {
-    // 先从 realChallengeLevels 找，找不到从 etiquetteLevels 找
-    const levels = global.realChallengeLevels || global.etiquetteLevels || [];
-    const level = levels.find(l => String(l.id) === String(challengeId));
-    if (!level) { console.warn('[RealChallenge] challenge not found:', challengeId); return; }
-
-    RealChallenge._challenge = buildChallengeFromLevel(level);
-    RealChallenge._stepIdx = 0;
-    RealChallenge._form = {};
-
-    // 定位容器 — 用 modal-challenge 里的区域
-    let container = document.getElementById('real-challenge-v5-container');
-    if (!container) {
-      container = document.createElement('div');
-      container.id = 'real-challenge-v5-container';
-      container.style.cssText = 'flex:1;overflow-y:auto;padding:16px;';
-      // 插入到 modal-challenge 内（如果存在），或插到 body 末尾
-      const modal = document.getElementById('modal-real-challenge');
-      if (modal) {
-        const scrollArea = modal.querySelector('.ct-scroll, .modal-content');
-        if (scrollArea) scrollArea.parentNode.insertBefore(container, scrollArea);
-        else modal.appendChild(container);
+    // 确保 challenges 已加载
+    if (!window.challenges || window.challenges.length === 0) {
+      // 先加载
+      if (typeof window.loadMockChallenges === 'function') {
+        window.loadMockChallenges(false);
       } else {
-        // fallback：append 到 body
-        container.style.cssText += ';position:fixed;top:0;left:0;right:0;bottom:0;background:#fff;z-index:9999;';
-        document.body.appendChild(container);
+        console.warn('[RealChallenge] challenges 未加载');
+        return;
       }
     }
-    RealChallenge._container = container;
-    container.style.display = 'block';
 
-    render();
-  }
-
-  function startFromLevel(levelId) {
-    // 从礼仪训练 level 自动推荐挑战（默认找同 id）
-    start(levelId);
-  }
-
-  function render() {
-    const container = RealChallenge._container;
-    if (!container) return;
-    const step = RealChallenge._challenge.steps[RealChallenge._stepIdx];
-    const total = RealChallenge._challenge.steps.length;
-    const idx = RealChallenge._stepIdx;
-
-    let html = `<div style="text-align:center;margin-bottom:14px;">
-      <div style="font-size:11px;color:#9ca3af;">Real Challenge · Step ${idx+1} / ${total}</div>
-      <div style="font-size:18px;font-weight:700;color:#1f2937;margin-top:4px;">${step.title}</div>
-    </div>`;
-
-    switch (step.type) {
-      case 'intro':   html += renderIntro(step); break;
-      case 'prep':    html += renderPrep(step); break;
-      case 'record':  html += renderRecord(step); break;
-      case 'review':  html += renderReview(step); break;
-      default:        html += '<div class="text-gray-400">未知步骤类型</div>';
-    }
-
-    html += renderStepNav();
-    container.innerHTML = html;
-    bindEvents();
-  }
-
-  function renderStepNav() {
-    const idx = RealChallenge._stepIdx;
-    const total = RealChallenge._challenge.steps.length;
-    const isLast = idx >= total - 1;
-    const isFirst = idx === 0;
-
-    let dots = '';
-    for (let i = 0; i < total; i++) {
-      dots += `<div onclick="RealChallenge.gotoStep(${i})" style="width:10px;height:10px;border-radius:50%;background:${i<idx?'#10b981':i===idx?'#6366f1':'#d1d5db'};cursor:pointer;"></div>`;
-    }
-
-    return `<div style="display:flex;align-items:center;justify-content:space-between;padding-top:16px;margin-top:16px;border-top:1px solid #f3f4f6;">
-      <button onclick="RealChallenge.prev()" ${isFirst?'disabled':''} style="padding:8px 18px;border:1px solid #e5e7eb;border-radius:10px;background:${isFirst?'#f9fafb':'#fff'};color:${isFirst?'#d1d5db':'#374151'};cursor:${isFirst?'not-allowed':'pointer'};font-size:13px;">← 上一步</button>
-      <div style="display:flex;gap:6px;">${dots}</div>
-      <button onclick="RealChallenge.next()" ${isLast?'disabled':''} style="padding:8px 18px;border:none;border-radius:10px;background:${isLast?'#f3f4f6':'linear-gradient(135deg,#6366f1,#8b5cf6)'};color:${isLast?'#d1d5db':'#fff'};cursor:${isLast?'not-allowed':'pointer'};font-size:13px;font-weight:600;">${isLast?'完成':'下一步 →'}</button>
-    </div>`;
-  }
-
-  // ──────────────────────────────────────────────────────────────────────
-  // 各 step 渲染
-  // ──────────────────────────────────────────────────────────────────────
-
-  function renderIntro(step) {
-    let instrs = (step.instructions || []).map((t, i) =>
-      `<div style="display:flex;gap:10px;padding:6px 0;">
-        <span style="width:24px;height:24px;background:#6366f1;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">${i+1}</span>
-        <span style="font-size:14px;color:#374151;padding-top:2px;">${t}</span>
-      </div>`
-    ).join('');
-
-    let locs = (step.locations || []).map(l =>
-      `<span style="display:inline-block;background:#f3f4f6;border-radius:20px;padding:4px 12px;font-size:12px;color:#4b5563;margin:2px;">📍 ${l}</span>`
-    ).join('');
-
-    return `<div style="margin-bottom:16px;">
-      <div style="background:linear-gradient(135deg,#667eea,#764ba2);border-radius:14px;padding:20px;color:#fff;margin-bottom:14px;">
-        <div style="font-size:12px;opacity:.8;margin-bottom:6px;">📚 你刚学过的</div>
-        <div style="font-size:14px;font-weight:600;margin-bottom:8px;">${step.content}</div>
-        ${step.story ? `<div style="font-size:12px;opacity:.95;line-height:1.6;">「${step.story}」</div>` : ''}
-      </div>
-
-      <div style="background:#f0fdf4;border-radius:12px;padding:14px;margin-bottom:14px;">
-        <div style="font-size:12px;color:#16a34a;font-weight:600;margin-bottom:10px;">🎯 现实迁移任务</div>
-        ${instrs}
-      </div>
-
-      <div style="background:#f9fafb;border-radius:12px;padding:14px;">
-        <div style="font-size:12px;color:#6b7280;font-weight:600;margin-bottom:8px;">💡 找个类似的现实场景</div>
-        ${locs}
-        <div style="font-size:11px;color:#9ca3af;margin-top:8px;">${step.timeHint || '建议在 24 小时内完成'}</div>
-      </div>
-    </div>`;
-  }
-
-  function renderPrep(step) {
-    let checks = (step.checklist || []).map((c, i) =>
-      `<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px dashed #f3f4f6;">
-        <input type="checkbox" class="rc-prep-check" data-idx="${i}" style="width:18px;height:18px;accent-color:#6366f1;margin-top:2px;">
-        <div style="flex:1;">
-          <div style="font-size:14px;color:#1f2937;font-weight:500;">${c.text}</div>
-          <div style="font-size:12px;color:#9ca3af;margin-top:2px;">💡 ${c.tip}</div>
-        </div>
-      </div>`
-    ).join('');
-
-    let observes = (step.observePoints || []).map(p =>
-      `<span style="display:inline-block;background:#fef3c7;border-radius:20px;padding:4px 12px;font-size:12px;color:#92400e;margin:2px;">👀 ${p}</span>`
-    ).join('');
-
-    return `<div style="background:#fefce8;border:1px solid #fde68a;border-radius:12px;padding:16px;margin-bottom:14px;">
-      <div style="font-size:13px;color:#ca8a04;font-weight:600;margin-bottom:10px;">✓ 心理准备 · 逐条确认</div>
-      ${checks}
-    </div>
-
-    <div style="background:#ede9fe;border-radius:12px;padding:14px;margin-bottom:14px;">
-      <div style="font-size:12px;color:#6d28d9;font-weight:600;margin-bottom:8px;">🔍 这次重点观察什么</div>
-      <div>${observes}</div>
-    </div>
-
-    <div style="background:#f9fafb;border-radius:10px;padding:12px;font-size:12px;color:#6b7280;line-height:1.7;">
-      ${step.coachHint}
-    </div>`;
-  }
-
-  function renderRecord(step) {
-    let fieldsHtml = '';
-    (step.fields || []).forEach(f => {
-      const saved = RealChallenge._form[f.key] || '';
-      if (f.type === 'choice') {
-        let opts = (f.options || []).map(o =>
-          `<label style="display:inline-flex;align-items:center;gap:6px;margin:4px 8px 4px 0;padding:6px 12px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:20px;cursor:pointer;font-size:13px;color:#374151;">
-            <input type="radio" name="rc-choice-${f.key}" value="${o}" ${saved===o?'checked':''} style="accent-color:#6366f1;">
-            ${o}
-          </label>`
-        ).join('');
-        fieldsHtml += `<div style="margin-bottom:16px;">
-          <div style="font-size:13px;color:#374151;font-weight:600;margin-bottom:8px;">${f.label}</div>
-          <div>${opts}</div>
-        </div>`;
-      } else {
-        fieldsHtml += `<div style="margin-bottom:16px;">
-          <div style="font-size:13px;color:#374151;font-weight:600;margin-bottom:8px;">${f.label}</div>
-          <textarea id="rc-field-${f.key}" rows="3" placeholder="${f.placeholder || ''}" style="width:100%;border:1px solid #e5e7eb;border-radius:10px;padding:10px;font-size:14px;resize:outline-none;font-family:inherit;">${saved}</textarea>
-        </div>`;
-      }
-    });
-
-    return `<div style="margin-bottom:16px;">
-      <div style="background:#1e1b4b;border-radius:12px;padding:12px;margin-bottom:14px;font-size:13px;color:#a5b4fc;line-height:1.7;">
-        💭 刚刚经历了什么？回来记录一下吧。<br>
-        <span style="opacity:.7; font-size:11px;">不追求完美 — 哪怕只填了地点和感觉，也有价值。</span>
-      </div>
-      ${fieldsHtml}
-      <button class="rc-save-form" style="width:100%;padding:12px;border:none;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-size:14px;font-weight:600;cursor:pointer;">保存记录 → 进入复盘</button>
-    </div>`;
-  }
-
-  function renderReview(step) {
-    const form = RealChallenge._form;
-    const challenge = RealChallenge._challenge;
-
-    // 根据 form 数据生成复盘
-    let feelingEmoji = '';
-    let feelingLabel = '';
-    if (form.feeling) {
-      feelingEmoji = form.feeling.charAt(0);
-      feelingLabel = form.feeling.replace(/^[😰😐🙂😄]\s*/, '');
-    }
-
-    // 动态生成反馈
-    let feedbackBlocks = [];
-
-    // 1. 肯定（通用）
-    feedbackBlocks.push({
-      icon: '🎉',
-      color: '#ecfdf5', border: '#a7f3d0', fg: '#047857',
-      title: '你跨出了舒适区',
-      content: '从"知道怎么做"到"在现实里真的做了"，这是最大的跨越。哪怕做得不完美，这一步就已经赢了。'
-    });
-
-    // 2. 根据 feeling
-    if (form.feeling) {
-      let feelingAdvice = '';
-      if (form.feeling.includes('紧张')) feelingAdvice = '紧张≠做得差，紧张只是你的身体在应对重要时刻。下次试试：先深呼吸 3 次再开口。';
-      else if (form.feeling.includes('一般')) feelingAdvice = '"一般"是进步的好信号 — 说明你没有被社交吓退，也没有过度兴奋。保持这种"平稳感"，下次可以挑战更难一点的场景。';
-      else if (form.feeling.includes('自然') || form.feeling.includes('轻松')) feelingAdvice = '你已经在建立"这块社交我能hold住"的肌肉记忆了。保持自信，下次可以试试更难的场景。';
-      feedbackBlocks.push({ icon: feelingEmoji || '💭', color: '#f0f9ff', border: '#bae6fd', fg: '#0369a1', title: '你的感受在告诉你', content: feelingAdvice });
-    }
-
-    // 3. 根据 behavior
-    if (form.behavior) {
-      let behAdvice = '';
-      if (form.behavior.includes('完全')) behAdvice = '你几乎完全按训练做了 — 训练和现实的 gap 被你填上了！现在可以挑战更复杂的分支情况（比如对方忽然被人叫走、话题突然中断）。';
-      else if (form.behavior.includes('做了动作但话术')) behAdvice = '动作到位了，但话术是自己想的 — 这反而是好事！说明训练给了你"行动信心"，你能自然表达自己。保持这种"不完全依赖模板"的状态。';
-      else if (form.behavior.includes('部分')) behAdvice = '只做了部分动作没关系 — 下次把注意力集中在你没做到的那一步（比如"微笑"或"加一个开放式问题"），一次只练一件事。';
-      else if (form.behavior.includes('没做')) behAdvice = '"没找到机会"也是一种结果 — 说明你在观察而不是盲目行动。下次可以试试更主动：跟一个平时不太说话的同事说声早安。';
-      feedbackBlocks.push({ icon: '🎯', color: '#fdf4ff', border: '#f5d0fe', fg: '#a21caf', title: '你做到了什么', content: behAdvice });
-    }
-
-    // 4. 结果分析 → 暴露薄弱点 → 推荐下一训练
-    let nextRecommendation = '';
-    if (form.result) {
-      if (form.result.includes('对话继续')) nextRecommendation = '🔥 表现不错！推荐下一训练：<strong>9007 约会中的试探</strong> — 话题继续之后，怎么自然收尾 + 留下次见面的钩子。';
-      else if (form.result.includes('回应了但没继续')) nextRecommendation = '💡 话题没继续通常是因为回应里缺少"给对方接话的钩子"。推荐重练：<strong>回到礼仪训练 Step 5 话术示范</strong>，重点看 A 档回应的"开放式问题"结构。';
-      else if (form.result.includes('尴尬')) nextRecommendation = '💪 尴尬是训练素材！尴尬通常来自"不知道接下来该说什么"。推荐下一训练：<strong>9002 朋友家的晚餐</strong> — 餐桌话题边界练习。';
-      else if (form.result.includes('退缩')) nextRecommendation = '🫂 临阵退缩是非常真实的反馈 — 说明"知道"和"做到"之间还有 gap。推荐从最简单的场景重新开始：<strong>礼仪训练 9001 咖啡厅的邂逅</strong>，这次只练"微笑 + 眼神"两个小动作。';
-    }
-
-    let feedbackHtml = feedbackBlocks.map(b => `
-      <div style="background:${b.color};border:1px solid ${b.border};border-radius:12px;padding:14px;margin-bottom:10px;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <span style="font-size:20px;">${b.icon}</span>
-          <span style="font-size:13px;font-weight:700;color:${b.fg};">${b.title}</span>
-        </div>
-        <div style="font-size:13px;color:#374151;line-height:1.7;padding-left:4px;">${b.content}</div>
-      </div>`).join('');
-
-    const hasRecord = Object.keys(form).length > 0;
-
-    return `<div style="margin-bottom:16px;">
-      ${hasRecord ? `
-        <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:12px;padding:14px;margin-bottom:14px;">
-          <div style="font-size:12px;color:#0369a1;font-weight:600;margin-bottom:8px;">📋 你的现实记录</div>
-          ${form.location ? `<div style="font-size:12px;color:#475569;margin-bottom:4px;">📍 在${form.location}</div>` : ''}
-          ${form.behavior ? `<div style="font-size:12px;color:#475569;margin-bottom:4px;">🎯 ${form.behavior}</div>` : ''}
-          ${form.feeling ? `<div style="font-size:12px;color:#475569;margin-bottom:4px;">💭 感觉${form.feeling}</div>` : ''}
-          ${form.result ? `<div style="font-size:12px;color:#475569;margin-bottom:4px;">📊 ${form.result}</div>` : ''}
-          ${form.description ? `<div style="font-size:12px;color:#475569;margin-top:6px;padding-top:6px;border-top:1px dashed #bae6fd;white-space:pre-wrap;">${form.description}</div>` : ''}
-        </div>` : ''}
-      ${feedbackHtml}
-      ${nextRecommendation ? `
-        <div style="background:linear-gradient(135deg,#667eea,#764ba2);border-radius:12px;padding:14px;color:#fff;margin-top:12px;">
-          <div style="font-size:12px;opacity:.8;margin-bottom:6px;">📚 基于你的暴露点，推荐下一训练</div>
-          <div style="font-size:14px;font-weight:600;line-height:1.7;">${nextRecommendation}</div>
-        </div>` : ''}
-    </div>`;
-  }
-
-  // ──────────────────────────────────────────────────────────────────────
-  // 事件绑定
-  // ──────────────────────────────────────────────────────────────────────
-
-  function bindEvents() {
-    const idx = RealChallenge._stepIdx;
-    const step = RealChallenge._challenge.steps[idx];
-
-    // prep checklist
-    document.querySelectorAll('.rc-prep-check').forEach(cb => {
-      cb.addEventListener('change', function () {
-        const i = parseInt(this.dataset.idx, 10);
-        RealChallenge._prepDone = RealChallenge._prepDone || {};
-        RealChallenge._prepDone[i] = this.checked;
-      });
-    });
-
-    // record: radio choices
-    document.querySelectorAll('[name^="rc-choice-"]').forEach(radio => {
-      radio.addEventListener('change', function () {
-        const key = this.name.replace('rc-choice-', '');
-        RealChallenge._form[key] = this.value;
-      });
-    });
-
-    // save form
-    const saveBtn = document.querySelector('.rc-save-form');
-    if (saveBtn) {
-      saveBtn.addEventListener('click', function () {
-        // 收集 textarea
-        document.querySelectorAll('[id^="rc-field-"]').forEach(ta => {
-          const key = ta.id.replace('rc-field-', '');
-          RealChallenge._form[key] = ta.value;
-        });
-        // 保存到 localStorage 留档
-        try {
-          const records = JSON.parse(localStorage.getItem('rc_records') || '[]');
-          records.push({ timestamp: Date.now(), challengeId: RealChallenge._challenge.challengeId, form: RealChallenge._form });
-          localStorage.setItem('rc_records', JSON.stringify(records.slice(-20)));
-        } catch(e) {}
-        // 跳到 review step
-        RealChallenge.gotoStep(idx + 1);
-      });
+    if (typeof window.startChallenge === 'function') {
+      // 第2个参数 = plainChat，开启纯文字对话模式
+      window.startChallenge(challengeId, true);
+    } else {
+      console.warn('[RealChallenge] startChallenge 未找到');
     }
   }
 
-  // ──────────────────────────────────────────────────────────────────────
-  // 公共 API
-  // ──────────────────────────────────────────────────────────────────────
-
-  RealChallenge.start = start;
-  RealChallenge.startFromLevel = startFromLevel;
-  RealChallenge.gotoStep = function (n) {
-    if (n < 0 || n >= RealChallenge._challenge.steps.length) return;
-    RealChallenge._stepIdx = n;
-    render();
-  };
-  RealChallenge.next = function () {
-    if (RealChallenge._stepIdx < RealChallenge._challenge.steps.length - 1) {
-      RealChallenge.gotoStep(RealChallenge._stepIdx + 1);
-    }
-  };
-  RealChallenge.prev = function () {
-    if (RealChallenge._stepIdx > 0) {
-      RealChallenge.gotoStep(RealChallenge._stepIdx - 1);
-    }
+  // ===== 导出 API =====
+  window.RealChallenge = {
+    start,
+    evaluate: evaluateAnswer,
+    init,
+    // 内部使用
+    _SCENE_RULES: SCENE_RULES,
+    _ETIQUETTE_KEYWORDS: ETIQUETTE_KEYWORDS
   };
 
-  global.RealChallenge = RealChallenge;
-
-})(window);
+  // DOM ready 后初始化
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();

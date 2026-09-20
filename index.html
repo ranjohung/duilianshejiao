@@ -15655,7 +15655,7 @@ function renderChallenges(isModal = false) {
     if (evidencePending) {
       actionBtn = '<button disabled class="w-full py-2 bg-amber-50 text-amber-700 text-xs font-medium rounded-lg cursor-not-allowed">🕒 凭证待审核（本地演示）</button>';
     } else if (isCompleted) {
-      actionBtn = '<button onclick="startChallenge(' + challenge.id + ')" class="w-full py-2 bg-gray-50 text-gray-600 text-xs font-medium rounded-lg hover:bg-gray-100 transition-colors">再次挑战</button>';
+      actionBtn = '<button onclick="startChallenge(' + challenge.id + ', true)" class="w-full py-2 bg-gray-50 text-gray-600 text-xs font-medium rounded-lg hover:bg-gray-100 transition-colors">再次挑战</button>';
     } else if (isInProgress) {
       actionBtn = `
         <div class="space-y-2">
@@ -15674,7 +15674,7 @@ function renderChallenges(isModal = false) {
       `;
     } else if (isUnlocked) {
       const trialLabel = isTrialChallenge && !EM_isPro() ? '免费体验（每日 3 次）' : '开始挑战';
-      actionBtn = `<button onclick="startChallenge(${challenge.id})" class="w-full py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-xs font-medium rounded-lg hover:opacity-90 transition-opacity">${trialLabel}</button>`;
+      actionBtn = `<button onclick="startChallenge(${challenge.id}, true)" class="w-full py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-xs font-medium rounded-lg hover:opacity-90 transition-opacity">${trialLabel}</button>`;
     } else {
       actionBtn = `<button disabled class="w-full py-2 bg-gray-100 text-gray-400 text-xs font-medium rounded-lg cursor-not-allowed">🔒 需${challenge.unlockScore}积分</button>`;
     }
@@ -15748,7 +15748,7 @@ function showChallenge() {
   loadChallenges(true);
 }
 
-function startChallenge(challengeId) {
+function startChallenge(challengeId, plainChat) {
   const challenge = challenges.find(c => c.id === challengeId);
   if (!challenge) return;
 
@@ -15765,7 +15765,7 @@ function startChallenge(challengeId) {
     alert(`🔒 该挑战未解锁！\n\n需要 ${challenge.unlockScore} 积分才能解锁，当前 ${currentPoints} 积分。\n\n继续训练获得更多积分吧！`);
     return;
   }
-  if (!EM_gate3DProject('challenge', challengeId, function () { startChallenge(challengeId); })) return;
+  if (!plainChat && !EM_gate3DProject('challenge', challengeId, function () { startChallenge(challengeId); })) return;
   EM_accountTrainStart();
 
   closeModal('challenge');
@@ -15774,6 +15774,7 @@ function startChallenge(challengeId) {
   window.challengeRound = 0;
   window.challengeScore = 0;
   window.challengeMessages = [];
+  window.challengePlainChat = !!plainChat;
   window.challengeSceneMeta = challenge.sceneMeta || getChallengeSceneMeta(challenge);
   window.challengeCoach = getChallengeCoach(window.challengeSceneMeta);
   window.challengeStrictMode = true;
@@ -15786,36 +15787,53 @@ function startChallenge(challengeId) {
     challengeCoachAvatar.src = getCoachAvatarSrc(window.challengeCoach);
     challengeCoachAvatar.alt = window.challengeCoach.name + '，' + window.challengeSceneMeta.role;
   }
-  const cinematicImage = getCinematicSceneImage(window.challengeSceneMeta);
+
+  // ===== 纯文字模式：隐藏 3D/照片场景，直接进入对话 =====
+  const stage3dEl = $('challenge-3d-stage');
+  const stageBackdrop = $('challenge-stage-backdrop');
+  const stageCharacter = $('challenge-stage-character');
+  const stageBubbles = $('challenge-stage-bubbles');
   const challengeSurface = $('challenge-training-surface');
-  if (challengeSurface) {
-    challengeSurface.style.backgroundImage = "linear-gradient(rgba(7,5,18,.76),rgba(10,8,22,.92)), url('" + cinematicImage + "')";
-    challengeSurface.dataset.visualMode = 'cinematic-photo';
-  }
-  // ===== 3D 优先：先尝试 GameStage3D.mount，失败才 fallback 到照片模式 =====
-  const stage3dOk = mountStage3DForChallenge('challenge-3d-stage', {
-    env: getStage3DEnvKey(window.challengeSceneMeta, challenge.title),
-    npcLabel: window.challengeCoach.name + ' 饰 ' + (window.challengeSceneMeta.role || '场景角色')
-  });
-  if (!stage3dOk) {
-    // fallback: 照片模式
-    const cinematicMounted = typeof window.mountCinematicPhotoStage === 'function' && window.mountCinematicPhotoStage('challenge-3d-stage', {
-      env: getStage3DEnvKey(window.challengeSceneMeta, challenge.title),
-      background: cinematicImage,
-      backgroundAlt: (window.challengeSceneMeta.location || '真实场景') + ' 真人影视背景',
-      npcSrc: getCinematicNpcSrc(getStage3DEnvKey(window.challengeSceneMeta, challenge.title)),
-      npcLabel: window.challengeCoach.name + ' 饰 ' + (window.challengeSceneMeta.role || '场景角色'),
-      npcAlt: window.challengeCoach.name + '，' + window.challengeSceneMeta.role + '，真人全身形象',
-      userSrc: getCinematicUserSrc(),
-      table: true
-    });
-    if (!cinematicMounted) {
-      const stageBackdrop = $('challenge-stage-backdrop');
-      if (stageBackdrop) { stageBackdrop.src = getChallenge3DImage(window.challengeSceneMeta); stageBackdrop.alt = (window.challengeSceneMeta.location || '真实场景') + ' 3D 背景'; }
-      const stageCharacter = $('challenge-stage-character');
-      if (stageCharacter) { stageCharacter.src = getCoachFullBodySrc(window.challengeCoach); stageCharacter.alt = window.challengeCoach.name + '，' + window.challengeSceneMeta.role; }
+  if (plainChat) {
+    if (stage3dEl) stage3dEl.style.display = 'none';
+    if (stageBackdrop) stageBackdrop.style.display = 'none';
+    if (stageCharacter) stageCharacter.style.display = 'none';
+    if (stageBubbles) stageBubbles.style.display = 'none';
+    if (challengeSurface) {
+      challengeSurface.style.backgroundImage = 'none';
+      challengeSurface.style.backgroundColor = '#f8fafc';
+      challengeSurface.dataset.visualMode = 'plain-chat';
     }
-  }
+  } else {
+    const cinematicImage = getCinematicSceneImage(window.challengeSceneMeta);
+    if (challengeSurface) {
+      challengeSurface.style.backgroundImage = "linear-gradient(rgba(7,5,18,.76),rgba(10,8,22,.92)), url('" + cinematicImage + "')";
+      challengeSurface.style.backgroundColor = '';
+      challengeSurface.dataset.visualMode = 'cinematic-photo';
+    }
+    // ===== 3D 优先：先尝试 GameStage3D.mount，失败才 fallback 到照片模式 =====
+    const stage3dOk = mountStage3DForChallenge('challenge-3d-stage', {
+      env: getStage3DEnvKey(window.challengeSceneMeta, challenge.title),
+      npcLabel: window.challengeCoach.name + ' 饰 ' + (window.challengeSceneMeta.role || '场景角色')
+    });
+    if (!stage3dOk && stageBackdrop && stageCharacter) {
+      // fallback: 照片模式
+      const cinematicMounted = typeof window.mountCinematicPhotoStage === 'function' && window.mountCinematicPhotoStage('challenge-3d-stage', {
+        env: getStage3DEnvKey(window.challengeSceneMeta, challenge.title),
+        background: cinematicImage,
+        backgroundAlt: (window.challengeSceneMeta.location || '真实场景') + ' 真人影视背景',
+        npcSrc: getCinematicNpcSrc(getStage3DEnvKey(window.challengeSceneMeta, challenge.title)),
+        npcLabel: window.challengeCoach.name + ' 饰 ' + (window.challengeSceneMeta.role || '场景角色'),
+        npcAlt: window.challengeCoach.name + '，' + window.challengeSceneMeta.role + '，真人全身形象',
+        userSrc: getCinematicUserSrc(),
+        table: true
+      });
+      if (!cinematicMounted) {
+        if (stageBackdrop) { stageBackdrop.src = getChallenge3DImage(window.challengeSceneMeta); stageBackdrop.alt = (window.challengeSceneMeta.location || '真实场景') + ' 3D 背景'; }
+        if (stageCharacter) { stageCharacter.src = getCoachFullBodySrc(window.challengeCoach); stageCharacter.alt = window.challengeCoach.name + '，' + window.challengeSceneMeta.role; }
+      }
+    }
+  } // end else (非纯文字模式)
   const stageLocation = $('challenge-stage-location');
   if (stageLocation) stageLocation.textContent = window.challengeSceneMeta.location || '真实场景';
   const stageGoal = $('challenge-scene-goal');
@@ -15954,13 +15972,46 @@ function sendChallengeMessage() {
     const evaluation = $('challenge-coach-evaluation');
     const activeChallenge = challenges.find(item => item.id === window.currentChallengeId) || {};
     const scoreDelta = Number(analysis.scoreDelta || 0);
-    const scoreLabel = scoreDelta >= 0 ? `本轮观察 +${scoreDelta}分` : `本轮观察 ${scoreDelta}分`;
-    const why = analysis.correctReason || (scoreDelta >= 0 ? '你的表达与当前场景目标基本一致，给了对方继续回应的空间。' : '这次表达没有充分回应场景目标，可能让对方难以继续接话。');
-    const method = analysis.suggestion || '先回应对方的核心信息，再补充真实细节，并给对方选择或追问的空间。';
-    const reference = analysis.correctAnswer || getScenarioCorrectAnswer(activeChallenge.title || '', getChallengeScenario(activeChallenge.title || ''), '');
+    const scoreLabel = scoreDelta >= 0 ? `本轮 +${scoreDelta}分` : `本轮 ${scoreDelta}分`;
+
     if (evaluation) {
       evaluation.className = 'challenge-coach-evaluation';
-      evaluation.innerHTML = `<strong>🎓 ${escapeCardText((window.challengeCoach && window.challengeCoach.name) || '教练')}评价</strong><br><span class="font-medium">${escapeCardText(scoreLabel)} · ${escapeCardText(analysis.comment || '已记录你的表达')}</span><div class="mt-2"><b>为什么：</b>${escapeCardText(why)}</div><div class="mt-1"><b>怎么做：</b>${escapeCardText(method)}</div><div class="mt-1"><b>参考回答：</b>${escapeCardText(reference)}</div>`;
+      if (window.challengePlainChat) {
+        // ===== 纯文字模式：三段式评价（对在哪 / 错在哪 / 应该怎么做）=====
+        const positives = analysis.positives || [];
+        const improvements = analysis.improvements || [];
+        const tip = analysis.suggestion || '先回应对方，再补充一个细节或反问，让对方有话可接。';
+
+        let html = `<strong>🎓 ${escapeCardText((window.challengeCoach && window.challengeCoach.name) || '教练')}评价</strong>`;
+        html += `<div class="mt-1 text-sm font-semibold ${scoreDelta >= 0 ? 'text-emerald-600' : 'text-rose-600'}">${escapeCardText(scoreLabel)} · ${escapeCardText(analysis.comment || '')}</div>`;
+
+        if (positives.length > 0) {
+          html += `<div class="mt-2 p-2 rounded-lg bg-emerald-50 border border-emerald-200">`;
+          html += `<div class="text-xs font-semibold text-emerald-700 mb-1">✅ 做得好的地方</div>`;
+          html += positives.map(p => `<div class="text-xs text-emerald-800 leading-relaxed">· ${escapeCardText(p)}</div>`).join('');
+          html += `</div>`;
+        }
+
+        if (improvements.length > 0) {
+          html += `<div class="mt-2 p-2 rounded-lg bg-amber-50 border border-amber-200">`;
+          html += `<div class="text-xs font-semibold text-amber-700 mb-1">⚠️ 需要注意的地方</div>`;
+          html += improvements.map(i => `<div class="text-xs text-amber-800 leading-relaxed">· ${escapeCardText(i)}</div>`).join('');
+          html += `</div>`;
+        }
+
+        html += `<div class="mt-2 p-2 rounded-lg bg-indigo-50 border border-indigo-200">`;
+        html += `<div class="text-xs font-semibold text-indigo-700 mb-1">💡 应该怎么做</div>`;
+        html += `<div class="text-xs text-indigo-800 leading-relaxed">${escapeCardText(tip)}</div>`;
+        html += `</div>`;
+
+        evaluation.innerHTML = html;
+      } else {
+        // ===== 3D/照片模式：保持原有格式 =====
+        const why = analysis.correctReason || (scoreDelta >= 0 ? '你的表达与当前场景目标基本一致，给了对方继续回应的空间。' : '这次表达没有充分回应场景目标，可能让对方难以继续接话。');
+        const method = analysis.suggestion || '先回应对方的核心信息，再补充真实细节，并给对方选择或追问的空间。';
+        const reference = analysis.correctAnswer || getScenarioCorrectAnswer(activeChallenge.title || '', getChallengeScenario(activeChallenge.title || ''), '');
+        evaluation.innerHTML = `<strong>🎓 ${escapeCardText((window.challengeCoach && window.challengeCoach.name) || '教练')}评价</strong><br><span class="font-medium">${escapeCardText(scoreLabel)} · ${escapeCardText(analysis.comment || '已记录你的表达')}</span><div class="mt-2"><b>为什么：</b>${escapeCardText(why)}</div><div class="mt-1"><b>怎么做：</b>${escapeCardText(method)}</div><div class="mt-1"><b>参考回答：</b>${escapeCardText(reference)}</div>`;
+      }
     }    setTimeout(() => {
       const npcResponse = getChallengeResponse(window.currentChallengeId, text, round);
       addChallengeMessage('npc', npcResponse);
