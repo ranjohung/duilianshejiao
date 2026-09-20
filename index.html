@@ -18857,37 +18857,16 @@ function useAvatarDetail() {
       html += '</div>';
     }
 
-    // 场景对话流程：直接渲染卡片自带的 content（完整话术）+ principle + tips
-        var cardContent = card.content || '';
-    var srcPath = (card.source || '').replace(/\\/g, '/');
-    var isMdSource = /\.md$/i.test(srcPath);
-    var ftContainerId = 'kd-fulltext-' + (card.id || 'card');
-
-    if (cardContent && cardContent !== card.source) {
+    // 原始资料出处（资料库课程可溯源）—— v2.5：高级会员专属福利（§18.4）
+    if (card.source) {
+      var srcLocked = (typeof EM_canAccessSource === 'function') ? !EM_canAccessSource() : false;
       html += '<div class="knowledge-formula">';
-      html += '  <div class="formula-label">📖 参考话术原文（摘要）</div>';
-      html += '  <div style="font-size:13px;color:#3a3754;line-height:1.8;background:#fff;padding:12px 14px;border-radius:10px;margin-top:8px;border-left:3px solid #6655ee;white-space:pre-wrap;">' + escapeHTML(cardContent.trim()) + '</div>';
-      if (isMdSource) {
-        html += '  <div id="' + ftContainerId + '"></div>';
-        html += '  <button class="kt-fulltext-btn" onclick="KL_loadFullText(\'' + escapeHTML(srcPath) + '\', \'' + ftContainerId + '\', this)" style="width:100%;padding:10px;border:1px dashed #c4bfff;background:#f5f3ff;border-radius:10px;color:#6655ee;font-size:12px;font-weight:600;cursor:pointer;margin-top:10px;">📖 查看完整全文（约 ' + (card.chars ? Math.round(card.chars/10000) + '万字' : '原始全文') + '）</button>';
+      html += '  <div class="formula-label">📎 原始资料</div>';
+      if (srcLocked) {
+        html += '  <div style="font-size:11px;color:#6b6488;line-height:1.7;background:#faf9ff;padding:10px 12px;border-radius:8px;margin-top:6px;text-align:center;">👑 原始资料为高级会员专属福利<br><button onclick="goToMember()" style="margin-top:6px;padding:6px 14px;border:none;border-radius:8px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:12px;font-weight:700;cursor:pointer;">开通高级会员查看</button></div>';
+      } else {
+        html += '  <div style="font-size:11px;color:#6b6488;line-height:1.6;word-break:break-all;background:#faf9ff;padding:8px 10px;border-radius:8px;margin-top:6px;">' + escapeHTML(card.source) + '</div>';
       }
-      html += '</div>';
-    } else if (isMdSource) {
-      html += '<div class="knowledge-formula">';
-      html += '  <div class="formula-label">📖 原始资料全文</div>';
-      html += '  <div id="' + ftContainerId + '"></div>';
-      html += '  <button class="kt-fulltext-btn" onclick="KL_loadFullText(\'' + escapeHTML(srcPath) + '\', \'' + ftContainerId + '\', this)" style="width:100%;padding:10px;border:1px dashed #c4bfff;background:#f5f3ff;border-radius:10px;color:#6655ee;font-size:12px;font-weight:600;cursor:pointer;margin-top:8px;">📖 查看完整全文（约 ' + (card.chars ? Math.round(card.chars/10000) + '万字' : '原始全文') + '）</button>';
-      html += '</div>';
-    }
-// 完整场景对话（scenes JSON 里的多轮 scripts）—— 异步 fetch 后渲染
-    if (card.source && /scenes[\\\/].+\.json$/i.test(card.source)) {
-      var srcPath = card.source.replace(/\\/g, '/');
-      var srcCacheKey = srcPath;
-      html += '<div class="knowledge-formula">';
-      html += '  <div class="formula-label">🎭 完整「' + escapeHTML(card.scene || '') + '」场景对话（' + (card.round || '—') + ' 轮）</div>';
-      html += '  <div id="kd-scene-' + escapeHTML(card.id || card.scene || 'unknown') + '" style="margin-top:8px;">';
-      html += '    <button onclick="KL_loadSceneDialog(\'' + escapeHTML(srcPath) + '\', \'' + escapeHTML(card.id || card.scene || '') + '\', this)" style="width:100%;padding:10px;border:1px dashed #c4bfff;background:#f5f3ff;border-radius:10px;color:#6655ee;font-size:12px;font-weight:600;cursor:pointer;">▼ 点击展开完整 ' + escapeHTML(card.scene || '') + ' 场景对话（共 6 轮）</button>';
-      html += '  </div>';
       html += '</div>';
     }
 
@@ -19110,163 +19089,6 @@ function useAvatarDetail() {
     if (arrow) arrow.textContent = open ? '展开 ▾' : '收起 ▴';
   }
 
-  // 缓存 fetch 过的 scenes JSON 内容
-  window.__kdSceneCache = window.__kdSceneCache || {};
-  window.__kdFullTextCache = window.__kdFullTextCache || {};
-
-  function KL_loadFullText(srcPath, containerId, btn) {
-    var container = document.getElementById(containerId);
-    if (!container) return;
-
-    // 已展开就折叠
-    if (container.dataset.expanded === 'true') {
-      container.innerHTML = '';
-      container.dataset.expanded = 'false';
-      btn.textContent = '📖 查看完整全文（' + (window.__kdFullTextCache[srcPath] ? '已缓存' : '按需加载') + '）';
-      return;
-    }
-
-    if (window.__kdFullTextCache[srcPath]) {
-      KL_renderFullText(window.__kdFullTextCache[srcPath], container, btn);
-      return;
-    }
-
-    btn.disabled = true;
-    btn.textContent = '⏳ 加载全文中...';
-    container.innerHTML = '<div style="font-size:12px;color:#9ca3af;text-align:center;padding:20px;">📥 正在从服务器拉取完整文本...</div>';
-
-    fetch(srcPath)
-      .then(function (r) {
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.text();
-      })
-      .then(function (text) {
-        window.__kdFullTextCache[srcPath] = text;
-        KL_renderFullText(text, container, btn);
-      })
-      .catch(function (err) {
-        container.innerHTML = '<div style="font-size:12px;color:#ef4444;background:#fff5f5;padding:12px;border-radius:8px;">⚠ 全文加载失败：' + err.message + '<br>本地请用 HTTP server 预览（file:// 协议无法 fetch）。</div>';
-        btn.disabled = false;
-        btn.textContent = '📖 查看完整全文';
-      });
-  }
-
-  function KL_renderFullText(text, container, btn) {
-    // 跳过 YAML header
-    var body = text;
-    var hdrIdx = body.indexOf('---');
-    if (hdrIdx > 0) body = body.substring(hdrIdx + 3);
-    body = body.trim();
-
-    // 清理重复水印行
-    var wmPats = [/更多.{0,10}电子书.{0,5}微信.{0,10}/, /朋友圈.{0,10}电子版.{0,10}微信/, /kc58567|sm99878|tushu959/, /课程网址.{0,20}https?:/];
-    var lines = body.split('\n');
-    var cleaned = [];
-    var skip = 0;
-    var curRun = 0, maxRun = 0, maxEnd = -1;
-    for (var j = 0; j < lines.length; j++) {
-      var st = lines[j].trim();
-      if (!st) continue;
-      var isWm = false;
-      for (var p = 0; p < wmPats.length; p++) { if (wmPats[p].test(st)) { isWm = true; break; } }
-      if (isWm) { curRun++; if (curRun > maxRun) { maxRun = curRun; maxEnd = j; } } else { curRun = 0; }
-    skip = (maxRun > 3) ? maxEnd + 1 : 0;
-    for (var j = skip; j < lines.length; j++) cleaned.push(lines[j]);
-    body = cleaned.join('\n').trim();
-
-    var totalChars = text.length;
-    var readTime = Math.max(1, Math.round(totalChars / 500)); // 按 500 字/分钟
-
-    container.innerHTML =
-      '<div style="background:#fafbff;border:1px solid #e5e7ff;border-radius:12px;padding:16px;margin-top:12px;">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
-      '<span style="font-size:12px;color:#888;">📄 完整原文 · 约 ' + totalChars.toLocaleString() + ' 字 · 阅读 ' + readTime + ' 分钟</span>' +
-      '<button onclick="document.getElementById(\'' + container.id + '\').dataset.expanded=\'false\';document.getElementById(\'' + container.id + '\').innerHTML=\'\';this.closest(\'.knowledge-formula\').querySelector(\'.kt-fulltext-btn\').textContent=\'📖 查看完整全文\';" style="font-size:11px;color:#888;background:none;border:none;cursor:pointer;">收起</button>' +
-      '</div>' +
-      '<div style="font-size:13px;color:#2d2a4a;line-height:1.9;white-space:pre-wrap;max-height:600px;overflow-y:auto;padding-right:8px;">' + escapeHTML(body) + '</div>' +
-      '</div>';
-
-    container.dataset.expanded = 'true';
-    btn.disabled = false;
-    btn.textContent = '📖 收起全文';
-  }
-
-  function KL_loadSceneDialog(scenePath, cardId, btn) {
-    var container = document.getElementById('kd-scene-' + (cardId || 'unknown'));
-    if (!container) return;
-
-    // 如果缓存有，直接渲染
-    if (window.__kdSceneCache[scenePath]) {
-      KL_renderSceneDialog(window.__kdSceneCache[scenePath], container, btn);
-      return;
-    }
-
-    // 显示 loading
-    btn.disabled = true;
-    btn.textContent = '⏳ 加载中...';
-
-    fetch(scenePath)
-      .then(function (r) {
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.json();
-      })
-      .then(function (data) {
-        window.__kdSceneCache[scenePath] = data;
-        KL_renderSceneDialog(data, container, btn);
-      })
-      .catch(function (err) {
-        container.innerHTML = '<div style="font-size:12px;color:#9ca3af;background:#f9f9f9;padding:10px;border-radius:8px;">⚠ 场景对话加载失败：' + err.message + '<br>请确认 GitHub Pages 已部署最新版本。</div>';
-        btn.disabled = false;
-        btn.textContent = '▼ 重试';
-      });
-  }
-
-  function KL_renderSceneDialog(data, container, btn) {
-    var scripts = data && data.scripts || [];
-    var sceneName = data && data.scene_name || '';
-
-    // 如果已经渲染过，收起/展开
-    var existing = container.querySelector('.kd-scene-dialog');
-    if (existing) {
-      var isHidden = existing.style.display === 'none';
-      existing.style.display = isHidden ? 'block' : 'none';
-      btn.textContent = isHidden ? '▲ 收起场景对话' : '▼ 展开完整对话（' + scripts.length + ' 轮）';
-      return;
-    }
-
-    // 渲染完整场景对话
-    var html = '<div class="kd-scene-dialog" style="margin-top:10px;">';
-    html += '<div style="font-size:12px;font-weight:700;color:#3a3258;margin-bottom:8px;border-bottom:1px dashed #e5e0ff;padding-bottom:6px;">🎬 「' + escapeHTML(sceneName) + '」完整对话流程（' + scripts.length + ' 轮）</div>';
-
-    scripts.forEach(function (s, i) {
-      var tags = (s.tags || []).map(function (t) {
-        return '<span style="display:inline-block;font-size:10px;background:#ede9fe;color:#6b46c1;padding:1px 7px;border-radius:99px;margin-right:4px;">' + escapeHTML(t) + '</span>';
-      }).join('');
-
-      html += '<div style="background:' + (i % 2 === 0 ? '#fff' : '#fbfaff') + ';border:1px solid #ecebff;border-radius:10px;padding:10px 12px;margin-bottom:8px;">';
-      html += '  <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
-      html += '    <span style="flex-shrink:0;width:22px;height:22px;background:linear-gradient(135deg,#6655ee,#9671ff);color:#fff;border-radius:50%;font-size:11px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;">' + (i + 1) + '</span>';
-      html += '    <span style="font-size:13px;font-weight:600;color:#3a3258;">' + escapeHTML(s.purpose || '') + '</span>';
-      html += '    <span style="font-size:10px;color:#a39ec0;margin-left:auto;">第 ' + s.round + ' 轮</span>';
-      html += '  </div>';
-      html += '  <div style="font-size:13px;color:#3a3754;line-height:1.8;background:#faf9ff;padding:8px 12px;border-radius:8px;border-left:3px solid #6655ee;white-space:pre-wrap;margin-bottom:6px;">' + escapeHTML(s.text || '') + '</div>';
-      html += '  <div style="font-size:11px;color:#8b86a6;display:flex;flex-wrap:wrap;gap:6px;align-items:center;">';
-      html += '    <span>情绪: ' + (s.user_emotion || []).join('/') + '</span>';
-      html += '    <span>·</span>';
-      html += '    <span>教练风格: ' + (s.coach_style || []).join('/') + '</span>';
-      html += '    <span>·</span>';
-      html += '    <span>层级: ' + (s.level || '') + '</span>';
-      html += '    <div style="margin-left:auto;">' + tags + '</div>';
-      html += '  </div>';
-      html += '</div>';
-    });
-
-    html += '</div>';
-
-    container.insertAdjacentHTML('beforeend', html);
-    btn.textContent = '▲ 收起场景对话';
-  }
-
   // 兼容旧调用名
   function KL_goSceneStep(direction) { KL_goStep(direction); }
   function KL_goSceneStepByAttr(el) { KL_goStepByAttr(el); }
@@ -19282,7 +19104,6 @@ function useAvatarDetail() {
   global.KL_toggleOutlineByAttr = KL_toggleOutlineByAttr;
   global.KL_openDetail = KL_openDetail;
   global.KL_openDetailByAttr = KL_openDetailByAttr;
-  global.KL_loadSceneDialog = KL_loadSceneDialog;
   global.KL_goStep = KL_goStep;
   global.KL_goStepTo = KL_goStepTo;
   global.KL_goStepByAttr = KL_goStepByAttr;
