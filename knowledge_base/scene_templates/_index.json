@@ -16,14 +16,16 @@
       "title": "初次见面问候",
       "category": "日常社交",
       "difficulty": 1,
-      "status": "todo"
+      "status": "✅ 完整",
+      "file": "ST-002_first_meet.json"
     },
     {
       "scene_id": "ST-003",
       "title": "握手礼仪专项",
       "category": "商务社交",
       "difficulty": 1,
-      "status": "todo"
+      "status": "✅ 完整",
+      "file": "ST-003_handshake.json"
     },
     {
       "scene_id": "ST-004",
@@ -62,7 +64,8 @@
       "title": "共情沟通训练",
       "category": "日常社交",
       "difficulty": 2,
-      "status": "todo"
+      "status": "✅ 完整",
+      "file": "ST-008_empathy_listening.json"
     },
     {
       "scene_id": "ST-009",
@@ -109,28 +112,32 @@
       "title": "酒店入住沟通",
       "category": "公共服务与办事",
       "difficulty": 1,
-      "status": "todo"
+      "status": "✅ 完整",
+      "file": "ST-014_hotel_checkin.json"
     },
     {
       "scene_id": "ST-015",
       "title": "医院挂号问诊",
       "category": "公共服务与办事",
       "difficulty": 2,
-      "status": "todo"
+      "status": "✅ 完整",
+      "file": "ST-015_hospital_visit.json"
     },
     {
       "scene_id": "ST-016",
       "title": "政务大厅办事",
       "category": "公共服务与办事",
       "difficulty": 1,
-      "status": "todo"
+      "status": "✅ 完整",
+      "file": "ST-016_gov_service.json"
     },
     {
       "scene_id": "ST-017",
       "title": "快递物流沟通",
       "category": "公共服务与办事",
       "difficulty": 1,
-      "status": "todo"
+      "status": "✅ 完整",
+      "file": "ST-017_delivery_issue.json"
     }
   ]
 }
