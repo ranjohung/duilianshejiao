@@ -355,11 +355,11 @@
     window.renderCardItem = function (card) {
       var html = _origRenderCardItem(card);
 
-      // 在 </article> 前插入演练按钮
+      // 课程库列表只放"查看详情"一个按钮
+      // 演练功能只在课程详情页里提供，不在列表页占位
       var practiceBtn =
-        '<div class="relative z-10 mt-3 flex gap-2">' +
-          '<button onclick="event.stopPropagation();window.V3Learning.showCourseDetail(' + JSON.stringify(card.id) + ')" class="flex-1 py-2.5 rounded-xl bg-white border border-indigo-200 text-indigo-700 text-xs font-medium hover:bg-indigo-50 transition-colors">📖 查看详情</button>' +
-          '<button onclick="event.stopPropagation();window.V3Learning.quickPractice(' + JSON.stringify(card.id) + ')" class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-600 text-white text-xs font-medium hover:opacity-90 transition-opacity">🎯 去AI演练</button>' +
+        '<div class="relative z-10 mt-3">' +
+          '<button onclick="event.stopPropagation();window.V3Learning.showCourseDetail(' + JSON.stringify(card.id) + ')" class="w-full py-2.5 rounded-xl bg-white border border-indigo-200 text-indigo-700 text-xs font-medium hover:bg-indigo-50 transition-colors">📖 查看详情 · 学习完整课程</button>' +
         '</div>';
 
       html = html.replace('</article>', practiceBtn + '</article>');
