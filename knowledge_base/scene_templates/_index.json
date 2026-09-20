@@ -27,10 +27,11 @@
     },
     {
       "scene_id": "ST-004",
-      "title": "用餐祝酒",
+      "title": "商务饭局祝酒",
       "category": "商务社交",
       "difficulty": 2,
-      "status": "todo"
+      "status": "✅ 完整",
+      "file": "ST-004_business_toast.json"
     },
     {
       "scene_id": "ST-005",
@@ -95,10 +96,11 @@
     },
     {
       "scene_id": "ST-013",
-      "title": "朋友借钱",
+      "title": "朋友借钱（熟人开口）",
       "category": "家庭与亲友",
       "difficulty": 3,
-      "status": "todo"
+      "status": "✅ 完整",
+      "file": "ST-013_friend_money.json"
     },
     {
       "scene_id": "ST-014",
