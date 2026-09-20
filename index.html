@@ -1393,14 +1393,7 @@ h1,h2,h3 { text-wrap:balance; }
             </div>
           </button>
 
-          <!-- V5 SceneTemplate 入口（2026-09-20 扩展：多模板选择器） -->
-          <button onclick="openV5TemplatePicker()" class="w-full text-left bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all ring-2 ring-yellow-300/50" style="position:relative">
-            <span style="position:absolute;top:-8px;right:10px;background:#fbbf24;color:#78350f;font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;">V5 新架构</span>
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-3"><span class="text-2xl">📋</span><div><h3 class="font-semibold text-lg">V5 场景模板训练</h3><p class="text-xs opacity-80 mt-1" id="v5-template-count">加载中…</p></div></div>
-              <span class="text-sm opacity-80">进入 →</span>
-            </div>
-          </button>
+          <!-- v5.0.0: V5 SceneTemplate 不再作为独立功能区，融入场景模板市场卡片（每个有 V5 的场景显示 📋 V5 徽章 + 分步按钮） -->
 
 <script>
 /** V5 模板选择器入口 — 列出所有已加载的完整模板 */
@@ -8063,6 +8056,37 @@ function renderScenes() {
   if (market && market.style.display !== 'none') renderSceneList();
 }
 
+// ===== 训练中心 → V5 模板映射（v5.0.0: V5 融入已有功能区，不再独立） =====
+const V5_TEMPLATE_MAP = {
+  1: 'ST-011',    // 相亲模拟 → V5 相亲
+  2: 'ST-006',    // 兴趣社群自我介绍 → V5 社群介绍
+  3: 'ST-005',    // 模拟面试 → V5 面试
+  5: 'ST-007',    // 被朋友误解 → V5 误解化解
+  6: 'ST-008',    // 共情沟通 → V5 共情
+  8: 'ST-009',    // 拒绝同事 → V5 职场拒绝
+  9: 'ST-010',    // 初次约会 → V5 约会
+  15: 'ST-015'    // 医院问诊 → V5 问诊
+};
+
+function findV5TemplateForScene(sceneIdOrName) {
+  if (typeof sceneIdOrName === 'number' && V5_TEMPLATE_MAP[sceneIdOrName]) return V5_TEMPLATE_MAP[sceneIdOrName];
+  if (typeof sceneIdOrName === 'string') {
+    var ST = window.SceneTemplates;
+    if (ST && ST.index && ST.index.templates) {
+      for (var i = 0; i < ST.index.templates.length; i++) {
+        var t = ST.index.templates[i];
+        if (t.status && t.status.indexOf('完整') >= 0) {
+          var cleanTitle = (t.title || '').replace(/（.*?）/g, '').trim();
+          if (sceneIdOrName.indexOf(cleanTitle) >= 0 || cleanTitle.indexOf(sceneIdOrName) >= 0) {
+            return t.scene_id;
+          }
+        }
+      }
+    }
+  }
+  return null;
+}
+
 function showTrainingModule(moduleName) {
   const hub = $('training-module-hub');
   const market = $('training-market-module');
@@ -8506,6 +8530,7 @@ function renderCustomScenes() {
 }
 
 // 渲染场景模板市场（PRD §2.4）
+// v5.0.0: 有 V5 SceneTemplate 的场景 → 卡片加 📋 V5 徽章 + 分步卡片按钮
 function renderTemplateScenes() {
   const featuredScenes = templateScenes.filter(s => s.creator === '官方推荐').slice(0, 6);
   $('template-scene-list').innerHTML = featuredScenes.map(s => {
@@ -8514,8 +8539,14 @@ function renderTemplateScenes() {
     const linked = findTrainingSceneForTemplate(s);
     const status = linked ? getSceneUnlockStatus(linked) : getTemplateUnlockStatus(s);
     const actionLabel = status === 'unlocked' ? '开始训练' : status === 'unlockable' ? '解锁并训练' : '查看解锁条件';
+
+    // v5.0.0: 检查是否有对应 V5 SceneTemplate
+    const v5Id = findV5TemplateForScene(s.name);
+    const hasV5 = v5Id && window.SceneTemplates && window.SceneTemplates.loaded[v5Id];
+
     return `
-    <div class="bg-white rounded-xl p-3 shadow-sm">
+    <div class="bg-white rounded-xl p-3 shadow-sm" style="position:relative">
+      ${hasV5 ? '<span style="position:absolute;top:-6px;right:-4px;background:#10b981;color:white;font-size:9px;font-weight:700;padding:1px 6px;border-radius:999px;box-shadow:0 2px 4px rgba(0,0,0,.1);">📋 V5</span>' : ''}
       <div class="flex items-center gap-2 mb-2">
         <span class="text-xl">${s.icon}</span>
         <span class="text-xs text-gray-400">⭐${s.difficulty}</span>
@@ -8523,16 +8554,17 @@ function renderTemplateScenes() {
       <h4 class="font-medium text-gray-800 text-sm">${s.name}</h4>
       <p class="text-xs text-gray-500 mt-0.5 line-clamp-2">${s.desc}</p>
       <div class="flex items-center justify-between mt-2">
-        <span class="text-xs text-gray-400">${s.creator}</span>
+        <span class="text-xs text-gray-400">${s.creator}${hasV5 ? ' · 两种训练方式' : ''}</span>
         <span class="flex items-center gap-1 text-xs text-orange-500">${renderStars(parseFloat(avgRating))} ${avgRating}</span>
       </div>
       <div class="flex gap-2 mt-2">
         <button onclick="useTemplateScene(${s.id})" class="flex-1 py-1.5 text-xs font-medium bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-colors">
           ${actionLabel}
         </button>
-        <button onclick="showTemplateReviews(${s.id})" class="flex-1 py-1.5 text-xs font-medium bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors">
-          评价(${ratings.length})
-        </button>
+        ${hasV5
+          ? `<button onclick="openV5SceneTemplate('${v5Id}')" class="flex-1 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition-colors">📋 分步卡片</button>`
+          : `<button onclick="showTemplateReviews(${s.id})" class="flex-1 py-1.5 text-xs font-medium bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors">评价(${ratings.length})</button>`
+        }
       </div>
     </div>
   `}).join('');
