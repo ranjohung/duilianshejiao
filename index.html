@@ -17262,6 +17262,7 @@ const etiquetteLevels = [
   { id: 9014, title: '门店服务接待礼仪', icon: '🏪', world: 'work', worldName: '职场社交', sceneKey: 'service', category: '日常生活消费', story: '顾客走进门店浏览，但暂时没有主动求助。', relation: '服务人员与顾客', goal: '欢迎、观察需求、提供帮助、处理异议并欢送', focus: '服务距离、询问方式、致歉与欢送', opening: '顾客：我先随便看看。', options: [{label:'A',quality:'good',text:'好的，您慢慢看。我就在这边，需要了解尺寸或功能时随时叫我。',why:'尊重顾客浏览空间，同时说明可提供的帮助。'},{label:'B',quality:'neutral',text:'好的。',why:'不施压但服务信息不足。'},{label:'C',quality:'cold',text:'不买就别乱碰。',why:'带有敌意，会直接破坏服务关系。'}], coachAnswer:'好的，您慢慢看。我就在附近，需要帮助随时叫我。', refReason:'好的门店服务既不紧逼，也不消失。' },
   { id: 9015, title: '涉外商务交往', icon: '🌍', world: 'work', worldName: '职场社交', sceneKey: 'office', category: '职场与事业', story: '你第一次与海外客户正式会面。', relation: '商务合作双方', goal: '守时、称呼准确、避免隐私话题并确认合同信息', focus: '跨文化边界、守时、专业表达', opening: '客户：很高兴见到你，我们可以直接开始谈项目吗？', options: [{label:'A',quality:'good',text:'当然，很高兴见到您。议程和英文资料已经准备好，我们先确认今天的三个目标。',why:'简洁问候后直接进入清晰议程，符合专业预期。'},{label:'B',quality:'neutral',text:'可以，我们开始吧。',why:'直接但缺少议程确认。'},{label:'C',quality:'cold',text:'先别急，先聊聊你结婚没有。',why:'把私人问题放在正式商务开场，容易越界。'}], coachAnswer:'很高兴见到您。资料已经准备好，我们先确认今天的议程和目标。', refReason:'跨文化商务优先守时、清晰和边界。' },
 ];
+window.etiquetteLevels = etiquetteLevels; // ES6 const 不自动挂 window，手动导出给 libs 用
 
 let currentEtiquetteLevel = null;
 let etiquetteRound = 0;
@@ -17341,6 +17342,22 @@ function startEtiquetteLevel(levelId) {
   if (!EM_gate3DProject('etiquette', levelId, function () { startEtiquetteLevel(levelId); })) return;
   EM_accountTrainStart();
   closeModal('etiquette');
+
+  // ===== V5.0 场景化训练：优先用分步教学流程（ChatGPT 方案 R12）=====
+  if (typeof SceneTraining !== 'undefined' && SceneTraining.start) {
+    openModal('etiquette-training');
+    SceneTraining.start(levelId);
+    // 更新基础 HUD（教练头像等）
+    const coach = getEtiquetteCoach(level);
+    const meta = getEtiquetteSceneLabel(level);
+    const avatar = $('etiquette-coach-avatar');
+    if (avatar) { avatar.src = getCoachAvatarSrc(coach); avatar.alt = coach.name + '，' + meta.role; }
+    $('etiquette-title').textContent = level.title;
+    $('etiquette-subtitle').textContent = meta.location + ' · ' + level.goal;
+    $('etiquette-coach-role').textContent = coach.name + ' · ' + meta.role + ' · ' + meta.tone;
+    return; // 走 V5 流程，不加载 3D
+  }
+  // ===== Fallback：旧 3D 流程 =====
   window.currentEtiquetteLevel = level;
   window.etiquetteRound = 0;
   window.etiquetteScore = 0;
@@ -19320,6 +19337,8 @@ function useAvatarDetail() {
 <script src="libs/v3_sudden_change.js"></script>
 <!-- V4.0 四级教学闭环（依赖 window.Stage3D 已在 L3253 加载） -->
 <script src="libs/v4_teaching_closed_loop.js"></script>
+<!-- V5.0 场景化礼仪训练（ChatGPT 方案：分步教学流程，3D 降级为辅助） -->
+<script src="libs/v5_scene_training.js"></script>
 <!-- SceneTemplate 轻量加载器（V5 架构数据层入口） -->
 <script>
 /**
