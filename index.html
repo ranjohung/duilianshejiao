@@ -19533,14 +19533,16 @@ function useAvatarDetail() {
     _emoji: emojiFor
   };
 
-  fetch('knowledge_base/scene_templates/_index.json')
+  // v5.0.1: 加 cache-busting 避免浏览器拿坏 JSON 的旧缓存
+  var _ts = Date.now();
+  fetch('knowledge_base/scene_templates/_index.json?t='+_ts)
     .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
     .then(function(idx){
       window.SceneTemplates.index = idx;
       var toLoad = (idx.templates || []).filter(function(t){ return t.status && t.status.indexOf('完整')>=0; });
       return Promise.all(toLoad.map(function(t){
         var base = 'knowledge_base/scene_templates/' + t.file;
-        return fetch(base).then(function(r){
+        return fetch(base+'?t='+_ts).then(function(r){
           if(!r.ok) throw new Error('HTTP '+r.status+' '+base);
           return r.json();
         }).then(function(data){
