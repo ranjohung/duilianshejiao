@@ -922,8 +922,51 @@ h1,h2,h3 { text-wrap:balance; }
           </div>
         </div>
 
+        <!-- v5.0.0 新增：勇气徽章 + V5 模板快捷入口 -->
+        <div class="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-4 mb-4 text-left">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-teal-600 text-lg">🌟</span>
+            <span class="text-sm font-medium text-teal-800">首次勇气徽章</span>
+          </div>
+          <p class="text-xs text-teal-700 mb-2">完成第一次"真实挑战"后，你的勇气证据库将解锁第一枚徽章："我跨出了舒适区"。记录每一次尝试，比完美更重要。</p>
+          <div class="flex items-center gap-2 bg-white/60 rounded-lg px-3 py-2 mb-2">
+            <span class="text-lg">🥉</span>
+            <div class="flex-1">
+              <div class="text-xs font-semibold text-gray-700">勇气挑战者</div>
+              <div class="text-[10px] text-gray-500">完成第一次真实挑战</div>
+            </div>
+            <span class="text-[10px] text-gray-400">待解锁</span>
+          </div>
+        </div>
+
+        <div class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-4 mb-4 text-left">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-purple-600 text-lg">📋</span>
+            <span class="text-sm font-medium text-purple-800">V5 场景模板推荐</span>
+            <span style="background:#fbbf24;color:#78350f;font-size:9px;font-weight:700;padding:1px 6px;border-radius:999px;">新</span>
+          </div>
+          <p class="text-xs text-purple-700 mb-2">V5 把 17 个高频社交场景做成了完整训练包：面试/约会/饭局/职场拒绝/亲戚盘问… 选一个直接进入分步卡片训练。</p>
+          <div class="grid grid-cols-3 gap-1.5">
+            <button onclick="closeOnboarding();openV5SceneTemplate('ST-005')" class="bg-white rounded-lg p-2 text-center hover:bg-purple-100 transition-all border border-purple-200">
+              <div class="text-base mb-0.5">💼</div>
+              <div class="text-[10px] text-gray-700 font-medium">求职面试</div>
+            </button>
+            <button onclick="closeOnboarding();openV5SceneTemplate('ST-010')" class="bg-white rounded-lg p-2 text-center hover:bg-purple-100 transition-all border border-purple-200">
+              <div class="text-base mb-0.5">☕</div>
+              <div class="text-[10px] text-gray-700 font-medium">初次约会</div>
+            </button>
+            <button onclick="closeOnboarding();openV5SceneTemplate('ST-012')" class="bg-white rounded-lg p-2 text-center hover:bg-purple-100 transition-all border border-purple-200">
+              <div class="text-base mb-0.5">🫕</div>
+              <div class="text-[10px] text-gray-700 font-medium">亲戚盘问</div>
+            </button>
+          </div>
+        </div>
+
         <button onclick="closeOnboarding()" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-xl hover:opacity-90 transition-all animate-pulse-glow" data-page-node-id="1J52KQxEjiUScMSG84PMGH">
           开始训练
+        </button>
+        <button onclick="closeOnboarding()" class="w-full py-2.5 mt-2 text-gray-500 text-sm hover:text-gray-700 transition-all" style="background:none;border:none;">
+          稍后看看 →
         </button>
       </div>
     </div>
