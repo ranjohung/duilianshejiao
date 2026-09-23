@@ -1,0 +1,4 @@
+(function(){
+ function fix(){var page=document.getElementById('page-login');if(!page)return;page.style.zIndex='20';page.style.pointerEvents='auto';page.querySelectorAll('input,button').forEach(function(el){el.style.pointerEvents='auto';el.style.position='relative';el.style.zIndex='2'});document.querySelectorAll('.modal-overlay').forEach(function(el){if(el.id!=='modal-login'&&el.style.display!=='flex')el.style.pointerEvents='none'});var phone=document.getElementById('login-phone'),pwd=document.getElementById('login-password');[phone,pwd].forEach(function(el){if(!el||el.dataset.guard)return;el.dataset.guard='1';el.addEventListener('mousedown',function(ev){ev.stopPropagation()});el.addEventListener('click',function(){el.focus()})})}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',fix);else fix();setTimeout(fix,400);setTimeout(fix,1200);
+})();
