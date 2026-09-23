@@ -17487,26 +17487,30 @@ function getEtiquetteSceneLabel(level) {
   return over ? Object.assign({}, meta, over) : meta;
 }
 
-function startEtiquetteLevel(levelId) {
+function startEtiquetteLevel(levelId, lessonContext) {
   const level = etiquetteLevels.find(l => l.id === levelId);
   if (!level) return;
   // v2.5.1（§18.3）：礼仪训练保留 1 个免费体验项目（消耗每日训练次数），其余项目高级会员专属
-  if (!EM_gate3DProject('etiquette', levelId, function () { startEtiquetteLevel(levelId); })) return;
+  if (!EM_gate3DProject('etiquette', levelId, function () { startEtiquetteLevel(levelId, lessonContext); })) return;
   EM_accountTrainStart();
   closeModal('etiquette');
 
   // ===== V5.0 场景化训练：优先用分步教学流程（ChatGPT 方案 R12）=====
   if (typeof SceneTraining !== 'undefined' && SceneTraining.start) {
     openModal('etiquette-training');
-    SceneTraining.start(levelId);
+    SceneTraining.start(levelId, lessonContext);
     // 更新基础 HUD（教练头像等）
     const coach = getEtiquetteCoach(level);
     const meta = getEtiquetteSceneLabel(level);
     const avatar = $('etiquette-coach-avatar');
     if (avatar) { avatar.src = getCoachAvatarSrc(coach); avatar.alt = coach.name + '，' + meta.role; }
-    $('etiquette-title').textContent = level.title;
-    $('etiquette-subtitle').textContent = meta.location + ' · ' + level.goal;
-    $('etiquette-coach-role').textContent = coach.name + ' · ' + meta.role + ' · ' + meta.tone;
+    $('etiquette-title').textContent = lessonContext ? lessonContext.courseTitle : level.title;
+    $('etiquette-subtitle').textContent = lessonContext
+      ? lessonContext.category + ' · ' + lessonContext.knowledgePoint
+      : meta.location + ' · ' + level.goal;
+    $('etiquette-coach-role').textContent = lessonContext
+      ? coach.name + ' · 课程原文跟练'
+      : coach.name + ' · ' + meta.role + ' · ' + meta.tone;
     return; // 走 V5 流程，不加载 3D
   }
   // ===== Fallback：旧 3D 流程 =====
@@ -18905,7 +18909,7 @@ function useAvatarDetail() {
     var hasRealContent = !!rawFull && steps.length > 0;
     if (hasRealContent && (rawFull || steps.length)) {
       // 字数：优先用正文全文；scenes 类卡片无 rawText/chars 时按各节实文累计（避免显示“0 字”）
-      var wc = (rawFull || '').length
+      var wc = Number(card.verifiedReadingChars) || (rawFull || '').length
         || (steps.reduce(function (n, s) { return n + ((s && s.x) || '').length; }, 0))
         || card.chars || 0;
       var cur = steps[KL._stepIdx] || { t: card.title || '正文', x: '' };
@@ -18919,6 +18923,9 @@ function useAvatarDetail() {
               (emLocked ? '🔒 会员内容'
                 : (emTrial ? '✨ 免费试读 · ' : '') +
               (steps.length > 1 ? '第 ' + (KL._stepIdx + 1) + ' / ' + steps.length + ' 节 · ' : '') + wc + ' 字') + '</span></div>';
+      if (card.reviewNeeded && !emLocked) {
+        html += '  <div class="kc-source-review-note" role="note" style="margin:0 0 12px;padding:10px 12px;border:1px solid #fcd34d;border-radius:10px;background:#fffbeb;color:#92400e;font-size:12px;line-height:1.7;">文字正文已提取；原资料中的图片、表格或复杂版式尚未全部人工核对，可能未完整呈现。当前显示的文字保持原文提取结果。</div>';
+      }
       if (emLocked) {
         var chName = EM_chapterOf(card) || '本章节';
         var teaser = (bodyText || '').replace(/\s+/g, ' ').trim().slice(0, 60);
@@ -19055,34 +19062,64 @@ function useAvatarDetail() {
       if (typeof showToast === 'function') showToast('请先完成自测题');
       return;
     }
-    // v2.5（§18.4）：去对练消耗当日训练次数；次数用完触发付费墙（学完立刻练=最佳付费触发点）
-    if (typeof EM_checkTrainGate === 'function' && !EM_checkTrainGate('knowledge', function () { KL_jumpToPractice(); })) return;
     var detail = KL._detail;
-    if (detail.contentType || detail.rawText) {
-      window._v3_practicePrompt = '请围绕课程“' + (detail.title || '本课') + '”的当前知识点“' + ((KL._steps[KL._stepIdx] || {}).t || '当前知识点') + '”，模拟一个真实' + (detail.category || '社交') + '场景，先给出对方的一句自然话，再让用户回答；反馈只依据课程正文，不自行创造礼仪规则。\n课程正文：\n' + ((KL._steps[KL._stepIdx] || {}).x || '');
-      window.currentScenarioId = detail.id;
-      window.currentChallengeId = detail.id;
+    var section = KL._steps && KL._steps[KL._stepIdx];
+    var sourceText = section && typeof section.x === 'string' ? section.x : '';
+    if (!(detail.contentType || detail.rawText) || !sourceText.trim()) {
+      if (typeof showToast === 'function') showToast('当前条目没有可核对的课程正文，暂不能进入课程练习。');
+      return;
     }
-    var cat = KL._detail.category || '';
-    var catToScene = {
-      '社交场合与人际交往': 9001,
-      '日常生活消费': 9003,
-      '家庭与亲友': 9004,
-      '亲密关系与约会': 9005,
-      '公共服务与办事': 9006,
-      '突发与冲突': 9007,
-      '数字社交': 9008,
-      '职场与事业': 9002
+    var context = {
+      courseId: String(detail.id || ''),
+      courseTitle: String(detail.title || '本课'),
+      category: String(detail.category || detail.scene || '社交技能'),
+      knowledgePoint: String(section.t || detail.title || '当前知识点'),
+      sourceText: sourceText
     };
-    var lv = catToScene[cat];
+    // 保留正文原句，供训练步骤、练习提示和复盘引用。
+    window.currentLessonPractice = context;
+    window.currentScenarioId = detail.id;
+    window.currentChallengeId = detail.id;
+
+    var topic = context.courseTitle + ' ' + context.knowledgePoint + ' ' + context.category;
+    var topicRoutes = [
+      [/宴请|酒桌|饭局|敬酒|祝酒|饮酒/, 9012],
+      [/乘车|座次|入座|就座/, 9011],
+      [/电梯|引导|开门|带路/, 9013],
+      [/门店|顾客|导购|服务接待|销售/, 9014],
+      [/涉外|跨文化/, 9015],
+      [/婚礼|致辞/, 9009],
+      [/冲突|分歧|道歉|异议|批评/, 9008],
+      [/约会|相亲|亲密关系/, 9007],
+      [/面试|职场新人|入职|同事/, 9004],
+      [/汇报|演讲|述职|公开表达/, 9006],
+      [/客户|拜访|握手|名片|接待|商务/, 9010],
+      [/家庭|朋友父母|亲友/, 9002],
+      [/邻居|邻里|帮助/, 9003],
+      [/咖啡|破冰|初次见面|问候|寒暄/, 9001]
+    ];
+    var matchedRoute = topicRoutes.find(function (route) { return route[0].test(topic); });
+    var categoryRoutes = {
+      '社交场合与人际交往': 9001,
+      '日常生活消费': 9014,
+      '家庭与亲友': 9002,
+      '亲密关系与约会': 9007,
+      '公共服务与办事': 9003,
+      '突发与冲突': 9008,
+      '数字社交': 9001,
+      '职场与事业': 9010,
+      '礼仪训练与规范': 9001,
+      '演讲表达': 9006,
+      '饭局酒桌': 9012
+    };
+    var lv = matchedRoute ? matchedRoute[1] : (categoryRoutes[context.category] || 9001);
+    // 训练次数/会员门控在课程正文确认后执行，避免空条目消耗次数。
+    if (typeof EM_checkTrainGate === 'function' && !EM_checkTrainGate('knowledge', function () { KL_jumpToPractice(); })) return;
     if (typeof closeModal === 'function') closeModal('knowledge-detail');
-    if (lv && typeof startEtiquetteLevel === 'function') {
-      startEtiquetteLevel(lv);
-    } else if (typeof openChallengeCustomScene === 'function') {
-      showToast && showToast('为你打开自定义场景，结合本课创建专属练习');
-      openChallengeCustomScene && openChallengeCustomScene();
+    if (typeof startEtiquetteLevel === 'function') {
+      startEtiquetteLevel(lv, context);
     } else if (typeof showToast === 'function') {
-      showToast('已为你找到相关训练入口');
+      showToast('课程正文已找到，但训练模块当前不可用。');
     }
   }
 

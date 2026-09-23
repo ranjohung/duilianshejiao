@@ -271,16 +271,110 @@
   // 渲染主入口
   // ──────────────────────────────────────────────────────────────────────
 
-  function start(levelId) {
+  function courseNpcLine(context) {
+    const topic = String((context.courseTitle || '') + ' ' + (context.knowledgePoint || '') + ' ' + (context.category || ''));
+    const rules = [
+      [/握手|见面|问候|称呼|迎接/, '对方：您好，很高兴认识您。'],
+      [/敬酒|酒桌|饭局|宴请|祝酒/, '同席者：今天大家难得聚在一起，您方便举杯吗？'],
+      [/座次|入座|就座|乘车|座位/, '来访者：请问我坐在哪里比较合适？'],
+      [/电梯|引导|开门|带路/, '来访者：请问会议室往哪边走？'],
+      [/门店|顾客|导购|销售|客户|成交|拜访/, '客户：我想先了解一下，暂时还没有决定。'],
+      [/面试|求职|应聘/, '面试官：请用一两分钟介绍一下自己。'],
+      [/汇报|演讲|致辞|表达/, '听众：你刚才提到的重点，可以再具体说明一下吗？'],
+      [/送礼|礼物|收礼/, '对方：谢谢你还想着我，这份心意我收到了。'],
+      [/拒绝|边界|请求|求助/, '对方：这件事你能不能帮我一下？'],
+      [/倾听|情绪|安慰|共情/, '对方：最近这件事让我有些烦，想听听你的看法。'],
+      [/冲突|分歧|异议|道歉|批评/, '对方：我对刚才的处理不太认同，你怎么看？'],
+      [/电话|通话/, '对方：您好，请问您是哪位？'],
+      [/家庭|亲友|相亲|约会/, '对方：最近过得怎么样？你最近在忙些什么？']
+    ];
+    const matched = rules.find(([pattern]) => pattern.test(topic));
+    if (matched) return matched[1];
+    const point = String(context.knowledgePoint || context.courseTitle || '这件事').replace(/[“”"<>]/g, '').slice(0, 40);
+    return '对方：关于“' + point + '”，我想听听你的想法。';
+  }
+
+  function buildCourseDrivenSteps(level, context) {
+    const esc = global.escapeCardText || function (value) {
+      return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    };
+    const source = String(context.sourceText || '');
+    const title = String(context.courseTitle || '本课程');
+    const point = String(context.knowledgePoint || '当前知识点');
+    const npc = courseNpcLine(context);
+    const sceneNote = '练习情景由软件依据课程主题设计，不是原资料原文；具体规则只以本课原文为依据。';
+    const sourceLabel = esc(title) + ' · ' + esc(point);
+    const sourceHtml = esc(source);
+    return [
+      {
+        type: 'intro', title: '本次课程 · ' + esc(point),
+        sceneHint: esc(context.category || '社交技能') + ' · 课程驱动练习',
+        content: esc(npc) + '\n\n' + esc(sceneNote),
+        courseSource: { label: sourceLabel, text: sourceHtml }
+      },
+      {
+        type: 'objectives', title: '先从课程中找依据',
+        items: ['指出原文中与当前情境相关的做法', '只按原文明确写出的顺序和边界练习', '用自己的话回应；原文未说明的细节先确认']
+      },
+      {
+        type: 'why', title: '本次练习依据',
+        points: [
+          { q: '课程原文（保持原句）', a: sourceHtml },
+          { q: '练习范围', a: esc(sceneNote) }
+        ]
+      },
+      {
+        type: 'action_demo', title: '行为跟练 · 对照原文',
+        whenToDo: '在开始回应前，先确认现实关系、场合和对方的意愿。',
+        commonMistakes: ['把模拟情景当成原文规则', '把课程没有说明的细节说成固定礼仪', '忽略对方拒绝或不方便的信号'],
+        actions: [
+          { step: 1, icon: '📖', label: '从原文找出适用内容', tip: '确认原文明确写了什么；不要用猜测补充课程规则。' },
+          { step: 2, icon: '🧭', label: '确认场景和对方边界', tip: '把课程方法放进当前关系与场合，留意对方是否愿意继续。' },
+          { step: 3, icon: '💬', label: '用自己的话自然回应', tip: '表达后给对方回应空间，再根据真实情况调整。' }
+        ],
+        why: '动作和话术练习都要回到当前课程原文；此处没有摄像头动作识别。'
+      },
+      {
+        type: 'speech_demo', title: '话术准备 · 先理解再表达',
+        options: [], coursePractice: true,
+        practicePrompt: '结合上方课程原文，先确定你要遵循的做法，再组织自己的回应。不要背诵或补造原文没有的规则。'
+      },
+      {
+        type: 'follow_prac', title: '跟练 · 行为确认与表达',
+        actionChecklist: ['我已在原文中找到本次回应的依据', '我已考虑场景关系和对方边界'],
+        speechPlaceholder: '写下或说出你的自然回应…',
+        coachHint: '这是自我跟练记录，系统不会假称看见了你的动作。完成后可回到原文核对。'
+      },
+      {
+        type: 'ai_roleplay', title: '真实情景对话 · 课程主题练习',
+        dialogue: [{
+          npc: esc(npc),
+          practicePrompt: '请按本课原文回应。完成后指出你依据的原文内容；若原文没有覆盖情景中的细节，可以先询问，不要自行编成课程规定。'
+        }],
+        practicePrompt: '使用本课知识回应；课程原文在前面的步骤中可以查看。'
+      },
+      { type: 'evaluation', title: '练习复盘 · 回到课程原文', courseContext: true }
+    ];
+  }
+
+  function start(levelId, lessonContext) {
     const levels = global.etiquetteLevels || [];
     const level = levels.find(l => String(l.id) === String(levelId));
     if (!level) { console.warn('[SceneTraining] level not found:', levelId, 'available ids:', levels.map(l=>l.id)); return; }
 
     SceneTraining._level = level;
-    SceneTraining._steps = buildStepsFromLevel(level);
+    SceneTraining._lessonContext = lessonContext && lessonContext.sourceText ? lessonContext : null;
+    SceneTraining._steps = SceneTraining._lessonContext
+      ? buildCourseDrivenSteps(level, SceneTraining._lessonContext)
+      : buildStepsFromLevel(level);
     SceneTraining._stepIdx = 0;
     SceneTraining._answers = {};
     SceneTraining._actionDone = {};
+    SceneTraining._turnIdx = 0;
+    SceneTraining._dialogueAnswers = {};
+    SceneTraining._quizAnswer = null;
     console.log('[SceneTraining] start:', level.id, level.title, 'steps:', SceneTraining._steps.length);
 
     // 容器定位 — 和 modal-etiquette-training 共存
@@ -362,12 +456,13 @@
   }
 
   function renderIntro(step) {
+    const source = step.courseSource ? `<div style="margin-top:14px;background:#fff;border:1px solid #c7d2fe;border-radius:10px;padding:12px;"><strong>课程原文依据 · ${step.courseSource.label}</strong><pre style="white-space:pre-wrap;font:inherit;line-height:1.8;margin:8px 0 0;">${step.courseSource.text}</pre></div>` : '';
     return `<div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:12px;padding:16px;margin-bottom:16px;">
       <div style="font-size:13px;color:#0369a1;font-weight:600;margin-bottom:8px;">📍 ${step.sceneHint || '场景'}</div>
-      <div style="font-size:14px;color:#334155;line-height:1.8;white-space:pre-wrap;">${step.content || ''}</div>
+      <div style="font-size:14px;color:#334155;line-height:1.8;white-space:pre-wrap;">${step.content || ''}</div>${source}
     </div>
     <div style="text-align:center;color:#6b7280;font-size:13px;">
-      先了解清楚"你在什么情境里"，后面的动作和话术才有意义。
+      ${step.courseSource ? '本次模拟台词与课程原文分开标示；请只依据课程原文学习规则。' : '先了解清楚"你在什么情境里"，后面的动作和话术才有意义。'}
     </div>`;
   }
 
@@ -454,6 +549,7 @@
   }
 
   function renderSpeechDemo(step) {
+    if (step.coursePractice) return `<div style="background:#fdf4ff;border:1px solid #f5d0fe;border-radius:12px;padding:16px;"><div style="font-size:13px;color:#a21caf;font-weight:600;margin-bottom:12px;">💬 话术准备</div><p style="font-size:14px;line-height:1.8;color:#374151;">${step.practicePrompt}</p><p style="font-size:12px;color:#6b7280;">参考依据：前一步展示的课程原文。情景台词是练习设计，不能当成原文示例。</p></div>`;
     let options = (step.options || []).map((o, i) => {
       const colorMap = { good:'#10b981', neutral:'#f59e0b', cold:'#ef4444' };
       const bgMap = { good:'#ecfdf5', neutral:'#fffbeb', cold:'#fef2f2' };
@@ -535,6 +631,9 @@
 
     const practicePrompt = hasMultiTurn ? dp[turnIdx].practicePrompt : step.practicePrompt;
     const isLastTurn = hasMultiTurn && turnIdx >= dp.length - 1;
+    const submitLabel = SceneTraining._lessonContext
+      ? '提交回答 · 查看课程对照提示'
+      : (isLastTurn ? '发送 · AI 评价' : '发送 · 下一轮 →');
 
     const savedAnswer = hasMultiTurn && SceneTraining._dialogueAnswers ? SceneTraining._dialogueAnswers[turnIdx] || '' : (SceneTraining._answers[SceneTraining._stepIdx] || '');
 
@@ -554,13 +653,26 @@
       <textarea id="st-ai-input" rows="3" placeholder="${hasMultiTurn ? '轮到你了…' : '在这里输入你的回应…'}" style="width:100%;border:1px solid #e5e7eb;border-radius:10px;padding:10px;font-size:14px;resize:outline-none;">${savedAnswer}</textarea>
       <div style="display:flex;gap:8px;margin-top:10px;">
         <button style="flex:1;padding:10px;border:1px solid #c7d2fe;background:#eef2ff;border-radius:10px;color:#4338ca;font-size:13px;cursor:pointer;" onclick="startEtiquetteVoiceInput()">🎙️ 语音</button>
-        <button class="st-ai-send" style="flex:1;padding:10px;border:none;background:linear-gradient(135deg,#10b981,#059669);border-radius:10px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;">${isLastTurn ? '发送 · AI 评价' : '发送 · 下一轮 →'}</button>
+        <button class="st-ai-send" style="flex:1;padding:10px;border:none;background:linear-gradient(135deg,#10b981,#059669);border-radius:10px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;">${submitLabel}</button>
       </div>
       <div id="st-ai-feedback" style="margin-top:12px;"></div>
     </div>`;
   }
 
   function renderEvaluation(step) {
+    if (step.courseContext && SceneTraining._lessonContext) {
+      const ctx = SceneTraining._lessonContext;
+      const esc = global.escapeCardText || function (value) { return String(value == null ? '' : value).replace(/[&<>"']/g, function(c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); };
+      const answersForCourse = SceneTraining._answers;
+      const response = answersForCourse['ai_roleplay_full'] || answersForCourse['ai_roleplay'] || '';
+      return `<div style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:12px;padding:16px;line-height:1.8;">
+        <strong>练习已记录 · 请对照课程复盘</strong>
+        <p style="margin-top:10px;"><b>你的回应：</b></p><pre style="white-space:pre-wrap;font:inherit;">${esc(response || '本轮尚无文字回应。')}</pre>
+        <p><b>课程原文：</b></p><pre style="white-space:pre-wrap;font:inherit;background:#fff;padding:10px;border-radius:8px;">${esc(ctx.sourceText || '')}</pre>
+        <ul style="padding-left:20px;"><li>我能指出回应依据的原文内容。</li><li>我没有把软件模拟台词当成课程原文。</li><li>原文未覆盖的细节，我选择先确认而不是编造规则。</li></ul>
+        <p style="font-size:12px;color:#64748b;margin-top:10px;">此处提供的是本地自查提示，不是AI语义评价；系统也没有识别你的实际肢体动作。</p>
+      </div>`;
+    }
     const answers = SceneTraining._answers;
     const level = SceneTraining._level;
     const userAIInput = answers['ai_roleplay'] || answers[SceneTraining._steps.findIndex(s=>s.type==='ai_roleplay')];
@@ -797,8 +909,9 @@
         if (!text) { feedback.innerHTML = '<div style="color:#ef4444;font-size:13px;">请输入你的回应</div>'; return; }
         this.textContent = '发送中…';
 
-        // 简单启发式评价（真实项目会调 AI API）
-        const quality = evaluateResponse(text, SceneTraining._level);
+        // 课程驱动的本地练习不调用启发式评分，也不冒称 AI 评价。
+        const courseDriven = !!SceneTraining._lessonContext;
+        const quality = courseDriven ? null : evaluateResponse(text, SceneTraining._level);
 
         // 多轮模式
         const step = SceneTraining._steps[idx];
@@ -820,10 +933,12 @@
             SceneTraining._answers['ai_roleplay'] = text;
             SceneTraining._answers['ai_roleplay_full'] = Object.values(SceneTraining._dialogueAnswers || {}).join('\n');
             setTimeout(() => {
-              feedback.innerHTML = `<div style="background:${quality.bg};border:1px solid ${quality.border};border-radius:10px;padding:12px;font-size:13px;color:${quality.fg};line-height:1.8;">
-                <strong>${quality.title}</strong><br>${quality.desc}<br><span style="color:#6b7280;font-size:11px;margin-top:6px;display:block;">多轮对话完成！下一步进入综合评价。</span>
-              </div>`;
-              this.textContent = '✓ 已完成多轮对话';
+              feedback.innerHTML = courseDriven
+                ? '<div style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:10px;padding:12px;font-size:13px;color:#3730a3;line-height:1.8;"><strong>本轮回应已记录</strong><br>请进入复盘，对照课程原文检查你的回应依据。此处没有进行 AI 语义评分。</div>'
+                : `<div style="background:${quality.bg};border:1px solid ${quality.border};border-radius:10px;padding:12px;font-size:13px;color:${quality.fg};line-height:1.8;">
+                  <strong>${quality.title}</strong><br>${quality.desc}<br><span style="color:#6b7280;font-size:11px;margin-top:6px;display:block;">多轮对话完成！下一步进入综合评价。</span>
+                </div>`;
+              this.textContent = courseDriven ? '✓ 已记录本轮回应' : '✓ 已完成多轮对话';
             }, 600);
           }
         } else {
@@ -831,10 +946,12 @@
           SceneTraining._answers[idx] = text;
           SceneTraining._answers['ai_roleplay'] = text;
           setTimeout(() => {
-            feedback.innerHTML = `<div style="background:${quality.bg};border:1px solid ${quality.border};border-radius:10px;padding:12px;font-size:13px;color:${quality.fg};line-height:1.8;">
-              <strong>${quality.title}</strong><br>${quality.desc}
-            </div>`;
-            this.textContent = '✓ 已评价';
+            feedback.innerHTML = courseDriven
+              ? '<div style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:10px;padding:12px;font-size:13px;color:#3730a3;line-height:1.8;"><strong>本轮回应已记录</strong><br>请进入复盘，对照课程原文检查你的回应依据。此处没有进行 AI 语义评分。</div>'
+              : `<div style="background:${quality.bg};border:1px solid ${quality.border};border-radius:10px;padding:12px;font-size:13px;color:${quality.fg};line-height:1.8;">
+                <strong>${quality.title}</strong><br>${quality.desc}
+              </div>`;
+            this.textContent = courseDriven ? '✓ 已记录本轮回应' : '✓ 已评价';
           }, 600);
         }
       });
@@ -852,6 +969,9 @@
 
   // 简单启发式评价（MVP，真实项目调 AI）
   function evaluateResponse(text, level) {
+    if (SceneTraining._lessonContext) {
+      return { title: '已记录本轮回应', desc: '这不是AI语义评分。请指出回应依据的课程原文；若课程未说明情景细节，可以先确认再回答。', bg: '#eef2ff', border: '#c7d2fe', fg: '#3730a3' };
+    }
     const goodOpt = (level.options || []).find(o => o.quality === 'good');
     const coldOpt = (level.options || []).find(o => o.quality === 'cold');
     const textLower = text.toLowerCase();
