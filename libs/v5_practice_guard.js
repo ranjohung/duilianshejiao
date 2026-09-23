@@ -1,0 +1,4 @@
+(function(){
+ function enhance(){var root=document.getElementById('v5-classroom');if(!root||root.dataset.guard)return;root.dataset.guard='1';root.addEventListener('click',function(ev){var next=ev.target.closest('[data-next]');if(!next)return;var nav=root.querySelector('nav .on');if(!nav||nav.textContent.indexOf('04')<0)return;var checked=root.querySelectorAll('.check input:checked').length;if(checked<2){ev.preventDefault();ev.stopImmediatePropagation();var old=root.querySelector('.v5-practice-hint');if(old)old.remove();var hint=document.createElement('div');hint.className='v5-practice-hint';hint.textContent='先完成至少两个动作，再进入 AI 对话。你可以先做最自然的两项。';root.querySelector('.v5-panel').appendChild(hint)}},true)}
+ new MutationObserver(enhance).observe(document.body,{childList:true,subtree:true});enhance();
+})();

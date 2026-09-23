@@ -1,0 +1,5 @@
+(function(){
+  var rounds=[['01 问候','客户：您好，您就是 XXX 吧？路上辛苦了。','您好，我是 XX 公司的 XXX，很高兴认识您。'],['02 入座','客户：请坐，我们先聊聊这次合作。','好的，谢谢。'],['03 临时问题','客户：如果预算需要再压缩一些，你会怎么考虑？','我理解您的考虑，我们可以一起看看哪些部分可以优化。']];
+  function enhance(){var root=document.getElementById('v5-classroom');if(!root)return;var nav=root.querySelector('nav .on');if(!nav||nav.textContent.indexOf('05')<0)return;var panel=root.querySelector('.v5-panel');if(!panel||panel.querySelector('.v5-rounds'))return;var box=document.createElement('div');box.className='v5-rounds';box.innerHTML=rounds.map(function(x,i){return '<button class="'+(i===0?'active':'')+'" data-round="'+i+'">'+x[0]+'</button>'}).join('');var bubble=panel.querySelector('.bubble'),area=panel.querySelector('textarea');panel.insertBefore(box,bubble);function select(i){var x=rounds[i];box.querySelectorAll('button').forEach(function(b,j){b.classList.toggle('active',i===j)});if(bubble)bubble.textContent=x[1];if(area)area.placeholder=x[2]+'（也可以换成自己的话）'}box.querySelectorAll('button').forEach(function(b){b.onclick=function(){select(+b.dataset.round)}})}
+  new MutationObserver(enhance).observe(document.body,{childList:true,subtree:true});enhance();
+})();

@@ -17,6 +17,7 @@ body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,
 @keyframes pageSlideIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
 .page-content { padding:16px; padding-bottom:80px; }
 .tab-bar { display:none; position:absolute; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #f0f0f0; padding:6px 12px; padding-bottom:calc(6px + env(safe-area-inset-bottom)); z-index:100; }
+.tab-bar.show { z-index:1000; }
 .tab-bar.show { display:flex; }
 .tab-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; padding:4px 0; cursor:pointer; border:none; background:none; transition:color .2s; }
 .tab-item .tab-icon { font-size:20px; }
@@ -574,6 +575,17 @@ h1,h2,h3 { text-wrap:balance; }
 /* ===== 训练模态：上下分屏（3D 场景 + 输入框固定，其余内容在下方滚动）2026-09-10 ===== */
 #modal-etiquette-training .modal-content,
 #modal-challenge-training .modal-content { height:88vh; max-height:88vh; display:flex; flex-direction:column; overflow:hidden; }
+#modal-challenge-training .ct-stage-fixed { display:none !important; }
+#modal-challenge-training .challenge-training-surface { background:#f8fafc !important; }
+#modal-challenge-training .ct-scroll { padding-top:10px; }
+.challenge-learning-brief { margin:10px 12px 0; padding:12px 14px; border:1px solid #e0e7ff; border-radius:16px; background:linear-gradient(135deg,#eef2ff,#faf5ff); color:#4338ca; }
+.challenge-learning-brief .brief-title { font-size:12px; font-weight:700; margin-bottom:5px; }
+.challenge-learning-brief .brief-copy { font-size:12px; line-height:1.6; color:#5b5b78; }
+.challenge-input-hint { display:flex; gap:6px; flex-wrap:wrap; padding:0 4px 8px; font-size:11px; color:#7c6f99; }
+.challenge-input-hint span { background:#fff; border:1px solid #e9e5f2; border-radius:999px; padding:4px 8px; }
+#modal-challenge-training .ct-input-row { align-items:center; }
+#modal-challenge-training #challenge-input { min-width:0; width:100%; height:42px; max-height:42px; line-height:20px; }
+#modal-challenge-training .ct-input-row button { flex-shrink:0; white-space:nowrap; }
 /* 头部固定 */
 #modal-etiquette-training .modal-content > div:first-child,
 #modal-challenge-training .modal-content > div:first-child { flex-shrink:0; }
@@ -2904,7 +2916,7 @@ function showMutationCoachAdvice(mutation) {
           <div data-page-node-id="Awcido5IzWeyj5kPk4gKJq">
             <h3 class="font-semibold text-gray-800" id="challenge-title" data-page-node-id="qPkzEatshOV931VHl0oXHy">挑战训练</h3>
             <p class="text-xs text-gray-400" id="challenge-subtitle" data-page-node-id="3tarfvgUAdU4kTGByJKD8t">真实场景模拟</p>
-            <p class="text-[11px] text-indigo-500 mt-0.5" id="challenge-coach-role" data-page-node-id="C4wad7dvMAPfZhCCA9jv6c">教练角色待加载</p>
+            <p class="text-[11px] text-indigo-500 mt-0.5" id="challenge-coach-role" data-page-node-id="C4wad7dvMAPfZhCCA9jv6c">教练角色待加载</p><span id="challenge-round-label" class="inline-flex mt-1 px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600 text-[10px] font-medium">第1轮 / 共5轮</span>
           </div>
         </div>
         <button onclick="closeModal('challenge-training')" class="text-gray-400 hover:text-gray-600 text-xl" data-page-node-id="ikeSCUIrIvXpAQAJTD0FzR">✕</button>
@@ -2917,14 +2929,14 @@ function showMutationCoachAdvice(mutation) {
           <div class="challenge-stage-hud" data-page-node-id="IMW4XTRrUkVLHDHRRM6kTT"><div class="hud-card" data-page-node-id="odni6KzTR2P2xtXrnK1Jio"><div class="text-[10px] uppercase tracking-[.16em] text-indigo-100" data-page-node-id="Rt3cvRkXKqdaATUOqzftmh">沉浸式现场</div><div id="challenge-stage-location" class="text-xs font-semibold mt-1" data-page-node-id="0EwqdAJ08SGS520GhfV6b6">场景加载中</div></div><div class="hud-card text-right" data-page-node-id="CbzWs9DshpASTP4vypYGx6"><div class="text-[10px] text-indigo-100" data-page-node-id="PkilDZbwhq2SDOjgHEtLXA">轮次</div><div id="challenge-stage-progress" class="text-sm font-semibold mt-1" data-page-node-id="OAsRzd0y04f2mW1AYlHfHK">0 / 3</div></div></div>
         </div>
       </div>
-      <div class="ct-fixed ct-input-fixed" data-page-node-id="Q4aC9oQEE9mu601R5A1g2v">
-        <div class="flex gap-2 ct-input-row" data-page-node-id="P2y2uXO5Bs35kRZwsCQhJo">
-          <input type="text" id="challenge-input" placeholder="输入你会说的话或会做的动作…" class="flex-1 px-4 py-2 rounded-full border border-gray-200 text-sm focus:outline-none focus:border-indigo-500" data-page-node-id="PSWNuJwdGLquAK121nSl3W">
-          <button onclick="openActionPanel({kind:'input', id:'challenge-input', stageId:'challenge-stage', who:'user'})" class="btn-action-trigger" title="动作指令" aria-label="动作指令">🎬</button><button onclick="showSuddenMutationPicker()" title="🔥 临场突变：模拟对方突然做了出乎意料的事" style="padding:6px 10px;border:1px solid #fb923c;background:#fff7ed;color:#c2410c;border-radius:999px;font-size:12px;cursor:pointer;transition:all .15s;" onmouseover="this.style.background='#fed7aa'" onmouseout="this.style.background='#fff7ed'">🔥 突发</button><button onclick="sendChallengeMessage()" class="px-4 py-2 bg-indigo-500 text-white rounded-full text-sm font-medium hover:bg-indigo-600 transition-colors" data-page-node-id="eoxBDZ9YEG4ci4bN0mujna">发送</button>
+      <div class="ct-fixed ct-input-fixed" data-page-node-id="Q4aC9oQEE9mu601R5A1g2v"><div class="challenge-learning-brief"><div class="brief-title">🎯 这一轮练什么</div><div class="brief-copy">先读场景，再用你自己的话完成主动打招呼、回应或说明动作。教练会从语言、动作和礼仪三个维度解释：哪里有效、哪里需要调整、下一句怎么说。</div></div>
+        <div class="challenge-input-hint"><span>🗣 说什么</span><span>🤝 做什么动作</span><span>🧭 为什么这样做</span></div><div class="flex gap-2 ct-input-row" data-page-node-id="P2y2uXO5Bs35kRZwsCQhJo">
+          <input type="text" id="challenge-input" placeholder="输入你会说的话 + 动作，例如：微笑点头：你好，很高兴认识你" class="flex-1 px-4 py-2 rounded-full border border-gray-200 text-sm focus:outline-none focus:border-indigo-500" data-page-node-id="PSWNuJwdGLquAK121nSl3W">
+          <button onclick="openActionPanel({kind:'input', id:'challenge-input', stageId:'challenge-stage', who:'user'})" class="btn-action-trigger" title="动作指令" aria-label="动作指令">🎬</button><button onclick="showSuddenMutationPicker()" title="🔥 情境变化：让教练追加一轮变化" style="padding:6px 10px;border:1px solid #fb923c;background:#fff7ed;color:#c2410c;border-radius:999px;font-size:12px;cursor:pointer;transition:all .15s;" onmouseover="this.style.background='#fed7aa'" onmouseout="this.style.background='#fff7ed'">🧩 情境变化</button><button onclick="sendChallengeMessage()" class="px-4 py-2 bg-indigo-500 text-white rounded-full text-sm font-medium hover:bg-indigo-600 transition-colors" data-page-node-id="eoxBDZ9YEG4ci4bN0mujna">发送</button>
         </div>
       </div>
       <div class="ct-scroll">
-        <div id="challenge-coach-evaluation" class="challenge-coach-evaluation is-empty" data-page-node-id="Cb7v8s4BtJ2TToyjhdf0zc">每轮输入都会在这里得到教练评价；本模式不提供选项或示范答案。</div>
+        <div id="challenge-coach-evaluation" class="challenge-coach-evaluation is-empty" data-page-node-id="Cb7v8s4BtJ2TToyjhdf0zc">每轮都会从语言、动作、礼仪三个维度给出评价，并解释为什么。</div>
         <div id="challenge-scene-goal" class="challenge-scene-goal" data-page-node-id="uCUtkxMtITdYwQCnTjijiP">本关目标加载中</div>
         <div id="challenge-messages" class="space-y-3" data-page-node-id="TSDUTqvsaXJUvA7Z9ChHBp"></div>
       </div>
@@ -3519,7 +3531,7 @@ function showMutationCoachAdvice(mutation) {
 
 <script src="knowledge_base/learning_cards.js"></script>
 <script src="knowledge_base/raw_course_cards.js"></script>
-<script src="knowledge_base/extra_course_cards_all.js?v=20250704"></script>
+<script src="knowledge_base/text_course_cards.js?v=20260922"></script>
 
 <!-- three.js 5 个库 — v5.0.0 架构改为按需加载（3D 降级为可选增强器）
   默认不加载；用户开启 3D 演示 或 进入需要 3D 的页面时才调用 load3D()
@@ -4611,13 +4623,9 @@ const fallbackLearningCards = [
 const structuredLearningCards = Array.isArray(window.knowledgeLearningCards) ? window.knowledgeLearningCards : [];
 const rawCourseLearningCards = Array.isArray(window.rawCourseLearningCards) ? window.rawCourseLearningCards : [];
 // 资料库课程目录全量纳入（音视频课 / 话术资料 / 电子书），不做删减
-const extraCourseCards = Array.isArray(window.extraCourseCards)
-  ? window.extraCourseCards.filter(function(card) {
-      return card && card.status === 'ok' && card.bundle && Number(card.chars || 0) > 0;
-    })
-  : [];
-let learningCards = [...structuredLearningCards, ...rawCourseLearningCards, ...extraCourseCards];
-if (!learningCards.length) learningCards = fallbackLearningCards;
+const extraCourseCards = Array.isArray(window.textCourseCards) ? window.textCourseCards : [];
+// 客户课程只收录真实文字；旧摘要、路径卡和自动编写的话术不冒充原资料。
+let learningCards = extraCourseCards.slice();
 setTimeout(function () {
   var total = document.getElementById('training-hub-card-total');
   if (total) total.textContent = learningCards.length;
@@ -4856,6 +4864,10 @@ function showView(id) {
 }
 
 function switchTab(tab) {
+  // 主导航始终可用：切换主功能时关闭当前弹窗遮罩。
+  document.querySelectorAll('.modal-overlay').forEach(function (modal) {
+    if (modal && modal.id !== 'modal-onboarding') modal.style.display = 'none';
+  });
   currentTab = tab;
   const pages = { home:'page-home', coach:'page-coach', training:'page-training', growth:'page-growth', profile:'page-profile' };
   showView(pages[tab]);
@@ -5532,6 +5544,7 @@ function EM_isChapterUnlocked(card) {
 // 锁定判定：非试读 + 章节未买断 + 无有效会员 → 锁。
 function EM_cardLocked(card) {
   if (!card) return false;
+  if (card.contentType && card.status === 'ok') return false;
   if (EM_isTrialCard(card)) return false;
   if (EM_isChapterUnlocked(card)) return false;
   if (hasPaidMembership()) return false;
@@ -6186,6 +6199,7 @@ async function doLogin() {
 }
 
 function showOnboarding() {
+  if (typeof showPersonalizedOnboarding === 'function') { showPersonalizedOnboarding(); return; }
   const ticketCount = $('onboarding-ticket-count');
   if (ticketCount) ticketCount.textContent = String(timeRewindTickets);
   const onboarding = $('modal-onboarding');
@@ -14319,6 +14333,7 @@ function escapeCardText(value) {
 
 function getLearningCardCategory(card) {
   if (!card) return '社交沟通';
+  if (card.contentType) return card.category;
   if (card.kind !== 'lesson' && card.kind !== 'summary' && card.kind !== 'intro') return card.category || '社交沟通';
   const sourceText = String(card.scene || '') + ' ' + String(card.title || '');
   const rules = [
@@ -14350,6 +14365,7 @@ function showCards() {
 
 function setCardSearchTerm(value) {
   cardSearchTerm = String(value || '').trim().toLowerCase();
+  if (cardSearchTerm && window.loadTextCourseSearch) window.loadTextCourseSearch(refreshLearningCards);
   cardPage = 1;
   const target = document.getElementById('training-card-module') && document.getElementById('training-card-module').style.display !== 'none' ? 'training' : 'modal';
   renderCards(target);
@@ -14369,7 +14385,7 @@ function loadMoreCards() {
 function cardMatchesSearch(card) {
   if (!cardSearchTerm) return true;
   const category = getLearningCardCategory(card);
-  const haystack = [card.title, card.scene, category, card.category, card.content, card.rawText, card.principle, card.practicePrompt].concat(card.tags || [], card.tips || []).join(' ').toLowerCase();
+  const haystack = [(window.textCourseSearch || {})[card.id], card.title, card.scene, category, card.category, card.content, card.rawText, card.principle, card.practicePrompt].concat(card.tags || [], card.tips || []).join(' ').toLowerCase();
   return haystack.includes(cardSearchTerm);
 }
 
@@ -14427,7 +14443,7 @@ function renderLearningCardDetail(card) {
     tips.length ? '<section class="card-detail-section"><div class="card-detail-label">练习要点</div><ul class="text-sm text-gray-700 leading-relaxed list-disc pl-5">' + tips.map(function(t) { return '<li>' + escapeCardText(t) + '</li>'; }).join('') + '</ul></section>' : '',
     '<section class="card-detail-section"><div class="card-detail-label">练习任务</div><p class="text-sm text-gray-700 leading-relaxed">' + escapeCardText(card.practicePrompt || '用自己的话完成一次表达，再回看课程原则。') + '</p></section>',
     '<section class="card-detail-section"><div class="card-detail-label">安全边界</div><p class="text-sm text-amber-700 leading-relaxed">⚠️ ' + escapeCardText(card.safetyNote || '请结合真实情况改写，不编造、不施压，并允许对方拒绝。') + '</p></section>',
-    '<p class="text-[11px] text-gray-400">来源：' + escapeCardText(card.source || '项目知识库') + '</p>',
+    '',
     '<div class="flex gap-2 pt-1"><button onclick="toggleCardCollectionFromDetail(' + cardArgHtml + ')" class="flex-1 py-3 rounded-xl ' + (collected ? 'bg-gray-100 text-gray-600' : 'bg-indigo-50 text-indigo-700') + ' text-sm font-medium">' + (collected ? '取消收藏' : '收藏课程') + '</button><button onclick="startCardReviewFromDetail(' + cardArgHtml + ')" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-medium">开始复习</button></div>',
     '</div>'
   ].join('');
@@ -14436,11 +14452,7 @@ function renderLearningCardDetail(card) {
 let currentLearningCard = null;
 
 function openLearningCard(id) {
-  const card = learningCards.find(function(item) { return String(item.id) === String(id); });
-  if (!card) return;
-  currentLearningCard = card;
-  renderLearningCardDetail(card);
-  showModal('card-detail');
+  if (typeof KL_openDetail === 'function') KL_openDetail(id);
 }
 
 function toggleCardCollectionFromDetail(id) {
@@ -14514,6 +14526,7 @@ function startCardReview(cardId) {
   const card = learningCards.find(c => c.id === cardId);
   if (!card) return;
 
+  if (card.contentType) { openLearningCard(cardId); return; }
   const reviewProgress = userData.cardReviewProgress || {};
   if (reviewProgress[cardId] && reviewProgress[cardId] >= 3) {
     alert('该卡片已复习3次，达到复习上限');
@@ -15749,6 +15762,8 @@ function showChallenge() {
 }
 
 function startChallenge(challengeId, plainChat) {
+  // 真实挑战统一采用纯对话训练：场景说明 → 自主话术/动作 → 教练点评。
+  plainChat = true;
   const challenge = challenges.find(c => c.id === challengeId);
   if (!challenge) return;
 
@@ -15840,9 +15855,11 @@ function startChallenge(challengeId, plainChat) {
   const gameMeta = challenge.gameMeta || {};
   if (stageGoal) stageGoal.textContent = '本关目标：' + (gameMeta.goal || challenge.description || '在真实场景中完成自然沟通') + '。你可以输入语言，也可以描述动作；系统不会提供选项或示范答案。';
   const progress = $('challenge-stage-progress');
-  if (progress) progress.textContent = '0 / 3';
+  if (progress) progress.textContent = '0 / 5';
+  const roundLabel = $('challenge-round-label');
+  if (roundLabel) roundLabel.textContent = '第1轮 / 共5轮';
   const evaluation = $('challenge-coach-evaluation');
-  if (evaluation) { evaluation.className = 'challenge-coach-evaluation is-empty'; evaluation.textContent = '每轮输入都会在这里得到教练评价；本模式不提供选项或示范答案。'; }
+  if (evaluation) { evaluation.className = 'challenge-coach-evaluation is-empty'; evaluation.textContent = '每轮都会从语言、动作、礼仪三个维度给出评价，并解释为什么。'; }
   $('challenge-messages').innerHTML = '';
   const bubbleLayer = $('challenge-stage-bubbles');
   if (bubbleLayer) bubbleLayer.innerHTML = '';
@@ -15964,7 +15981,7 @@ function sendChallengeMessage() {
   window.challengeRound = (window.challengeRound || 0) + 1;
   const round = window.challengeRound;
   const progress = $('challenge-stage-progress');
-  if (progress) progress.textContent = `${round} / 3`;
+  if (progress) progress.textContent = `${round} / 5`;
 
   setTimeout(() => {
     const analysis = analyzeChallengeAnswer(text, window.currentChallengeId, round);
@@ -15980,6 +15997,8 @@ function sendChallengeMessage() {
         // ===== 纯文字模式：三段式评价（对在哪 / 错在哪 / 应该怎么做）=====
         const positives = analysis.positives || [];
         const improvements = analysis.improvements || [];
+        if (/(微笑|点头|握手|鞠躬|挥手|面向|目光|保持距离|起身|坐下)/.test(text)) { positives.push('你把动作写进了话术，说明已经开始把礼仪知识迁移到行为。'); } else { improvements.push('这轮还没有写出动作；可以补充微笑、点头、面向对方或保持一臂距离。'); }
+        if (/(您好|你好|谢谢|请|辛苦|不好意思|麻烦|理解)/.test(text)) { positives.push('称呼、感谢或缓冲语让表达更有礼貌。'); } else { improvements.push('可以加入称呼、感谢或缓冲语，让语气更自然。'); }
         const tip = analysis.suggestion || '先回应对方，再补充一个细节或反问，让对方有话可接。';
 
         let html = `<strong>🎓 ${escapeCardText((window.challengeCoach && window.challengeCoach.name) || '教练')}评价</strong>`;
@@ -16015,8 +16034,10 @@ function sendChallengeMessage() {
     }    setTimeout(() => {
       const npcResponse = getChallengeResponse(window.currentChallengeId, text, round);
       addChallengeMessage('npc', npcResponse);
+      if (round === 3) addChallengeMessage('system', '🧩 情境变化：对方的反应发生变化，请根据刚才的反馈调整你的表达。');
+      if (round === 4) addChallengeMessage('system', '📝 最后一轮：请用更自然的话术完成收束，并带上合适的动作或礼貌表达。');
       window.challengeBusy = false;
-      if (round >= 3) setTimeout(showChallengeResult, 900);
+      if (round >= 5) setTimeout(showChallengeResult, 900);
     }, 700);
   }, 700);
 }
@@ -16058,7 +16079,7 @@ function getChallengeResponse(challengeId, userText, round) {
   const title = challenge ? challenge.title : '';
   const list = responses[title] || ['好的，我知道了。', '嗯，继续说。', '明白了。'];
 
-  return list[Math.min(round - 1, list.length - 1)];
+  return list[Math.min(round - 1, list.length - 1)] || '嗯，我听到了。请继续说说你的想法。';
 }
 
 function analyzeChallengeAnswer(answer, challengeId, round) {
@@ -17402,6 +17423,7 @@ let etiquetteBusy = false;
 function showEtiquetteTraining() {
   showModal('etiquette');
   renderEtiquetteLevelList();
+  if (window.renderTextEtiquetteCourses) window.renderTextEtiquetteCourses();
 }
 
 function renderEtiquetteWorldMap() {
@@ -18589,7 +18611,7 @@ function useAvatarDetail() {
 
   function isLearned(cardId) {
     var p = (userData && userData.knowledgeProgress) || {};
-    return !!(p[cardId] && (p[cardId].opened || p[cardId].practiced));
+    return !!(p[cardId] && p[cardId].readCompleted);
   }
   function markOpened(cardId) {
     if (!userData) return;
@@ -18614,7 +18636,7 @@ function useAvatarDetail() {
 
   function matchesSearch(card, term) {
     if (!term) return true;
-    var hay = [card.title, card.scene, card.category, card.content, card.principle, card.practicePrompt].concat(card.tags || [], card.tips || []).join(' ').toLowerCase();
+    var hay = [(window.textCourseSearch || {})[card.id], card.title, card.scene, card.category, card.content, card.contentType].concat(card.tags || [], card.tips || []).join(' ').toLowerCase();
     return hay.indexOf(term) >= 0;
   }
 
@@ -18738,24 +18760,22 @@ function useAvatarDetail() {
   // 打开卡片时按需注入对应分卷的 <script>，避免首屏加载几十 MB 正文。
   var KL_contentLoading = {};
   function KL_ensureContent(card, done) {
-    var id = card && card.id;
-    if (!id) { done(); return; }
-    var store = window.CourseContent || {};
-    if (store[id]) { done(); return; }
-    if (!card.bundle) { done(); return; }        // 该卡无正文（扫描件/损坏/待转录）
-    if (KL_contentLoading[id]) { KL_contentLoading[id].push(done); return; }
-    KL_contentLoading[id] = [done];
-    var s = document.createElement('script');
-    s.src = 'knowledge_base/course_content/' + card.bundle;
-    s.async = true;
+    if ((window.CourseContent || {})[card.id]) { done(); return; }
+    if (!card.bundle) { card.loadError = true; done(); return; }
+    var key = card.bundle;
+    if (KL_contentLoading[key]) { KL_contentLoading[key].push(done); return; }
+    KL_contentLoading[key] = [done];
+    var script = document.createElement('script');
+    script.src = 'knowledge_base/course_content/' + key + '?v=reading-20260922';
     var finish = function () {
-      var q = KL_contentLoading[id] || [];
-      delete KL_contentLoading[id];
-      q.forEach(function (fn) { try { fn(); } catch (e) { console.warn(e); } });
+      card.loadError = !(window.CourseContent || {})[card.id];
+      var callbacks = KL_contentLoading[key] || [];
+      delete KL_contentLoading[key];
+      callbacks.forEach(function (fn) { fn(); });
+      script.remove();
     };
-    s.onload = finish;
-    s.onerror = function () { console.warn('正文分卷加载失败:', card.bundle); finish(); };
-    document.head.appendChild(s);
+    script.onload = finish; script.onerror = finish;
+    document.head.appendChild(script);
   }
   // 把分卷里的真实正文写回卡片对象
   function KL_applyContent(card) {
@@ -18763,6 +18783,8 @@ function useAvatarDetail() {
     if (!cv) return false;
     if (cv.full) card.rawText = cv.full;
     if (cv.sections && cv.sections.length) card.sections = cv.sections;
+    card.readingSections = cv.readingSections;
+    card.readingStart = cv.readingStart || 0;
     return true;
   }
 
@@ -18774,7 +18796,7 @@ function useAvatarDetail() {
     KL._quizChoice = -1;
     // 先渲染骨架（列表/目录即时可见），正文分卷到达后再补渲染
     renderKnowledgeDetail(card);
-    markOpened(cardId);
+
     // close library modal + open detail modal (compat with both modal open fns)
     if (typeof closeModal === 'function') closeModal('knowledge-library');
     if (typeof showModal === 'function') showModal('knowledge-detail');
@@ -18786,11 +18808,14 @@ function useAvatarDetail() {
     }, 0);
     // 懒加载正文
     KL_ensureContent(card, function () {
-      if (KL._detail !== card) return;   // 用户已切走
-      if (KL_applyContent(card)) {
-        renderKnowledgeDetail(card);
-        setTimeout(scrollOutlineToCurrent, 0);
+      if (KL._detail !== card) return;
+      KL_applyContent(card);
+      if (KL._search && card.sections) {
+        var found = card.sections.findIndex(function (part) { return part.x.toLowerCase().indexOf(KL._search.toLowerCase().trim()) >= 0; });
+        if (found >= 0) { KL._detailId = card.id; KL._stepIdx = found; }
       }
+      renderKnowledgeDetail(card);
+      setTimeout(scrollOutlineToCurrent, 0);
     });
   }
 
@@ -18867,15 +18892,17 @@ function useAvatarDetail() {
 
     // ===== 正文主体：一次只显示一节，看完点“下一节” =====
     // 每份资料按内容切成若干「节」；一张卡片就是一堂课，节内逐条翻页学习。
-    var steps = (card.sections && card.sections.length)
-      ? card.sections
-      : [{ t: card.title || '正文', x: card.rawText || card.content || '' }];
-    if (KL._detailId !== card.id) { KL._detailId = card.id; KL._stepIdx = 0; }   // 换卡片时回到第 1 节
+    // Reading sections are classified from original pages; archived full text remains unchanged.
+    var steps = Array.isArray(card.readingSections) ? card.readingSections : [];
+    if (KL._detailId !== card.id || (steps.length && KL._readingLoadedId !== card.id)) { KL._detailId = card.id; KL._stepIdx = card.readingStart || 0; if (steps.length) KL._readingLoadedId = card.id; }
     if (KL._stepIdx == null || KL._stepIdx < 0 || KL._stepIdx >= steps.length) KL._stepIdx = 0;
     KL._steps = steps;
-
+    var learningTitle = function (s, i) {
+      var t = String((s && s.t) || '').replace(/^第\s*\d+\s*页(?:\s*[·.]\s*\d+)?$/,'').trim();
+      return t || ('知识点 ' + (i + 1));
+    };
     var rawFull = card.rawText || '';
-    var hasRealContent = (card.status === 'ok') || (card.status === undefined && (rawFull || steps.length));
+    var hasRealContent = !!rawFull && steps.length > 0;
     if (hasRealContent && (rawFull || steps.length)) {
       // 字数：优先用正文全文；scenes 类卡片无 rawText/chars 时按各节实文累计（避免显示“0 字”）
       var wc = (rawFull || '').length
@@ -18884,12 +18911,9 @@ function useAvatarDetail() {
       var cur = steps[KL._stepIdx] || { t: card.title || '正文', x: '' };
       // 标题已在节头上显示，正文若以标题开头则去掉这段前缀（避免重复；剩余内容过短时保留原文）
       var bodyText = cur.x || '';
-      if (cur.t && bodyText.indexOf(cur.t) === 0 && bodyText.length > cur.t.length * 2) {
-        bodyText = bodyText.slice(cur.t.length).replace(/^[。！？；：，、\s\n]+/, '');
-      }
       // v2.5（§13.3）课程门控：非试读 + 章节未买断 + 无有效会员 → 锁定正文，显示解锁引导
       var emLocked = (typeof EM_cardLocked === 'function') ? EM_cardLocked(card) : false;
-      var emTrial = (typeof EM_isTrialCard === 'function') ? EM_isTrialCard(card) : false;
+      var emTrial = false;
       html += '<div class="knowledge-content-main">';
       html += '  <div class="kc-head"><span class="kc-title">📖 课程正文</span><span class="kc-meta">' +
               (emLocked ? '🔒 会员内容'
@@ -18899,7 +18923,7 @@ function useAvatarDetail() {
         var chName = EM_chapterOf(card) || '本章节';
         var teaser = (bodyText || '').replace(/\s+/g, ' ').trim().slice(0, 60);
         html += '  <div class="kc-sec">';
-        html += '    <div class="kc-sec-t"><span class="kc-sec-i">🔒</span><span class="kc-sec-n">' + escapeHTML(cur.t || ('第 ' + (KL._stepIdx + 1) + ' 节')) + '</span></div>';
+        html += '    <div class="kc-sec-t"><span class="kc-sec-i">🔒</span><span class="kc-sec-n">' + escapeHTML(learningTitle(cur, KL._stepIdx)) + '</span></div>';
         html += '    <div class="kc-sec-x" style="max-height:110px;overflow:hidden;filter:blur(4px);opacity:.7;user-select:none;pointer-events:none;">' + escapeHTML(bodyText) + '</div>';
         html += '    <div style="position:relative;margin-top:-20px;padding:16px 14px;text-align:center;background:linear-gradient(180deg,rgba(255,255,255,.55),#fff);border-radius:10px;">';
         html += '      <div style="font-size:13px;font-weight:700;color:#4c1d95;margin-bottom:4px;">🔓 该课程为会员内容</div>';
@@ -18914,168 +18938,27 @@ function useAvatarDetail() {
         html += '  </div>';
       } else {
         html += '  <div class="kc-sec">';
-        html += '    <div class="kc-sec-t"><span class="kc-sec-i">' + (KL._stepIdx + 1) + '</span><span class="kc-sec-n">' + escapeHTML(cur.t || ('第 ' + (KL._stepIdx + 1) + ' 节')) + '</span></div>';
+        html += '    <div class="kc-sec-t"><span class="kc-sec-i">' + (KL._stepIdx + 1) + '</span><span class="kc-sec-n">' + escapeHTML(learningTitle(cur, KL._stepIdx)) + '</span></div>';
         html += '    <div class="kc-sec-x">' + escapeHTML(bodyText) + '</div>';
         html += '  </div>';
       }
-      if (card.truncated && !emLocked) {
-        html += '<div class="kc-note">该资料正文较长，本卡收录前 ' + wc + ' 字；完整文件见下方「原始资料」。</div>';
-      }
       html += '</div>';
     } else {
-      var stMap = {
-        scanned: ['🖼', '该资料暂无法转为文字', '这份资料是图片型 PDF / 无有效语音的音视频，原文件已完整归档；文字识别完成后会自动补入正文。'],
-        corrupt: ['⚠', '原文件损坏', '该文件在网盘下载时不完整（内容为零填充或缺失索引），已登记在册但无法提取正文；重新下载该文件后可补入。'],
-        missing: ['⏳', '正文待提取', '该条目尚未完成正文提取，稍后重新同步即可补入。']
-      };
-      var st = stMap[card.status] || stMap.missing;
-      html += '<div class="knowledge-content-main empty">';
-      html += '  <div class="kc-head"><span class="kc-title">' + st[0] + ' ' + st[1] + '</span></div>';
-      html += '  <div class="kc-sec-x">' + st[2] + '</div>';
+      html += '<div class="knowledge-content-main"><p>' + (card.loadError ? '课程加载失败，请重试。' : (rawFull ? '这份资料尚未提取出可阅读正文，正在等待核对。' : '正在加载课程正文…')) + '</p>';
+      if (card.loadError) html += '<button onclick="KL_retryContent()">重新加载</button>';
       html += '</div>';
     }
-
-    html += '<div class="knowledge-principle">';
-    html += '  <div class="principle-label">核心原则</div>';
-    html += '  <div class="principle-body">' + escapeHTML(principle) + '</div>';
-    html += '</div>';
-
-    // 关键要点（chip 形式，比竖排列表更易读）
-    html += '<div class="knowledge-formula">';
-    html += '  <div class="formula-label">关键要点</div>';
-    html += '  <div class="kd-chips">' + formulaItems.map(function (t) { return '<span class="kd-chip">' + escapeHTML(t) + '</span>'; }).join('') + '</div>';
-    html += '</div>';
-
-    // ===== 本课程目录：列出这份资料的全部「节」，点哪节看哪节 =====
-    if (steps.length > 1) {
-      html += '<div class="knowledge-formula">';
-      html += '  <div class="formula-label kd-outline-toggle" onclick="KL_toggleOutline(this)">📚 本课程目录 · 共 ' + steps.length + ' 节<span class="kd-toggle-arrow">展开 ▾</span></div>';
-      html += '  <div class="kd-outline-wrap" id="kd-outline-wrap" style="display:none;">';
-      html += '  <div class="kd-outline-stat">共 ' + steps.length + ' 节，逐节学习；点击任意一节可直接跳到该节。' + (steps.length > 6 ? '（列表内可上下滚动）' : '') + '</div>';
-      html += '  <div class="kd-outline' + (steps.length > 8 ? ' scrollable' : '') + '" id="kd-outline-list">';
-      steps.forEach(function (s, i) {
-        var isCur = (i === KL._stepIdx);
-        var absSrc = (s.x || '').replace(/\s+/g, ' ').trim();
-        var abs = absSrc.length > 46 ? absSrc.slice(0, 46) + '…' : absSrc;
-        html += '    <div class="kd-outline-item' + (isCur ? ' cur' : '') + '"' + (isCur ? ' id="kd-outline-cur"' : '') + ' data-step="' + i + '" onclick="KL_goStepByAttr(this)">';
-        html += '      <span class="kd-outline-idx">' + (i + 1) + '</span>';
-        html += '      <span class="kd-outline-body">';
-        html += '        <span class="kd-outline-name">' + escapeHTML(s.t || ('第 ' + (i + 1) + ' 节')) + '</span>';
-        if (abs) html += '        <span class="kd-outline-abs">' + escapeHTML(abs) + '</span>';
-        html += '      </span>';
-        html += '      <span class="kd-outline-kind">' + (s.x || '').length + '字</span>';
-        html += '    </div>';
-      });
-      html += '  </div>';
-      html += '  </div>';
-      html += '</div>';
-    }
-
-    // ===== 同一分类下的其他资料（次要入口，不影响逐节阅读）=====
-    var siblings = (learningCards || []).filter(function (c) { return c && c.scene && c.scene === card.scene && c.id !== card.id; });
-    if (siblings.length) {
-      var KIND_ORDER2 = { intro: 0, lesson: 1, summary: 2 };
-      var idxMap2 = {};
-      (learningCards || []).forEach(function (c, i) { if (c && c.id) idxMap2[c.id] = i; });
-      siblings = siblings.slice().sort(function (a, b) {
-        var ka = KIND_ORDER2[a.kind] == null ? 1 : KIND_ORDER2[a.kind];
-        var kb = KIND_ORDER2[b.kind] == null ? 1 : KIND_ORDER2[b.kind];
-        if (ka !== kb) return ka - kb;
-        return (idxMap2[a.id] || 0) - (idxMap2[b.id] || 0);
-      });
-      html += '<div class="knowledge-formula">';
-      html += '  <div class="formula-label kd-outline-toggle" onclick="KL_toggleSiblings(this)">📚 『' + escapeHTML(card.scene || '') + '』下的其他资料 · ' + siblings.length + ' 篇<span class="kd-toggle-arrow">展开 ▾</span></div>';
-      html += '  <div class="kd-outline-wrap" id="kd-sibling-wrap" style="display:none;">';
-      html += '  <div class="kd-outline' + (siblings.length > 8 ? ' scrollable' : '') + '">';
-      siblings.forEach(function (it) {
-        var kindLabel = { intro: '导语', lesson: '正文', summary: '速记' }[it.kind] || (it.medium === 'audio' ? '音频' : (it.medium === 'video' ? '视频' : (it.medium === 'book' ? '书' : '参考')));
-        var absSrc = ((it.content || it.principle || '') + '').replace(/\s+/g, ' ').trim();
-        var abs = absSrc.length > 46 ? absSrc.slice(0, 46) + '…' : absSrc;
-        html += '    <div class="kd-outline-item" data-id="' + escapeHTML(it.id) + '" onclick="KL_openDetailByAttr(this)">';
-        html += '      <span class="kd-outline-idx">' + (it.status === 'ok' ? '📄' : (it.status === 'scanned' ? '🖼' : (it.status === 'corrupt' ? '⚠' : '⏳'))) + '</span>';
-        html += '      <span class="kd-outline-body">';
-        html += '        <span class="kd-outline-name">' + escapeHTML(it.title || '(未命名)') + '</span>';
-        if (abs) html += '        <span class="kd-outline-abs">' + escapeHTML(abs) + '</span>';
-        html += '      </span>';
-        html += '      <span class="kd-outline-kind">' + kindLabel + '</span>';
-        html += '    </div>';
-      });
-      html += '  </div>';
-      html += '  </div>';
-      html += '</div>';
-    }
-
-    // 资料提取状态：不再显示网盘源文件路径，改为内容提取说明 + 知识库归档位置
-    // 客户不需要关心原始网盘路径，只需要知道内容是否完整可用
-    {
-      var hasBody = !!(bodyText && bodyText.trim());
-      var isLocked = emLocked || !emUnlocked;
-      var cardStatus = card.status || (hasBody ? 'ok' : 'missing');
-      var bodyLen = (card.content || '').length;
-      var statusBadge = {
-        ok:       ['✅', '正文已完整提取', '本资料的文字内容已全部录入知识库，您现在看到的就是完整课程正文。'],
-        truncated:['📄', '正文较长，已完整收录', '本资料较长，当前卡片展示核心内容；完整正文已存入知识库对应分类文件夹，可随时查阅。'],
-        partial:  ['📝', '正文部分提取', '本资料的可识别文字已录入，部分图表/图片内容需人工整理后补入。'],
-        scanned:  ['🖼', '图片型资料', '这份资料以图片/扫描页为主，文字识别暂未覆盖；可查阅知识库原始文件归档。'],
-        corrupt:  ['⚠️', '原文件下载损坏', '网盘下载时该文件不完整，重新下载后可补入正文。'],
-        missing:  ['⏳', '正文待提取', '该条目正在排队进行文字提取，稍后刷新即可看到正文。']
-      }[cardStatus] || ['📚', '资料已归档', '本资料已录入知识库。'];
-      // 归档位置：尝试推断知识库分类路径
-      var archiveHint = '';
-      var src = (card.source || '').toString();
-      if (src.indexOf('580好好接话') >= 0) archiveHint = 'knowledge_base/01-高情商接话话术/';
-      else if (src.indexOf('销售话术300套') >= 0) archiveHint = 'knowledge_base/02-销售话术300套/';
-      else if (src.indexOf('送礼话术') >= 0) archiveHint = 'knowledge_base/03-送礼话术全攻略/';
-      else if (src.indexOf('职场社交') >= 0 || src.indexOf('职场处事') >= 0) archiveHint = 'knowledge_base/04-职场社交提升/';
-      else if (src.indexOf('版块12') >= 0 || src.indexOf('礼仪培训') >= 0) archiveHint = 'knowledge_base/05-礼仪培训/';
-      else if (src.indexOf('人性') >= 0 || src.indexOf('说话的艺术') >= 0 || src.indexOf('思维认知') >= 0) archiveHint = 'knowledge_base/06-人性认知思维/';
-      else if (src.indexOf('赚钱') >= 0 || src.indexOf('营销') >= 0 || src.indexOf('利他销售') >= 0) archiveHint = 'knowledge_base/07-赚钱营销提升/';
-      else if (src.indexOf('两性') >= 0 || src.indexOf('情感') >= 0) archiveHint = 'knowledge_base/08-两性情感/';
-      else if (src.indexOf('权谋') >= 0 || src.indexOf('做局') >= 0) archiveHint = 'knowledge_base/09-权谋思维/';
-      html += '<div class="knowledge-formula">';
-      html += '  <div class="formula-label">📚 资料状态</div>';
-      html += '  <div style="font-size:12px;line-height:1.7;background:#f0fdf4;border:1px solid #bbf7d0;padding:10px 12px;border-radius:8px;margin-top:6px;">';
-      html += '    <div style="font-weight:700;color:#15803d;margin-bottom:4px;">' + statusBadge[0] + ' ' + escapeHTML(statusBadge[1]) + '</div>';
-      html += '    <div style="color:#475569;">' + escapeHTML(statusBadge[2]) + '</div>';
-      if (archiveHint) {
-        html += '    <div style="font-size:11px;color:#64748b;margin-top:6px;padding-top:6px;border-top:1px dashed #e2e8f0;">📂 知识库归档: <code>' + escapeHTML(archiveHint) + '</code></div>';
-      }
-      if (bodyLen > 0 && !isLocked) {
-        html += '    <div style="font-size:11px;color:#64748b;margin-top:4px;">📖 当前卡片正文: ' + bodyLen + ' 字</div>';
-      }
-      html += '  </div>';
-      html += '</div>';
-    }
-
-    html += '<div class="knowledge-redline">';
-    html += '  <span class="redline-label">⚠ 红线</span>' + escapeHTML(safety);
-    html += '</div>';
-
-    html += '<div class="knowledge-quiz" id="knowledge-quiz">';
-    html += '  <div class="quiz-label">自测 · 看看你掌握了吗</div>';
-    html += '  <div class="quiz-question">练习情境：' + escapeHTML(practice) + '</div>';
-    html += '  <div class="quiz-options" id="knowledge-quiz-options">';
-    var qA = card.content ? card.content.split(/[\n。]/)[0].slice(0, 80) : '先肯定对方，再把话题推进。';
-    var qB = '这件事我不太懂，能麻烦你再说一次吗？';
-    var qC = '直接质疑对方观点。';
-    html += '    <button class="quiz-option" data-idx="0" onclick="KL_pickAnswer(0)">A. ' + escapeHTML(qA) + '</button>';
-    html += '    <button class="quiz-option" data-idx="1" onclick="KL_pickAnswer(1)">B. ' + escapeHTML(qB) + '</button>';
-    html += '    <button class="quiz-option" data-idx="2" onclick="KL_pickAnswer(2)">C. ' + escapeHTML(qC) + '</button>';
-    html += '  </div>';
-    html += '  <div id="knowledge-quiz-feedback"></div>';
-    // v2.5（§13.3）：自测题人人可答；AI 详细批改会员免费，免费用户 20 币/次
-    var aiLabel = (typeof EM_canAiReview === 'function' && EM_canAiReview()) ? '🤖 AI 详细批改（会员免费）' : '🤖 AI 详细批改（20 币/次）';
-    html += '  <button onclick="EM_payAiReview()" style="margin-top:10px;width:100%;padding:9px 12px;border:1px solid #e0d7ff;border-radius:10px;background:#faf9ff;color:#6d28d9;font-size:12px;font-weight:700;cursor:pointer;">' + aiLabel + '</button>';
-    html += '</div>';
 
     box.innerHTML = html;
+    var exactBody = box.querySelector(".kc-sec-x");
+    if (exactBody && hasRealContent) exactBody.textContent = bodyText;
 
     // 翻页导航：在本份资料的「节」之间前后翻（不是在不同文件之间）
     var pager = document.getElementById('knowledge-detail-pager');
     if (pager) {
       if (steps.length > 1) {
         var i0 = KL._stepIdx;
-        var curT = (steps[i0] && steps[i0].t) || card.title || '(本节)';
+        var curT = learningTitle(steps[i0], i0) || card.title || '(本节)';
         var ph = '';
         ph += '<div class="kd-pager">';
         ph += '  <button data-dir="-1" onclick="KL_goStepByAttr(this)"' + (i0 > 0 ? '' : ' disabled') + '>← 上一节</button>';
@@ -19097,11 +18980,12 @@ function useAvatarDetail() {
       var ah = '';
       ah += '<div class="knowledge-detail-actions">';
       ah += '  <div class="row">';
-      ah += '    <button class="btn-primary" id="knowledge-jump-btn" onclick="KL_jumpToPractice()"' + (learned ? '' : ' disabled') + '>✅ 我已学会，去对练</button>';
+      ah += '<button class="btn-primary" onclick="KL_markRead()"' + (!card.rawText ? ' disabled' : '') + '>' + (learned ? '✓ 已完成阅读' : '标记已读') + '</button>';
+      if (card.contentType || card.rawText) ah += '    <button class="btn-primary" style="margin-top:8px;background:linear-gradient(135deg,#f97316,#ea580c);" onclick="KL_jumpToPractice()">🎭 进入真实场景练习</button>';
       ah += '  </div>';
       ah += '  <div class="btn-row-secondary">';
       ah += '    <button class="btn-secondary" onclick="KL_toggleCollect()">' + (collected ? '★ 取消收藏' : '☆ 收藏') + '</button>';
-      ah += '    <button class="btn-secondary" onclick="KL_startReview()">🔁 复习</button>';
+      ah += '    <button class="btn-secondary" onclick="KL_readAgain()">🔁 重读</button>';
       ah += '  </div>';
       ah += '</div>';
       bar.innerHTML = ah;
@@ -19144,14 +19028,41 @@ function useAvatarDetail() {
     }
   }
 
+  global.KL_findDirectoryItem = function (btn) {
+    var q = String(btn && btn.getAttribute('data-directory-query') || '').trim();
+    if (!q || !KL._steps || !KL._steps.length) return;
+    var idx = -1, normalized = q.replace(/\s+/g, ''), pageNo = parseInt(btn && btn.getAttribute('data-directory-page') || '', 10); if (pageNo > 0 && pageNo <= KL._steps.length) idx = pageNo - 1;
+    KL._steps.some(function (step, i) {
+      var title = String((step && step.t) || '').replace(/\s+/g, '');
+      var body = String((step && step.x) || '').replace(/\s+/g, '');
+      if ((title && (title.indexOf(q) >= 0 || q.indexOf(title) >= 0 || title.replace(/[第页.·]/g, '').indexOf(normalized) >= 0)) || body.indexOf(q) >= 0) { idx = i; return true; }
+      return false;
+    });
+    if (idx < 0) {
+      var keyword = q.slice(0, Math.min(12, q.length));
+      KL._steps.some(function (step, i) { if (String((step && step.x) || '').indexOf(keyword) >= 0) { idx = i; return true; } return false; });
+    }
+    if (idx >= 0) {
+      KL._stepIdx = idx; renderKnowledgeDetail(KL._detail);
+      var bodyEl = document.querySelector('.knowledge-content-main');
+      if (bodyEl) bodyEl.scrollIntoView({behavior:'smooth', block:'start'});
+      if (typeof showToast === 'function') showToast('已打开：' + q);
+    } else if (typeof showToast === 'function') showToast('该目录条目暂未匹配到正文，请从知识点目录学习');
+  }
   function KL_jumpToPractice() {
     if (!KL._detail) return;
-    if (!KL._practicePassed) {
+    if (!KL._practicePassed && !(KL._detail && (KL._detail.contentType || KL._detail.rawText))) {
       if (typeof showToast === 'function') showToast('请先完成自测题');
       return;
     }
     // v2.5（§18.4）：去对练消耗当日训练次数；次数用完触发付费墙（学完立刻练=最佳付费触发点）
     if (typeof EM_checkTrainGate === 'function' && !EM_checkTrainGate('knowledge', function () { KL_jumpToPractice(); })) return;
+    var detail = KL._detail;
+    if (detail.contentType || detail.rawText) {
+      window._v3_practicePrompt = '请围绕课程“' + (detail.title || '本课') + '”的当前知识点“' + ((KL._steps[KL._stepIdx] || {}).t || '当前知识点') + '”，模拟一个真实' + (detail.category || '社交') + '场景，先给出对方的一句自然话，再让用户回答；反馈只依据课程正文，不自行创造礼仪规则。\n课程正文：\n' + ((KL._steps[KL._stepIdx] || {}).x || '');
+      window.currentScenarioId = detail.id;
+      window.currentChallengeId = detail.id;
+    }
     var cat = KL._detail.category || '';
     var catToScene = {
       '社交场合与人际交往': 9001,
@@ -19192,6 +19103,31 @@ function useAvatarDetail() {
     if (typeof global.startCardReview === 'function') global.startCardReview(KL._detail.id);
   }
 
+
+  global.KL_retryContent = function () { if (KL._detail) KL_openDetail(KL._detail.id); };
+  global.KL_markRead = function () {
+    var card = KL._detail;
+    if (!card || !card.rawText || (typeof EM_cardLocked === 'function' && EM_cardLocked(card))) return;
+    userData.knowledgeProgress = userData.knowledgeProgress || {};
+    userData.knowledgeProgress[card.id] = Object.assign({}, userData.knowledgeProgress[card.id], {readCompleted:true});
+    saveData(); renderKnowledgeDetail(card);
+  };
+  global.KL_readAgain = function () { KL._stepIdx = 0; if (KL._detail) renderKnowledgeDetail(KL._detail); };
+  var searchReady = false;
+  var searchWaiters = [];
+  function loadTextSearch(done) {
+    if (window.textCourseSearch) { done(); return; }
+    searchWaiters.push(done);
+    if (searchReady) return;
+    searchReady = true;
+    var script = document.createElement('script');
+    script.src = 'knowledge_base/text_course_search.js?v=20260922';
+    script.onload = function () { searchWaiters.splice(0).forEach(function (fn) { fn(); }); };
+    script.onerror = function () { searchReady=false; searchWaiters=[]; if (typeof showToast==='function') showToast('全文搜索加载失败，请重新输入重试'); };
+    document.head.appendChild(script);
+  }
+
+  global.loadTextCourseSearch = loadTextSearch;
   // search box bindings
   function bindKnowledgeSearch() {
     var inp = document.getElementById('knowledge-search-input');
@@ -19199,6 +19135,7 @@ function useAvatarDetail() {
     inp._bound = true;
     inp.addEventListener('input', function () {
       KL._search = inp.value || '';
+      if (KL._search) loadTextSearch(renderChapterList);
       var sb = document.getElementById('knowledge-search-box');
       if (sb) sb.classList.toggle('has-value', !!KL._search);
       KL._openChapter = null;
@@ -19493,7 +19430,7 @@ function useAvatarDetail() {
 <script src="libs/v3_protocol_ui.js"></script>
 
 <!-- V3 增强模块（2026-09-19 审查修复：之前漏加载） -->
-<script src="libs/v3_learning_enhance.js"></script>
+<script src="libs/v3_learning_enhance.js?v=20260922-text"></script>
 <script src="libs/v3_sudden_change.js"></script>
 <!-- V4.0 四级教学闭环（依赖 window.Stage3D 已在 L3253 加载） -->
 <script src="libs/v4_teaching_closed_loop.js"></script>
@@ -19681,4 +19618,50 @@ function startV5Practice(sceneId) {
 #modal-knowledge-detail .kd-scroll *{max-width:100%;box-sizing:border-box}
 #modal-knowledge-detail .rawtxt,#modal-knowledge-detail pre,#modal-knowledge-detail .formula-card{white-space:pre-wrap!important;overflow-wrap:anywhere;word-break:break-word}
 </style>
-</body></html>
+<script src="assets/text-etiquette-training.js?v=20260922-2"></script>
+<script>
+(function(){
+  const KEY='duilian_profile';
+  const SCENARIOS=['工作汇报','面试求职','日常社交','公开演讲','销售与客户沟通','短视频/直播','综合提升表达','其他/还不确定'];
+  const PAINS=[['一开口就紧张，容易忘词卡壳','跟练模式'],['我发音/语感不够好','语音跟读模式'],['表达时没思路，不知道说什么','知识卡片 + 半开放训练'],['说话抓不住重点，逻辑容易乱','经典公式训练']];
+  const GOALS=['提升职场沟通','克服社恐','提升逻辑表达','应对面试表达','提升公开表达'];
+  let state={step:1,target_scenario:'',pain_point:'',daily_goal_minutes:7,reminder_days:['一','三','五'],reminder_time:'20:30',occupation:'',age_range:'',usage_goals:[]};
+  function read(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return {}}}
+  function save(done){const p=read();p.onboarding_completed=!!done;p.user_persona=Object.assign({},p.user_persona||{},state);localStorage.setItem(KEY,JSON.stringify(p));if(typeof userData==='object'){userData.userPersona=state;userData.onboardingCompleted=!!done; if(typeof saveData==='function')saveData();}}
+  function esc(x){return String(x||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+  function render(){let m=document.getElementById('modal-onboarding');if(!m){m=document.createElement('div');m.id='modal-onboarding';m.className='modal-overlay';document.body.appendChild(m)}
+    const sub=state.step===1?'选择现在最重要的一项，我们会据此了解你的练习方向。':state.step===2?'不用准备，也不用一次说得很好。选中后我们会直接帮你进入最适合的第一练。':'为你定制每天都能完成的练习节奏。';
+    let body=''; if(state.step===1)body=SCENARIOS.map(x=>`<button class="po-option" data-v="${esc(x)}" data-k="target_scenario">${esc(x)}</button>`).join('');
+    if(state.step===2)body=PAINS.map(x=>`<button class="po-option" data-v="${esc(x[0])}" data-k="pain_point"><b>${esc(x[0])}</b><small>推荐：${esc(x[1])}</small></button>`).join('');
+    if(state.step===3)body=['3','7','15','30'].map(x=>`<button class="po-option ${x==='7'?'selected':''}" data-v="${x}" data-k="daily_goal_minutes">${x}分钟/天${x==='7'?' · 稳定进步·推荐':''}</button>`).join('')+'<button class="po-next">继续</button>';
+    if(state.step===4)body='<div class="po-days">'+['一','二','三','四','五','六','日'].map(x=>`<label><input type="checkbox" value="${x}" ${state.reminder_days.includes(x)?'checked':''}>周${x}</label>`).join('')+'</div><input class="po-time" type="time" value="'+state.reminder_time+'"><button class="po-next">继续</button>';
+    if(state.step===5)body='<select class="po-select" id="po-occ"><option value="">职业（可选）</option><option>学生</option><option>互联网</option><option>金融/保险/投资</option><option>医疗</option><option>制造</option><option>自由职业</option></select><select class="po-select" id="po-age"><option value="">年龄段（可选）</option><option>18以下</option><option>18-24</option><option>25-34</option><option>35-44</option><option>45以上</option></select><div class="po-goals">'+GOALS.map(x=>'<label><input type="checkbox" value="'+x+'"> '+x+'</label>').join('')+'</div><div class="po-preview">3个月后，你将更有思路、内容更充实、表达更完整。</div><button class="po-finish">开始第1天</button>';    m.innerHTML=`<div class="po-card"><div class="po-progress">第 ${state.step} 步 / 共 5 步</div><h2>为你定制练习方向</h2><p>${sub}</p><div class="po-body">${body}</div>${state.step<5?'<button class="po-skip">跳过</button>':''}<small class="po-privacy">数据仅用于本地训练推荐，不会上传用于其他商业用途</small></div>`;m.style.display='flex';
+    m.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{state[b.dataset.k]=b.dataset.k==='daily_goal_minutes'?Number(b.dataset.v):b.dataset.v;if(state.step<3){state.step++;render()}else if(state.step===3){state.step=4;render()}});
+    const next=m.querySelector('.po-next');if(next)next.onclick=()=>{if(state.step===4){state.reminder_days=[...m.querySelectorAll('.po-days input:checked')].map(x=>x.value);state.reminder_time=m.querySelector('.po-time').value||'20:30'}state.step++;render()};
+    const finish=m.querySelector('.po-finish');if(finish)finish.onclick=()=>{state.occupation=m.querySelector('#po-occ').value;state.age_range=m.querySelector('#po-age').value;state.usage_goals=[...m.querySelectorAll('.po-goals input:checked')].map(x=>x.value);save(true);m.style.display='none';showPersonalizedRecommendation();showToast&&showToast('已为你生成专属第1天练习')};
+    const skip=m.querySelector('.po-skip');if(skip)skip.onclick=()=>{if(confirm('跳过后将使用默认练习方向，之后仍可在个人中心修改。')){state={step:5,target_scenario:'综合提升表达',pain_point:'一开口就紧张',daily_goal_minutes:7,reminder_days:[],reminder_time:'20:30',occupation:'',age_range:'',usage_goals:[]};save(true);m.style.display='none';showPersonalizedRecommendation()}};
+  }
+  window.showPersonalizedOnboarding=()=>{const p=read();if(p.onboarding_completed)return;state.step=1;render()};
+  window.getPersonalizedContext=()=>{const p=read().user_persona||{};return `当前用户目标场景：${p.target_scenario||'综合提升表达'}；核心痛点：${p.pain_point||'一开口就紧张'}；职业：${p.occupation||'未填写'}；每日目标：${p.daily_goal_minutes||7}分钟。请围绕这些信息生成练习。`};
+  const style=document.createElement('style');style.textContent='.persona-recommendation{margin:12px 16px;padding:14px;border-radius:14px;background:linear-gradient(135deg,#fff7ed,#ffedd5);color:#9a3412;font-weight:700;font-size:13px}.po-card{background:#101b36;color:#fff;width:min(520px,92vw);max-height:90vh;overflow:auto;border-radius:24px;padding:26px}.po-card h2{font-size:24px;margin:12px 0 6px}.po-card p{color:#c7d2fe}.po-progress{color:#fbbf24;font-weight:700}.po-body{display:grid;gap:10px;margin:20px 0}.po-option,.po-next,.po-finish{border:0;border-radius:14px;padding:14px;background:#fff;color:#172554;text-align:left;font-size:15px;cursor:pointer}.po-option small{display:block;color:#64748b;margin-top:5px}.po-next,.po-finish{background:#f59e0b;color:#fff;text-align:center;font-weight:700}.po-skip{background:none;border:0;color:#c7d2fe;width:100%;padding:12px}.po-days,.po-goals{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.po-days label,.po-goals label{background:#fff;color:#172554;padding:12px;border-radius:12px}.po-time,.po-select{width:100%;padding:12px;border-radius:12px;margin:5px 0}.po-preview{background:#24345d;padding:14px;border-radius:12px;margin:12px 0}.po-privacy{display:block;color:#94a3b8;text-align:center;margin-top:10px}.po-option b{display:block}',document.head.appendChild(style);
+})();
+</script></body></html>
+<link rel="stylesheet" href="libs/v5_etiquette_classroom.css"><script src="libs/v5_etiquette_classroom.js"></script>
+<script src="libs/v5_etiquette_rounds.js"></script>
+<script src="libs/v5_etiquette_review.js"></script>
+<script src="libs/v5_etiquette_persistence.js"></script>
+<script src="libs/v5_etiquette_weakpoint.js"></script>
+<script src="libs/v5_scene_templates.js"></script>
+<script src="libs/v5_template_goals.js"></script>
+<script src="libs/v5_learning_summary.js"></script>
+<script src="libs/v5_training_recommendation.js"></script>
+<script src="libs/v5_practice_guard.js"></script>
+<script src="libs/v5_evaluator.js"></script>
+<script src="libs/v5_voice_rehearsal.js"></script>
+<script src="libs/v5_action_demo.js"></script>
+<script src="libs/v5_node_navigation.js"></script>
+<script src="libs/v5_progress_resume.js"></script>
+<script src="libs/login_interaction_guard.js"></script>
+<style id="login-interaction-guard">#page-login,#page-login *{pointer-events:auto}#page-login{z-index:20!important}#page-login input,#page-login button{position:relative;z-index:3;cursor:pointer}#page-login input{cursor:text}</style>
+<script src="libs/personalized_recommendation.js"></script>
+<script src="libs/personalized_gate.js"></script>
