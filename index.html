@@ -3532,6 +3532,8 @@ function showMutationCoachAdvice(mutation) {
 <script src="knowledge_base/learning_cards.js"></script>
 <script src="knowledge_base/raw_course_cards.js"></script>
 <script src="knowledge_base/text_course_cards.js?v=20260922"></script>
+<script src="knowledge_base/supplemental_source_course_cards.js?v=20260924"></script>
+<script src="knowledge_base/customer_course_quality.js?v=20260924"></script>
 
 <!-- three.js 5 个库 — v5.0.0 架构改为按需加载（3D 降级为可选增强器）
   默认不加载；用户开启 3D 演示 或 进入需要 3D 的页面时才调用 load3D()
@@ -4623,9 +4625,10 @@ const fallbackLearningCards = [
 const structuredLearningCards = Array.isArray(window.knowledgeLearningCards) ? window.knowledgeLearningCards : [];
 const rawCourseLearningCards = Array.isArray(window.rawCourseLearningCards) ? window.rawCourseLearningCards : [];
 // 资料库课程目录全量纳入（音视频课 / 话术资料 / 电子书），不做删减
-const extraCourseCards = Array.isArray(window.textCourseCards) ? window.textCourseCards : [];
+const extraCourseCards = (Array.isArray(window.textCourseCards) ? window.textCourseCards : []).concat(Array.isArray(window.supplementalSourceCourseCards) ? window.supplementalSourceCourseCards : []);
 // 客户课程只收录真实文字；旧摘要、路径卡和自动编写的话术不冒充原资料。
-let learningCards = extraCourseCards.slice();
+const customerCourseExcludedIds = new Set((window.customerCourseQuality && window.customerCourseQuality.excludedIds) || []);
+let learningCards = extraCourseCards.filter(function (card) { return card && !customerCourseExcludedIds.has(String(card.id)); });
 setTimeout(function () {
   var total = document.getElementById('training-hub-card-total');
   if (total) total.textContent = learningCards.length;
@@ -4890,12 +4893,19 @@ function switchTab(tab) {
 
 function showModal(name) {
   const el = $('modal-' + name);
-  if (el) { el.style.display = 'flex'; renderModal(name); }
+  if (el) {
+    // 登录交互保护会让初始隐藏弹窗 pointer-events:none；打开时必须恢复命中。
+    el.style.pointerEvents = 'auto';
+    // 移动端底部导航为 z-index:1000；课程和训练弹窗必须压在导航之上。
+    if (!el.style.zIndex || Number(el.style.zIndex) < 9995) el.style.zIndex = '9995';
+    el.style.display = 'flex';
+    renderModal(name);
+  }
 }
 
 function closeModal(name) {
   const el = $('modal-' + name);
-  if (el) el.style.display = 'none';
+  if (el) { el.style.display = 'none'; el.style.pointerEvents = 'none'; }
   if (window.Stage3D) {
     if (name === 'challenge-training') Stage3D.dispose('challenge-3d-stage');
     if (name === 'etiquette-training') Stage3D.dispose('etiquette-3d-stage');
@@ -14385,7 +14395,7 @@ function loadMoreCards() {
 function cardMatchesSearch(card) {
   if (!cardSearchTerm) return true;
   const category = getLearningCardCategory(card);
-  const haystack = [(window.textCourseSearch || {})[card.id], card.title, card.scene, category, card.category, card.content, card.rawText, card.principle, card.practicePrompt].concat(card.tags || [], card.tips || []).join(' ').toLowerCase();
+  const haystack = customerCourseText([(window.textCourseSearch || {})[card.id], card.title, card.scene, category, card.category, card.content, card.rawText, card.principle, card.practicePrompt].concat(card.tags || [], card.tips || []).join(' ')).toLowerCase();
   return haystack.includes(cardSearchTerm);
 }
 
@@ -14402,22 +14412,41 @@ function refreshLearningCards() {
   renderCards(getLearningCardTarget());
 }
 
+function customerCourseText(value) {
+  return window.customerCourseQuality && typeof window.customerCourseQuality.cleanText === 'function'
+    ? window.customerCourseQuality.cleanText(value) : String(value == null ? '' : value);
+}
+
+function customerCourseLessonText(value, title) {
+  if (/^(?:目录|目\s*录|章节目录|课程目录|contents?)$/i.test(String(title || '').trim())) return '';
+  const lines = customerCourseText(value).split(/\r?\n/);
+  return lines.filter(function (line, index) {
+    const text = line.trim();
+    if (/^(?:目录|目\s*录|章节目录|课程目录|contents?)$/i.test(text)) return false;
+    if (/(?:\.{4,}|…{2,}|·{5,}|_{4,})\s*\d{1,5}\s*$/.test(text)) return false;
+    if (/^\d{1,5}$/.test(text) && index > 0 && /(?:\.{4,}|…{2,}|·{5,}|_{4,})\s*$/.test(lines[index - 1].trim())) return false;
+    return true;
+  }).join('\n');
+}
+
 function renderCardItem(card) {
   const collected = collectedCards.some(function(item) { return item.id === card.id; });
-  const tips = Array.isArray(card.tips) ? card.tips.slice(0, 3) : [];
+  const tips = Array.isArray(card.tips) ? card.tips.slice(0, 3).map(customerCourseText).filter(Boolean) : [];
+  const cardPreview = customerCourseText(card.content || card.principle || '');
   const category = getLearningCardCategory(card);
   const cardArgHtml = learningCardJsArg(card.id).replace(/"/g, '&quot;');
   const sourceLabel = card.rawText ? '原文课程' : '结构化知识';
   const collectAction = collected ? 'startCardReview(' + cardArgHtml + ')' : 'collectCard(' + cardArgHtml + ')';
   const html = [
-    '<article class="training-card-item p-4" role="button" tabindex="0" aria-label="查看课程：' + escapeCardText(card.title) + '" onclick="openLearningCard(' + cardArgHtml + ')" onkeydown="if(event.key===&quot;Enter&quot;||event.key===&quot; &quot;){event.preventDefault();openLearningCard(' + cardArgHtml + ')}">',
+    '<article class="training-card-item p-4" role="group" aria-label="课程：' + escapeCardText(card.title) + '" onclick="openLearningCard(' + cardArgHtml + ')">',
     '<div class="relative z-10 flex items-start justify-between gap-3"><div class="flex flex-wrap items-center gap-2"><span class="px-2 py-1 rounded-full bg-indigo-100 text-indigo-700 text-[11px] font-medium">' + escapeCardText(category) + '</span><span class="px-2 py-1 rounded-full bg-white/80 text-gray-500 text-[11px]">' + escapeCardText(card.scene || '通用场景') + '</span></div>' + (collected ? '<span class="text-[11px] text-green-600">★ 已收藏</span>' : '') + '</div>',
     '<h3 class="relative z-10 text-base font-semibold text-gray-900 mt-3">' + escapeCardText(card.title) + '</h3>',
-    '<p class="relative z-10 training-card-quote text-sm mt-2">' + escapeCardText(card.content || card.principle || '先理解场景，再组织表达。') + '</p>',
-    '<div class="relative z-10 mt-3 rounded-xl bg-white/75 p-3 card-principle-preview"><div class="text-[11px] font-semibold text-indigo-600 mb-1">核心原则</div><p class="text-xs text-gray-600 leading-relaxed">' + escapeCardText(card.principle || '结合真实信息，尊重对方边界。') + '</p></div>',
+    '<p class="relative z-10 training-card-quote text-sm mt-2">' + escapeCardText(cardPreview || '打开课程查看正文') + '</p>',
+    '<div class="relative z-10 mt-3 rounded-xl bg-white/75 p-3 card-principle-preview"><div class="text-[11px] font-semibold text-indigo-600 mb-1">核心原则</div><p class="text-xs text-gray-600 leading-relaxed">' + escapeCardText(customerCourseText(card.principle) || '结合真实信息，尊重对方边界。') + '</p></div>',
     tips.length ? '<div class="relative z-10 flex flex-wrap gap-1.5 mt-3">' + tips.map(function(t) { return '<span class="px-2 py-1 rounded-lg bg-purple-50 text-purple-700 text-[11px]">' + escapeCardText(t) + '</span>'; }).join('') + '</div>' : '',
     '<div class="relative z-10 card-open-link"><span>' + sourceLabel + ' · 点击查看完整课程</span><span aria-hidden="true">→</span></div>',
-    '<div class="relative z-10 mt-3 flex items-center justify-between gap-2"><span class="text-[11px] text-gray-500">练习：' + escapeCardText(card.practicePrompt || '用自己的话完成一次表达') + '</span><button onclick="event.stopPropagation();' + collectAction + '" class="flex-shrink-0 px-3 py-2 rounded-lg ' + (collected ? 'bg-emerald-500 text-white' : 'bg-indigo-50 text-indigo-700') + ' text-xs font-medium">' + (collected ? '开始复习' : '+ 收藏') + '</button></div>',
+    '<button type="button" class="relative z-10 w-full mt-3 px-4 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-semibold shadow-sm hover:brightness-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" aria-label="开始学习：' + escapeCardText(card.title) + '" onclick="event.stopPropagation();openLearningCard(' + cardArgHtml + ')">开始学习课程 →</button>',
+    '<div class="relative z-10 mt-3 flex items-center justify-between gap-2"><span class="text-[11px] text-gray-500">练习：' + escapeCardText(customerCourseText(card.practicePrompt) || '用自己的话完成一次表达') + '</span><button onclick="event.stopPropagation();' + collectAction + '" class="flex-shrink-0 px-3 py-2 rounded-lg ' + (collected ? 'bg-emerald-500 text-white' : 'bg-indigo-50 text-indigo-700') + ' text-xs font-medium">' + (collected ? '开始复习' : '+ 收藏') + '</button></div>',
     collected ? '<button onclick="event.stopPropagation();removeCard(' + cardArgHtml + ')" class="relative z-10 mt-2 text-[11px] text-gray-400 underline">取消收藏</button>' : '',
     '<p class="relative z-10 text-[10px] text-amber-700 mt-3">⚠️ ' + escapeCardText(card.safetyNote || '请结合真实情况改写，不编造、不施压。') + '</p>',
     '</article>'
@@ -14430,8 +14459,11 @@ function renderLearningCardDetail(card) {
   const title = $('card-detail-title');
   if (!detail || !card) return;
   const category = getLearningCardCategory(card);
-  const rawText = card.rawText || card.content || card.principle || '暂无课程正文';
-  const tips = Array.isArray(card.tips) ? card.tips : [];
+  const rawText = customerCourseText(card.rawText || card.content || card.principle || '暂无课程正文');
+  const principle = customerCourseText(card.principle);
+  const practicePrompt = customerCourseText(card.practicePrompt);
+  const safetyNote = customerCourseText(card.safetyNote);
+  const tips = Array.isArray(card.tips) ? card.tips.map(customerCourseText).filter(Boolean) : [];
   const collected = collectedCards.some(function(item) { return item.id === card.id; });
   const cardArgHtml = learningCardJsArg(card.id).replace(/"/g, '&quot;');
   if (title) title.textContent = '📖 ' + (card.title || '学习课程');
@@ -14439,10 +14471,10 @@ function renderLearningCardDetail(card) {
     '<div class="space-y-4">',
     '<div><div class="flex flex-wrap items-center gap-2 mb-2"><span class="px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-700 text-xs font-medium">' + escapeCardText(category) + '</span><span class="px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 text-xs">' + (card.rawText ? '原始课程正文' : '结构化知识点') + '</span></div><h4 class="text-xl font-bold text-gray-900 leading-snug">' + escapeCardText(card.title) + '</h4><p class="text-xs text-gray-500 mt-2">场景：' + escapeCardText(card.scene || '通用场景') + '</p></div>',
     '<section class="card-detail-section"><div class="card-detail-label">课程正文</div><div class="card-detail-raw">' + escapeCardText(rawText) + '</div></section>',
-    '<section class="card-detail-section"><div class="card-detail-label">核心原则</div><p class="text-sm text-gray-700 leading-relaxed">' + escapeCardText(card.principle || '先理解当下情境，再组织真实、尊重边界的表达。') + '</p></section>',
+    '<section class="card-detail-section"><div class="card-detail-label">核心原则</div><p class="text-sm text-gray-700 leading-relaxed">' + escapeCardText(principle || '先理解当下情境，再组织真实、尊重边界的表达。') + '</p></section>',
     tips.length ? '<section class="card-detail-section"><div class="card-detail-label">练习要点</div><ul class="text-sm text-gray-700 leading-relaxed list-disc pl-5">' + tips.map(function(t) { return '<li>' + escapeCardText(t) + '</li>'; }).join('') + '</ul></section>' : '',
-    '<section class="card-detail-section"><div class="card-detail-label">练习任务</div><p class="text-sm text-gray-700 leading-relaxed">' + escapeCardText(card.practicePrompt || '用自己的话完成一次表达，再回看课程原则。') + '</p></section>',
-    '<section class="card-detail-section"><div class="card-detail-label">安全边界</div><p class="text-sm text-amber-700 leading-relaxed">⚠️ ' + escapeCardText(card.safetyNote || '请结合真实情况改写，不编造、不施压，并允许对方拒绝。') + '</p></section>',
+    '<section class="card-detail-section"><div class="card-detail-label">练习任务</div><p class="text-sm text-gray-700 leading-relaxed">' + escapeCardText(practicePrompt || '用自己的话完成一次表达，再回看课程原则。') + '</p></section>',
+    '<section class="card-detail-section"><div class="card-detail-label">安全边界</div><p class="text-sm text-amber-700 leading-relaxed">⚠️ ' + escapeCardText(safetyNote || '请结合真实情况改写，不编造、不施压，并允许对方拒绝。') + '</p></section>',
     '',
     '<div class="flex gap-2 pt-1"><button onclick="toggleCardCollectionFromDetail(' + cardArgHtml + ')" class="flex-1 py-3 rounded-xl ' + (collected ? 'bg-gray-100 text-gray-600' : 'bg-indigo-50 text-indigo-700') + ' text-sm font-medium">' + (collected ? '取消收藏' : '收藏课程') + '</button><button onclick="startCardReviewFromDetail(' + cardArgHtml + ')" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-medium">开始复习</button></div>',
     '</div>'
@@ -14452,7 +14484,21 @@ function renderLearningCardDetail(card) {
 let currentLearningCard = null;
 
 function openLearningCard(id) {
-  if (typeof KL_openDetail === 'function') KL_openDetail(id);
+  const card = learningCards.find(function(item) { return String(item.id) === String(id); });
+  if (!card) {
+    if (typeof showToast === 'function') showToast('没有找到这门课程，请刷新学习卡片后重试。');
+    return false;
+  }
+  if (typeof KL_openDetail === 'function') {
+    KL_openDetail(card.id);
+    return true;
+  }
+  // 详情模块未加载时仍提供可读正文，避免卡片点击静默失效。
+  currentLearningCard = card;
+  renderLearningCardDetail(card);
+  if (typeof showModal === 'function') showModal('card-detail');
+  else if (typeof showToast === 'function') showToast('课程详情暂时无法打开，请刷新页面后重试。');
+  return false;
 }
 
 function toggleCardCollectionFromDetail(id) {
@@ -15865,7 +15911,7 @@ function startChallenge(challengeId, plainChat) {
   if (bubbleLayer) bubbleLayer.innerHTML = '';
   addChallengeMessage('system', '🎭 ' + window.challengeCoach.name + ' 将在本场景中扮演' + window.challengeSceneMeta.role + '；本轮不提供选项或示范答案。');
   addChallengeMessage('npc', getChallengeScenario(challenge.title));
-  $('modal-challenge-training').style.display = 'flex';
+  showModal('challenge-training');
 }
 
 function getChallengeScenario(title) {
@@ -15934,7 +15980,7 @@ function addChallengeMessage(role, text) {
   const isSystem = role === 'system';
   const safeText = escapeCardText(text);
 
-  if (window.challengeStrictMode && !isSystem) {
+  if (window.challengeStrictMode && !window.challengePlainChat && !isSystem) {
     const bubbleLayer = $('challenge-stage-bubbles');
     if (bubbleLayer) {
       const bubble = document.createElement('div');
@@ -17497,7 +17543,7 @@ function startEtiquetteLevel(levelId, lessonContext) {
 
   // ===== V5.0 场景化训练：优先用分步教学流程（ChatGPT 方案 R12）=====
   if (typeof SceneTraining !== 'undefined' && SceneTraining.start) {
-    openModal('etiquette-training');
+    showModal('etiquette-training');
     SceneTraining.start(levelId, lessonContext);
     // 更新基础 HUD（教练头像等）
     const coach = getEtiquetteCoach(level);
@@ -17573,7 +17619,7 @@ function startEtiquetteLevel(levelId, lessonContext) {
   window.etiquetteSceneMeta = meta;
   window.etiquetteCoach = coach;
 
-  $('modal-etiquette-training').style.display = 'flex';
+  showModal('etiquette-training');
   setTimeout(() => addEtiquetteBubble('npc', level.opening), 900);
   setTimeout(() => renderEtiquetteOptions(level), 1500);
 }
@@ -18640,7 +18686,7 @@ function useAvatarDetail() {
 
   function matchesSearch(card, term) {
     if (!term) return true;
-    var hay = [(window.textCourseSearch || {})[card.id], card.title, card.scene, card.category, card.content, card.contentType].concat(card.tags || [], card.tips || []).join(' ').toLowerCase();
+    var hay = customerCourseText([(window.textCourseSearch || {})[card.id], card.title, card.scene, card.category, card.content, card.contentType].concat(card.tags || [], card.tips || []).join(' ')).toLowerCase();
     return hay.indexOf(term) >= 0;
   }
 
@@ -18855,26 +18901,28 @@ function useAvatarDetail() {
     var collected = isCollected(card.id);
 
     var tags = (card.tags || []).slice(0, 4);
-    var tips = (card.tips || []).slice(0, 5);
+    var tips = (card.tips || []).map(customerCourseText).filter(Boolean).slice(0, 5);
     // 左右两栏：课程原文类卡片展示「原文摘录 / 学习建议」，其余展示「易踩坑 / 建议这样」
     var isRawCourse = !!card.rawText;
     var leftLabel, rightLabel, badExample, goodExample;
     if (isRawCourse) {
       leftLabel = '📖 原文摘录';
       rightLabel = '💡 学习建议';
-      badExample = (card.rawText || '').replace(/\s+/g, ' ').trim().slice(0, 72) + '…';
+      badExample = customerCourseText(card.rawText || '').replace(/\s+/g, ' ').trim().slice(0, 72) + '…';
       goodExample = '先通读下方完整原文，再结合自己真实处境改写一句，最后到对应场景里说一遍。';
     } else {
       leftLabel = '❌ 易踩坑';
       rightLabel = '✅ 建议这样';
       badExample = tips[0] ? '「' + tips[0] + '」' + (card.tips[2] ? '、' + card.tips[2] : '') + ' 等场景，若直接表达容易暴露底牌/显得生硬。' : '在不了解情况时直接抛出结论，容易引起对方反感或误会。';
-      goodExample = card.content ? card.content.split(/[\n。]/)[0].slice(0, 80) : (tips[0] ? '「' + tips[0] + '」' + '可以更柔和、更得体地表达' : '用自己的话表达，关键在于先肯定当下情境，再把话题推进一步。');
+      var cleanCardContent = customerCourseText(card.content || '');
+      goodExample = cleanCardContent ? cleanCardContent.split(/[\n。]/)[0].slice(0, 80) : (tips[0] ? '「' + tips[0] + '」' + '可以更柔和、更得体地表达' : '用自己的话表达，关键在于先肯定当下情境，再把话题推进一步。');
     }
-    var principle = card.principle || '先回应当下情境，再把话题推进一步。';
-    var safety = card.safetyNote || '请结合真实情况改写，不编造、不施压。';
-    var practice = card.practicePrompt || '用自己的话完成一次表达。';
+    var principle = customerCourseText(card.principle) || '先回应当下情境，再把话题推进一步。';
+    var safety = customerCourseText(card.safetyNote) || '请结合真实情况改写，不编造、不施压。';
+    var practice = customerCourseText(card.practicePrompt) || '用自己的话完成一次表达。';
+    var cleanRawText = customerCourseText(card.rawText || '');
 
-    var formulaItems = tips.length ? tips.slice(0, 4) : (card.content ? card.content.split(/[\n。]/).filter(function (x) { return x && x.length < 60; }).slice(0, 4) : ['先肯定对方', '加入情境信息', '提出下一步建议']);
+    var formulaItems = tips.length ? tips.slice(0, 4) : (cleanCardContent ? cleanCardContent.split(/[\n。]/).filter(function (x) { return x && x.length < 60; }).slice(0, 4) : ['先肯定对方', '加入情境信息', '提出下一步建议']);
 
     var html = '';
     html += '<div class="knowledge-detail-head">';
@@ -18897,21 +18945,22 @@ function useAvatarDetail() {
     // ===== 正文主体：一次只显示一节，看完点“下一节” =====
     // 每份资料按内容切成若干「节」；一张卡片就是一堂课，节内逐条翻页学习。
     // Reading sections are classified from original pages; archived full text remains unchanged.
-    var steps = Array.isArray(card.readingSections) ? card.readingSections : [];
-    if (KL._detailId !== card.id || (steps.length && KL._readingLoadedId !== card.id)) { KL._detailId = card.id; KL._stepIdx = card.readingStart || 0; if (steps.length) KL._readingLoadedId = card.id; }
+    var rawSteps = Array.isArray(card.readingSections) ? card.readingSections : [];
+    var steps = rawSteps.map(function (step, sourceIndex) { return { t: step && step.t, x: customerCourseLessonText(step && step.x, step && step.t), sourceIndex: sourceIndex }; }).filter(function (step) { return step.x.trim().length > 0; });
+    var initialStep = steps.findIndex(function (step) { return step.sourceIndex >= (Number(card.readingStart) || 0); });
+    if (initialStep < 0) initialStep = 0;
+    if (KL._detailId !== card.id || (steps.length && KL._readingLoadedId !== card.id)) { KL._detailId = card.id; KL._stepIdx = initialStep; if (steps.length) KL._readingLoadedId = card.id; }
     if (KL._stepIdx == null || KL._stepIdx < 0 || KL._stepIdx >= steps.length) KL._stepIdx = 0;
     KL._steps = steps;
     var learningTitle = function (s, i) {
       var t = String((s && s.t) || '').replace(/^第\s*\d+\s*页(?:\s*[·.]\s*\d+)?$/,'').trim();
       return t || ('知识点 ' + (i + 1));
     };
-    var rawFull = card.rawText || '';
-    var hasRealContent = !!rawFull && steps.length > 0;
+    var rawFull = cleanRawText;
+    var hasRealContent = !!rawFull.trim() && steps.length > 0;
     if (hasRealContent && (rawFull || steps.length)) {
       // 字数：优先用正文全文；scenes 类卡片无 rawText/chars 时按各节实文累计（避免显示“0 字”）
-      var wc = Number(card.verifiedReadingChars) || (rawFull || '').length
-        || (steps.reduce(function (n, s) { return n + ((s && s.x) || '').length; }, 0))
-        || card.chars || 0;
+      var wc = steps.reduce(function (n, s) { return n + ((s && s.x) || '').length; }, 0);
       var cur = steps[KL._stepIdx] || { t: card.title || '正文', x: '' };
       // 标题已在节头上显示，正文若以标题开头则去掉这段前缀（避免重复；剩余内容过短时保留原文）
       var bodyText = cur.x || '';
@@ -18923,8 +18972,11 @@ function useAvatarDetail() {
               (emLocked ? '🔒 会员内容'
                 : (emTrial ? '✨ 免费试读 · ' : '') +
               (steps.length > 1 ? '第 ' + (KL._stepIdx + 1) + ' / ' + steps.length + ' 节 · ' : '') + wc + ' 字') + '</span></div>';
-      if (card.reviewNeeded && !emLocked) {
-        html += '  <div class="kc-source-review-note" role="note" style="margin:0 0 12px;padding:10px 12px;border:1px solid #fcd34d;border-radius:10px;background:#fffbeb;color:#92400e;font-size:12px;line-height:1.7;">文字正文已提取；原资料中的图片、表格或复杂版式尚未全部人工核对，可能未完整呈现。当前显示的文字保持原文提取结果。</div>';
+      var filteredPromoLines = window.customerCourseQuality ? window.customerCourseQuality.countFilteredLines(card.rawText || '') : 0;
+      if (filteredPromoLines > 0 && !emLocked) {
+        html += '  <div class="kc-source-review-note" role="note" style="margin:0 0 12px;padding:10px 12px;border:1px solid #c7d2fe;border-radius:10px;background:#eef2ff;color:#4338ca;font-size:12px;line-height:1.7;">已隐藏与课程学习无关的资源推广行；课程正文按可核实文字展示。</div>';
+      } else if (card.reviewNeeded && !emLocked) {
+        html += '  <div class="kc-source-review-note" role="note" style="margin:0 0 12px;padding:10px 12px;border:1px solid #fcd34d;border-radius:10px;background:#fffbeb;color:#92400e;font-size:12px;line-height:1.7;">文字正文已提取；原资料中的图片、表格或复杂版式尚未全部人工核对，可能未完整呈现。</div>';
       }
       if (emLocked) {
         var chName = EM_chapterOf(card) || '本章节';
@@ -19702,3 +19754,4 @@ function startV5Practice(sceneId) {
 <style id="login-interaction-guard">#page-login,#page-login *{pointer-events:auto}#page-login{z-index:20!important}#page-login input,#page-login button{position:relative;z-index:3;cursor:pointer}#page-login input{cursor:text}</style>
 <script src="libs/personalized_recommendation.js"></script>
 <script src="libs/personalized_gate.js"></script>
+<script src="libs/v5_course_migration_bridge.js"></script>
