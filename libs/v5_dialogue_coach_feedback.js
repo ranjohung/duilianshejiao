@@ -27,6 +27,7 @@ function mount(){
       var note=document.createElement('div');
       note.style='margin-top:8px;padding:9px 10px;border-radius:9px;background:#f0fdf4;color:#166534;font-size:12px;line-height:1.6;';
       note.textContent=feedback(input.value);
+      try{var raw=input.value.trim(),reason=/[？?]|吗|你呢|您呢|是否/.test(raw)?'可以继续增加具体信息，让表达更有内容':'下一次重点加入一个开放式问题，给对方继续接话的入口';localStorage.setItem('duilian_dialogue_weakpoint',JSON.stringify({text:reason,answer:raw,updatedAt:Date.now()}));localStorage.setItem('duilian_etiquette_next_recommendation',JSON.stringify({title:'针对本轮薄弱点再练',reason:reason,updatedAt:Date.now()}));}catch(e){}
       out.appendChild(note);
     },700);
   });
