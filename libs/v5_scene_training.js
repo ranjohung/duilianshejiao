@@ -416,8 +416,19 @@
   }
 
   function render() {
-    const container = SceneTraining._container;
-    if (!container) return;
+    let container = SceneTraining._container;
+    if (!container || !container.isConnected) {
+      container = document.getElementById('scene-training-container');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'scene-training-container';
+        container.style.cssText = 'flex:1;overflow-y:auto;padding:16px;';
+        const scrollArea = document.querySelector('#modal-etiquette-training .ct-scroll');
+        if (scrollArea && scrollArea.parentNode) scrollArea.parentNode.insertBefore(container, scrollArea);
+      }
+      SceneTraining._container = container;
+      container.style.display = 'block';
+    }
     const step = SceneTraining._steps[SceneTraining._stepIdx];
     const level = SceneTraining._level;
 

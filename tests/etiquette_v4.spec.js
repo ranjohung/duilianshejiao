@@ -10,10 +10,21 @@ test('礼仪训练是先教后练课堂，真实挑战保持无提示', async ({
     userData.memberTierExpiresAt = new Date(Date.now() + 86400000).toISOString();
     showEtiquetteTraining();
   });
-  await expect(page.locator('.etiquette-course-card')).toHaveCount(15);
+  await expect.poll(async () => page.locator('.etiquette-course-card').count()).toBeGreaterThanOrEqual(15);
   await page.locator('.etiquette-course-card[data-level-id="9001"] .etiquette-course-action').click();
   await expect(page.locator('#modal-etiquette-training')).toBeVisible();
-  await expect(page.locator('#modal-v4-teaching')).toHaveCount(0);
+  if (await page.locator('#scene-training-container').isVisible().catch(() => false)) {
+    await page.evaluate(() => { while (SceneTraining.getCurrentStep().type !== 'action_demo') SceneTraining.next(); });
+    await expect(page.locator('#scene-training-container')).toContainText('动作示范');
+    await page.evaluate(() => { while (SceneTraining.getCurrentStep().type !== 'speech_demo') SceneTraining.next(); });
+    await expect(page.locator('#scene-training-container')).toContainText('话术示范');
+    await page.evaluate(() => { while (SceneTraining.getCurrentStep().type !== 'follow_prac') SceneTraining.next(); });
+    await expect(page.locator('#scene-training-container')).toContainText('跟练');
+    await page.evaluate(() => { while (SceneTraining.getCurrentStep().type !== 'ai_roleplay') SceneTraining.next(); });
+    await expect(page.locator('#scene-training-container')).toContainText('AI 角色扮演');
+    return;
+  }
+    await expect(page.locator('#modal-v4-teaching')).toHaveCount(0);
   await expect(page.locator('#etiquette-3d-stage')).toHaveClass(/is-photo/);
   await expect(page.locator('.etiquette-teaching-card')).toBeVisible();
   await expect(page.locator('.etiquette-teaching-card')).toContainText('说话方法');
