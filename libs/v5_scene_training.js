@@ -395,6 +395,8 @@
     SceneTraining._turnIdx = 0;
     SceneTraining._dialogueAnswers = {};
     SceneTraining._quizAnswer = null;
+    SceneTraining._progressKey = 'duilian_scene_progress_' + level.id;
+    try { const saved = JSON.parse(localStorage.getItem(SceneTraining._progressKey) || 'null'); if (saved && saved.scene === level.title) { SceneTraining._stepIdx = Math.min(Number(saved.stepIdx) || 0, SceneTraining._steps.length - 1); SceneTraining._answers = saved.answers || {}; SceneTraining._actionDone = saved.actionDone || {}; SceneTraining._turnIdx = saved.turnIdx || 0; SceneTraining._dialogueAnswers = saved.dialogueAnswers || {}; SceneTraining._quizAnswer = saved.quizAnswer || null; } } catch (e) {}
     console.log('[SceneTraining] start:', level.id, level.title, 'steps:', SceneTraining._steps.length);
 
     // 容器定位 — 和 modal-etiquette-training 共存
@@ -1042,9 +1044,12 @@
   // ──────────────────────────────────────────────────────────────────────
 
   SceneTraining.start = start;
+  SceneTraining.persistProgress = function () { try { localStorage.setItem(SceneTraining._progressKey, JSON.stringify({ scene: SceneTraining._level && SceneTraining._level.title, stepIdx: SceneTraining._stepIdx, answers: SceneTraining._answers, actionDone: SceneTraining._actionDone, turnIdx: SceneTraining._turnIdx, dialogueAnswers: SceneTraining._dialogueAnswers, quizAnswer: SceneTraining._quizAnswer, updatedAt: Date.now() })); } catch (e) {} };
+  SceneTraining.clearProgress = function () { try { localStorage.removeItem(SceneTraining._progressKey); } catch (e) {} };
   SceneTraining.gotoStep = function (n) {
     if (n < 0 || n >= SceneTraining._steps.length) return;
     SceneTraining._stepIdx = n;
+    SceneTraining.persistProgress();
     updateHUD();
     render();
   };
