@@ -720,7 +720,8 @@
     const level = SceneTraining._level;
     const userAIInput = answers['ai_roleplay'] || answers[SceneTraining._steps.findIndex(s=>s.type==='ai_roleplay')];
     const userFollowInput = answers['follow_prac'] || answers[SceneTraining._steps.findIndex(s=>s.type==='follow_prac')];
-    const allUserInput = userAIInput || userFollowInput || '';
+    const courseSelfCheck = answers['course_source_check'] || '';
+    const allUserInput = userAIInput || userFollowInput || courseSelfCheck || '';
     const bestOpt = (level.options || []).find(o => o.quality === 'good');
     const coldOpt = (level.options || []).find(o => o.quality === 'cold');
 
@@ -765,7 +766,7 @@
     }));
     const savedQuizAnswer = courseDriven ? null : (SceneTraining._quizAnswer || null);
     let quizHtml = courseDriven
-      ? `<div id="st-quiz-block" style="padding:10px;background:#fff;border-radius:8px;font-size:12px;color:#475569;line-height:1.7;"><strong style="display:block;color:#0369a1;margin-bottom:5px;">📚 课程原文自查</strong>请从课程原文中找出：本轮回应依据了哪条规则？如果原文没有覆盖该细节，请记录“需要进一步确认”，不要自行补充礼仪标准。</div>`
+      ? `<div id="st-quiz-block" style="padding:10px;background:#fff;border-radius:8px;font-size:12px;color:#475569;line-height:1.7;"><strong style="display:block;color:#0369a1;margin-bottom:5px;">📚 课程原文自查</strong><div>请从课程原文中找出：本轮回应依据了哪条规则？如果原文没有覆盖该细节，请记录“需要进一步确认”，不要自行补充礼仪标准。</div><textarea id="st-course-source-check" rows="3" placeholder="写下你依据的原文规则…" style="width:100%;margin-top:8px;border:1px solid #c7d2fe;border-radius:8px;padding:8px;font-size:12px;resize:vertical;">${SceneTraining._answers.course_source_check || ''}</textarea><button class="st-course-check-save" style="margin-top:7px;padding:7px 10px;border:0;border-radius:8px;background:#4f46e5;color:#fff;font-size:11px;cursor:pointer;">保存知识自查</button><span id="st-course-check-result" style="margin-left:8px;color:#047857;font-size:11px;"></span></div>`
       : `<div id="st-quiz-block"><div style="font-size:14px;font-weight:700;color:#1f2937;margin-bottom:10px;">第 1 题 · 知识小测验</div><div style="font-size:13px;color:#6b7280;margin-bottom:10px;">面对这个场景，下面哪个回应最合适？</div>`;
     if (!courseDriven) {
       quizOptions.forEach(opt => {
@@ -1026,6 +1027,15 @@
       });
     }
 
+    // 课程原文自查保存
+    const courseCheckBtn = document.querySelector('.st-course-check-save');
+    if (courseCheckBtn) courseCheckBtn.addEventListener('click', function () {
+      const input = document.getElementById('st-course-source-check');
+      SceneTraining._answers.course_source_check = input ? input.value.trim() : '';
+      SceneTraining.persistProgress();
+      const result = document.getElementById('st-course-check-result');
+      if (result) result.textContent = SceneTraining._answers.course_source_check ? '✓ 已保存' : '请先写下依据';
+    });
     // 知识评价选择题
     document.querySelectorAll('.st-quiz-opt').forEach(btn => {
       btn.addEventListener('click', function () {

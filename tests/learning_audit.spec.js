@@ -297,6 +297,9 @@ test('课程模板进入完整礼仪教学闭环', async ({ page }) => {
   await page.evaluate(() => { while (SceneTraining.getCurrentStep().type !== 'evaluation') SceneTraining.next(); });
   await expect(page.locator('#scene-training-container')).toContainText('课程原文对照');
   await expect(page.locator('#scene-training-container')).toContainText('课程原文自查');
+  await page.locator('#st-course-source-check').fill('课程原文要求先确认对方需求，再给出简洁回应。');
+  await page.locator('.st-course-check-save').click();
+  await expect.poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem('duilian_scene_progress_9001') || '{}').answers.course_source_check)).toContain('先确认');
   await expect(page.locator('#scene-training-container')).not.toContainText('面对这个场景，下面哪个回应最合适');
   await expect(page.locator('#scene-training-container')).toContainText('课堂 → 现实挑战');
   await expect(page.locator('#scene-training-container')).toContainText('行为确认');
