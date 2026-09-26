@@ -938,7 +938,7 @@
         const input = document.getElementById('st-follow-input');
         if (input) {
           SceneTraining._answers[idx] = input.value;
-          SceneTraining._answers['follow_prac'] = input.value;  // 类型 key，evaluation 能找到
+          SceneTraining._answers['follow_prac'] = input.value;  // 类型 key，evaluation 能找到\n          SceneTraining.persistProgress();
           this.textContent = '✅ 已保存';
           setTimeout(() => { this.textContent = '保存练习'; }, 1500);
         }
@@ -966,6 +966,7 @@
           SceneTraining._turnIdx = SceneTraining._turnIdx || 0;
           SceneTraining._dialogueAnswers = SceneTraining._dialogueAnswers || {};
           SceneTraining._dialogueAnswers[SceneTraining._turnIdx] = text;
+          SceneTraining.persistProgress();
 
           if (SceneTraining._turnIdx < step.dialogue.length - 1) {
             // 不是最后一轮 → 跳到下一轮
