@@ -53,6 +53,7 @@
       let log = []; try { log = JSON.parse(localStorage.getItem('duilian_challenge_log') || '[]'); } catch (e) {}
       log.unshift(item); localStorage.setItem('duilian_challenge_log', JSON.stringify(log.slice(0, 50)));
       localStorage.setItem('duilian_next_training', JSON.stringify({ levelId: level.id || 9001, scene: level.title || '礼仪场景', recommendation: recommendation, source: 'scene-training', createdAt: Date.now() }));
+      SceneTraining.clearProgress();
       window.dispatchEvent(new CustomEvent('v5-recommendation-refresh'));
       const out = root.querySelector('#st-reality-result');
       if (out) out.innerHTML = '<strong>已保存现实记录</strong><br>下一次建议：' + recommendation;
