@@ -875,7 +875,11 @@ function renderEvaluation(step) {
       ? '今天找一个低压力场景，按动作清单完成全部动作，再说出一句完整回应。'
       : (langAvg !== null && langAvg < 65
         ? '今天找一个熟悉的人，练习“礼貌回应 + 具体信息 + 一个开放问题”，不追求完美。'
-        : '今天找一个真实场景，练习本课动作，并在对方出现变化时保持自然回应。');    // ── 课堂 → 现实：挑战记录与下一练推荐 ──
+        : '今天找一个真实场景，练习本课动作，并在对方出现变化时保持自然回应。');    const draftNextRecommendation = actionPercent < 100
+      ? '先补齐动作时间轴，再进行下一轮对话。'
+      : (langAvg !== null && langAvg < 65 ? '用完整句回应，并加入一个开放式问题。' : '挑战一次对方临时打断或提出不同意见。');
+    html += `<div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:12px;padding:12px 14px;margin-bottom:12px;"><div style="font-size:13px;color:#6d28d9;font-weight:700;">🧭 下一练预告</div><div style="font-size:12px;color:#5b21b6;margin-top:5px;line-height:1.6;">${draftNextRecommendation}</div></div>`;
+    // ── 课堂 → 现实：挑战记录与下一练推荐 ──
     html += `<div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:14px;margin-bottom:12px;">
       <div style="font-size:13px;color:#047857;font-weight:700;margin-bottom:6px;">🌱 课堂 → 现实挑战</div>
       <div style="font-size:12px;color:#065f46;line-height:1.6;margin-bottom:8px;">${challengeText} 不需要完美，回来记录真实发生了什么。</div>
