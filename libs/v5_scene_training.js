@@ -919,6 +919,7 @@
         this.style.background = done ? '#10b981' : 'transparent';
         this.style.color = done ? '#fff' : '#d1d5db';
         this.textContent = done ? '✓' : '';
+        SceneTraining.persistProgress();
       });
     });
 
@@ -928,6 +929,7 @@
         const cIdx = parseInt(this.dataset.checkIdx, 10);
         SceneTraining._actionDone[idx] = SceneTraining._actionDone[idx] || {};
         SceneTraining._actionDone[idx][cIdx] = this.checked;
+        SceneTraining.persistProgress();
       });
     });
 
