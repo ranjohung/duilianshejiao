@@ -77,6 +77,11 @@ test('礼仪训练是先教后练课堂，真实挑战保持无提示', async ({
     expect(challenge.location).toBe('公司');
     expect(challenge.outcome).toBe('完成了');
     expect(challenge.recommendation).toBeTruthy();
+    const nextTraining = await page.evaluate(() => JSON.parse(localStorage.getItem('duilian_next_training') || '{}'));
+    expect(nextTraining.outcome).toBe('完成了');
+    expect(nextTraining.behaviorPercent).toBeGreaterThan(0);
+    expect(nextTraining.behaviorPercent).toBeLessThan(100);
+    expect(nextTraining.challenge).toBe(challenge.challenge);
     expect(challenge.challenge).toContain('行为清单');
     expect(challenge.branch).toBe('对方临时打断');
     expect(challenge.recommendation).toContain('对方临时打断');

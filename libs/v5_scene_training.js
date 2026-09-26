@@ -69,7 +69,7 @@
       const item = { levelId: level.id || 9001, scene: level.title || '礼仪场景', challenge: challenge, note: text, location: location ? location.value : '', outcome: outcome ? outcome.value : '', feeling: feeling ? feeling.value : '', dialogueTurns: Object.keys(SceneTraining._dialogueAnswers || {}).length, dialogue: SceneTraining._dialogueAnswers || {}, behaviorDone: done, behaviorTotal: total, behaviorPercent: behaviorPercent, recommendation: recommendation, branch: branchLabel, createdAt: Date.now() };
       let log = []; try { log = JSON.parse(localStorage.getItem('duilian_challenge_log') || '[]'); } catch (e) {}
       log.unshift(item); localStorage.setItem('duilian_challenge_log', JSON.stringify(log.slice(0, 50)));
-      localStorage.setItem('duilian_next_training', JSON.stringify({ levelId: level.id || 9001, scene: level.title || '礼仪场景', recommendation: recommendation, source: 'scene-training', createdAt: Date.now() }));
+      localStorage.setItem('duilian_next_training', JSON.stringify({ levelId: level.id || 9001, scene: level.title || '礼仪场景', recommendation: recommendation, challenge: challenge, outcome: outcomeValue, behaviorPercent: behaviorPercent, source: 'scene-training', createdAt: Date.now() }));
       localStorage.setItem('duilian_etiquette_completed_' + level.id, JSON.stringify({ scene: level.title || '礼仪场景', completedAt: Date.now(), behaviorPercent: behaviorPercent, dialogueTurns: Object.keys(SceneTraining._dialogueAnswers || {}).length }));
       SceneTraining.clearProgress();
       window.dispatchEvent(new CustomEvent('v5-recommendation-refresh'));
