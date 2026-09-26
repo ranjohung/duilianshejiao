@@ -67,11 +67,15 @@ test('礼仪训练是先教后练课堂，真实挑战保持无提示', async ({
     expect(reached.evaluationReachedAt).toBeTruthy();
     await expect(page.locator('#st-reality-note').first()).toBeVisible();
     await page.locator('#st-reality-note').first().fill('今天在办公室主动向同事问候，并保持自然目光交流。');
+    await page.locator('#st-reality-location').first().selectOption('公司');
+    await page.locator('#st-reality-outcome').first().selectOption('完成了');
     await page.locator('#st-reality-feeling').first().selectOption('比较自然');
     await page.locator('#st-save-reality').first().click();
     await expect(page.locator('#st-reality-result').first()).toContainText('已保存现实记录');
     const challenge = await page.evaluate(() => JSON.parse(localStorage.getItem('duilian_challenge_log') || '[]')[0]);
     expect(challenge.note).toContain('办公室');
+    expect(challenge.location).toBe('公司');
+    expect(challenge.outcome).toBe('完成了');
     expect(challenge.recommendation).toBeTruthy();
     expect(challenge.challenge).toContain('行为清单');
     expect(challenge.branch).toBe('对方临时打断');

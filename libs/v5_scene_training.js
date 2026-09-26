@@ -48,6 +48,8 @@
       if (!root) return;
       const note = root.querySelector('#st-reality-note');
       const feeling = root.querySelector('#st-reality-feeling');
+      const location = root.querySelector('#st-reality-location');
+      const outcome = root.querySelector('#st-reality-outcome');
       const text = note ? note.value.trim() : '';
       if (!text) { if (typeof global.showToast === 'function') global.showToast('先写下你准备在哪里完成，或回来后的真实经历。'); return; }
       const level = SceneTraining._level || {};
@@ -58,7 +60,7 @@
       const challenge = behaviorPercent < 100 ? '现实中完成全部行为清单，并说出一句完整回应' : (dialogueTurns < 2 ? '现实中用完整句回应，并加入一个开放式问题' : '现实中练习一次临时变化下的自然回应');
       const branchLabel = SceneTraining._branchLabel || '';
       const recommendation = done < 2 ? '再练一次：动作时间轴与行为确认' : (text.length < 12 ? '再练一次：用完整句回应并推进话题' : (branchLabel ? '下一练：继续练习“' + branchLabel + '”后的自然回应' : '下一练：加入对方临时打断或不同意见的分支'));
-      const item = { levelId: level.id || 9001, scene: level.title || '礼仪场景', challenge: challenge, note: text, feeling: feeling ? feeling.value : '', dialogueTurns: Object.keys(SceneTraining._dialogueAnswers || {}).length, dialogue: SceneTraining._dialogueAnswers || {}, behaviorDone: done, behaviorTotal: total, behaviorPercent: behaviorPercent, recommendation: recommendation, branch: branchLabel, createdAt: Date.now() };
+      const item = { levelId: level.id || 9001, scene: level.title || '礼仪场景', challenge: challenge, note: text, location: location ? location.value : '', outcome: outcome ? outcome.value : '', feeling: feeling ? feeling.value : '', dialogueTurns: Object.keys(SceneTraining._dialogueAnswers || {}).length, dialogue: SceneTraining._dialogueAnswers || {}, behaviorDone: done, behaviorTotal: total, behaviorPercent: behaviorPercent, recommendation: recommendation, branch: branchLabel, createdAt: Date.now() };
       let log = []; try { log = JSON.parse(localStorage.getItem('duilian_challenge_log') || '[]'); } catch (e) {}
       log.unshift(item); localStorage.setItem('duilian_challenge_log', JSON.stringify(log.slice(0, 50)));
       localStorage.setItem('duilian_next_training', JSON.stringify({ levelId: level.id || 9001, scene: level.title || '礼仪场景', recommendation: recommendation, source: 'scene-training', createdAt: Date.now() }));
@@ -902,7 +904,8 @@ if (courseDriven) {
     html += `<div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:14px;margin-bottom:12px;">
       <div style="font-size:13px;color:#047857;font-weight:700;margin-bottom:6px;">🌱 课堂 → 现实挑战</div>
       <div style="font-size:12px;color:#065f46;line-height:1.6;margin-bottom:8px;">${challengeText} 不需要完美，回来记录真实发生了什么。</div>
-      <textarea id="st-reality-note" placeholder="在哪里？发生了什么？（也可以先写下准备挑战的场景）" style="width:100%;min-height:64px;border:1px solid #bbf7d0;border-radius:9px;padding:9px;font-size:12px;resize:vertical;"></textarea>
+      <textarea id="st-reality-note" placeholder="发生了什么？你做了哪些动作、说了什么？" style="width:100%;min-height:64px;border:1px solid #bbf7d0;border-radius:9px;padding:9px;font-size:12px;resize:vertical;"></textarea>
+      <div style="display:flex;gap:8px;margin-top:8px;"><select id="st-reality-location" style="flex:1;border:1px solid #bbf7d0;border-radius:9px;padding:8px;font-size:12px;background:#fff;"><option value="">发生地点（可选）</option><option>公司</option><option>学校</option><option>咖啡店</option><option>家里</option><option>其他</option></select><select id="st-reality-outcome" style="flex:1;border:1px solid #bbf7d0;border-radius:9px;padding:8px;font-size:12px;background:#fff;"><option value="">完成情况（可选）</option><option>完成了</option><option>做了一半</option><option>还没完成</option></select></div>
       <select id="st-reality-feeling" style="margin-top:8px;width:100%;border:1px solid #bbf7d0;border-radius:9px;padding:8px;font-size:12px;background:#fff;"><option value="">当时感觉（可选）</option><option>紧张</option><option>一般</option><option>比较自然</option><option>很轻松</option></select>
       <button id="st-save-reality" onclick="SceneTraining.saveChallenge()" style="margin-top:9px;padding:9px 14px;border:0;border-radius:9px;background:#059669;color:#fff;font-size:12px;font-weight:700;cursor:pointer;">保存现实记录</button>
       <div id="st-reality-result" style="margin-top:8px;font-size:12px;color:#047857;"></div>
