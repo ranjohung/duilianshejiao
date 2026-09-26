@@ -797,7 +797,9 @@ function renderEvaluation(step) {
       } else quizHtml += `<div style="font-size:12px;color:#9ca3af;margin-top:6px;">选一个，看看你掌握了多少</div>`;
       quizHtml += `</div>`;
     }
-    // ── 总评 ──
+if (courseDriven) {
+      quizHtml += `<div style="margin-top:8px;font-size:11px;color:#0369a1;">知识自查完成度：<span id="st-course-knowledge-score">${courseKnowledgeScore}/100</span></div>`;
+    }    // ── 总评 ──
     let overallScore = 0, overallLabel = '', overallDesc = '';
     const hasAnyInput = allUserInput.length > 0 || savedQuizAnswer || actionPercent > 0;
     if (hasAnyInput) {
@@ -1053,6 +1055,8 @@ function renderEvaluation(step) {
       SceneTraining._answers.course_source_check = input ? input.value.trim() : '';
       SceneTraining.persistProgress();
       const result = document.getElementById('st-course-check-result');
+      const score = document.getElementById('st-course-knowledge-score');
+      if (score) score.textContent = (SceneTraining._answers.course_source_check.length >= 12 ? 100 : (SceneTraining._answers.course_source_check ? 50 : 0)) + '/100';
       if (result) result.textContent = SceneTraining._answers.course_source_check ? '✓ 已保存' : '请先写下依据';
     });
     // 知识评价选择题
