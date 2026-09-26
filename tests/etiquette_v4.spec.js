@@ -99,6 +99,7 @@ test('礼仪训练是先教后练课堂，真实挑战保持无提示', async ({
     await page.locator('.v5-recommendation button', { hasText: '查看最近复盘' }).click();
     await expect(page.locator('#v5-review-history')).toContainText('办公室');
     await expect(page.locator('#v5-review-history')).toContainText('临时变化');
+    await expect(page.locator('#v5-review-history')).toContainText('知识自查：未进行');
     await expect(page.locator('#v5-review-history')).toContainText('对方临时打断');
     await page.locator('#v5-review-history details summary').click();
     await expect(page.locator('#v5-review-history')).toContainText('第1轮');
