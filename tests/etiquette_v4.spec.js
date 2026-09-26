@@ -40,6 +40,7 @@ test('礼仪训练是先教后练课堂，真实挑战保持无提示', async ({
       await page.locator('.st-ai-send').click();
       await page.waitForTimeout(750);
     }
+    await expect(page.locator('#st-ai-feedback')).toContainText('本地教练提示');
     await page.evaluate(() => SceneTraining.next());
     await expect(page.locator('#scene-training-container')).toContainText('训练完成');
     await expect(page.locator('#st-reality-note').first()).toBeVisible();

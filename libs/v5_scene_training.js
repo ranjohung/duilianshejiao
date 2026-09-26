@@ -961,7 +961,7 @@
 
         // 课程驱动的本地练习不调用启发式评分，也不冒称 AI 评价。
         const courseDriven = !!SceneTraining._lessonContext;
-        const quality = courseDriven ? null : evaluateResponse(text, SceneTraining._level);
+        const quality = evaluateResponse(text, SceneTraining._level);
 
         // 多轮模式
         const step = SceneTraining._steps[idx];
@@ -985,7 +985,7 @@
             SceneTraining._answers['ai_roleplay_full'] = Object.values(SceneTraining._dialogueAnswers || {}).join('\n');
             setTimeout(() => {
               feedback.innerHTML = courseDriven
-                ? '<div style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:10px;padding:12px;font-size:13px;color:#3730a3;line-height:1.8;"><strong>本轮回应已记录</strong><br>请进入复盘，对照课程原文检查你的回应依据。此处没有进行 AI 语义评分。</div>'
+                ? '<div style="background:${quality.bg};border:1px solid ${quality.border};border-radius:10px;padding:12px;font-size:13px;color:${quality.fg};line-height:1.8;"><strong>${quality.title}</strong><br>${quality.desc}<br><span style="color:#64748b;font-size:11px;">这是基于本课规则的即时反馈；进入复盘可继续对照课程原文。</span></div>'
                 : `<div style="background:${quality.bg};border:1px solid ${quality.border};border-radius:10px;padding:12px;font-size:13px;color:${quality.fg};line-height:1.8;">
                   <strong>${quality.title}</strong><br>${quality.desc}<br><span style="color:#6b7280;font-size:11px;margin-top:6px;display:block;">多轮对话完成！下一步进入综合评价。</span>
                 </div>`;
@@ -998,7 +998,7 @@
           SceneTraining._answers['ai_roleplay'] = text;
           setTimeout(() => {
             feedback.innerHTML = courseDriven
-              ? '<div style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:10px;padding:12px;font-size:13px;color:#3730a3;line-height:1.8;"><strong>本轮回应已记录</strong><br>请进入复盘，对照课程原文检查你的回应依据。此处没有进行 AI 语义评分。</div>'
+              ? '<div style="background:${quality.bg};border:1px solid ${quality.border};border-radius:10px;padding:12px;font-size:13px;color:${quality.fg};line-height:1.8;"><strong>${quality.title}</strong><br>${quality.desc}<br><span style="color:#64748b;font-size:11px;">这是基于本课规则的即时反馈；进入复盘可继续对照课程原文。</span></div>'
               : `<div style="background:${quality.bg};border:1px solid ${quality.border};border-radius:10px;padding:12px;font-size:13px;color:${quality.fg};line-height:1.8;">
                 <strong>${quality.title}</strong><br>${quality.desc}
               </div>`;
@@ -1021,7 +1021,7 @@
   // 简单启发式评价（MVP，真实项目调 AI）
   function evaluateResponse(text, level) {
     if (SceneTraining._lessonContext) {
-      return { title: '已记录本轮回应', desc: '这不是AI语义评分。请指出回应依据的课程原文；若课程未说明情景细节，可以先确认再回答。', bg: '#eef2ff', border: '#c7d2fe', fg: '#3730a3' };
+      const ctx = SceneTraining._lessonContext || {}; const hasQuestion = /[？?]/.test(text) || text.includes('吗') || text.includes('请问') || text.includes('能否'); const hasCourtesy = /谢谢|您好|请|辛苦|麻烦|理解|感谢/.test(text); const hasAction = /先|然后|再|确认|说明|回应|倾听|点头|微笑|等待/.test(text); if (text.length < 8) return { title: '⚠ 回应还不够完整', desc: '先把对象、回应和下一步说清楚，再进入下一轮。', bg: '#fef2f2', border: '#fecaca', fg: '#dc2626' }; if (hasQuestion && hasCourtesy && hasAction) return { title: '✅ 回应结构完整', desc: '你同时表达了礼貌、行动依据和推进问题，符合“' + String(ctx.knowledgePoint || ctx.courseTitle || '本课规则').slice(0, 28) + '”的训练方向。', bg: '#ecfdf5', border: '#a7f3d0', fg: '#047857' }; if (hasQuestion || hasAction) return { title: '😊 基本合适，还能更自然', desc: '回应已经有场景动作或推进问题；可以再补一句礼貌回应，让对方更容易接话。', bg: '#fffbeb', border: '#fde68a', fg: '#b45309' }; return { title: '📝 建议再具体一点', desc: '参考本课原文，补充你准备采取的动作、理由或下一步，不要只回答“好的/嗯”。', bg: '#eef2ff', border: '#c7d2fe', fg: '#3730a3' };
     }
     const goodOpt = (level.options || []).find(o => o.quality === 'good');
     const coldOpt = (level.options || []).find(o => o.quality === 'cold');
