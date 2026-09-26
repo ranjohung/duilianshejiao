@@ -69,7 +69,7 @@
       else if (done < 2) recommendation = '再练一次：动作时间轴与行为确认';
       else if (text.length < 12) recommendation = '再练一次：用完整句回应并推进话题';
       else if (branchLabel) recommendation = '下一练：继续练习“' + branchLabel + '”后的自然回应';
-      const item = { levelId: level.id || 9001, scene: level.title || '礼仪场景', challenge: challenge, note: text, location: location ? location.value : '', outcome: outcome ? outcome.value : '', feeling: feeling ? feeling.value : '', dialogueTurns: Object.keys(SceneTraining._dialogueAnswers || {}).length, dialogue: SceneTraining._dialogueAnswers || {}, behaviorDone: done, behaviorTotal: total, behaviorPercent: behaviorPercent, courseKnowledgeScore: courseKnowledgeScore, recommendation: recommendation, branch: branchLabel, createdAt: Date.now() };
+      const item = { levelId: level.id || 9001, scene: level.title || '礼仪场景', challenge: challenge, note: text, location: location ? location.value : '', outcome: outcome ? outcome.value : '', feeling: feeling ? feeling.value : '', dialogueTurns: Object.keys(SceneTraining._dialogueAnswers || {}).length, dialogue: SceneTraining._dialogueAnswers || {}, dialogueFeedback: SceneTraining._dialogueFeedback || {}, behaviorDone: done, behaviorTotal: total, behaviorPercent: behaviorPercent, courseKnowledgeScore: courseKnowledgeScore, recommendation: recommendation, branch: branchLabel, createdAt: Date.now() };
       let log = []; try { log = JSON.parse(localStorage.getItem('duilian_challenge_log') || '[]'); } catch (e) {}
       log.unshift(item); localStorage.setItem('duilian_challenge_log', JSON.stringify(log.slice(0, 50)));
       localStorage.setItem('duilian_next_training', JSON.stringify({ levelId: level.id || 9001, scene: level.title || '礼仪场景', recommendation: recommendation, challenge: challenge, outcome: outcomeValue, behaviorPercent: behaviorPercent, courseKnowledgeScore: courseKnowledgeScore, source: 'scene-training', createdAt: Date.now() }));
@@ -426,12 +426,13 @@
     SceneTraining._actionDone = {};
     SceneTraining._turnIdx = 0;
     SceneTraining._dialogueAnswers = {};
+    SceneTraining._dialogueFeedback = {};
     SceneTraining._branchUsed = false;
     SceneTraining._branchLabel = '';
     SceneTraining._quizAnswer = null;
     SceneTraining._progressKey = 'duilian_scene_progress_' + level.id;
     SceneTraining._resumed = false;
-    try { const saved = JSON.parse(localStorage.getItem(SceneTraining._progressKey) || 'null'); if (saved && saved.scene === level.title && !!saved.lessonDriven === !!SceneTraining._lessonContext) { SceneTraining._resumed = true; SceneTraining._stepIdx = Math.min(Number(saved.stepIdx) || 0, SceneTraining._steps.length - 1); SceneTraining._maxReached = Math.min(Math.max(Number(saved.maxReached) || SceneTraining._stepIdx, SceneTraining._stepIdx), SceneTraining._steps.length - 1); SceneTraining._answers = saved.answers || {}; SceneTraining._actionDone = saved.actionDone || {}; SceneTraining._turnIdx = saved.turnIdx || 0; SceneTraining._dialogueAnswers = saved.dialogueAnswers || {}; SceneTraining._branchUsed = !!saved.branchUsed; SceneTraining._branchLabel = saved.branchLabel || ''; SceneTraining._quizAnswer = saved.quizAnswer || null; } } catch (e) {}
+    try { const saved = JSON.parse(localStorage.getItem(SceneTraining._progressKey) || 'null'); if (saved && saved.scene === level.title && !!saved.lessonDriven === !!SceneTraining._lessonContext) { SceneTraining._resumed = true; SceneTraining._stepIdx = Math.min(Number(saved.stepIdx) || 0, SceneTraining._steps.length - 1); SceneTraining._maxReached = Math.min(Math.max(Number(saved.maxReached) || SceneTraining._stepIdx, SceneTraining._stepIdx), SceneTraining._steps.length - 1); SceneTraining._answers = saved.answers || {}; SceneTraining._actionDone = saved.actionDone || {}; SceneTraining._turnIdx = saved.turnIdx || 0; SceneTraining._dialogueAnswers = saved.dialogueAnswers || {}; SceneTraining._dialogueFeedback = saved.dialogueFeedback || {}; SceneTraining._branchUsed = !!saved.branchUsed; SceneTraining._branchLabel = saved.branchLabel || ''; SceneTraining._quizAnswer = saved.quizAnswer || null; } } catch (e) {}
 if (SceneTraining._branchUsed && SceneTraining._branchLabel) {
       const restoredAI = SceneTraining._steps.find(function (item) { return item.type === 'ai_roleplay'; });
       const restoredBranch = restoredAI && (restoredAI.branches || []).find(function (item) { return item.label === SceneTraining._branchLabel; });
@@ -1042,6 +1043,7 @@ if (courseDriven) {
           SceneTraining._turnIdx = SceneTraining._turnIdx || 0;
           SceneTraining._dialogueAnswers = SceneTraining._dialogueAnswers || {};
           SceneTraining._dialogueAnswers[SceneTraining._turnIdx] = text;
+          SceneTraining._dialogueFeedback[SceneTraining._turnIdx] = { title: quality.title, desc: quality.desc };
           SceneTraining.persistProgress();
 
           if (SceneTraining._turnIdx < step.dialogue.length - 1) {
@@ -1140,7 +1142,7 @@ if (courseDriven) {
   // ──────────────────────────────────────────────────────────────────────
 
   SceneTraining.start = start;
-  SceneTraining.persistProgress = function () { try { localStorage.setItem(SceneTraining._progressKey, JSON.stringify({ scene: SceneTraining._level && SceneTraining._level.title, lessonDriven: !!SceneTraining._lessonContext, stepIdx: SceneTraining._stepIdx, maxReached: SceneTraining._maxReached, answers: SceneTraining._answers, actionDone: SceneTraining._actionDone, turnIdx: SceneTraining._turnIdx, dialogueAnswers: SceneTraining._dialogueAnswers, quizAnswer: SceneTraining._quizAnswer, branchUsed: !!SceneTraining._branchUsed, branchLabel: SceneTraining._branchLabel || '', updatedAt: Date.now() })); } catch (e) {} };
+  SceneTraining.persistProgress = function () { try { localStorage.setItem(SceneTraining._progressKey, JSON.stringify({ scene: SceneTraining._level && SceneTraining._level.title, lessonDriven: !!SceneTraining._lessonContext, stepIdx: SceneTraining._stepIdx, maxReached: SceneTraining._maxReached, answers: SceneTraining._answers, actionDone: SceneTraining._actionDone, turnIdx: SceneTraining._turnIdx, dialogueAnswers: SceneTraining._dialogueAnswers, dialogueFeedback: SceneTraining._dialogueFeedback, quizAnswer: SceneTraining._quizAnswer, branchUsed: !!SceneTraining._branchUsed, branchLabel: SceneTraining._branchLabel || '', updatedAt: Date.now() })); } catch (e) {} };
   SceneTraining.clearProgress = function () { try { localStorage.removeItem(SceneTraining._progressKey); } catch (e) {} };
   SceneTraining.gotoStep = function (n) {
     if (n < 0 || n >= SceneTraining._steps.length) return;
