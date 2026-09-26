@@ -718,7 +718,7 @@ function renderActionDemo(step) {
       </div>
       <textarea id="st-ai-input" rows="3" placeholder="${hasMultiTurn ? '轮到你了…' : '在这里输入你的回应…'}" style="width:100%;border:1px solid #e5e7eb;border-radius:10px;padding:10px;font-size:14px;resize:outline-none;">${savedAnswer}</textarea>
       <div style="display:flex;gap:8px;margin-top:10px;">
-        <button style="flex:1;padding:10px;border:1px solid #c7d2fe;background:#eef2ff;border-radius:10px;color:#4338ca;font-size:13px;cursor:pointer;" onclick="startEtiquetteVoiceInput()">🎙️ 语音</button>
+        <button class="st-ai-voice-btn" style="flex:1;padding:10px;border:1px solid #c7d2fe;background:#eef2ff;border-radius:10px;color:#4338ca;font-size:13px;cursor:pointer;" onclick="startEtiquetteVoiceInput()">🎙️ 语音</button>
         <button class="st-ai-send" style="flex:1;padding:10px;border:none;background:linear-gradient(135deg,#10b981,#059669);border-radius:10px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;">${submitLabel}</button>
       </div>
       <div id="st-ai-feedback" style="margin-top:12px;"></div>

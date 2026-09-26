@@ -17699,7 +17699,7 @@ function practiceEtiquetteAction(){const x=window.currentEtiquetteStep;if(!x)ret
 function startEtiquetteVoiceInput() {
   const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   const status = $('etiquette-voice-status');
-  const button = $('etiquette-voice-btn');
+  const button = $('etiquette-voice-btn') || document.querySelector('.st-voice-btn');
   if (!Recognition) {
     if (status) status.textContent = '当前浏览器不支持语音识别，请使用文字输入；在支持语音识别的浏览器中可直接说话。';
     showToast('当前浏览器不支持语音识别，请改用文字输入');
@@ -17719,7 +17719,7 @@ function startEtiquetteVoiceInput() {
       if (event.results[i].isFinal) finalText += transcript;
       else interim += transcript;
     }
-    const input = $('etiquette-input');
+    const input = $('st-ai-input') || $('st-follow-input') || $('etiquette-input');
     if (input) input.value = (finalText || interim).trim();
   };
   recognition.onerror = event => {
@@ -17734,7 +17734,7 @@ function startEtiquetteVoiceInput() {
 }
 
 function pickEtiquetteOption(content, element) {
-  const input = $('etiquette-input');
+  const input = $('st-ai-input') || $('st-follow-input') || $('etiquette-input');
   if (input) input.value = content;
   document.querySelectorAll('#etiquette-options .option-card').forEach(opt => {
     opt.classList.remove('bg-green-100', 'bg-red-100', 'bg-yellow-100');
