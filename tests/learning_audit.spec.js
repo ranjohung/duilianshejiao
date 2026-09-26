@@ -294,6 +294,11 @@ test('课程模板进入完整礼仪教学闭环', async ({ page }) => {
   await expect(page.locator('#modal-v5-scene')).toBeVisible();
   await page.getByRole('button', { name: /开始跟练/ }).click();
   await expect(page.locator('#modal-etiquette-training')).toBeVisible();
+  await page.evaluate(() => SceneTraining.gotoStep(SceneTraining._steps.findIndex(s => s.type === 'ai_roleplay')));
+  await page.locator('#st-ai-input').fill('您好，我会先确认对方需求，再给出简洁回应。请问您最关注哪一项？');
+  await page.locator('.st-ai-send').click();
+  await expect(page.locator('#st-ai-feedback')).toContainText('基于本课规则的即时反馈');
+  await expect(page.locator('#st-ai-feedback')).not.toContainText('${quality.title}');
   await page.evaluate(() => { while (SceneTraining.getCurrentStep().type !== 'evaluation') SceneTraining.next(); });
   await expect(page.locator('#scene-training-container')).toContainText('课程原文对照');
   await expect(page.locator('#scene-training-container')).toContainText('课程原文自查');

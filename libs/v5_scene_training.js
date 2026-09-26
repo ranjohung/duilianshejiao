@@ -1037,7 +1037,7 @@ if (courseDriven) {
             SceneTraining._answers['ai_roleplay_full'] = Object.values(SceneTraining._dialogueAnswers || {}).join('\n');
             setTimeout(() => {
               feedback.innerHTML = courseDriven
-                ? '<div style="background:${quality.bg};border:1px solid ${quality.border};border-radius:10px;padding:12px;font-size:13px;color:${quality.fg};line-height:1.8;"><strong>${quality.title}</strong><br>${quality.desc}<br><span style="color:#64748b;font-size:11px;">这是基于本课规则的即时反馈；进入复盘可继续对照课程原文。</span></div>'
+                ? `<div style="background:${quality.bg};border:1px solid ${quality.border};border-radius:10px;padding:12px;font-size:13px;color:${quality.fg};line-height:1.8;"><strong>${quality.title}</strong><br>${quality.desc}<br><span style="color:#64748b;font-size:11px;">这是基于本课规则的即时反馈；进入复盘可继续对照课程原文。</span></div>`
                 : `<div style="background:${quality.bg};border:1px solid ${quality.border};border-radius:10px;padding:12px;font-size:13px;color:${quality.fg};line-height:1.8;">
                   <strong>${quality.title}</strong><br>${quality.desc}<br><span style="color:#6b7280;font-size:11px;margin-top:6px;display:block;">多轮对话完成！下一步进入综合评价。</span>
                 </div>`;
@@ -1050,7 +1050,7 @@ if (courseDriven) {
           SceneTraining._answers['ai_roleplay'] = text;
           setTimeout(() => {
             feedback.innerHTML = courseDriven
-              ? '<div style="background:${quality.bg};border:1px solid ${quality.border};border-radius:10px;padding:12px;font-size:13px;color:${quality.fg};line-height:1.8;"><strong>${quality.title}</strong><br>${quality.desc}<br><span style="color:#64748b;font-size:11px;">这是基于本课规则的即时反馈；进入复盘可继续对照课程原文。</span></div>'
+              ? `<div style="background:${quality.bg};border:1px solid ${quality.border};border-radius:10px;padding:12px;font-size:13px;color:${quality.fg};line-height:1.8;"><strong>${quality.title}</strong><br>${quality.desc}<br><span style="color:#64748b;font-size:11px;">这是基于本课规则的即时反馈；进入复盘可继续对照课程原文。</span></div>`
               : `<div style="background:${quality.bg};border:1px solid ${quality.border};border-radius:10px;padding:12px;font-size:13px;color:${quality.fg};line-height:1.8;">
                 <strong>${quality.title}</strong><br>${quality.desc}
               </div>`;
