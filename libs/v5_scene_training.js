@@ -96,6 +96,10 @@
         { npc: '小雨：（看着你的咖啡杯）你常来吗？我感觉这家环境还不错，但我其实更喜欢街角那家新开的。', practicePrompt: '小雨在聊咖啡厅。你怎么回应？', },
         { npc: '小雨：（眼睛亮了）真的？那家我还没去过！你觉得什么好喝？', practicePrompt: '她感兴趣了，继续推荐吧。' },
         { npc: '小雨：哈哈好，那就这么定了！我叫小雨，你呢？', practicePrompt: '破冰成功！轻松收尾 + 下次见面的钩子。' }
+      ], branches: [
+        { label: '对方临时打断', npc: '小雨：不好意思，我临时要接个电话，我们晚点再聊可以吗？', practicePrompt: '先表示理解，再自然约定下一次继续交流。' },
+        { label: '对方提出不同意见', npc: '小雨：不过我觉得那家咖啡厅有点贵，你怎么看？', practicePrompt: '先接住对方的不同意见，再表达你的理由，不要急着否定。' },
+        { label: '自然结束话题', npc: '小雨：今天聊得很开心，我要先走了。', practicePrompt: '用简短、礼貌的话回应，并留下自然的告别。' }
       ] },
     { type: 'evaluation', title: '综合评价', dimensions: ['知识评价（你知不知道应该怎么做）', '语言评价（AI 分析你的表达）', '行为确认（你完成了哪些动作）'] }
   ];
@@ -280,7 +284,12 @@
       type: 'ai_roleplay', title: 'AI 角色扮演 · 多轮对话',
       dialogue,
       npcOpening: opening,
-      practicePrompt: '现在由 AI 扮演' + npcName + '。你可以用文字或语音回应。'
+      practicePrompt: '现在由 AI 扮演' + npcName + '。你可以用文字或语音回应。',
+      branches: [
+        { label: '对方临时打断', npc: npcName + '：不好意思，我临时要离开一下，我们稍后继续可以吗？', practicePrompt: '先表示理解，再约定稍后继续。' },
+        { label: '对方提出异议', npc: npcName + '：我不太确定你的看法，你能再解释一下吗？', practicePrompt: '先确认对方的疑问，再用一句清晰的话补充说明。' },
+        { label: '对方准备结束', npc: npcName + '：今天先聊到这里，谢谢你。', practicePrompt: '礼貌回应并自然结束，不要突然中断。' }
+      ]
     });
 
     // ────────── Step 8: evaluation ──────────
@@ -396,10 +405,11 @@
     SceneTraining._actionDone = {};
     SceneTraining._turnIdx = 0;
     SceneTraining._dialogueAnswers = {};
+    SceneTraining._branchUsed = false;
     SceneTraining._quizAnswer = null;
     SceneTraining._progressKey = 'duilian_scene_progress_' + level.id;
     SceneTraining._resumed = false;
-    try { const saved = JSON.parse(localStorage.getItem(SceneTraining._progressKey) || 'null'); if (saved && saved.scene === level.title) { SceneTraining._resumed = true; SceneTraining._stepIdx = Math.min(Number(saved.stepIdx) || 0, SceneTraining._steps.length - 1); SceneTraining._answers = saved.answers || {}; SceneTraining._actionDone = saved.actionDone || {}; SceneTraining._turnIdx = saved.turnIdx || 0; SceneTraining._dialogueAnswers = saved.dialogueAnswers || {}; SceneTraining._quizAnswer = saved.quizAnswer || null; } } catch (e) {}
+    try { const saved = JSON.parse(localStorage.getItem(SceneTraining._progressKey) || 'null'); if (saved && saved.scene === level.title) { SceneTraining._resumed = true; SceneTraining._stepIdx = Math.min(Number(saved.stepIdx) || 0, SceneTraining._steps.length - 1); SceneTraining._answers = saved.answers || {}; SceneTraining._actionDone = saved.actionDone || {}; SceneTraining._turnIdx = saved.turnIdx || 0; SceneTraining._dialogueAnswers = saved.dialogueAnswers || {}; SceneTraining._branchUsed = !!saved.branchUsed; SceneTraining._quizAnswer = saved.quizAnswer || null; } } catch (e) {}
     console.log('[SceneTraining] start:', level.id, level.title, 'steps:', SceneTraining._steps.length);
 
     // 容器定位 — 和 modal-etiquette-training 共存
@@ -686,6 +696,7 @@
 
       ${dialogueBlock}
 
+      ${isLastTurn && Array.isArray(step.branches) && step.branches.length && !SceneTraining._branchUsed ? `<div style="margin:10px 0;padding:10px;border:1px solid #fed7aa;border-radius:10px;background:#fff7ed;"><div style="font-size:12px;color:#c2410c;font-weight:700;margin-bottom:7px;">🧩 选择一个情境变化，继续练习</div>${step.branches.map((b,i)=>`<button class="st-branch-btn" data-branch-idx="${i}" style="display:block;width:100%;text-align:left;padding:8px 10px;margin-top:5px;border:1px solid #fdba74;border-radius:8px;background:#fff;color:#9a3412;cursor:pointer;font-size:12px;">${b.label}</button>`).join('')}</div>` : ''}
       <div style="background:#f0fdf4;border-radius:10px;padding:10px;font-size:13px;color:#15803d;margin-bottom:12px;">
         💬 ${practicePrompt || '用你的话回应'}
       </div>
@@ -949,6 +960,16 @@
       });
     }
 
+    // 情境分支：把用户选择的突发情况追加为下一轮
+    document.querySelectorAll('.st-branch-btn').forEach(btn => btn.addEventListener('click', function () {
+      const branch = step.branches && step.branches[parseInt(this.dataset.branchIdx, 10)];
+      if (!branch) return;
+      step.dialogue = (step.dialogue || []).concat([{ npc: branch.npc, practicePrompt: branch.practicePrompt }]);
+      SceneTraining._branchUsed = true;
+      SceneTraining._turnIdx = step.dialogue.length - 1;
+      SceneTraining.persistProgress();
+      render();
+    }));
     // AI 评价发送（单轮 + 多轮）
     const aiSend = document.querySelector('.st-ai-send');
     if (aiSend) {
@@ -1051,7 +1072,7 @@
   // ──────────────────────────────────────────────────────────────────────
 
   SceneTraining.start = start;
-  SceneTraining.persistProgress = function () { try { localStorage.setItem(SceneTraining._progressKey, JSON.stringify({ scene: SceneTraining._level && SceneTraining._level.title, stepIdx: SceneTraining._stepIdx, answers: SceneTraining._answers, actionDone: SceneTraining._actionDone, turnIdx: SceneTraining._turnIdx, dialogueAnswers: SceneTraining._dialogueAnswers, quizAnswer: SceneTraining._quizAnswer, updatedAt: Date.now() })); } catch (e) {} };
+  SceneTraining.persistProgress = function () { try { localStorage.setItem(SceneTraining._progressKey, JSON.stringify({ scene: SceneTraining._level && SceneTraining._level.title, stepIdx: SceneTraining._stepIdx, answers: SceneTraining._answers, actionDone: SceneTraining._actionDone, turnIdx: SceneTraining._turnIdx, dialogueAnswers: SceneTraining._dialogueAnswers, quizAnswer: SceneTraining._quizAnswer, branchUsed: !!SceneTraining._branchUsed, updatedAt: Date.now() })); } catch (e) {} };
   SceneTraining.clearProgress = function () { try { localStorage.removeItem(SceneTraining._progressKey); } catch (e) {} };
   SceneTraining.gotoStep = function (n) {
     if (n < 0 || n >= SceneTraining._steps.length) return;
