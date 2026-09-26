@@ -17504,9 +17504,11 @@ function renderEtiquetteLevelList() {
   root.innerHTML = etiquetteLevels.map((level, i) => {
     const isTrial = EM_isTrial3DProject('etiquette', level.id);
     const canStart = isTrial || isProUser;
-    const status = isTrial && !isProUser ? '免费体验' : (canStart ? '可学习' : '高级会员');
+    let locallyCompleted = false;
+    try { locallyCompleted = !!localStorage.getItem('duilian_etiquette_completed_' + level.id); } catch (e) {}
+    const status = locallyCompleted ? '已完成 · 可复习' : (isTrial && !isProUser ? '免费体验' : (canStart ? '可学习' : '高级会员'));
     const button = canStart
-      ? `<button onclick="startEtiquetteLevel(${level.id})" class="etiquette-course-action">开始学习</button>`
+      ? `<button onclick="startEtiquetteLevel(${level.id})" class="etiquette-course-action">${locallyCompleted ? '复习本课' : '开始学习'}</button>`
       : `<button onclick="goToMember()" class="etiquette-course-action is-locked">了解会员权益</button>`;
     return `<article class="etiquette-course-card" data-level-id="${level.id}">
       <div class="etiquette-course-number">${String(i + 1).padStart(2, '0')}</div>
