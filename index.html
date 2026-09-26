@@ -17710,7 +17710,7 @@ function startEtiquetteVoiceInput() {
   recognition.interimResults = true;
   recognition.continuous = false;
   let finalText = '';
-  if (button) { button.classList.add('is-listening'); button.textContent = '停止'; }
+  if (button) { button.classList.add('is-listening'); button.textContent = '🎙️ 识别中…'; button.setAttribute('aria-busy', 'true'); }
   if (status) status.textContent = '正在听，请自然说出你的回答…';
   recognition.onresult = event => {
     let interim = '';
@@ -17723,10 +17723,10 @@ function startEtiquetteVoiceInput() {
     if (input) input.value = (finalText || interim).trim();
   };
   recognition.onerror = event => {
-    if (status) status.textContent = event.error === 'not-allowed' ? '未获得麦克风权限，请允许后重试，或改用文字输入。' : '没有识别清楚，请再说一次或改用文字输入。';
+    if (status) status.textContent = event.error === 'not-allowed' ? '未获得麦克风权限，请允许后重试，或改用文字输入。' : '没有识别清楚，请再说一次或改用文字输入。'; if (button) { button.classList.remove('is-listening'); button.textContent = button.classList.contains('st-ai-voice-btn') ? '🎙️ 语音' : '🎙️ 语音输入'; button.removeAttribute('aria-busy'); }
   };
   recognition.onend = () => {
-    if (button) { button.classList.remove('is-listening'); button.textContent = '🎙️'; }
+    if (button) { button.classList.remove('is-listening'); button.textContent = button.classList.contains('st-ai-voice-btn') ? '🎙️ 语音' : '🎙️ 语音输入'; button.removeAttribute('aria-busy'); }
     if (status && finalText) status.textContent = '语音已转成文字，请检查输入框内容，确认后提交跟练。';
   };
   window.currentEtiquetteRecognition = recognition;
