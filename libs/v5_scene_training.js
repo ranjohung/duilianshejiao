@@ -734,11 +734,14 @@
     const coldOpt = (level.options || []).find(o => o.quality === 'cold');
 
     // ── 行为确认汇总 ──
-    let totalChecks = 0, doneChecks = 0;
+    let doneChecks = 0;
     Object.values(SceneTraining._actionDone).forEach(obj => {
       if (!obj) return;
-      Object.values(obj).forEach(v => { totalChecks++; if (v) doneChecks++; });
+      Object.values(obj).forEach(v => { if (v) doneChecks++; });
     });
+    const definedChecks = (SceneTraining._steps || []).reduce((n, item) => n + (Array.isArray(item.actions) ? item.actions.length : 0) + (Array.isArray(item.actionChecklist) ? item.actionChecklist.length : 0), 0);
+    const recordedChecks = Object.values(SceneTraining._actionDone).reduce((n, obj) => n + Object.keys(obj || {}).length, 0);
+    const totalChecks = definedChecks || recordedChecks;
     const actionPercent = totalChecks > 0 ? Math.round(doneChecks / totalChecks * 100) : 0;
     const actionProgressColor = actionPercent >= 80 ? '#10b981' : actionPercent >= 50 ? '#f59e0b' : '#ef4444';
 

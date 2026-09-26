@@ -53,6 +53,7 @@ test('礼仪训练是先教后练课堂，真实挑战保持无提示', async ({
     await expect(page.locator('#st-ai-feedback')).toContainText('本地教练提示');
     await page.evaluate(() => SceneTraining.next());
     await expect(page.locator('#scene-training-container')).toContainText('训练完成');
+    await expect(page.locator('#scene-training-container')).toContainText('2 / 8 个动作已确认');
     await expect(page.locator('#st-reality-note').first()).toBeVisible();
     await page.locator('#st-reality-note').first().fill('今天在办公室主动向同事问候，并保持自然目光交流。');
     await page.locator('#st-reality-feeling').first().selectOption('比较自然');
