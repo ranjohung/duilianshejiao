@@ -2,7 +2,7 @@
  function readRecommendation(){
   var rec={};
   try{rec=JSON.parse(localStorage.getItem('duilian_next_training')||'{}')}catch(e){}
-  if(rec.recommendation)return {title:rec.recommendation,reason:'来自上一节课的现实记录，继续练习最薄弱的行为环节。',source:rec.scene||'礼仪训练',levelId:rec.levelId||9001};
+  if(rec.recommendation){var reason=rec.outcome==='还没完成'?'根据你记录的“还没完成”，先把难度降下来。':(rec.outcome==='做了一半'?'根据你记录的“做了一半”，先补齐未完成动作。':(rec.outcome==='完成了'?'你已经完成现实挑战，可以进入更复杂的变化练习。':'来自上一节课的现实记录，继续练习最薄弱的行为环节。'));return {title:rec.recommendation,reason:reason,source:rec.scene||'礼仪训练',levelId:rec.levelId||9001};}
   try{rec=JSON.parse(localStorage.getItem('duilian_etiquette_next_recommendation')||'{}')}catch(e){}
   return {title:rec.title||'低压力问候练习',reason:rec.reason||'先在熟悉的人身上完成一次自然问候，再逐步增加场景复杂度。',source:rec.scene||'礼仪训练',levelId:rec.levelId||9001};
  }
