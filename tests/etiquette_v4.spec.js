@@ -55,6 +55,7 @@ test('礼仪训练是先教后练课堂，真实挑战保持无提示', async ({
       await page.locator('#st-ai-input').fill('您好，谢谢您的介绍。我会先确认重点，再和您同步下一步，您最关注哪一项？');
       await page.locator('.st-ai-send').click();
       await page.waitForTimeout(750);
+      if (i === 0) await expect(page.locator('.st-turn-feedback')).toHaveCount(1);
     }
     await expect(page.locator('.st-branch-btn')).toHaveCount(3);
     await page.locator('.st-branch-btn').first().click();

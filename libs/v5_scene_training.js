@@ -699,7 +699,7 @@ function renderActionDemo(step) {
               <div style="display:flex;gap:10px;justify-content:flex-end;">
                 <div style="background:#dcfce7;border-radius:10px;padding:10px;font-size:13px;color:#166534;max-width:80%;">${escapeTrainingText(SceneTraining._dialogueAnswers[i])}</div>
                 <div style="width:28px;height:28px;background:#10b981;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;flex-shrink:0;">你</div>
-              </div>` : ''}
+              </div>${SceneTraining._dialogueFeedback && SceneTraining._dialogueFeedback[i] ? `<div class="st-turn-feedback" style="margin:4px 0 8px 38px;padding:7px 9px;border-radius:8px;background:#fffbeb;color:#92400e;font-size:11px;line-height:1.5;"><strong>教练提示：</strong>${escapeTrainingText(SceneTraining._dialogueFeedback[i].title)} · ${escapeTrainingText(SceneTraining._dialogueFeedback[i].desc)}</div>` : ''}` : ''}
           </div>`).join('')}
         <!-- 当前轮次 NPC 说话 -->
         <div style="display:flex;gap:10px;margin-bottom:6px;">
