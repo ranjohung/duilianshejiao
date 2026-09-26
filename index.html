@@ -19718,14 +19718,20 @@ function openV5SceneTemplate(sceneId) {
   document.body.appendChild(modal);
 }
 
-/** V5 跟练入口（简单占位：alert 展示第一条 prompt） */
+/** V5 跟练入口：从模板导览进入统一的多步骤课堂与多轮对话引擎。 */
 function startV5Practice(sceneId) {
-  var ST = window.SceneTemplates.loaded[sceneId];
+  var ST = window.SceneTemplates && window.SceneTemplates.loaded && window.SceneTemplates.loaded[sceneId];
   if (!ST) return;
-  var prompt = (ST.data.practice_steps && ST.data.practice_steps[0] && ST.data.practice_steps[0].user_prompt) ||
-               (ST.data.entry_question) ||
-               '开始跟练！';
-  alert('V5 跟练（占位）\n\n下一步将展开 AI 角色扮演对话：\n"' + prompt + '"\n\n（完整 V5 对话引擎待开发）');
+  var v5LevelMap = { 'ST-011': 9001, 'ST-010': 9001, 'ST-005': 9001 };
+  var levelId = v5LevelMap[sceneId] || 9001;
+  var old = document.getElementById('modal-v5-scene');
+  if (old) old.remove();
+  if (typeof showEtiquetteTraining === 'function') showEtiquetteTraining();
+  if (typeof startEtiquetteLevel === 'function') {
+    startEtiquetteLevel(levelId);
+  } else if (typeof SceneTraining !== 'undefined' && SceneTraining.start) {
+    SceneTraining.start(levelId);
+  }
 }
 </script>
 
