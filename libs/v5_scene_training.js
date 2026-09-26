@@ -31,6 +31,12 @@
 
   if (!global) return;
 
+  const escapeTrainingText = global.escapeCardText || function (value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  };
+
   const SceneTraining = {
     _level: null,
     _steps: [],
@@ -652,7 +658,7 @@ function renderActionDemo(step) {
 <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#6b7280;font-weight:600;margin-bottom:6px;"><span>① 完成这些动作（勾上）</span><span id="st-follow-progress" style="font-size:11px;color:#6366f1;">已完成 ${followDone} / ${followTotal}</span></div>
       <div style="background:#f9fafb;border-radius:10px;padding:12px;margin-bottom:14px;">${checklist}</div>
       <div style="font-size:13px;color:#6b7280;font-weight:600;margin-bottom:6px;">② 说出你的回应</div>
-      <textarea id="st-follow-input" rows="3" placeholder="${step.speechPlaceholder || '在这里输入…'}" style="width:100%;border:1px solid #e5e7eb;border-radius:10px;padding:10px;font-size:14px;resize:outline-none;">${savedAnswer}</textarea>
+      <textarea id="st-follow-input" rows="3" placeholder="${step.speechPlaceholder || '在这里输入…'}" style="width:100%;border:1px solid #e5e7eb;border-radius:10px;padding:10px;font-size:14px;resize:outline-none;">${escapeTrainingText(savedAnswer)}</textarea>
       <div style="display:flex;gap:8px;margin-top:10px;">
         <button class="st-voice-btn" style="flex:1;padding:10px;border:1px solid #c7d2fe;background:#eef2ff;border-radius:10px;color:#4338ca;font-size:13px;cursor:pointer;">🎙️ 语音输入</button>
         <button class="st-save-btn" style="flex:1;padding:10px;border:none;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:10px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;">保存练习</button>
@@ -678,7 +684,7 @@ function renderActionDemo(step) {
             </div>
             ${SceneTraining._dialogueAnswers && SceneTraining._dialogueAnswers[i] ? `
               <div style="display:flex;gap:10px;justify-content:flex-end;">
-                <div style="background:#dcfce7;border-radius:10px;padding:10px;font-size:13px;color:#166534;max-width:80%;">${SceneTraining._dialogueAnswers[i]}</div>
+                <div style="background:#dcfce7;border-radius:10px;padding:10px;font-size:13px;color:#166534;max-width:80%;">${escapeTrainingText(SceneTraining._dialogueAnswers[i])}</div>
                 <div style="width:28px;height:28px;background:#10b981;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;flex-shrink:0;">你</div>
               </div>` : ''}
           </div>`).join('')}
@@ -716,7 +722,7 @@ function renderActionDemo(step) {
       <div style="background:#f0fdf4;border-radius:10px;padding:10px;font-size:13px;color:#15803d;margin-bottom:12px;">
         💬 ${practicePrompt || '用你的话回应'}
       </div>
-      <textarea id="st-ai-input" rows="3" placeholder="${hasMultiTurn ? '轮到你了…' : '在这里输入你的回应…'}" style="width:100%;border:1px solid #e5e7eb;border-radius:10px;padding:10px;font-size:14px;resize:outline-none;">${savedAnswer}</textarea>
+      <textarea id="st-ai-input" rows="3" placeholder="${hasMultiTurn ? '轮到你了…' : '在这里输入你的回应…'}" style="width:100%;border:1px solid #e5e7eb;border-radius:10px;padding:10px;font-size:14px;resize:outline-none;">${escapeTrainingText(savedAnswer)}</textarea>
       <div style="display:flex;gap:8px;margin-top:10px;">
         <button class="st-ai-voice-btn" style="flex:1;padding:10px;border:1px solid #c7d2fe;background:#eef2ff;border-radius:10px;color:#4338ca;font-size:13px;cursor:pointer;" onclick="startEtiquetteVoiceInput()">🎙️ 语音</button>
         <button class="st-ai-send" style="flex:1;padding:10px;border:none;background:linear-gradient(135deg,#10b981,#059669);border-radius:10px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;">${submitLabel}</button>
@@ -790,7 +796,7 @@ function renderEvaluation(step) {
     }));
     const savedQuizAnswer = courseDriven ? null : (SceneTraining._quizAnswer || null);
     let quizHtml = courseDriven
-      ? `<div id="st-quiz-block" style="padding:10px;background:#fff;border-radius:8px;font-size:12px;color:#475569;line-height:1.7;"><strong style="display:block;color:#0369a1;margin-bottom:5px;">📚 课程原文自查</strong><div>请从课程原文中找出：本轮回应依据了哪条规则？如果原文没有覆盖该细节，请记录“需要进一步确认”，不要自行补充礼仪标准。</div><textarea id="st-course-source-check" rows="3" placeholder="写下你依据的原文规则…" style="width:100%;margin-top:8px;border:1px solid #c7d2fe;border-radius:8px;padding:8px;font-size:12px;resize:vertical;">${SceneTraining._answers.course_source_check || ''}</textarea><button class="st-course-check-save" style="margin-top:7px;padding:7px 10px;border:0;border-radius:8px;background:#4f46e5;color:#fff;font-size:11px;cursor:pointer;">保存知识自查</button><span id="st-course-check-result" style="margin-left:8px;color:#047857;font-size:11px;"></span></div>`
+      ? `<div id="st-quiz-block" style="padding:10px;background:#fff;border-radius:8px;font-size:12px;color:#475569;line-height:1.7;"><strong style="display:block;color:#0369a1;margin-bottom:5px;">📚 课程原文自查</strong><div>请从课程原文中找出：本轮回应依据了哪条规则？如果原文没有覆盖该细节，请记录“需要进一步确认”，不要自行补充礼仪标准。</div><textarea id="st-course-source-check" rows="3" placeholder="写下你依据的原文规则…" style="width:100%;margin-top:8px;border:1px solid #c7d2fe;border-radius:8px;padding:8px;font-size:12px;resize:vertical;">${escapeTrainingText(SceneTraining._answers.course_source_check || '')}</textarea><button class="st-course-check-save" style="margin-top:7px;padding:7px 10px;border:0;border-radius:8px;background:#4f46e5;color:#fff;font-size:11px;cursor:pointer;">保存知识自查</button><span id="st-course-check-result" style="margin-left:8px;color:#047857;font-size:11px;"></span></div>`
       : `<div id="st-quiz-block"><div style="font-size:14px;font-weight:700;color:#1f2937;margin-bottom:10px;">第 1 题 · 知识小测验</div><div style="font-size:13px;color:#6b7280;margin-bottom:10px;">面对这个场景，下面哪个回应最合适？</div>`;
     if (!courseDriven) {
       quizOptions.forEach(opt => {
