@@ -734,7 +734,7 @@ function renderEvaluation(step) {
     const userAIInput = answers['ai_roleplay'] || answers[SceneTraining._steps.findIndex(s=>s.type==='ai_roleplay')];
     const userFollowInput = answers['follow_prac'] || answers[SceneTraining._steps.findIndex(s=>s.type==='follow_prac')];
     const courseSelfCheck = answers['course_source_check'] || '';
-    const allUserInput = userAIInput || userFollowInput || courseSelfCheck || '';
+    const allUserInput = userAIInput || userFollowInput || '';
     const bestOpt = (level.options || []).find(o => o.quality === 'good');
     const coldOpt = (level.options || []).find(o => o.quality === 'cold');
 
@@ -771,6 +771,7 @@ function renderEvaluation(step) {
 
     // 语言评价总分
     const langAvg = langDims.length ? Math.round(langDims.reduce((s, d) => s + d.score, 0) / langDims.length) : null;
+    const courseKnowledgeScore = courseDriven ? (courseSelfCheck.length >= 12 ? 100 : (courseSelfCheck ? 50 : 0)) : null;
 
     // ── 知识评价：课程模式只做原文自查，避免复用其他场景的选项 ──
     const quizOptions = courseDriven ? [] : (level.options || []).map((o, i) => ({
@@ -803,7 +804,7 @@ function renderEvaluation(step) {
       // 综合分：行为 30% + 语言 40% + 知识 30%
       let actionScore = actionPercent * 0.3;
       let langScore = (langAvg || 50) * 0.4;
-      let quizScore = savedQuizAnswer ? ((quizOptions.find(o => o.key === savedQuizAnswer)?.quality === 'good') ? 100 : 30) * 0.3 : 50 * 0.3;
+      let quizScore = courseDriven ? (courseKnowledgeScore || 0) * 0.3 : (savedQuizAnswer ? ((quizOptions.find(o => o.key === savedQuizAnswer)?.quality === 'good') ? 100 : 30) * 0.3 : 50 * 0.3);
       overallScore = Math.round(actionScore + langScore + quizScore);
       if (overallScore >= 80) { overallLabel = '🌟 优秀'; overallDesc = '你已经掌握了这个场景的核心动作和话术。下次可以挑战更复杂的分支情况（比如对方忽然被人叫走）。'; }
       else if (overallScore >= 60) { overallLabel = '👍 良好'; overallDesc = '基础已经打好了。重点改进建议：让回应信息更丰富 + 加一个开放式问题。'; }
