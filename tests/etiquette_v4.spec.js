@@ -25,6 +25,8 @@ test('礼仪训练是先教后练课堂，真实挑战保持无提示', async ({
   await page.locator('.etiquette-course-card[data-level-id="9001"] .etiquette-course-action').click();
   await expect(page.locator('#modal-etiquette-training')).toBeVisible();
   await expect.poll(async () => page.locator('#scene-training-container').isVisible().catch(() => false), { timeout: 10000 }).toBe(true);
+  const jumpResult = await page.evaluate(() => { const last = SceneTraining._steps.length - 1; SceneTraining.gotoStep(last); return { idx: SceneTraining._stepIdx, last }; });
+  expect(jumpResult.idx).toBe(0);
   if (await page.locator('#scene-training-container').isVisible().catch(() => false)) {
     await page.evaluate(() => { while (SceneTraining.getCurrentStep().type !== 'action_demo') SceneTraining.next(); });
     await expect(page.locator('#scene-training-container')).toContainText('动作示范');

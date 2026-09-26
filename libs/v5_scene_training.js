@@ -41,6 +41,7 @@
     _level: null,
     _steps: [],
     _stepIdx: 0,
+    _maxReached: 0,
     _answers: {},      // stepIdx -> user input
     _actionDone: {},   // stepIdx -> checklist completion {idx: true}
     _container: null,    saveChallenge: function () {
@@ -418,6 +419,7 @@
       ? buildCourseDrivenSteps(level, SceneTraining._lessonContext)
       : buildStepsFromLevel(level);
     SceneTraining._stepIdx = 0;
+    SceneTraining._maxReached = 0;
     SceneTraining._answers = {};
     SceneTraining._actionDone = {};
     SceneTraining._turnIdx = 0;
@@ -427,7 +429,7 @@
     SceneTraining._quizAnswer = null;
     SceneTraining._progressKey = 'duilian_scene_progress_' + level.id;
     SceneTraining._resumed = false;
-    try { const saved = JSON.parse(localStorage.getItem(SceneTraining._progressKey) || 'null'); if (saved && saved.scene === level.title && !!saved.lessonDriven === !!SceneTraining._lessonContext) { SceneTraining._resumed = true; SceneTraining._stepIdx = Math.min(Number(saved.stepIdx) || 0, SceneTraining._steps.length - 1); SceneTraining._answers = saved.answers || {}; SceneTraining._actionDone = saved.actionDone || {}; SceneTraining._turnIdx = saved.turnIdx || 0; SceneTraining._dialogueAnswers = saved.dialogueAnswers || {}; SceneTraining._branchUsed = !!saved.branchUsed; SceneTraining._branchLabel = saved.branchLabel || ''; SceneTraining._quizAnswer = saved.quizAnswer || null; } } catch (e) {}
+    try { const saved = JSON.parse(localStorage.getItem(SceneTraining._progressKey) || 'null'); if (saved && saved.scene === level.title && !!saved.lessonDriven === !!SceneTraining._lessonContext) { SceneTraining._resumed = true; SceneTraining._stepIdx = Math.min(Number(saved.stepIdx) || 0, SceneTraining._steps.length - 1); SceneTraining._maxReached = Math.min(Math.max(Number(saved.maxReached) || SceneTraining._stepIdx, SceneTraining._stepIdx), SceneTraining._steps.length - 1); SceneTraining._answers = saved.answers || {}; SceneTraining._actionDone = saved.actionDone || {}; SceneTraining._turnIdx = saved.turnIdx || 0; SceneTraining._dialogueAnswers = saved.dialogueAnswers || {}; SceneTraining._branchUsed = !!saved.branchUsed; SceneTraining._branchLabel = saved.branchLabel || ''; SceneTraining._quizAnswer = saved.quizAnswer || null; } } catch (e) {}
 if (SceneTraining._branchUsed && SceneTraining._branchLabel) {
       const restoredAI = SceneTraining._steps.find(function (item) { return item.type === 'ai_roleplay'; });
       const restoredBranch = restoredAI && (restoredAI.branches || []).find(function (item) { return item.label === SceneTraining._branchLabel; });
@@ -1129,10 +1131,14 @@ if (courseDriven) {
   // ──────────────────────────────────────────────────────────────────────
 
   SceneTraining.start = start;
-  SceneTraining.persistProgress = function () { try { localStorage.setItem(SceneTraining._progressKey, JSON.stringify({ scene: SceneTraining._level && SceneTraining._level.title, lessonDriven: !!SceneTraining._lessonContext, stepIdx: SceneTraining._stepIdx, answers: SceneTraining._answers, actionDone: SceneTraining._actionDone, turnIdx: SceneTraining._turnIdx, dialogueAnswers: SceneTraining._dialogueAnswers, quizAnswer: SceneTraining._quizAnswer, branchUsed: !!SceneTraining._branchUsed, branchLabel: SceneTraining._branchLabel || '', updatedAt: Date.now() })); } catch (e) {} };
+  SceneTraining.persistProgress = function () { try { localStorage.setItem(SceneTraining._progressKey, JSON.stringify({ scene: SceneTraining._level && SceneTraining._level.title, lessonDriven: !!SceneTraining._lessonContext, stepIdx: SceneTraining._stepIdx, maxReached: SceneTraining._maxReached, answers: SceneTraining._answers, actionDone: SceneTraining._actionDone, turnIdx: SceneTraining._turnIdx, dialogueAnswers: SceneTraining._dialogueAnswers, quizAnswer: SceneTraining._quizAnswer, branchUsed: !!SceneTraining._branchUsed, branchLabel: SceneTraining._branchLabel || '', updatedAt: Date.now() })); } catch (e) {} };
   SceneTraining.clearProgress = function () { try { localStorage.removeItem(SceneTraining._progressKey); } catch (e) {} };
   SceneTraining.gotoStep = function (n) {
     if (n < 0 || n >= SceneTraining._steps.length) return;
+    if (n > SceneTraining._maxReached) {
+      if (typeof global.showToast === 'function') global.showToast('请先完成前面的教学步骤，再进入这里。');
+      return;
+    }
     SceneTraining._stepIdx = n;
     SceneTraining.persistProgress();
     updateHUD();
@@ -1140,6 +1146,7 @@ if (courseDriven) {
   };
   SceneTraining.next = function () {
     if (SceneTraining._stepIdx < SceneTraining._steps.length - 1) {
+      SceneTraining._maxReached = Math.max(SceneTraining._maxReached, SceneTraining._stepIdx + 1);
       SceneTraining.gotoStep(SceneTraining._stepIdx + 1);
     }
   };
