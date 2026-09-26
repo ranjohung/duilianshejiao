@@ -427,7 +427,7 @@
     SceneTraining._quizAnswer = null;
     SceneTraining._progressKey = 'duilian_scene_progress_' + level.id;
     SceneTraining._resumed = false;
-    try { const saved = JSON.parse(localStorage.getItem(SceneTraining._progressKey) || 'null'); if (saved && saved.scene === level.title) { SceneTraining._resumed = true; SceneTraining._stepIdx = Math.min(Number(saved.stepIdx) || 0, SceneTraining._steps.length - 1); SceneTraining._answers = saved.answers || {}; SceneTraining._actionDone = saved.actionDone || {}; SceneTraining._turnIdx = saved.turnIdx || 0; SceneTraining._dialogueAnswers = saved.dialogueAnswers || {}; SceneTraining._branchUsed = !!saved.branchUsed; SceneTraining._branchLabel = saved.branchLabel || ''; SceneTraining._quizAnswer = saved.quizAnswer || null; } } catch (e) {}
+    try { const saved = JSON.parse(localStorage.getItem(SceneTraining._progressKey) || 'null'); if (saved && saved.scene === level.title && !!saved.lessonDriven === !!SceneTraining._lessonContext) { SceneTraining._resumed = true; SceneTraining._stepIdx = Math.min(Number(saved.stepIdx) || 0, SceneTraining._steps.length - 1); SceneTraining._answers = saved.answers || {}; SceneTraining._actionDone = saved.actionDone || {}; SceneTraining._turnIdx = saved.turnIdx || 0; SceneTraining._dialogueAnswers = saved.dialogueAnswers || {}; SceneTraining._branchUsed = !!saved.branchUsed; SceneTraining._branchLabel = saved.branchLabel || ''; SceneTraining._quizAnswer = saved.quizAnswer || null; } } catch (e) {}
 if (SceneTraining._branchUsed && SceneTraining._branchLabel) {
       const restoredAI = SceneTraining._steps.find(function (item) { return item.type === 'ai_roleplay'; });
       const restoredBranch = restoredAI && (restoredAI.branches || []).find(function (item) { return item.label === SceneTraining._branchLabel; });
@@ -1129,7 +1129,7 @@ if (courseDriven) {
   // ──────────────────────────────────────────────────────────────────────
 
   SceneTraining.start = start;
-  SceneTraining.persistProgress = function () { try { localStorage.setItem(SceneTraining._progressKey, JSON.stringify({ scene: SceneTraining._level && SceneTraining._level.title, stepIdx: SceneTraining._stepIdx, answers: SceneTraining._answers, actionDone: SceneTraining._actionDone, turnIdx: SceneTraining._turnIdx, dialogueAnswers: SceneTraining._dialogueAnswers, quizAnswer: SceneTraining._quizAnswer, branchUsed: !!SceneTraining._branchUsed, branchLabel: SceneTraining._branchLabel || '', updatedAt: Date.now() })); } catch (e) {} };
+  SceneTraining.persistProgress = function () { try { localStorage.setItem(SceneTraining._progressKey, JSON.stringify({ scene: SceneTraining._level && SceneTraining._level.title, lessonDriven: !!SceneTraining._lessonContext, stepIdx: SceneTraining._stepIdx, answers: SceneTraining._answers, actionDone: SceneTraining._actionDone, turnIdx: SceneTraining._turnIdx, dialogueAnswers: SceneTraining._dialogueAnswers, quizAnswer: SceneTraining._quizAnswer, branchUsed: !!SceneTraining._branchUsed, branchLabel: SceneTraining._branchLabel || '', updatedAt: Date.now() })); } catch (e) {} };
   SceneTraining.clearProgress = function () { try { localStorage.removeItem(SceneTraining._progressKey); } catch (e) {} };
   SceneTraining.gotoStep = function (n) {
     if (n < 0 || n >= SceneTraining._steps.length) return;
