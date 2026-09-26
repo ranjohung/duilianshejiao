@@ -8640,7 +8640,7 @@ function renderTemplateScenes() {
     const ratings = getTemplateRatings(s.id);
     const avgRating = ratings.length > 0 ? (ratings.reduce((sum, r) => sum + r.rating, 0) / ratings.length).toFixed(1) : '暂无评分';
     const linked = findTrainingSceneForTemplate(s);
-    const status = linked ? getSceneUnlockStatus(linked) : getTemplateUnlockStatus(s);
+    const status = s.unlocked === true ? 'unlocked' : (linked ? getSceneUnlockStatus(linked) : getTemplateUnlockStatus(s));
     const actionLabel = status === 'unlocked' ? '开始训练' : status === 'unlockable' ? '解锁并训练' : '查看解锁条件';
 
     // v5.0.0: 检查是否有对应 V5 SceneTemplate
@@ -8661,7 +8661,7 @@ function renderTemplateScenes() {
         <span class="flex items-center gap-1 text-xs text-orange-500">${renderStars(parseFloat(avgRating))} ${avgRating}</span>
       </div>
       <div class="flex gap-2 mt-2">
-        <button onclick="useTemplateScene(${s.id})" class="flex-1 py-1.5 text-xs font-medium bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-colors">
+        <button onclick="useTemplateScene(${s.id})" aria-label="开始训练" class="flex-1 py-1.5 text-xs font-medium bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-colors">
           ${actionLabel}
         </button>
         ${hasV5
@@ -8738,7 +8738,7 @@ function showCategoryScenes(categoryId) {
     </div>
     ${categoryScenes.map(s => {
       const linked = findTrainingSceneForTemplate(s);
-      const status = linked ? getSceneUnlockStatus(linked) : getTemplateUnlockStatus(s);
+      const status = s.unlocked === true ? 'unlocked' : (linked ? getSceneUnlockStatus(linked) : getTemplateUnlockStatus(s));
       const requirement = linked ? getSceneUnlockRequirement(linked) : getTemplateUnlockRequirement(s);
       const isCompleted = linked ? linked.completed : !!s.completed;
       const isUnlocked = status === 'unlocked';
@@ -10226,6 +10226,14 @@ function getTemplateUnlockStatus(template) {
 function useTemplateScene(id) {
   const template = templateScenes.find(t => t.id === id);
   if (!template) return;
+
+  // 有完整 V5 教学模板的官方场景，主入口直接进入“知识 → 动作 → 话术 → 跟练”课堂。
+  // 只有确实存在映射时才接管，避免把销售/客户沟通等课程误指向相亲模板。
+  const v5SceneId = typeof findV5TemplateForScene === 'function' ? findV5TemplateForScene(template.name) : null;
+  if (template.creator === '官方推荐' && v5SceneId && window.SceneTemplates && window.SceneTemplates.loaded && window.SceneTemplates.loaded[v5SceneId]) {
+    openV5SceneTemplate(v5SceneId);
+    return;
+  }
   normalizeAccountPoints();
 
   // 市场卡片必须进入统一的训练场景状态，不能因模板 ID 不同而绕过首次选择、积分和穿梭券规则。
@@ -14489,10 +14497,9 @@ function openLearningCard(id) {
     if (typeof showToast === 'function') showToast('没有找到这门课程，请刷新学习卡片后重试。');
     return false;
   }
-  if (typeof KL_openDetail === 'function') {
-    KL_openDetail(card.id);
-    return true;
-  }
+  // 知识库增强模块可以先记录/补充详情，但最终统一打开主课程详情弹窗，
+  // 避免不同入口出现“点击后无可见反馈”的分叉体验。
+  // 详情增强数据由主弹窗直接渲染，避免知识库弹层与课程弹层叠加。
   // 详情模块未加载时仍提供可读正文，避免卡片点击静默失效。
   currentLearningCard = card;
   renderLearningCardDetail(card);
@@ -15856,7 +15863,14 @@ function startChallenge(challengeId, plainChat) {
   const stageBubbles = $('challenge-stage-bubbles');
   const challengeSurface = $('challenge-training-surface');
   if (plainChat) {
-    if (stage3dEl) stage3dEl.style.display = 'none';
+    if (stage3dEl) {
+      stage3dEl.style.display = ''; stage3dEl.classList.add('is-photo'); stage3dEl.dataset.visualMode = 'cinematic-photo';
+      if (!stage3dEl.querySelector('.photo-bg')) {
+        const bg = document.createElement('img'); bg.className = 'photo-bg'; bg.src = 'assets/cafe-realistic.jpg'; bg.alt = '真人场景背景'; stage3dEl.appendChild(bg);
+        const u = document.createElement('img'); u.className = 'photo-char photo-user'; u.src = getCinematicUserSrc(); stage3dEl.appendChild(u);
+        const n = document.createElement('img'); n.className = 'photo-char photo-npc'; n.src = getCinematicNpcSrc(getStage3DEnvKey(window.challengeSceneMeta, challenge.title)); stage3dEl.appendChild(n);
+      }
+    }
     if (stageBackdrop) stageBackdrop.style.display = 'none';
     if (stageCharacter) stageCharacter.style.display = 'none';
     if (stageBubbles) stageBubbles.style.display = 'none';
@@ -17557,7 +17571,13 @@ function startEtiquetteLevel(levelId, lessonContext) {
     $('etiquette-coach-role').textContent = lessonContext
       ? coach.name + ' · 课程原文跟练'
       : coach.name + ' · ' + meta.role + ' · ' + meta.tone;
-    return; // 走 V5 流程，不加载 3D
+    const v5Image = getCinematicSceneImage(meta);
+    if (typeof window.mountCinematicPhotoStage === 'function') {
+      window.mountCinematicPhotoStage('etiquette-3d-stage', { env: getStage3DEnvKey(meta, level.title), background: v5Image, backgroundAlt: (meta.location || '礼仪场景') + ' 真人影视背景', npcSrc: getCinematicNpcSrc(getStage3DEnvKey(meta, level.title), level.id), npcLabel: coach.name + ' 饰 ' + (meta.role || '场景角色'), npcAlt: coach.name + '，' + meta.role, userSrc: getCinematicUserSrc(), table: true });
+    }
+    const v5Bubbles = $('etiquette-stage-bubbles');
+    if (v5Bubbles && !v5Bubbles.querySelector('.challenge-stage-bubble') && level.opening) addEtiquetteBubble('npc', level.opening);
+    return; // V5 教学流程继续作为核心，照片舞台仅作增强
   }
   // ===== Fallback：旧 3D 流程 =====
   window.currentEtiquetteLevel = level;
@@ -18811,6 +18831,14 @@ function useAvatarDetail() {
   var KL_contentLoading = {};
   function KL_ensureContent(card, done) {
     if ((window.CourseContent || {})[card.id]) { done(); return; }
+    // Supplemental extracted cards carry their complete text inline; do not request a non-existent course_content bundle.
+    if (card.inlineContent && String(card.content || '').trim()) {
+      card.rawText = card.rawText || card.content;
+      if (!Array.isArray(card.readingSections) || !card.readingSections.length) {
+        card.readingSections = [{ t: card.title || '课程正文', x: card.content }];
+      }
+      done(); return;
+    }
     if (!card.bundle) { card.loadError = true; done(); return; }
     var key = card.bundle;
     if (KL_contentLoading[key]) { KL_contentLoading[key].push(done); return; }
