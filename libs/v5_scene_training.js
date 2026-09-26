@@ -396,7 +396,8 @@
     SceneTraining._dialogueAnswers = {};
     SceneTraining._quizAnswer = null;
     SceneTraining._progressKey = 'duilian_scene_progress_' + level.id;
-    try { const saved = JSON.parse(localStorage.getItem(SceneTraining._progressKey) || 'null'); if (saved && saved.scene === level.title) { SceneTraining._stepIdx = Math.min(Number(saved.stepIdx) || 0, SceneTraining._steps.length - 1); SceneTraining._answers = saved.answers || {}; SceneTraining._actionDone = saved.actionDone || {}; SceneTraining._turnIdx = saved.turnIdx || 0; SceneTraining._dialogueAnswers = saved.dialogueAnswers || {}; SceneTraining._quizAnswer = saved.quizAnswer || null; } } catch (e) {}
+    SceneTraining._resumed = false;
+    try { const saved = JSON.parse(localStorage.getItem(SceneTraining._progressKey) || 'null'); if (saved && saved.scene === level.title) { SceneTraining._resumed = true; SceneTraining._stepIdx = Math.min(Number(saved.stepIdx) || 0, SceneTraining._steps.length - 1); SceneTraining._answers = saved.answers || {}; SceneTraining._actionDone = saved.actionDone || {}; SceneTraining._turnIdx = saved.turnIdx || 0; SceneTraining._dialogueAnswers = saved.dialogueAnswers || {}; SceneTraining._quizAnswer = saved.quizAnswer || null; } } catch (e) {}
     console.log('[SceneTraining] start:', level.id, level.title, 'steps:', SceneTraining._steps.length);
 
     // 容器定位 — 和 modal-etiquette-training 共存
@@ -486,6 +487,7 @@
     return `<div class="st-step-header" style="text-align:center;margin-bottom:16px;">
       <div style="font-size:28px;margin-bottom:4px;">${typeIcon}</div>
       <div style="font-size:11px;color:#9ca3af;">Step ${idx+1} / ${total}</div>
+      ${SceneTraining._resumed ? '<div style="display:inline-block;margin-top:8px;padding:5px 9px;border-radius:999px;background:#ecfdf5;color:#047857;font-size:11px;">↩ 已恢复上次进度</div>' : ''}
       <div style="font-size:18px;font-weight:600;color:#1f2937;margin-top:4px;">${step.title || ''}</div>
     </div>`;
   }
@@ -872,7 +874,7 @@
     </div>`;
     // 底部操作
     html += `<div style="text-align:center;padding-top:8px;">
-      <button onclick="SceneTraining.gotoStep(0)" style="padding:10px 20px;border:1px solid #d1d5db;border-radius:10px;background:#fff;font-size:13px;cursor:pointer;margin-right:8px;">🔄 从头重练</button>
+      <button onclick="SceneTraining.clearProgress();SceneTraining._resumed=false;SceneTraining.gotoStep(0)" style="padding:10px 20px;border:1px solid #d1d5db;border-radius:10px;background:#fff;font-size:13px;cursor:pointer;margin-right:8px;">🔄 从头重练</button>
       <button onclick="SceneTraining.gotoStep(SceneTraining._steps.findIndex(s=>s.type==='ai_roleplay'))" style="padding:10px 20px;border:1px solid #c7d2fe;border-radius:10px;background:#eef2ff;color:#4338ca;font-size:13px;cursor:pointer;margin-right:8px;">🎭 再练一次 AI</button>
       <button onclick="closeModal('etiquette-training')" style="padding:10px 20px;border:none;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-size:13px;font-weight:600;cursor:pointer;">✅ 完成训练</button>
     </div>`;
