@@ -936,7 +936,8 @@ if (courseDriven) {
 
     let dots = '';
     for (let i = 0; i < total; i++) {
-      dots += `<div onclick="SceneTraining.gotoStep(${i})" style="width:10px;height:10px;border-radius:50%;background:${i===idx?'#6366f1':'#d1d5db'};cursor:pointer;transition:all .2s;"></div>`;
+      const unlocked = i <= SceneTraining._maxReached;
+      dots += `<button type="button" aria-label="步骤 ${i + 1}${unlocked ? '（已解锁）' : '（未解锁）'}" title="${unlocked ? '步骤 ' + (i + 1) : '请先完成前面的步骤'}" onclick="SceneTraining.gotoStep(${i})" style="width:10px;height:10px;padding:0;border:0;border-radius:50%;background:${i===idx?'#6366f1':(unlocked?'#d1d5db':'#e5e7eb')};opacity:${unlocked?1:.55};cursor:${unlocked?'pointer':'not-allowed'};transition:all .2s;"></button>`;
     }
 
     return `<div style="display:flex;align-items:center;justify-content:space-between;padding-top:16px;margin-top:16px;border-top:1px solid #f3f4f6;">
