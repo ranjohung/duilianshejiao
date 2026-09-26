@@ -287,3 +287,15 @@ test('测试账号入口与真人影视训练舞台可用', async ({ page }) => 
   await expect(challengeStage.locator('.photo-char')).toHaveCount(2);
   expect(pageErrors).toEqual([]);
 });
+
+test('课程模板进入完整礼仪教学闭环', async ({ page }) => {
+  await loginDemo(page);
+  await page.evaluate(() => openV5SceneTemplate('ST-011'));
+  await expect(page.locator('#modal-v5-scene')).toBeVisible();
+  await page.getByRole('button', { name: /开始跟练/ }).click();
+  await expect(page.locator('#modal-etiquette-training')).toBeVisible();
+  await page.evaluate(() => { while (SceneTraining.getCurrentStep().type !== 'evaluation') SceneTraining.next(); });
+  await expect(page.locator('#scene-training-container')).toContainText('课程原文对照');
+  await expect(page.locator('#scene-training-container')).toContainText('课堂 → 现实挑战');
+  await expect(page.locator('#scene-training-container')).toContainText('行为确认');
+});
