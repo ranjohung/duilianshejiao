@@ -553,7 +553,9 @@ if (SceneTraining._branchUsed && SceneTraining._branchLabel) {
     </div>`;
   }
 
-  function renderActionDemo(step) {
+function renderActionDemo(step) {
+    const actionDoneCount = Object.values(SceneTraining._actionDone[SceneTraining._stepIdx] || {}).filter(Boolean).length;
+    const actionTotalCount = (step.actions || []).length;
     // 时间轴样式：大圆 icon + 纵向连线 + 每步 label + tip
     let actionsHtml = '';
     (step.actions || []).forEach((a, i) => {
@@ -601,7 +603,7 @@ if (SceneTraining._branchUsed && SceneTraining._branchLabel) {
       </div>` : '';
 
     return `<div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:16px;margin-bottom:16px;">
-      <div style="font-size:13px;color:#047857;font-weight:600;margin-bottom:14px;">🕺 动作时间轴 · 跟着做，完成后点右侧 ✓</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#047857;font-weight:600;margin-bottom:14px;"><span>🕺 动作时间轴 · 跟着做，完成后点右侧 ✓</span><span id="st-action-progress" style="font-size:11px;color:#047857;">已完成 ${actionDoneCount} / ${actionTotalCount}</span></div>
       ${actionsHtml}
     </div>
     ${whenBox}
@@ -951,6 +953,8 @@ if (courseDriven) {
         }
         SceneTraining._actionDone[idx][aIdx] = !currentlyDone;
         const done = SceneTraining._actionDone[idx][aIdx];
+        const progress = document.getElementById('st-action-progress');
+        if (progress) progress.textContent = '已完成 ' + Object.values(SceneTraining._actionDone[idx] || {}).filter(Boolean).length + ' / ' + (step.actions || []).length;
         this.style.background = done ? '#10b981' : 'transparent';
         this.style.color = done ? '#fff' : '#d1d5db';
         this.textContent = done ? '✓' : '';
