@@ -714,19 +714,8 @@
   }
 
   function renderEvaluation(step) {
-    if (step.courseContext && SceneTraining._lessonContext) {
-      const ctx = SceneTraining._lessonContext;
-      const esc = global.escapeCardText || function (value) { return String(value == null ? '' : value).replace(/[&<>"']/g, function(c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); };
-      const answersForCourse = SceneTraining._answers;
-      const response = answersForCourse['ai_roleplay_full'] || answersForCourse['ai_roleplay'] || '';
-      return `<div style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:12px;padding:16px;line-height:1.8;">
-        <strong>练习已记录 · 请对照课程复盘</strong>
-        <p style="margin-top:10px;"><b>你的回应：</b></p><pre style="white-space:pre-wrap;font:inherit;">${esc(response || '本轮尚无文字回应。')}</pre>
-        <p><b>课程原文：</b></p><pre style="white-space:pre-wrap;font:inherit;background:#fff;padding:10px;border-radius:8px;">${esc(ctx.sourceText || '')}</pre>
-        <ul style="padding-left:20px;"><li>我能指出回应依据的原文内容。</li><li>我没有把软件模拟台词当成课程原文。</li><li>原文未覆盖的细节，我选择先确认而不是编造规则。</li></ul>
-        <p style="font-size:12px;color:#64748b;margin-top:10px;">此处提供的是本地自查提示，不是AI语义评价；系统也没有识别你的实际肢体动作。</p>
-      </div>`;
-    }
+    const courseDriven = !!(step.courseContext && SceneTraining._lessonContext);
+    const courseContextNote = courseDriven ? `<div style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:12px;padding:14px;margin-bottom:12px;line-height:1.7;"><strong style="color:#3730a3;">📘 课程原文对照</strong><p style="font-size:12px;color:#475569;margin:6px 0;">下面的回应来自练习情景；请指出它对应的课程原文依据。原文没有覆盖的细节，不要把模拟台词当成礼仪规则。</p><pre style="white-space:pre-wrap;font:inherit;background:#fff;padding:9px;border-radius:8px;font-size:12px;color:#334155;">${global.escapeCardText ? global.escapeCardText(SceneTraining._lessonContext.sourceText || '') : String(SceneTraining._lessonContext.sourceText || '')}</pre></div>` : '';
     const answers = SceneTraining._answers;
     const level = SceneTraining._level;
     const userAIInput = answers['ai_roleplay'] || answers[SceneTraining._steps.findIndex(s=>s.type==='ai_roleplay')];
@@ -734,6 +723,8 @@
     const allUserInput = userAIInput || userFollowInput || '';
     const bestOpt = (level.options || []).find(o => o.quality === 'good');
     const coldOpt = (level.options || []).find(o => o.quality === 'cold');
+
+    let html = courseContextNote;
 
     // ── 行为确认汇总 ──
     let doneChecks = 0;
@@ -824,7 +815,7 @@
     }
 
     // 组装
-    let html = `<div style="text-align:center;margin-bottom:16px;">
+    html += `<div style="text-align:center;margin-bottom:16px;">
       <div style="font-size:48px;margin-bottom:8px;">🏆</div>
       <div style="font-size:16px;font-weight:600;color:#1f2937;">训练完成！来看看你的三种评价</div>
       ${hasAnyInput ? `<div style="margin-top:8px;font-size:28px;font-weight:800;background:linear-gradient(135deg,#6366f1,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">${overallScore} / 100</div>
