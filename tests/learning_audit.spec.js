@@ -305,6 +305,8 @@ test('课程模板进入完整礼仪教学闭环', async ({ page }) => {
   await page.locator('#st-course-source-check').fill('课程原文要求先确认对方需求，再给出简洁回应。');
   await page.locator('.st-course-check-save').click();
   await expect(page.locator('#scene-training-container')).toContainText('知识自查完成度：100/100');
+  const completion = await page.evaluate(() => JSON.parse(localStorage.getItem('duilian_etiquette_completed_9001') || '{}'));
+  expect(completion.courseKnowledgeScore).toBe(100);
   await expect.poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem('duilian_scene_progress_9001') || '{}').answers.course_source_check)).toContain('先确认');
   await expect(page.locator('#scene-training-container')).not.toContainText('面对这个场景，下面哪个回应最合适');
   await expect(page.locator('#scene-training-container')).toContainText('课堂 → 现实挑战');

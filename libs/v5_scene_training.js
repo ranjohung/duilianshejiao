@@ -58,6 +58,7 @@
       const total = (SceneTraining._steps || []).reduce((n, step) => n + (Array.isArray(step.actions) ? step.actions.length : 0) + (Array.isArray(step.actionChecklist) ? step.actionChecklist.length : 0), 0) || Object.values(SceneTraining._actionDone || {}).reduce((n, row) => n + Object.keys(row || {}).length, 0);
       const behaviorPercent = total ? Math.round(done / total * 100) : 0;
       const dialogueTurns = Object.keys(SceneTraining._dialogueAnswers || {}).length;
+      const courseKnowledgeScore = SceneTraining._lessonContext ? (String(SceneTraining._answers.course_source_check || '').length >= 12 ? 100 : (SceneTraining._answers.course_source_check ? 50 : 0)) : null;
       const challenge = behaviorPercent < 100 ? '现实中完成全部行为清单，并说出一句完整回应' : (dialogueTurns < 2 ? '现实中用完整句回应，并加入一个开放式问题' : '现实中练习一次临时变化下的自然回应');
       const branchLabel = SceneTraining._branchLabel || '';
       const outcomeValue = outcome ? outcome.value : '';
@@ -67,7 +68,7 @@
       else if (done < 2) recommendation = '再练一次：动作时间轴与行为确认';
       else if (text.length < 12) recommendation = '再练一次：用完整句回应并推进话题';
       else if (branchLabel) recommendation = '下一练：继续练习“' + branchLabel + '”后的自然回应';
-      const item = { levelId: level.id || 9001, scene: level.title || '礼仪场景', challenge: challenge, note: text, location: location ? location.value : '', outcome: outcome ? outcome.value : '', feeling: feeling ? feeling.value : '', dialogueTurns: Object.keys(SceneTraining._dialogueAnswers || {}).length, dialogue: SceneTraining._dialogueAnswers || {}, behaviorDone: done, behaviorTotal: total, behaviorPercent: behaviorPercent, recommendation: recommendation, branch: branchLabel, createdAt: Date.now() };
+      const item = { levelId: level.id || 9001, scene: level.title || '礼仪场景', challenge: challenge, note: text, location: location ? location.value : '', outcome: outcome ? outcome.value : '', feeling: feeling ? feeling.value : '', dialogueTurns: Object.keys(SceneTraining._dialogueAnswers || {}).length, dialogue: SceneTraining._dialogueAnswers || {}, behaviorDone: done, behaviorTotal: total, behaviorPercent: behaviorPercent, courseKnowledgeScore: courseKnowledgeScore, recommendation: recommendation, branch: branchLabel, createdAt: Date.now() };
       let log = []; try { log = JSON.parse(localStorage.getItem('duilian_challenge_log') || '[]'); } catch (e) {}
       log.unshift(item); localStorage.setItem('duilian_challenge_log', JSON.stringify(log.slice(0, 50)));
       localStorage.setItem('duilian_next_training', JSON.stringify({ levelId: level.id || 9001, scene: level.title || '礼仪场景', recommendation: recommendation, challenge: challenge, outcome: outcomeValue, behaviorPercent: behaviorPercent, source: 'scene-training', createdAt: Date.now() }));
@@ -1086,8 +1087,14 @@ if (courseDriven) {
       SceneTraining.persistProgress();
       const result = document.getElementById('st-course-check-result');
       const score = document.getElementById('st-course-knowledge-score');
-      if (score) score.textContent = (SceneTraining._answers.course_source_check.length >= 12 ? 100 : (SceneTraining._answers.course_source_check ? 50 : 0)) + '/100';
+      const knowledgeScore = SceneTraining._answers.course_source_check.length >= 12 ? 100 : (SceneTraining._answers.course_source_check ? 50 : 0);
+      if (score) score.textContent = knowledgeScore + '/100';
       if (result) result.textContent = SceneTraining._answers.course_source_check ? '✓ 已保存' : '请先写下依据';
+      try {
+        const key = 'duilian_etiquette_completed_' + (SceneTraining._level && SceneTraining._level.id);
+        const previous = JSON.parse(localStorage.getItem(key) || '{}');
+        localStorage.setItem(key, JSON.stringify(Object.assign({}, previous, { courseKnowledgeScore: knowledgeScore, courseSelfCheckSavedAt: Date.now() })));
+      } catch (e) {}
     });
     // 知识评价选择题
     document.querySelectorAll('.st-quiz-opt').forEach(btn => {
