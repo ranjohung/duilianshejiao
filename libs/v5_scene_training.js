@@ -414,6 +414,14 @@
     SceneTraining._progressKey = 'duilian_scene_progress_' + level.id;
     SceneTraining._resumed = false;
     try { const saved = JSON.parse(localStorage.getItem(SceneTraining._progressKey) || 'null'); if (saved && saved.scene === level.title) { SceneTraining._resumed = true; SceneTraining._stepIdx = Math.min(Number(saved.stepIdx) || 0, SceneTraining._steps.length - 1); SceneTraining._answers = saved.answers || {}; SceneTraining._actionDone = saved.actionDone || {}; SceneTraining._turnIdx = saved.turnIdx || 0; SceneTraining._dialogueAnswers = saved.dialogueAnswers || {}; SceneTraining._branchUsed = !!saved.branchUsed; SceneTraining._branchLabel = saved.branchLabel || ''; SceneTraining._quizAnswer = saved.quizAnswer || null; } } catch (e) {}
+if (SceneTraining._branchUsed && SceneTraining._branchLabel) {
+      const restoredAI = SceneTraining._steps.find(function (item) { return item.type === 'ai_roleplay'; });
+      const restoredBranch = restoredAI && (restoredAI.branches || []).find(function (item) { return item.label === SceneTraining._branchLabel; });
+      if (restoredAI && restoredBranch && !(restoredAI.dialogue || []).some(function (item) { return item.npc === restoredBranch.npc; })) {
+        restoredAI.dialogue = (restoredAI.dialogue || []).concat([{ npc: restoredBranch.npc, practicePrompt: restoredBranch.practicePrompt }]);
+      }
+      if (restoredAI) SceneTraining._turnIdx = Math.min(SceneTraining._turnIdx, restoredAI.dialogue.length - 1);
+    }
     console.log('[SceneTraining] start:', level.id, level.title, 'steps:', SceneTraining._steps.length);
 
     // 容器定位 — 和 modal-etiquette-training 共存

@@ -48,6 +48,9 @@ test('礼仪训练是先教后练课堂，真实挑战保持无提示', async ({
     await expect(page.locator('.st-branch-btn')).toHaveCount(3);
     await page.locator('.st-branch-btn').first().click();
     await expect(page.locator('#scene-training-container')).toContainText('临时要接个电话');
+    await page.evaluate(() => { closeModal('etiquette-training'); showEtiquetteTraining(); });
+    await page.locator('.etiquette-course-card[data-level-id="9001"] .etiquette-course-action').click();
+    await expect(page.locator('#scene-training-container')).toContainText('临时要接个电话');
     await page.locator('#st-ai-input').fill('好的，你先接电话，我们晚点再继续聊。');
     await page.locator('.st-ai-send').click();
     await page.waitForTimeout(750);
