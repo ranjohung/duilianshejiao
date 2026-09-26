@@ -94,3 +94,27 @@ test('礼仪训练是先教后练课堂，真实挑战保持无提示', async ({
 
   expect(pageErrors).toEqual([]);
 });
+
+test('礼仪训练中途退出后可恢复，并支持从头重练', async ({ page }) => {
+  await page.goto('http://127.0.0.1:8000/index.html', { waitUntil: 'domcontentloaded' });
+  await page.evaluate(() => {
+    performLocalLogin('etiquette-progress', '进度恢复用户', 99999, '钻石学员');
+    userData.memberTier = 'pro';
+    userData.memberTierExpiresAt = new Date(Date.now() + 86400000).toISOString();
+    showEtiquetteTraining();
+  });
+  await acceptProtocol(page);
+  await page.locator('.etiquette-course-card[data-level-id="9001"] .etiquette-course-action').click();
+  await expect(page.locator('#scene-training-container')).toBeVisible();
+  await page.evaluate(() => {
+    while (SceneTraining.getCurrentStep().type !== 'action_demo') SceneTraining.next();
+    SceneTraining.persistProgress();
+  });
+  await expect.poll(async () => page.evaluate(() => !!localStorage.getItem('duilian_scene_progress_9001'))).toBe(true);
+  await page.evaluate(() => { closeModal('etiquette-training'); showEtiquetteTraining(); });
+  await page.locator('.etiquette-course-card[data-level-id="9001"] .etiquette-course-action').click();
+  await expect(page.locator('#scene-training-container')).toContainText('已恢复上次进度');
+  await page.evaluate(() => { SceneTraining._resumed = false; SceneTraining.gotoStep(0); SceneTraining.clearProgress(); });
+  await expect.poll(async () => page.evaluate(() => localStorage.getItem('duilian_scene_progress_9001'))).toBeNull();
+  await expect(page.locator('#scene-training-container')).toContainText('Step 1 / 8');
+});

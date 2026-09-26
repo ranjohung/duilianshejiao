@@ -876,7 +876,7 @@
     </div>`;
     // 底部操作
     html += `<div style="text-align:center;padding-top:8px;">
-      <button onclick="SceneTraining.clearProgress();SceneTraining._resumed=false;SceneTraining.gotoStep(0)" style="padding:10px 20px;border:1px solid #d1d5db;border-radius:10px;background:#fff;font-size:13px;cursor:pointer;margin-right:8px;">🔄 从头重练</button>
+      <button onclick="SceneTraining._resumed=false;SceneTraining.gotoStep(0);SceneTraining.clearProgress()" style="padding:10px 20px;border:1px solid #d1d5db;border-radius:10px;background:#fff;font-size:13px;cursor:pointer;margin-right:8px;">🔄 从头重练</button>
       <button onclick="SceneTraining.gotoStep(SceneTraining._steps.findIndex(s=>s.type==='ai_roleplay'))" style="padding:10px 20px;border:1px solid #c7d2fe;border-radius:10px;background:#eef2ff;color:#4338ca;font-size:13px;cursor:pointer;margin-right:8px;">🎭 再练一次 AI</button>
       <button onclick="closeModal('etiquette-training')" style="padding:10px 20px;border:none;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-size:13px;font-weight:600;cursor:pointer;">✅ 完成训练</button>
     </div>`;
