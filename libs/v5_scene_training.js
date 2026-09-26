@@ -50,8 +50,9 @@
       const behaviorPercent = total ? Math.round(done / total * 100) : 0;
       const dialogueTurns = Object.keys(SceneTraining._dialogueAnswers || {}).length;
       const challenge = behaviorPercent < 100 ? '现实中完成全部行为清单，并说出一句完整回应' : (dialogueTurns < 2 ? '现实中用完整句回应，并加入一个开放式问题' : '现实中练习一次临时变化下的自然回应');
-      const recommendation = done < 2 ? '再练一次：动作时间轴与行为确认' : (text.length < 12 ? '再练一次：用完整句回应并推进话题' : '下一练：加入对方临时打断或不同意见的分支');
-      const item = { levelId: level.id || 9001, scene: level.title || '礼仪场景', challenge: challenge, note: text, feeling: feeling ? feeling.value : '', dialogueTurns: Object.keys(SceneTraining._dialogueAnswers || {}).length, dialogue: SceneTraining._dialogueAnswers || {}, behaviorDone: done, behaviorTotal: total, behaviorPercent: behaviorPercent, recommendation: recommendation, createdAt: Date.now() };
+      const branchLabel = SceneTraining._branchLabel || '';
+      const recommendation = done < 2 ? '再练一次：动作时间轴与行为确认' : (text.length < 12 ? '再练一次：用完整句回应并推进话题' : (branchLabel ? '下一练：继续练习“' + branchLabel + '”后的自然回应' : '下一练：加入对方临时打断或不同意见的分支'));
+      const item = { levelId: level.id || 9001, scene: level.title || '礼仪场景', challenge: challenge, note: text, feeling: feeling ? feeling.value : '', dialogueTurns: Object.keys(SceneTraining._dialogueAnswers || {}).length, dialogue: SceneTraining._dialogueAnswers || {}, behaviorDone: done, behaviorTotal: total, behaviorPercent: behaviorPercent, recommendation: recommendation, branch: branchLabel, createdAt: Date.now() };
       let log = []; try { log = JSON.parse(localStorage.getItem('duilian_challenge_log') || '[]'); } catch (e) {}
       log.unshift(item); localStorage.setItem('duilian_challenge_log', JSON.stringify(log.slice(0, 50)));
       localStorage.setItem('duilian_next_training', JSON.stringify({ levelId: level.id || 9001, scene: level.title || '礼仪场景', recommendation: recommendation, source: 'scene-training', createdAt: Date.now() }));
@@ -408,10 +409,11 @@
     SceneTraining._turnIdx = 0;
     SceneTraining._dialogueAnswers = {};
     SceneTraining._branchUsed = false;
+    SceneTraining._branchLabel = '';
     SceneTraining._quizAnswer = null;
     SceneTraining._progressKey = 'duilian_scene_progress_' + level.id;
     SceneTraining._resumed = false;
-    try { const saved = JSON.parse(localStorage.getItem(SceneTraining._progressKey) || 'null'); if (saved && saved.scene === level.title) { SceneTraining._resumed = true; SceneTraining._stepIdx = Math.min(Number(saved.stepIdx) || 0, SceneTraining._steps.length - 1); SceneTraining._answers = saved.answers || {}; SceneTraining._actionDone = saved.actionDone || {}; SceneTraining._turnIdx = saved.turnIdx || 0; SceneTraining._dialogueAnswers = saved.dialogueAnswers || {}; SceneTraining._branchUsed = !!saved.branchUsed; SceneTraining._quizAnswer = saved.quizAnswer || null; } } catch (e) {}
+    try { const saved = JSON.parse(localStorage.getItem(SceneTraining._progressKey) || 'null'); if (saved && saved.scene === level.title) { SceneTraining._resumed = true; SceneTraining._stepIdx = Math.min(Number(saved.stepIdx) || 0, SceneTraining._steps.length - 1); SceneTraining._answers = saved.answers || {}; SceneTraining._actionDone = saved.actionDone || {}; SceneTraining._turnIdx = saved.turnIdx || 0; SceneTraining._dialogueAnswers = saved.dialogueAnswers || {}; SceneTraining._branchUsed = !!saved.branchUsed; SceneTraining._branchLabel = saved.branchLabel || ''; SceneTraining._quizAnswer = saved.quizAnswer || null; } } catch (e) {}
     console.log('[SceneTraining] start:', level.id, level.title, 'steps:', SceneTraining._steps.length);
 
     // 容器定位 — 和 modal-etiquette-training 共存
@@ -964,6 +966,7 @@
       if (!branch) return;
       step.dialogue = (step.dialogue || []).concat([{ npc: branch.npc, practicePrompt: branch.practicePrompt }]);
       SceneTraining._branchUsed = true;
+      SceneTraining._branchLabel = branch.label || '';
       SceneTraining._turnIdx = step.dialogue.length - 1;
       SceneTraining.persistProgress();
       render();
@@ -1079,7 +1082,7 @@
   // ──────────────────────────────────────────────────────────────────────
 
   SceneTraining.start = start;
-  SceneTraining.persistProgress = function () { try { localStorage.setItem(SceneTraining._progressKey, JSON.stringify({ scene: SceneTraining._level && SceneTraining._level.title, stepIdx: SceneTraining._stepIdx, answers: SceneTraining._answers, actionDone: SceneTraining._actionDone, turnIdx: SceneTraining._turnIdx, dialogueAnswers: SceneTraining._dialogueAnswers, quizAnswer: SceneTraining._quizAnswer, branchUsed: !!SceneTraining._branchUsed, updatedAt: Date.now() })); } catch (e) {} };
+  SceneTraining.persistProgress = function () { try { localStorage.setItem(SceneTraining._progressKey, JSON.stringify({ scene: SceneTraining._level && SceneTraining._level.title, stepIdx: SceneTraining._stepIdx, answers: SceneTraining._answers, actionDone: SceneTraining._actionDone, turnIdx: SceneTraining._turnIdx, dialogueAnswers: SceneTraining._dialogueAnswers, quizAnswer: SceneTraining._quizAnswer, branchUsed: !!SceneTraining._branchUsed, branchLabel: SceneTraining._branchLabel || '', updatedAt: Date.now() })); } catch (e) {} };
   SceneTraining.clearProgress = function () { try { localStorage.removeItem(SceneTraining._progressKey); } catch (e) {} };
   SceneTraining.gotoStep = function (n) {
     if (n < 0 || n >= SceneTraining._steps.length) return;

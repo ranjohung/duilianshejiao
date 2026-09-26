@@ -64,6 +64,8 @@ test('礼仪训练是先教后练课堂，真实挑战保持无提示', async ({
     expect(challenge.note).toContain('办公室');
     expect(challenge.recommendation).toBeTruthy();
     expect(challenge.challenge).toContain('行为清单');
+    expect(challenge.branch).toBe('对方临时打断');
+    expect(challenge.recommendation).toContain('对方临时打断');
     const completed = await page.evaluate(() => JSON.parse(localStorage.getItem('duilian_etiquette_completed_9001') || 'null'));
     expect(completed.scene).toContain('咖啡厅');
     await page.evaluate(() => { closeModal('etiquette-training'); showEtiquetteTraining(); });
