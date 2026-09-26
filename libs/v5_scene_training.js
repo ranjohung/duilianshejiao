@@ -59,7 +59,13 @@
       const dialogueTurns = Object.keys(SceneTraining._dialogueAnswers || {}).length;
       const challenge = behaviorPercent < 100 ? '现实中完成全部行为清单，并说出一句完整回应' : (dialogueTurns < 2 ? '现实中用完整句回应，并加入一个开放式问题' : '现实中练习一次临时变化下的自然回应');
       const branchLabel = SceneTraining._branchLabel || '';
-      const recommendation = done < 2 ? '再练一次：动作时间轴与行为确认' : (text.length < 12 ? '再练一次：用完整句回应并推进话题' : (branchLabel ? '下一练：继续练习“' + branchLabel + '”后的自然回应' : '下一练：加入对方临时打断或不同意见的分支'));
+      const outcomeValue = outcome ? outcome.value : '';
+      let recommendation = '下一练：加入对方临时打断或不同意见的分支';
+      if (outcomeValue === '还没完成') recommendation = '先降低难度：在熟悉的人身上只练习一个动作和一句问候，再回来记录。';
+      else if (outcomeValue === '做了一半') recommendation = '下一练先补齐未完成的动作，再练习完整回应。';
+      else if (done < 2) recommendation = '再练一次：动作时间轴与行为确认';
+      else if (text.length < 12) recommendation = '再练一次：用完整句回应并推进话题';
+      else if (branchLabel) recommendation = '下一练：继续练习“' + branchLabel + '”后的自然回应';
       const item = { levelId: level.id || 9001, scene: level.title || '礼仪场景', challenge: challenge, note: text, location: location ? location.value : '', outcome: outcome ? outcome.value : '', feeling: feeling ? feeling.value : '', dialogueTurns: Object.keys(SceneTraining._dialogueAnswers || {}).length, dialogue: SceneTraining._dialogueAnswers || {}, behaviorDone: done, behaviorTotal: total, behaviorPercent: behaviorPercent, recommendation: recommendation, branch: branchLabel, createdAt: Date.now() };
       let log = []; try { log = JSON.parse(localStorage.getItem('duilian_challenge_log') || '[]'); } catch (e) {}
       log.unshift(item); localStorage.setItem('duilian_challenge_log', JSON.stringify(log.slice(0, 50)));
