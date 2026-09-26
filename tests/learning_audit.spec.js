@@ -296,6 +296,8 @@ test('课程模板进入完整礼仪教学闭环', async ({ page }) => {
   await expect(page.locator('#modal-etiquette-training')).toBeVisible();
   await page.evaluate(() => { while (SceneTraining.getCurrentStep().type !== 'evaluation') SceneTraining.next(); });
   await expect(page.locator('#scene-training-container')).toContainText('课程原文对照');
+  await expect(page.locator('#scene-training-container')).toContainText('课程原文自查');
+  await expect(page.locator('#scene-training-container')).not.toContainText('面对这个场景，下面哪个回应最合适');
   await expect(page.locator('#scene-training-container')).toContainText('课堂 → 现实挑战');
   await expect(page.locator('#scene-training-container')).toContainText('行为确认');
 });

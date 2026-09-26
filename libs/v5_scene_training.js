@@ -758,47 +758,30 @@
     // 语言评价总分
     const langAvg = langDims.length ? Math.round(langDims.reduce((s, d) => s + d.score, 0) / langDims.length) : null;
 
-    // ── 知识评价（内置选择题） ──
-    // 用 level.options 生成 A/B/C 题
-    const quizOptions = (level.options || []).map((o, i) => ({
-      key: String.fromCharCode(65 + i),  // A, B, C
-      quality: o.quality,
+    // ── 知识评价：课程模式只做原文自查，避免复用其他场景的选项 ──
+    const quizOptions = courseDriven ? [] : (level.options || []).map((o, i) => ({
+      key: String.fromCharCode(65 + i), quality: o.quality,
       text: o.text.substring(0, 80) + (o.text.length > 80 ? '…' : '')
     }));
-
-    const savedQuizAnswer = SceneTraining._quizAnswer || null;
-
-    let quizHtml = `<div id="st-quiz-block">
-      <div style="font-size:14px;font-weight:700;color:#1f2937;margin-bottom:10px;">第 1 题 · 知识小测验</div>
-      <div style="font-size:13px;color:#6b7280;margin-bottom:10px;">面对这个场景，下面哪个回应最合适？</div>`;
-    quizOptions.forEach(opt => {
-      const isSaved = savedQuizAnswer === opt.key;
-      const isCorrect = savedQuizAnswer && opt.quality === 'good';
-      const isWrong = savedQuizAnswer && isSaved && opt.quality !== 'good';
-      let bg = '#f9fafb', border = '#e5e7eb', fg = '#374151';
+    const savedQuizAnswer = courseDriven ? null : (SceneTraining._quizAnswer || null);
+    let quizHtml = courseDriven
+      ? `<div id="st-quiz-block" style="padding:10px;background:#fff;border-radius:8px;font-size:12px;color:#475569;line-height:1.7;"><strong style="display:block;color:#0369a1;margin-bottom:5px;">📚 课程原文自查</strong>请从课程原文中找出：本轮回应依据了哪条规则？如果原文没有覆盖该细节，请记录“需要进一步确认”，不要自行补充礼仪标准。</div>`
+      : `<div id="st-quiz-block"><div style="font-size:14px;font-weight:700;color:#1f2937;margin-bottom:10px;">第 1 题 · 知识小测验</div><div style="font-size:13px;color:#6b7280;margin-bottom:10px;">面对这个场景，下面哪个回应最合适？</div>`;
+    if (!courseDriven) {
+      quizOptions.forEach(opt => {
+        const isSaved = savedQuizAnswer === opt.key;
+        const isWrong = savedQuizAnswer && isSaved && opt.quality !== 'good';
+        let bg = '#f9fafb', border = '#e5e7eb', fg = '#374151';
+        if (savedQuizAnswer) { if (opt.quality === 'good') { bg = '#ecfdf5'; border = '#a7f3d0'; fg = '#065f46'; } if (isWrong) { bg = '#fef2f2'; border = '#fecaca'; fg = '#991b1b'; } }
+        quizHtml += `<button class="st-quiz-opt" data-qkey="${opt.key}" data-qquality="${opt.quality}" style="display:block;width:100%;text-align:left;padding:10px 14px;margin-bottom:8px;background:${bg};border:2px solid ${border};border-radius:10px;font-size:13px;color:${fg};cursor:pointer;" ${savedQuizAnswer ? 'disabled' : ''}><span style="font-weight:700;margin-right:8px;">${opt.key}.</span>${opt.text}${savedQuizAnswer && opt.quality === 'good' ? ' ✅' : ''}${isWrong ? ' ❌' : ''}</button>`;
+      });
       if (savedQuizAnswer) {
-        if (opt.quality === 'good') { bg = '#ecfdf5'; border = '#a7f3d0'; fg = '#065f46'; }
-        if (isWrong) { bg = '#fef2f2'; border = '#fecaca'; fg = '#991b1b'; }
-      }
-      quizHtml += `<button class="st-quiz-opt" data-qkey="${opt.key}" data-qquality="${opt.quality}"
-        style="display:block;width:100%;text-align:left;padding:10px 14px;margin-bottom:8px;background:${bg};border:2px solid ${border};border-radius:10px;font-size:13px;color:${fg};cursor:pointer;transition:all .15s;"
-        ${savedQuizAnswer ? 'disabled' : ''}>
-        <span style="font-weight:700;margin-right:8px;">${opt.key}.</span>${opt.text}
-        ${savedQuizAnswer && opt.quality === 'good' ? ' ✅' : ''}
-        ${isWrong ? ' ❌' : ''}
-      </button>`;
-    });
-    if (savedQuizAnswer) {
-      const correctKey = quizOptions.find(o => o.quality === 'good')?.key;
-      const isRight = savedQuizAnswer === correctKey;
-      quizHtml += `<div style="margin-top:8px;padding:10px;border-radius:8px;background:${isRight?'#ecfdf5':'#fef2f2'};font-size:13px;color:${isRight?'#065f46':'#991b1b'};">
-        ${isRight ? '🎉 答对了！你理解了这个场景的核心原则。' : `差一点。正确答案是 ${correctKey}。${bestOpt ? '原因：' + bestOpt.why : ''}`}
-      </div>`;
-    } else {
-      quizHtml += `<div style="font-size:12px;color:#9ca3af;margin-top:6px;">选一个，看看你掌握了多少</div>`;
+        const correctKey = quizOptions.find(o => o.quality === 'good')?.key;
+        const isRight = savedQuizAnswer === correctKey;
+        quizHtml += `<div style="margin-top:8px;padding:10px;border-radius:8px;background:${isRight?'#ecfdf5':'#fef2f2'};font-size:13px;color:${isRight?'#065f46':'#991b1b'};">${isRight ? '🎉 答对了！你理解了这个场景的核心原则。' : `差一点。正确答案是 ${correctKey}。${bestOpt ? '原因：' + bestOpt.why : ''}`}</div>`;
+      } else quizHtml += `<div style="font-size:12px;color:#9ca3af;margin-top:6px;">选一个，看看你掌握了多少</div>`;
+      quizHtml += `</div>`;
     }
-    quizHtml += `</div>`;
-
     // ── 总评 ──
     let overallScore = 0, overallLabel = '', overallDesc = '';
     const hasAnyInput = allUserInput.length > 0 || savedQuizAnswer || actionPercent > 0;
