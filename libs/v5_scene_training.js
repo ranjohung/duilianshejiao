@@ -715,7 +715,18 @@
     </div>`;
   }
 
-  function renderEvaluation(step) {
+function renderEvaluation(step) {
+    // 到达综合评价即记录课堂完成里程碑；现实挑战稍后再填也不会丢失课程进度。
+    try {
+      const key = 'duilian_etiquette_completed_' + (SceneTraining._level && SceneTraining._level.id);
+      const previous = JSON.parse(localStorage.getItem(key) || '{}');
+      localStorage.setItem(key, JSON.stringify(Object.assign({}, previous, {
+        scene: (SceneTraining._level && SceneTraining._level.title) || '礼仪场景',
+        evaluationReachedAt: previous.evaluationReachedAt || Date.now(),
+        behaviorPercent: previous.behaviorPercent || 0,
+        dialogueTurns: previous.dialogueTurns || Object.keys(SceneTraining._dialogueAnswers || {}).length
+      })));
+    } catch (e) {}
     const courseDriven = !!(step.courseContext && SceneTraining._lessonContext);
     const courseContextNote = courseDriven ? `<div style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:12px;padding:14px;margin-bottom:12px;line-height:1.7;"><strong style="color:#3730a3;">📘 课程原文对照</strong><p style="font-size:12px;color:#475569;margin:6px 0;">下面的回应来自练习情景；请指出它对应的课程原文依据。原文没有覆盖的细节，不要把模拟台词当成礼仪规则。</p><pre style="white-space:pre-wrap;font:inherit;background:#fff;padding:9px;border-radius:8px;font-size:12px;color:#334155;">${global.escapeCardText ? global.escapeCardText(SceneTraining._lessonContext.sourceText || '') : String(SceneTraining._lessonContext.sourceText || '')}</pre></div>` : '';
     const answers = SceneTraining._answers;
