@@ -56,6 +56,9 @@ test('礼仪训练是先教后练课堂，真实挑战保持无提示', async ({
     await expect(page.locator('.v5-recommendation')).toContainText(challenge.recommendation);
     await page.locator('.v5-recommendation button', { hasText: '查看最近复盘' }).click();
     await expect(page.locator('#v5-review-history')).toContainText('办公室');
+    await page.locator('#v5-review-history details summary').click();
+    await expect(page.locator('#v5-review-history')).toContainText('第1轮');
+    await expect(page.locator('#v5-review-history')).toContainText('您好，谢谢您的介绍');
     await page.locator('#v5-review-history button[aria-label="关闭复盘"]').click();
     await page.locator('.v5-recommendation button', { hasText: '进入下一练' }).click();
     await expect(page.locator('#modal-etiquette-training')).toBeVisible();
