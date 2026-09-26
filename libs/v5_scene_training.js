@@ -51,6 +51,7 @@
       let log = []; try { log = JSON.parse(localStorage.getItem('duilian_challenge_log') || '[]'); } catch (e) {}
       log.unshift(item); localStorage.setItem('duilian_challenge_log', JSON.stringify(log.slice(0, 50)));
       localStorage.setItem('duilian_next_training', JSON.stringify({ scene: level.title || '礼仪场景', recommendation: recommendation, source: 'scene-training', createdAt: Date.now() }));
+      window.dispatchEvent(new CustomEvent('v5-recommendation-refresh'));
       const out = root.querySelector('#st-reality-result');
       if (out) out.innerHTML = '<strong>已保存现实记录</strong><br>下一次建议：' + recommendation;
       const btn = root.querySelector('#st-save-reality'); if (btn) { btn.textContent = '✅ 已保存，可继续复盘'; btn.disabled = true; }
@@ -395,6 +396,8 @@
     console.log('[SceneTraining] start:', level.id, level.title, 'steps:', SceneTraining._steps.length);
 
     // 容器定位 — 和 modal-etiquette-training 共存
+    const duplicateContainers = document.querySelectorAll('#scene-training-container');
+    duplicateContainers.forEach((node, i) => { if (i > 0) node.remove(); });
     let container = document.getElementById('scene-training-container');
     if (!container) {
       container = document.createElement('div');

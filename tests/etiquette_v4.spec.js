@@ -13,7 +13,7 @@ async function acceptProtocol(page) {
 test('礼仪训练是先教后练课堂，真实挑战保持无提示', async ({ page }) => {
   const pageErrors = [];
   page.on('pageerror', error => pageErrors.push(error.message));
-  await page.goto('http://localhost:8000/index.html', { waitUntil: 'domcontentloaded' });
+  await page.goto('http://127.0.0.1:8000/index.html', { waitUntil: 'domcontentloaded' });
   await page.evaluate(() => {
     performLocalLogin('etiquette-classroom', '课堂验收用户', 99999, '钻石学员');
     userData.memberTier = 'pro';
@@ -24,6 +24,7 @@ test('礼仪训练是先教后练课堂，真实挑战保持无提示', async ({
   await expect.poll(async () => page.locator('.etiquette-course-card').count()).toBeGreaterThanOrEqual(15);
   await page.locator('.etiquette-course-card[data-level-id="9001"] .etiquette-course-action').click();
   await expect(page.locator('#modal-etiquette-training')).toBeVisible();
+  await expect.poll(async () => page.locator('#scene-training-container').isVisible().catch(() => false), { timeout: 10000 }).toBe(true);
   if (await page.locator('#scene-training-container').isVisible().catch(() => false)) {
     await page.evaluate(() => { while (SceneTraining.getCurrentStep().type !== 'action_demo') SceneTraining.next(); });
     await expect(page.locator('#scene-training-container')).toContainText('动作示范');
@@ -41,14 +42,16 @@ test('礼仪训练是先教后练课堂，真实挑战保持无提示', async ({
     }
     await page.evaluate(() => SceneTraining.next());
     await expect(page.locator('#scene-training-container')).toContainText('训练完成');
-    await expect(page.locator('#st-reality-note')).toBeVisible();
-    await page.locator('#st-reality-note').fill('今天在办公室主动向同事问候，并保持自然目光交流。');
-    await page.locator('#st-reality-feeling').selectOption('比较自然');
-    await page.locator('#st-save-reality').click();
-    await expect(page.locator('#st-reality-result')).toContainText('已保存现实记录');
+    await expect(page.locator('#st-reality-note').first()).toBeVisible();
+    await page.locator('#st-reality-note').first().fill('今天在办公室主动向同事问候，并保持自然目光交流。');
+    await page.locator('#st-reality-feeling').first().selectOption('比较自然');
+    await page.locator('#st-save-reality').first().click();
+    await expect(page.locator('#st-reality-result').first()).toContainText('已保存现实记录');
     const challenge = await page.evaluate(() => JSON.parse(localStorage.getItem('duilian_challenge_log') || '[]')[0]);
     expect(challenge.note).toContain('办公室');
     expect(challenge.recommendation).toBeTruthy();
+    await page.evaluate(() => { closeModal('etiquette-training'); showEtiquetteTraining(); });
+    await expect(page.locator('.v5-recommendation')).toContainText(challenge.recommendation);
     return;
   }
     await expect(page.locator('#modal-v4-teaching')).toHaveCount(0);
