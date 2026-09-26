@@ -37,7 +37,24 @@
     _stepIdx: 0,
     _answers: {},      // stepIdx -> user input
     _actionDone: {},   // stepIdx -> checklist completion {idx: true}
-    _container: null,
+    _container: null,    saveChallenge: function () {
+      const root = document.getElementById('scene-training-container');
+      if (!root) return;
+      const note = root.querySelector('#st-reality-note');
+      const feeling = root.querySelector('#st-reality-feeling');
+      const text = note ? note.value.trim() : '';
+      if (!text) { if (typeof global.showToast === 'function') global.showToast('先写下你准备在哪里完成，或回来后的真实经历。'); return; }
+      const level = SceneTraining._level || {};
+      const done = Object.values(SceneTraining._actionDone || {}).reduce((n, row) => n + Object.values(row || {}).filter(Boolean).length, 0);
+      const recommendation = done < 2 ? '再练一次：动作时间轴与行为确认' : (text.length < 12 ? '再练一次：用完整句回应并推进话题' : '下一练：加入对方临时打断或不同意见的分支');
+      const item = { scene: level.title || '礼仪场景', challenge: '把本课的一个动作和一句话带到真实场景', note: text, feeling: feeling ? feeling.value : '', recommendation: recommendation, createdAt: Date.now() };
+      let log = []; try { log = JSON.parse(localStorage.getItem('duilian_challenge_log') || '[]'); } catch (e) {}
+      log.unshift(item); localStorage.setItem('duilian_challenge_log', JSON.stringify(log.slice(0, 50)));
+      localStorage.setItem('duilian_next_training', JSON.stringify({ scene: level.title || '礼仪场景', recommendation: recommendation, source: 'scene-training', createdAt: Date.now() }));
+      const out = root.querySelector('#st-reality-result');
+      if (out) out.innerHTML = '<strong>已保存现实记录</strong><br>下一次建议：' + recommendation;
+      const btn = root.querySelector('#st-save-reality'); if (btn) { btn.textContent = '✅ 已保存，可继续复盘'; btn.disabled = true; }
+    },
   };
 
   // ──────────────────────────────────────────────────────────────────────
@@ -837,6 +854,15 @@
       </div>
     </div>`;
 
+    // ── 课堂 → 现实：挑战记录与下一练推荐 ──
+    html += `<div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:14px;margin-bottom:12px;">
+      <div style="font-size:13px;color:#047857;font-weight:700;margin-bottom:6px;">🌱 课堂 → 现实挑战</div>
+      <div style="font-size:12px;color:#065f46;line-height:1.6;margin-bottom:8px;">今天找一个合适的场景，把本课的一个动作和一句话带到现实中。不需要完美，回来记录真实发生了什么。</div>
+      <textarea id="st-reality-note" placeholder="在哪里？发生了什么？（也可以先写下准备挑战的场景）" style="width:100%;min-height:64px;border:1px solid #bbf7d0;border-radius:9px;padding:9px;font-size:12px;resize:vertical;"></textarea>
+      <select id="st-reality-feeling" style="margin-top:8px;width:100%;border:1px solid #bbf7d0;border-radius:9px;padding:8px;font-size:12px;background:#fff;"><option value="">当时感觉（可选）</option><option>紧张</option><option>一般</option><option>比较自然</option><option>很轻松</option></select>
+      <button id="st-save-reality" onclick="SceneTraining.saveChallenge()" style="margin-top:9px;padding:9px 14px;border:0;border-radius:9px;background:#059669;color:#fff;font-size:12px;font-weight:700;cursor:pointer;">保存现实记录</button>
+      <div id="st-reality-result" style="margin-top:8px;font-size:12px;color:#047857;"></div>
+    </div>`;
     // 底部操作
     html += `<div style="text-align:center;padding-top:8px;">
       <button onclick="SceneTraining.gotoStep(0)" style="padding:10px 20px;border:1px solid #d1d5db;border-radius:10px;background:#fff;font-size:13px;cursor:pointer;margin-right:8px;">🔄 从头重练</button>
