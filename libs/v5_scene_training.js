@@ -46,8 +46,10 @@
       if (!text) { if (typeof global.showToast === 'function') global.showToast('先写下你准备在哪里完成，或回来后的真实经历。'); return; }
       const level = SceneTraining._level || {};
       const done = Object.values(SceneTraining._actionDone || {}).reduce((n, row) => n + Object.values(row || {}).filter(Boolean).length, 0);
+      const total = Object.values(SceneTraining._actionDone || {}).reduce((n, row) => n + Object.keys(row || {}).length, 0);
+      const behaviorPercent = total ? Math.round(done / total * 100) : 0;
       const recommendation = done < 2 ? '再练一次：动作时间轴与行为确认' : (text.length < 12 ? '再练一次：用完整句回应并推进话题' : '下一练：加入对方临时打断或不同意见的分支');
-      const item = { levelId: level.id || 9001, scene: level.title || '礼仪场景', challenge: '把本课的一个动作和一句话带到真实场景', note: text, feeling: feeling ? feeling.value : '', dialogueTurns: Object.keys(SceneTraining._dialogueAnswers || {}).length, dialogue: SceneTraining._dialogueAnswers || {}, recommendation: recommendation, createdAt: Date.now() };
+      const item = { levelId: level.id || 9001, scene: level.title || '礼仪场景', challenge: '把本课的一个动作和一句话带到真实场景', note: text, feeling: feeling ? feeling.value : '', dialogueTurns: Object.keys(SceneTraining._dialogueAnswers || {}).length, dialogue: SceneTraining._dialogueAnswers || {}, behaviorDone: done, behaviorTotal: total, behaviorPercent: behaviorPercent, recommendation: recommendation, createdAt: Date.now() };
       let log = []; try { log = JSON.parse(localStorage.getItem('duilian_challenge_log') || '[]'); } catch (e) {}
       log.unshift(item); localStorage.setItem('duilian_challenge_log', JSON.stringify(log.slice(0, 50)));
       localStorage.setItem('duilian_next_training', JSON.stringify({ levelId: level.id || 9001, scene: level.title || '礼仪场景', recommendation: recommendation, source: 'scene-training', createdAt: Date.now() }));
