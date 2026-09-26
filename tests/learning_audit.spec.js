@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
 
-const BASE_URL = 'http://localhost:8000/index.html';
+const BASE_URL = 'http://127.0.0.1:8000/index.html';
 
 async function acceptProtocol(page) {
   const protocol = page.locator('#v3-protocol-overlay');
