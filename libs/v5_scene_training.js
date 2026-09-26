@@ -1146,6 +1146,16 @@ if (courseDriven) {
   };
   SceneTraining.next = function () {
     if (SceneTraining._stepIdx < SceneTraining._steps.length - 1) {
+      const current = SceneTraining._steps[SceneTraining._stepIdx] || {};
+      const checks = current.type === 'action_demo' ? (current.actions || []) : (current.type === 'follow_prac' ? (current.actionChecklist || []) : []);
+      if (checks.length) {
+        const done = Object.values(SceneTraining._actionDone[SceneTraining._stepIdx] || {}).filter(Boolean).length;
+        const speech = current.type === 'follow_prac' ? String(SceneTraining._answers[SceneTraining._stepIdx] || '').trim() : '';
+        if (done < checks.length || (current.type === 'follow_prac' && !speech)) {
+          if (typeof global.showToast === 'function') global.showToast(current.type === 'action_demo' ? '请先完成动作时间轴，再进入下一步。' : '请完成行为清单并写下你的回应，再进入下一步。');
+          return;
+        }
+      }
       SceneTraining._maxReached = Math.max(SceneTraining._maxReached, SceneTraining._stepIdx + 1);
       SceneTraining.gotoStep(SceneTraining._stepIdx + 1);
     }

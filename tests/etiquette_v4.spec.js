@@ -35,11 +35,16 @@ test('礼仪训练是先教后练课堂，真实挑战保持无提示', async ({
     await expect.poll(async () => page.evaluate(() => { const p = JSON.parse(localStorage.getItem('duilian_scene_progress_9001') || '{}'); const row = p.actionDone && p.actionDone[SceneTraining._stepIdx]; return !!(row && row[1]); })).toBe(false);
     await page.locator('.st-action-check').nth(0).click();
     await page.locator('.st-action-check').nth(1).click();
+    await page.locator('.st-action-check').nth(2).click();
+    await page.locator('.st-action-check').nth(3).click();
     await page.evaluate(() => { while (SceneTraining.getCurrentStep().type !== 'speech_demo') SceneTraining.next(); });
     await expect(page.locator('#scene-training-container')).toContainText('话术示范');
     await page.evaluate(() => { while (SceneTraining.getCurrentStep().type !== 'follow_prac') SceneTraining.next(); });
     await expect(page.locator('#scene-training-container')).toContainText('跟练');
-    await expect(page.locator('#st-follow-progress')).toContainText('已完成');
+    await expect(page.locator('#st-follow-progress')).toContainText('已完成 0 / 4');
+    for (const box of await page.locator('.st-follow-check').all()) await box.check();
+    await page.locator('#st-follow-input').fill('我会先回应对方，再补充具体信息，并请对方继续说明。');
+    await page.locator('.st-save-btn').click();
     await page.evaluate(() => { while (SceneTraining.getCurrentStep().type !== 'ai_roleplay') SceneTraining.next(); });
     await expect(page.locator('#scene-training-container')).toContainText('AI 角色扮演');
     await page.evaluate(() => { window.SpeechRecognition = class { start() { this.onresult({ resultIndex: 0, results: [{ 0: { transcript: '语音回应测试' }, isFinal: true }] }); this.onend(); } }; });
@@ -63,7 +68,7 @@ test('礼仪训练是先教后练课堂，真实挑战保持无提示', async ({
     await expect(page.locator('#st-ai-feedback')).toContainText('本地教练提示');
     await page.evaluate(() => SceneTraining.next());
     await expect(page.locator('#scene-training-container')).toContainText('训练完成');
-    await expect(page.locator('#scene-training-container')).toContainText('2 / 8 个动作已确认');
+    await expect(page.locator('#scene-training-container')).toContainText('8 / 8 个动作已确认');
     await expect(page.locator('#scene-training-container')).toContainText('下一练预告');
     const reached = await page.evaluate(() => JSON.parse(localStorage.getItem('duilian_etiquette_completed_9001') || 'null'));
     expect(reached.evaluationReachedAt).toBeTruthy();
@@ -82,9 +87,9 @@ test('礼仪训练是先教后练课堂，真实挑战保持无提示', async ({
     const nextTraining = await page.evaluate(() => JSON.parse(localStorage.getItem('duilian_next_training') || '{}'));
     expect(nextTraining.outcome).toBe('完成了');
     expect(nextTraining.behaviorPercent).toBeGreaterThan(0);
-    expect(nextTraining.behaviorPercent).toBeLessThan(100);
+    expect(nextTraining.behaviorPercent).toBe(100);
     expect(nextTraining.challenge).toBe(challenge.challenge);
-    expect(challenge.challenge).toContain('行为清单');
+    expect(challenge.challenge).toContain('临时变化');
     expect(challenge.branch).toBe('对方临时打断');
     expect(challenge.recommendation).toContain('对方临时打断');
     const completed = await page.evaluate(() => JSON.parse(localStorage.getItem('duilian_etiquette_completed_9001') || 'null'));
@@ -93,7 +98,7 @@ test('礼仪训练是先教后练课堂，真实挑战保持无提示', async ({
     await expect(page.locator('.v5-recommendation')).toContainText(challenge.recommendation);
     await page.locator('.v5-recommendation button', { hasText: '查看最近复盘' }).click();
     await expect(page.locator('#v5-review-history')).toContainText('办公室');
-    await expect(page.locator('#v5-review-history')).toContainText('行为清单');
+    await expect(page.locator('#v5-review-history')).toContainText('临时变化');
     await expect(page.locator('#v5-review-history')).toContainText('对方临时打断');
     await page.locator('#v5-review-history details summary').click();
     await expect(page.locator('#v5-review-history')).toContainText('第1轮');
