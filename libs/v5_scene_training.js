@@ -46,7 +46,7 @@
       if (!text) { if (typeof global.showToast === 'function') global.showToast('先写下你准备在哪里完成，或回来后的真实经历。'); return; }
       const level = SceneTraining._level || {};
       const done = Object.values(SceneTraining._actionDone || {}).reduce((n, row) => n + Object.values(row || {}).filter(Boolean).length, 0);
-      const total = Object.values(SceneTraining._actionDone || {}).reduce((n, row) => n + Object.keys(row || {}).length, 0);
+      const total = (SceneTraining._steps || []).reduce((n, step) => n + (Array.isArray(step.actions) ? step.actions.length : 0) + (Array.isArray(step.actionChecklist) ? step.actionChecklist.length : 0), 0) || Object.values(SceneTraining._actionDone || {}).reduce((n, row) => n + Object.keys(row || {}).length, 0);
       const behaviorPercent = total ? Math.round(done / total * 100) : 0;
       const dialogueTurns = Object.keys(SceneTraining._dialogueAnswers || {}).length;
       const challenge = behaviorPercent < 100 ? '现实中完成全部行为清单，并说出一句完整回应' : (dialogueTurns < 2 ? '现实中用完整句回应，并加入一个开放式问题' : '现实中练习一次临时变化下的自然回应');
@@ -933,7 +933,15 @@
       btn.addEventListener('click', function () {
         const aIdx = parseInt(this.dataset.actionIdx, 10);
         SceneTraining._actionDone[idx] = SceneTraining._actionDone[idx] || {};
-        SceneTraining._actionDone[idx][aIdx] = !SceneTraining._actionDone[idx][aIdx];
+        const currentlyDone = !!SceneTraining._actionDone[idx][aIdx];
+        if (!currentlyDone && aIdx > 0) {
+          const previousDone = Array.from({ length: aIdx }, (_, i) => !!SceneTraining._actionDone[idx][i]).every(Boolean);
+          if (!previousDone) {
+            if (typeof global.showToast === 'function') global.showToast('请先完成前面的动作，再进入这一步。');
+            return;
+          }
+        }
+        SceneTraining._actionDone[idx][aIdx] = !currentlyDone;
         const done = SceneTraining._actionDone[idx][aIdx];
         this.style.background = done ? '#10b981' : 'transparent';
         this.style.color = done ? '#fff' : '#d1d5db';

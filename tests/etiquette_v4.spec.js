@@ -28,6 +28,10 @@ test('礼仪训练是先教后练课堂，真实挑战保持无提示', async ({
   if (await page.locator('#scene-training-container').isVisible().catch(() => false)) {
     await page.evaluate(() => { while (SceneTraining.getCurrentStep().type !== 'action_demo') SceneTraining.next(); });
     await expect(page.locator('#scene-training-container')).toContainText('动作示范');
+    await page.locator('.st-action-check').nth(1).click();
+    await expect.poll(async () => page.evaluate(() => { const p = JSON.parse(localStorage.getItem('duilian_scene_progress_9001') || '{}'); const row = p.actionDone && p.actionDone[SceneTraining._stepIdx]; return !!(row && row[1]); })).toBe(false);
+    await page.locator('.st-action-check').nth(0).click();
+    await page.locator('.st-action-check').nth(1).click();
     await page.evaluate(() => { while (SceneTraining.getCurrentStep().type !== 'speech_demo') SceneTraining.next(); });
     await expect(page.locator('#scene-training-container')).toContainText('话术示范');
     await page.evaluate(() => { while (SceneTraining.getCurrentStep().type !== 'follow_prac') SceneTraining.next(); });
