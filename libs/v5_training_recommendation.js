@@ -12,7 +12,7 @@
   var old=list.parentNode.querySelector('.v5-recommendation'); if(old)return;
   var rec=readRecommendation();
   var box=document.createElement('section');box.className='v5-recommendation';box.setAttribute('role','status');
-  box.innerHTML='<div><small>基于你的最近练习 · '+rec.source+'</small><b>下一步建议</b><p>'+rec.title+'</p><span>'+rec.reason+'</span></div><i aria-hidden="true">↗</i>';
+  box.innerHTML='<div><small>基于你的最近练习 · '+rec.source+'</small><b>下一步建议</b><p>'+rec.title+'</p><span>'+rec.reason+'</span><button type="button" onclick="startEtiquetteLevel(9001)" style="display:block;margin-top:10px;border:0;border-radius:9px;padding:8px 12px;background:#7c3aed;color:#fff;font-size:12px;font-weight:700;cursor:pointer;">进入下一练 →</button></div><i aria-hidden="true">↗</i>';
   list.parentNode.insertBefore(box,list);
  }
  window.addEventListener('v5-recommendation-refresh',function(){document.querySelectorAll('.v5-recommendation').forEach(function(node){node.remove();});setTimeout(enhance,0);});
