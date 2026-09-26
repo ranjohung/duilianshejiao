@@ -63,7 +63,8 @@
       const branchLabel = SceneTraining._branchLabel || '';
       const outcomeValue = outcome ? outcome.value : '';
       let recommendation = '下一练：加入对方临时打断或不同意见的分支';
-      if (outcomeValue === '还没完成') recommendation = '先降低难度：在熟悉的人身上只练习一个动作和一句问候，再回来记录。';
+      if (courseKnowledgeScore !== null && courseKnowledgeScore < 100) recommendation = '先回到课程原文，补完知识自查后再练一次。';
+      else if (outcomeValue === '还没完成') recommendation = '先降低难度：在熟悉的人身上只练习一个动作和一句问候，再回来记录。';
       else if (outcomeValue === '做了一半') recommendation = '下一练先补齐未完成的动作，再练习完整回应。';
       else if (done < 2) recommendation = '再练一次：动作时间轴与行为确认';
       else if (text.length < 12) recommendation = '再练一次：用完整句回应并推进话题';
@@ -71,7 +72,7 @@
       const item = { levelId: level.id || 9001, scene: level.title || '礼仪场景', challenge: challenge, note: text, location: location ? location.value : '', outcome: outcome ? outcome.value : '', feeling: feeling ? feeling.value : '', dialogueTurns: Object.keys(SceneTraining._dialogueAnswers || {}).length, dialogue: SceneTraining._dialogueAnswers || {}, behaviorDone: done, behaviorTotal: total, behaviorPercent: behaviorPercent, courseKnowledgeScore: courseKnowledgeScore, recommendation: recommendation, branch: branchLabel, createdAt: Date.now() };
       let log = []; try { log = JSON.parse(localStorage.getItem('duilian_challenge_log') || '[]'); } catch (e) {}
       log.unshift(item); localStorage.setItem('duilian_challenge_log', JSON.stringify(log.slice(0, 50)));
-      localStorage.setItem('duilian_next_training', JSON.stringify({ levelId: level.id || 9001, scene: level.title || '礼仪场景', recommendation: recommendation, challenge: challenge, outcome: outcomeValue, behaviorPercent: behaviorPercent, source: 'scene-training', createdAt: Date.now() }));
+      localStorage.setItem('duilian_next_training', JSON.stringify({ levelId: level.id || 9001, scene: level.title || '礼仪场景', recommendation: recommendation, challenge: challenge, outcome: outcomeValue, behaviorPercent: behaviorPercent, courseKnowledgeScore: courseKnowledgeScore, source: 'scene-training', createdAt: Date.now() }));
       localStorage.setItem('duilian_etiquette_completed_' + level.id, JSON.stringify({ scene: level.title || '礼仪场景', completedAt: Date.now(), behaviorPercent: behaviorPercent, dialogueTurns: Object.keys(SceneTraining._dialogueAnswers || {}).length }));
       SceneTraining.clearProgress();
       window.dispatchEvent(new CustomEvent('v5-recommendation-refresh'));
