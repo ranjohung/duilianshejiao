@@ -631,11 +631,13 @@
       </label>`;
     }).join('');
     const savedAnswer = SceneTraining._answers[SceneTraining._stepIdx] || '';
+    const followDone = Object.values(SceneTraining._actionDone[SceneTraining._stepIdx] || {}).filter(Boolean).length;
+    const followTotal = (step.actionChecklist || []).length;
     return `<div style="margin-bottom:16px;">
       <div style="background:#fef3c7;border-radius:10px;padding:10px;font-size:13px;color:#92400e;margin-bottom:12px;">
         💡 ${step.coachHint || '先做动作，再说你的回应'}
       </div>
-      <div style="font-size:13px;color:#6b7280;font-weight:600;margin-bottom:6px;">① 完成这些动作（勾上）</div>
+<div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#6b7280;font-weight:600;margin-bottom:6px;"><span>① 完成这些动作（勾上）</span><span id="st-follow-progress" style="font-size:11px;color:#6366f1;">已完成 ${followDone} / ${followTotal}</span></div>
       <div style="background:#f9fafb;border-radius:10px;padding:12px;margin-bottom:14px;">${checklist}</div>
       <div style="font-size:13px;color:#6b7280;font-weight:600;margin-bottom:6px;">② 说出你的回应</div>
       <textarea id="st-follow-input" rows="3" placeholder="${step.speechPlaceholder || '在这里输入…'}" style="width:100%;border:1px solid #e5e7eb;border-radius:10px;padding:10px;font-size:14px;resize:outline-none;">${savedAnswer}</textarea>
@@ -959,6 +961,8 @@
         const cIdx = parseInt(this.dataset.checkIdx, 10);
         SceneTraining._actionDone[idx] = SceneTraining._actionDone[idx] || {};
         SceneTraining._actionDone[idx][cIdx] = this.checked;
+        const progress = document.getElementById('st-follow-progress');
+        if (progress) { const done = Object.values(SceneTraining._actionDone[idx] || {}).filter(Boolean).length; progress.textContent = '已完成 ' + done + ' / ' + (step.actionChecklist || []).length; }
         SceneTraining.persistProgress();
       });
     });
@@ -970,13 +974,15 @@
         const input = document.getElementById('st-follow-input');
         if (input) {
           SceneTraining._answers[idx] = input.value;
-          SceneTraining._answers['follow_prac'] = input.value;  // 类型 key，evaluation 能找到\n          SceneTraining.persistProgress();
-          this.textContent = '✅ 已保存';
+          SceneTraining._answers['follow_prac'] = input.value;
+          const done = Object.values(SceneTraining._actionDone[idx] || {}).filter(Boolean).length;
+          const total = (step.actionChecklist || []).length;
+          SceneTraining.persistProgress();
+          this.textContent = done === total && input.value.trim() ? '✅ 动作与话术已保存' : '⚠ 已保存，建议补完动作';
           setTimeout(() => { this.textContent = '保存练习'; }, 1500);
         }
       });
     }
-
     // 情境分支：把用户选择的突发情况追加为下一轮
     document.querySelectorAll('.st-branch-btn').forEach(btn => btn.addEventListener('click', function () {
       const branch = step.branches && step.branches[parseInt(this.dataset.branchIdx, 10)];

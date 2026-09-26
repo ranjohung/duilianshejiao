@@ -36,6 +36,7 @@ test('礼仪训练是先教后练课堂，真实挑战保持无提示', async ({
     await expect(page.locator('#scene-training-container')).toContainText('话术示范');
     await page.evaluate(() => { while (SceneTraining.getCurrentStep().type !== 'follow_prac') SceneTraining.next(); });
     await expect(page.locator('#scene-training-container')).toContainText('跟练');
+    await expect(page.locator('#st-follow-progress')).toContainText('已完成');
     await page.evaluate(() => { while (SceneTraining.getCurrentStep().type !== 'ai_roleplay') SceneTraining.next(); });
     await expect(page.locator('#scene-training-container')).toContainText('AI 角色扮演');
     const turns = await page.evaluate(() => SceneTraining.getCurrentStep().dialogue.length);
